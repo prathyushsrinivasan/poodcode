@@ -15776,6 +15776,33 @@
             ]
           },
           {
+            "id": "tsm-ts_higher_order-dz1",
+            "title": "Design: Rule (A validator built from rules)",
+            "prompt": "This is the worked example “A validator built from rules” from Higher-Order Functions & Currying, with its `Rule` declaration taken out. Write `Rule` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Rule` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Rule` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = (s: string) => string | undefined;\ntype _d1 = Expect<Equal<Rule, __Design>>;\n",
+            "starter": "____\nconst minLength = (n: number): Rule => (s) => (s.length < n ? `at least ${n} characters` : undefined);\nconst hasDigit: Rule = (s) => (/\\d/.test(s) ? undefined : \"needs a digit\");\nfunction validator(...rules: Rule[]) {\n  return (s: string) => rules.map((r) => r(s)).filter((m) => m !== undefined);\n}\nconst password = validator(minLength(8), hasDigit);\nfor (const p of [\"short\", \"longenough\", \"longer123\"]) {\n  console.log(`${p}: ${password(p).join(\", \") || \"ok\"}`);\n}\n",
+            "solution": "type Rule = (s: string) => string | undefined;\nconst minLength = (n: number): Rule => (s) => (s.length < n ? `at least ${n} characters` : undefined);\nconst hasDigit: Rule = (s) => (/\\d/.test(s) ? undefined : \"needs a digit\");\nfunction validator(...rules: Rule[]) {\n  return (s: string) => rules.map((r) => r(s)).filter((m) => m !== undefined);\n}\nconst password = validator(minLength(8), hasDigit);\nfor (const p of [\"short\", \"longenough\", \"longer123\"]) {\n  console.log(`${p}: ${password(p).join(\", \") || \"ok\"}`);\n}\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "short: at least 8 characters, needs a digit\nlongenough: needs a digit\nlonger123: ok"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_higher_order-dx1",
             "title": "Read the error: Higher-Order Functions & Currying #1",
             "prompt": "The compiler rejects this program:\n\n    error TS2345: Argument of type '(s: string) => number' is not assignable to parameter of type '(value: number, index: number, array: number[]) => number'.\n\nFix the cause so it compiles — keep what the program is for; deleting the line that fails is not a fix.",
@@ -15902,6 +15929,41 @@
             "lines": [
               2
             ]
+          },
+          {
+            "id": "tsm-ts_recursion-dz1",
+            "title": "Design: Nested (Recursing on nested data)",
+            "prompt": "This is the worked example “Recursing on nested data” from Recursion, with its `Nested` declaration taken out. Write `Nested` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Nested` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Nested` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = number | Nested[];\ntype _d1 = Expect<Equal<Nested, __Design>>;\n",
+            "starter": "import * as fs from \"fs\";\n____\n\nfunction total(value: Nested): number {\n  if (typeof value === \"number\") return value;\n  let sum = 0;\n  for (const item of value) sum += total(item);\n  return sum;\n}\n\nfunction depth(value: Nested): number {\n  if (typeof value === \"number\") return 0;\n  let deepest = 0;\n  for (const item of value) deepest = Math.max(deepest, depth(item));\n  return 1 + deepest;\n}\n\nconst data = JSON.parse(fs.readFileSync(0, \"utf8\").trim()) as Nested;\nconsole.log(`total ${total(data)}, depth ${depth(data)}`);\n",
+            "solution": "import * as fs from \"fs\";\ntype Nested = number | Nested[];\n\nfunction total(value: Nested): number {\n  if (typeof value === \"number\") return value;\n  let sum = 0;\n  for (const item of value) sum += total(item);\n  return sum;\n}\n\nfunction depth(value: Nested): number {\n  if (typeof value === \"number\") return 0;\n  let deepest = 0;\n  for (const item of value) deepest = Math.max(deepest, depth(item));\n  return 1 + deepest;\n}\n\nconst data = JSON.parse(fs.readFileSync(0, \"utf8\").trim()) as Nested;\nconsole.log(`total ${total(data)}, depth ${depth(data)}`);\n",
+            "tests": [
+              {
+                "input": "[1, [2, 3], [[4]]]",
+                "output": "total 10, depth 3"
+              },
+              {
+                "input": "7",
+                "output": "total 7, depth 0"
+              },
+              {
+                "input": "[[], [[], [5]]]",
+                "output": "total 5, depth 3"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           },
           {
             "id": "tsm-ts_recursion-rt1",
@@ -21460,6 +21522,33 @@
             ]
           },
           {
+            "id": "tsm-ts_destructuring-dz1",
+            "title": "Design: Order (Destructuring in a parameter list)",
+            "prompt": "This is the worked example “Destructuring in a parameter list” from Destructuring, Spread & Rest, with its `Order` declaration taken out. Write `Order` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Order` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Order` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { id: number; items: { name: string; qty: number }[]; note?: string };\ntype _d1 = Expect<Equal<Order, __Design>>;\n",
+            "starter": "____\nfunction summary({ id, items, note = \"none\" }: Order): string {\n  const units = items.reduce((n, { qty }) => n + qty, 0);\n  return `#${id}: ${units} units, note: ${note}`;\n}\nconsole.log(summary({ id: 7, items: [{ name: \"pen\", qty: 2 }, { name: \"cup\", qty: 1 }] }));\n",
+            "solution": "type Order = { id: number; items: { name: string; qty: number }[]; note?: string };\nfunction summary({ id, items, note = \"none\" }: Order): string {\n  const units = items.reduce((n, { qty }) => n + qty, 0);\n  return `#${id}: ${units} units, note: ${note}`;\n}\nconsole.log(summary({ id: 7, items: [{ name: \"pen\", qty: 2 }, { name: \"cup\", qty: 1 }] }));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "#7: 3 units, note: none"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_destructuring-rt1",
             "title": "Retype: Returning several values",
             "prompt": "This is the worked example “Returning several values” from Destructuring, Spread & Rest, with every type on the signatures of `minMax` replaced by `any`. It still runs and prints the right thing — and the compiler checks none of it. Give every parameter and return type its real type again.",
@@ -21712,6 +21801,33 @@
             "source_slug": "",
             "dataset": "",
             "explanation": "**Integer-like keys don't keep insertion order.** Objects list integer-like keys first, ascending. A `Map` keeps pure insertion order."
+          },
+          {
+            "id": "tsm-ts_objects-dz1",
+            "title": "Design: Account (Optional chaining through nested data)",
+            "prompt": "This is the worked example “Optional chaining through nested data” from Objects, with its `Account` declaration taken out. Write `Account` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Account` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Account` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { owner?: { address?: { city?: string } } };\ntype _d1 = Expect<Equal<Account, __Design>>;\n",
+            "starter": "____\nconst accounts: Account[] = [{ owner: { address: { city: \"Oslo\" } } }, { owner: {} }, {}];\nfor (const a of accounts) console.log(a.owner?.address?.city ?? \"unknown city\");\n",
+            "solution": "type Account = { owner?: { address?: { city?: string } } };\nconst accounts: Account[] = [{ owner: { address: { city: \"Oslo\" } } }, { owner: {} }, {}];\nfor (const a of accounts) console.log(a.owner?.address?.city ?? \"unknown city\");\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "Oslo\nunknown city\nunknown city"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           },
           {
             "id": "tsm-ts_objects-dx1",
@@ -22250,6 +22366,60 @@
             ]
           },
           {
+            "id": "tsm-ts_interfaces_types-dz1",
+            "title": "Design: Point (The same shape, two spellings)",
+            "prompt": "This is the worked example “The same shape, two spellings” from Interfaces & Type Aliases, with its `Point` declaration taken out. Write `Point` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Point` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Point` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = {\n  x: number;\n  y: number;\n};\ntype _d1 = Expect<Equal<Point, __Design>>;\n",
+            "starter": "____\ntype Size = { width: number; height: number };\ntype Rect = Point & Size;\n\nconst r: Rect = { x: 1, y: 2, width: 10, height: 4 };\nconst p: Point = r;\nconsole.log(`at (${p.x}, ${p.y}), area ${r.width * r.height}`);\n",
+            "solution": "interface Point {\n  x: number;\n  y: number;\n}\ntype Size = { width: number; height: number };\ntype Rect = Point & Size;\n\nconst r: Rect = { x: 1, y: 2, width: 10, height: 4 };\nconst p: Point = r;\nconsole.log(`at (${p.x}, ${p.y}), area ${r.width * r.height}`);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "at (1, 2), area 40"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-ts_interfaces_types-dz2",
+            "title": "Design: Animal (Extending, and what only a type can say)",
+            "prompt": "This is the worked example “Extending, and what only a type can say” from Interfaces & Type Aliases, with its `Animal` declaration taken out. Write `Animal` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Animal` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Animal` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = {\n  name: string;\n};\ntype _d1 = Expect<Equal<Animal, __Design>>;\n",
+            "starter": "____\ninterface Dog extends Animal {\n  breed: string;\n}\ntype Pet = Dog | { kind: \"fish\"; name: string };\n\nfunction describe(pet: Pet): string {\n  return \"breed\" in pet ? `${pet.name} the ${pet.breed}` : `${pet.name} the fish`;\n}\n\nconsole.log(describe({ name: \"Rex\", breed: \"collie\" }));\nconsole.log(describe({ kind: \"fish\", name: \"Bubbles\" }));\n",
+            "solution": "interface Animal {\n  name: string;\n}\ninterface Dog extends Animal {\n  breed: string;\n}\ntype Pet = Dog | { kind: \"fish\"; name: string };\n\nfunction describe(pet: Pet): string {\n  return \"breed\" in pet ? `${pet.name} the ${pet.breed}` : `${pet.name} the fish`;\n}\n\nconsole.log(describe({ name: \"Rex\", breed: \"collie\" }));\nconsole.log(describe({ kind: \"fish\", name: \"Bubbles\" }));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "Rex the collie\nBubbles the fish"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_interfaces_types-rt1",
             "title": "Retype: Extending, and what only a type can say",
             "prompt": "This is the worked example “Extending, and what only a type can say” from Interfaces & Type Aliases, with every type on the signatures of `describe` replaced by `any`. It still runs and prints the right thing — and the compiler checks none of it. Give every parameter and return type its real type again.",
@@ -22485,6 +22655,60 @@
             "source_slug": "",
             "dataset": "",
             "explanation": "**Integer-like keys don't keep insertion order.** Object property order puts integer-like keys first, in numeric order, then the rest in insertion order. A `Map` keeps pure insertion order."
+          },
+          {
+            "id": "tsm-ts_index_signatures-dz1",
+            "title": "Design: Level (An exhaustive table)",
+            "prompt": "This is the worked example “An exhaustive table” from Index Signatures & Records, with its `Level` declaration taken out. Write `Level` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Level` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Level` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = \"debug\" | \"info\" | \"warn\" | \"error\";\ntype _d1 = Expect<Equal<Level, __Design>>;\n",
+            "starter": "import * as fs from \"fs\";\n____\nconst prefix: Record<Level, string> = {\n  debug: \"[.]\",\n  info: \"[i]\",\n  warn: \"[!]\",\n  error: \"[x]\",\n};\nconst levels: Level[] = [\"debug\", \"info\", \"warn\", \"error\"];\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const [first = \"\", ...rest] = line.split(\" \");\n  const level = levels.find((l) => l === first);\n  console.log(level === undefined ? `[?] ${line}` : `${prefix[level]} ${rest.join(\" \")}`);\n}\n",
+            "solution": "import * as fs from \"fs\";\ntype Level = \"debug\" | \"info\" | \"warn\" | \"error\";\nconst prefix: Record<Level, string> = {\n  debug: \"[.]\",\n  info: \"[i]\",\n  warn: \"[!]\",\n  error: \"[x]\",\n};\nconst levels: Level[] = [\"debug\", \"info\", \"warn\", \"error\"];\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const [first = \"\", ...rest] = line.split(\" \");\n  const level = levels.find((l) => l === first);\n  console.log(level === undefined ? `[?] ${line}` : `${prefix[level]} ${rest.join(\" \")}`);\n}\n",
+            "tests": [
+              {
+                "input": "info started\nwarn disk at 91%\nverbose ignored\nerror stopped",
+                "output": "[i] started\n[!] disk at 91%\n[?] verbose ignored\n[x] stopped"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-ts_index_signatures-dz2",
+            "title": "Design: Profile (Absent versus present-but-undefined)",
+            "prompt": "This is the worked example “Absent versus present-but-undefined” from Index Signatures & Records, with its `Profile` declaration taken out. Write `Profile` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Profile` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Profile` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { name: string; nickname?: string };\ntype _d1 = Expect<Equal<Profile, __Design>>;\n",
+            "starter": "____\nconst a: Profile = { name: \"Ada\" };\nconst b: Profile = { name: \"Bo\", nickname: undefined };\nfor (const p of [a, b]) {\n  console.log(p.name, \"nickname\" in p, Object.hasOwn(p, \"nickname\"), p.nickname ?? \"(none)\");\n}\n",
+            "solution": "type Profile = { name: string; nickname?: string };\nconst a: Profile = { name: \"Ada\" };\nconst b: Profile = { name: \"Bo\", nickname: undefined };\nfor (const p of [a, b]) {\n  console.log(p.name, \"nickname\" in p, Object.hasOwn(p, \"nickname\"), p.nickname ?? \"(none)\");\n}\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "Ada false false (none)\nBo true true (none)"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           },
           {
             "id": "tsm-ts_index_signatures-dx1",
@@ -24565,6 +24789,33 @@
             ]
           },
           {
+            "id": "tsm-ts_maps_sets-dz1",
+            "title": "Design: Task (Objects as keys)",
+            "prompt": "This is the worked example “Objects as keys” from Map & Set, with its `Task` declaration taken out. Write `Task` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Task` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Task` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { title: string };\ntype _d1 = Expect<Equal<Task, __Design>>;\n",
+            "starter": "____\nconst a: Task = { title: \"write\" };\nconst b: Task = { title: \"write\" };\nconst minutes = new Map<Task, number>();\nminutes.set(a, 30);\nminutes.set(b, 45);\nconsole.log(minutes.size, minutes.get(a), minutes.get(b));\n",
+            "solution": "type Task = { title: string };\nconst a: Task = { title: \"write\" };\nconst b: Task = { title: \"write\" };\nconst minutes = new Map<Task, number>();\nminutes.set(a, 30);\nminutes.set(b, 45);\nconsole.log(minutes.size, minutes.get(a), minutes.get(b));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "2 30 45"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_maps_sets-dx1",
             "title": "Read the error: Map & Set #1",
             "prompt": "The compiler rejects this program:\n\n    error TS2345: Argument of type 'number' is not assignable to parameter of type 'string'.\n\nFix the cause so it compiles — keep what the program is for; deleting the line that fails is not a fix.",
@@ -24773,6 +25024,33 @@
             "lines": [
               2
             ]
+          },
+          {
+            "id": "tsm-ts_set_algebra-dz1",
+            "title": "Design: Node (Remembering things about objects)",
+            "prompt": "This is the worked example “Remembering things about objects” from Set Algebra, Grouping & Weak Collections, with its `Node` declaration taken out. Write `Node` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Node` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Node` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { id: string; children: Node[] };\ntype _d1 = Expect<Equal<Node, __Design>>;\n",
+            "starter": "____\nconst sizeCache = new WeakMap<Node, number>();\nlet computed = 0;\nfunction size(node: Node): number {\n  const cached = sizeCache.get(node);\n  if (cached !== undefined) return cached;\n  computed++;\n  let total = 1;\n  for (const child of node.children) total += size(child);\n  sizeCache.set(node, total);\n  return total;\n}\nconst leaf = { id: \"leaf\", children: [] };\nconst tree: Node = { id: \"root\", children: [{ id: \"a\", children: [leaf] }, leaf] };\nconsole.log(size(tree), size(tree), `computed ${computed}`);\n",
+            "solution": "type Node = { id: string; children: Node[] };\nconst sizeCache = new WeakMap<Node, number>();\nlet computed = 0;\nfunction size(node: Node): number {\n  const cached = sizeCache.get(node);\n  if (cached !== undefined) return cached;\n  computed++;\n  let total = 1;\n  for (const child of node.children) total += size(child);\n  sizeCache.set(node, total);\n  return total;\n}\nconst leaf = { id: \"leaf\", children: [] };\nconst tree: Node = { id: \"root\", children: [{ id: \"a\", children: [leaf] }, leaf] };\nconsole.log(size(tree), size(tree), `computed ${computed}`);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "4 4 computed 3"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           },
           {
             "id": "tsm-ts_set_algebra-rt1",
@@ -26965,6 +27243,33 @@
             ]
           },
           {
+            "id": "tsm-ts_unions-dz1",
+            "title": "Design: Command (A literal union of commands)",
+            "prompt": "This is the worked example “A literal union of commands” from Union & Literal Types, with its `Command` declaration taken out. Write `Command` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Command` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Command` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = \"start\" | \"stop\" | \"pause\";\ntype _d1 = Expect<Equal<Command, __Design>>;\n",
+            "starter": "____\nfunction run(cmd: Command): string {\n  switch (cmd) {\n    case \"start\":\n      return \"running\";\n    case \"stop\":\n      return \"stopped\";\n    case \"pause\":\n      return \"paused\";\n  }\n}\nconsole.log(([\"start\", \"pause\", \"stop\"] as const).map(run).join(\" -> \"));\n",
+            "solution": "type Command = \"start\" | \"stop\" | \"pause\";\nfunction run(cmd: Command): string {\n  switch (cmd) {\n    case \"start\":\n      return \"running\";\n    case \"stop\":\n      return \"stopped\";\n    case \"pause\":\n      return \"paused\";\n  }\n}\nconsole.log(([\"start\", \"pause\", \"stop\"] as const).map(run).join(\" -> \"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "running -> paused -> stopped"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_unions-rt1",
             "title": "Retype: A literal union of commands",
             "prompt": "This is the worked example “A literal union of commands” from Union & Literal Types, with every type on the signatures of `run` replaced by `any`. It still runs and prints the right thing — and the compiler checks none of it. Give every parameter and return type its real type again.",
@@ -27167,6 +27472,60 @@
             "lines": [
               6
             ]
+          },
+          {
+            "id": "tsm-ts_aliases-dz1",
+            "title": "Design: LineItem (Names that document a domain)",
+            "prompt": "This is the worked example “Names that document a domain” from Type Aliases & Interfaces, with its `LineItem` declaration taken out. Write `LineItem` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `LineItem` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `LineItem` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { sku: Sku; qty: number; unit: Cents };\ntype _d1 = Expect<Equal<LineItem, __Design>>;\n",
+            "starter": "type Cents = number;\ntype Sku = string;\n____\nconst total = (items: readonly LineItem[]): Cents => items.reduce((s, i) => s + i.qty * i.unit, 0);\nconsole.log(total([{ sku: \"PEN-1\", qty: 3, unit: 150 }, { sku: \"CUP-2\", qty: 1, unit: 400 }]));\n",
+            "solution": "type Cents = number;\ntype Sku = string;\ntype LineItem = { sku: Sku; qty: number; unit: Cents };\nconst total = (items: readonly LineItem[]): Cents => items.reduce((s, i) => s + i.qty * i.unit, 0);\nconsole.log(total([{ sku: \"PEN-1\", qty: 3, unit: 150 }, { sku: \"CUP-2\", qty: 1, unit: 400 }]));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "850"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-ts_aliases-dz2",
+            "title": "Design: Named (Extending an interface, intersecting a type)",
+            "prompt": "This is the worked example “Extending an interface, intersecting a type” from Type Aliases & Interfaces, with its `Named` declaration taken out. Write `Named` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Named` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Named` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = {\n  name: string;\n};\ntype _d1 = Expect<Equal<Named, __Design>>;\n",
+            "starter": "____\ninterface Employee extends Named {\n  team: string;\n}\ntype Timestamped = { createdAt: string };\ntype Record_ = Employee & Timestamped;\nconst r: Record_ = { name: \"ana\", team: \"web\", createdAt: \"2026-09-01\" };\nconsole.log(Object.keys(r).join(\",\"));\n",
+            "solution": "interface Named {\n  name: string;\n}\ninterface Employee extends Named {\n  team: string;\n}\ntype Timestamped = { createdAt: string };\ntype Record_ = Employee & Timestamped;\nconst r: Record_ = { name: \"ana\", team: \"web\", createdAt: \"2026-09-01\" };\nconsole.log(Object.keys(r).join(\",\"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "name,team,createdAt"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           },
           {
             "id": "tsm-ts_aliases-dx1",
@@ -27378,6 +27737,33 @@
             "source_slug": "",
             "dataset": "",
             "explanation": "**`as const` arrays can't go where mutable arrays are expected.** A `readonly` tuple can't be passed as `string[]`, because the function might mutate it — and this one does. Accept `readonly string[]` and return a new array; that function now works with both."
+          },
+          {
+            "id": "tsm-ts_literal_inference-dz1",
+            "title": "Design: Method (Where a literal widens)",
+            "prompt": "This is the worked example “Where a literal widens” from Literal Types, Widening & `as const`, with its `Method` declaration taken out. Write `Method` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Method` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Method` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = \"GET\" | \"POST\";\ntype _d1 = Expect<Equal<Method, __Design>>;\n",
+            "starter": "____\nfunction send(method: Method, path: string): string {\n  return `${method} ${path}`;\n}\n\nconst fixed = \"GET\";\nconst request = { method: \"POST\", path: \"/items\" } as const;\nconst table = { method: \"GET\" as Method, path: \"/\" };\n\nconsole.log(send(fixed, \"/health\"));\nconsole.log(send(request.method, request.path));\nconsole.log(send(table.method, table.path));\n",
+            "solution": "type Method = \"GET\" | \"POST\";\nfunction send(method: Method, path: string): string {\n  return `${method} ${path}`;\n}\n\nconst fixed = \"GET\";\nconst request = { method: \"POST\", path: \"/items\" } as const;\nconst table = { method: \"GET\" as Method, path: \"/\" };\n\nconsole.log(send(fixed, \"/health\"));\nconsole.log(send(request.method, request.path));\nconsole.log(send(table.method, table.path));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "GET /health\nPOST /items\nGET /"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           },
           {
             "id": "tsm-ts_literal_inference-rt1",
@@ -29841,6 +30227,33 @@
             ]
           },
           {
+            "id": "tsm-ts_narrowing-dz1",
+            "title": "Design: Reply (Equality with a literal)",
+            "prompt": "This is the worked example “Equality with a literal” from Type Narrowing, with its `Reply` declaration taken out. Write `Reply` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Reply` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Reply` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = \"yes\" | \"no\" | number;\ntype _d1 = Expect<Equal<Reply, __Design>>;\n",
+            "starter": "____\nfunction explain(r: Reply): string {\n  if (r === \"yes\" || r === \"no\") return `answered ${r}`;\n  return `scored ${r.toFixed(1)}`;\n}\nconsole.log(explain(\"yes\"), \"|\", explain(7));\n",
+            "solution": "type Reply = \"yes\" | \"no\" | number;\nfunction explain(r: Reply): string {\n  if (r === \"yes\" || r === \"no\") return `answered ${r}`;\n  return `scored ${r.toFixed(1)}`;\n}\nconsole.log(explain(\"yes\"), \"|\", explain(7));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "answered yes | scored 7.0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_narrowing-rt1",
             "title": "Retype: Normalising input of several shapes",
             "prompt": "This is the worked example “Normalising input of several shapes” from Type Narrowing, with every type on the signatures of `toList` replaced by `any`. It still runs and prints the right thing — and the compiler checks none of it. Give every parameter and return type its real type again.",
@@ -30079,6 +30492,33 @@
             ]
           },
           {
+            "id": "tsm-ts_type_predicates-dz1",
+            "title": "Design: Point (Validating `unknown` data)",
+            "prompt": "This is the worked example “Validating `unknown` data” from User-Defined Type Guards, with its `Point` declaration taken out. Write `Point` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Point` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Point` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { x: number; y: number };\ntype _d1 = Expect<Equal<Point, __Design>>;\n",
+            "starter": "____\nfunction isPoint(v: unknown): v is Point {\n  return typeof v === \"object\" && v !== null && \"x\" in v && \"y\" in v && typeof v.x === \"number\" && typeof v.y === \"number\";\n}\nfor (const text of ['{\"x\":1,\"y\":2}', '{\"x\":\"1\",\"y\":2}', \"[1,2]\"]) {\n  const v: unknown = JSON.parse(text);\n  console.log(isPoint(v) ? `distance ${Math.hypot(v.x, v.y).toFixed(2)}` : \"not a point\");\n}\n",
+            "solution": "type Point = { x: number; y: number };\nfunction isPoint(v: unknown): v is Point {\n  return typeof v === \"object\" && v !== null && \"x\" in v && \"y\" in v && typeof v.x === \"number\" && typeof v.y === \"number\";\n}\nfor (const text of ['{\"x\":1,\"y\":2}', '{\"x\":\"1\",\"y\":2}', \"[1,2]\"]) {\n  const v: unknown = JSON.parse(text);\n  console.log(isPoint(v) ? `distance ${Math.hypot(v.x, v.y).toFixed(2)}` : \"not a point\");\n}\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "distance 2.24\nnot a point\nnot a point"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_type_predicates-dx1",
             "title": "Read the error: User-Defined Type Guards #1",
             "prompt": "The compiler rejects this program:\n\n    error TS2677: A type predicate's type must be assignable to its parameter's type.\n\nFix the cause so it compiles — keep what the program is for; deleting the line that fails is not a fix.",
@@ -30309,6 +30749,33 @@
             ]
           },
           {
+            "id": "tsm-ts_nullish-dz1",
+            "title": "Design: Config (Defaults for nested, partial config)",
+            "prompt": "This is the worked example “Defaults for nested, partial config” from null, undefined & Strict Checks, with its `Config` declaration taken out. Write `Config` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Config` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Config` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { server?: { port?: number; host?: string }; debug?: boolean };\ntype _d1 = Expect<Equal<Config, __Design>>;\n",
+            "starter": "____\nfunction resolve(c: Config) {\n  return { port: c.server?.port ?? 3000, host: c.server?.host ?? \"localhost\", debug: c.debug ?? false };\n}\nconsole.log(JSON.stringify(resolve({})));\nconsole.log(JSON.stringify(resolve({ server: { port: 0 }, debug: true })));\n",
+            "solution": "type Config = { server?: { port?: number; host?: string }; debug?: boolean };\nfunction resolve(c: Config) {\n  return { port: c.server?.port ?? 3000, host: c.server?.host ?? \"localhost\", debug: c.debug ?? false };\n}\nconsole.log(JSON.stringify(resolve({})));\nconsole.log(JSON.stringify(resolve({ server: { port: 0 }, debug: true })));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "{\"port\":3000,\"host\":\"localhost\",\"debug\":false}\n{\"port\":0,\"host\":\"localhost\",\"debug\":true}"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_nullish-rt1",
             "title": "Retype: A lazily filled cache with `??=`",
             "prompt": "This is the worked example “A lazily filled cache with `??=`” from null, undefined & Strict Checks, with every type on the signatures of `label` replaced by `any`. It still runs and prints the right thing — and the compiler checks none of it. Give every parameter and return type its real type again.",
@@ -30520,6 +30987,60 @@
             "lines": [
               2
             ]
+          },
+          {
+            "id": "tsm-ts_control_flow-dz1",
+            "title": "Design: User (Early returns narrow the rest of the function)",
+            "prompt": "This is the worked example “Early returns narrow the rest of the function” from Control-Flow Analysis, with its `User` declaration taken out. Write `User` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `User` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `User` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { name: string; email?: string };\ntype _d1 = Expect<Equal<User, __Design>>;\n",
+            "starter": "import * as fs from \"fs\";\n____\n\nfunction contact(user: User | undefined): string {\n  if (user === undefined) return \"no user\";\n  if (user.email === undefined) return `${user.name} (no email)`;\n  return `${user.name} <${user.email.toLowerCase()}>`;\n}\n\nconst users: (User | undefined)[] = JSON.parse(fs.readFileSync(0, \"utf8\").trim());\nfor (const u of users) console.log(contact(u ?? undefined));\n",
+            "solution": "import * as fs from \"fs\";\ntype User = { name: string; email?: string };\n\nfunction contact(user: User | undefined): string {\n  if (user === undefined) return \"no user\";\n  if (user.email === undefined) return `${user.name} (no email)`;\n  return `${user.name} <${user.email.toLowerCase()}>`;\n}\n\nconst users: (User | undefined)[] = JSON.parse(fs.readFileSync(0, \"utf8\").trim());\nfor (const u of users) console.log(contact(u ?? undefined));\n",
+            "tests": [
+              {
+                "input": "[{\"name\":\"Ada\",\"email\":\"ADA@X.IO\"},{\"name\":\"Bo\"},null]",
+                "output": "Ada <ada@x.io>\nBo (no email)\nno user"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-ts_control_flow-dz2",
+            "title": "Design: Order (An assertion function)",
+            "prompt": "This is the worked example “An assertion function” from Control-Flow Analysis, with its `Order` declaration taken out. Write `Order` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Order` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Order` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { id: string; qty: number };\ntype _d1 = Expect<Equal<Order, __Design>>;\n",
+            "starter": "import * as fs from \"fs\";\n____\n\nfunction assertOrder(value: unknown): asserts value is Order {\n  if (typeof value !== \"object\" || value === null) throw new Error(\"not an object\");\n  if (!(\"id\" in value) || typeof value.id !== \"string\") throw new Error(\"bad id\");\n  if (!(\"qty\" in value) || typeof value.qty !== \"number\") throw new Error(\"bad qty\");\n}\n\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const data: unknown = JSON.parse(line);\n  try {\n    assertOrder(data);\n    console.log(`${data.id}: ${data.qty * 2} units`);\n  } catch (e) {\n    console.log(`rejected: ${e instanceof Error ? e.message : String(e)}`);\n  }\n}\n",
+            "solution": "import * as fs from \"fs\";\ntype Order = { id: string; qty: number };\n\nfunction assertOrder(value: unknown): asserts value is Order {\n  if (typeof value !== \"object\" || value === null) throw new Error(\"not an object\");\n  if (!(\"id\" in value) || typeof value.id !== \"string\") throw new Error(\"bad id\");\n  if (!(\"qty\" in value) || typeof value.qty !== \"number\") throw new Error(\"bad qty\");\n}\n\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const data: unknown = JSON.parse(line);\n  try {\n    assertOrder(data);\n    console.log(`${data.id}: ${data.qty * 2} units`);\n  } catch (e) {\n    console.log(`rejected: ${e instanceof Error ? e.message : String(e)}`);\n  }\n}\n",
+            "tests": [
+              {
+                "input": "{\"id\":\"a1\",\"qty\":3}\n{\"id\":7,\"qty\":1}\n[\"x\"]\n{\"id\":\"b2\"}",
+                "output": "a1: 6 units\nrejected: bad id\nrejected: bad id\nrejected: bad qty"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           },
           {
             "id": "tsm-ts_control_flow-rt1",
@@ -32387,6 +32908,60 @@
             ]
           },
           {
+            "id": "tsm-ts_discriminated_unions-dz1",
+            "title": "Design: Result (Processing results)",
+            "prompt": "This is the worked example “Processing results” from Discriminated Unions & Exhaustiveness, with its `Result` declaration taken out. Write `Result` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Result` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Result` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { ok: true; value: number } | { ok: false; error: string };\ntype _d1 = Expect<Equal<Result, __Design>>;\n",
+            "starter": "____\nconst results: Result[] = [{ ok: true, value: 4 }, { ok: false, error: \"timeout\" }, { ok: true, value: 6 }];\nlet sum = 0;\nfor (const r of results) {\n  if (r.ok) sum += r.value;\n  else console.log(\"skipped: \" + r.error);\n}\nconsole.log(\"sum \" + sum);\n",
+            "solution": "type Result = { ok: true; value: number } | { ok: false; error: string };\nconst results: Result[] = [{ ok: true, value: 4 }, { ok: false, error: \"timeout\" }, { ok: true, value: 6 }];\nlet sum = 0;\nfor (const r of results) {\n  if (r.ok) sum += r.value;\n  else console.log(\"skipped: \" + r.error);\n}\nconsole.log(\"sum \" + sum);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "skipped: timeout\nsum 10"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-ts_discriminated_unions-dz2",
+            "title": "Design: Light (A state machine)",
+            "prompt": "This is the worked example “A state machine” from Discriminated Unions & Exhaustiveness, with its `Light` declaration taken out. Write `Light` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Light` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Light` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { state: \"red\"; waited: number } | { state: \"green\" } | { state: \"amber\" };\ntype _d1 = Expect<Equal<Light, __Design>>;\n",
+            "starter": "____\nfunction next(l: Light): Light {\n  switch (l.state) {\n    case \"red\":\n      return l.waited >= 2 ? { state: \"green\" } : { state: \"red\", waited: l.waited + 1 };\n    case \"green\":\n      return { state: \"amber\" };\n    case \"amber\":\n      return { state: \"red\", waited: 0 };\n  }\n}\nlet light: Light = { state: \"red\", waited: 0 };\nconst seen: string[] = [];\nfor (let i = 0; i < 6; i++) {\n  light = next(light);\n  seen.push(light.state);\n}\nconsole.log(seen.join(\" \"));\n",
+            "solution": "type Light = { state: \"red\"; waited: number } | { state: \"green\" } | { state: \"amber\" };\nfunction next(l: Light): Light {\n  switch (l.state) {\n    case \"red\":\n      return l.waited >= 2 ? { state: \"green\" } : { state: \"red\", waited: l.waited + 1 };\n    case \"green\":\n      return { state: \"amber\" };\n    case \"amber\":\n      return { state: \"red\", waited: 0 };\n  }\n}\nlet light: Light = { state: \"red\", waited: 0 };\nconst seen: string[] = [];\nfor (let i = 0; i < 6; i++) {\n  light = next(light);\n  seen.push(light.state);\n}\nconsole.log(seen.join(\" \"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "red red green amber red red"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_discriminated_unions-rt1",
             "title": "Retype: A state machine",
             "prompt": "This is the worked example “A state machine” from Discriminated Unions & Exhaustiveness, with every type on the signatures of `next` replaced by `any`. It still runs and prints the right thing — and the compiler checks none of it. Give every parameter and return type its real type again.",
@@ -32568,6 +33143,33 @@
             "source_slug": "",
             "dataset": "",
             "explanation": "**`typeof v === \"object\"` includes `null`.** The compiler was right to keep `v` as `object | null` — the `as object` cast silenced it, and `Object.keys(null)` throws. Narrow properly and no cast is needed."
+          },
+          {
+            "id": "tsm-ts_top_bottom-dz1",
+            "title": "Design: Shape (An exhaustive switch)",
+            "prompt": "This is the worked example “An exhaustive switch” from `unknown`, `never`, `void` & Exhaustiveness, with its `Shape` declaration taken out. Write `Shape` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Shape` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Shape` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = | { kind: \"circle\"; radius: number }\n  | { kind: \"square\"; side: number }\n  | { kind: \"rect\"; width: number; height: number };\ntype _d1 = Expect<Equal<Shape, __Design>>;\n",
+            "starter": "import * as fs from \"fs\";\n____\n\nfunction area(s: Shape): number {\n  switch (s.kind) {\n    case \"circle\":\n      return Math.PI * s.radius ** 2;\n    case \"square\":\n      return s.side ** 2;\n    case \"rect\":\n      return s.width * s.height;\n    default: {\n      const unhandled: never = s;\n      throw new Error(`unhandled ${JSON.stringify(unhandled)}`);\n    }\n  }\n}\n\nconst shapes = JSON.parse(fs.readFileSync(0, \"utf8\").trim()) as Shape[];\nconsole.log(shapes.map((s) => area(s).toFixed(2)).join(\" \"));\n",
+            "solution": "import * as fs from \"fs\";\ntype Shape =\n  | { kind: \"circle\"; radius: number }\n  | { kind: \"square\"; side: number }\n  | { kind: \"rect\"; width: number; height: number };\n\nfunction area(s: Shape): number {\n  switch (s.kind) {\n    case \"circle\":\n      return Math.PI * s.radius ** 2;\n    case \"square\":\n      return s.side ** 2;\n    case \"rect\":\n      return s.width * s.height;\n    default: {\n      const unhandled: never = s;\n      throw new Error(`unhandled ${JSON.stringify(unhandled)}`);\n    }\n  }\n}\n\nconst shapes = JSON.parse(fs.readFileSync(0, \"utf8\").trim()) as Shape[];\nconsole.log(shapes.map((s) => area(s).toFixed(2)).join(\" \"));\n",
+            "tests": [
+              {
+                "input": "[{\"kind\":\"circle\",\"radius\":1},{\"kind\":\"square\",\"side\":3},{\"kind\":\"rect\",\"width\":2,\"height\":5}]",
+                "output": "3.14 9.00 10.00"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           },
           {
             "id": "tsm-ts_top_bottom-rt1",
@@ -34795,6 +35397,60 @@
             "explanation": "**A detached method loses `this`.** `counter.increment` is a plain function value; calling it on its own runs with `this` undefined. Wrap the call in an arrow (or `bind`), so `this` is fixed where it is created. Writing `increment(this: Counter)` would have made the compiler reject `step()` outright."
           },
           {
+            "id": "tsm-ts_function_types-dz1",
+            "title": "Design: Formatter (A function that carries a property)",
+            "prompt": "This is the worked example “A function that carries a property” from Function Types in Depth, with its `Formatter` declaration taken out. Write `Formatter` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Formatter` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Formatter` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = {\n  (value: number): string;\n  label: string;\n};\ntype _d1 = Expect<Equal<Formatter, __Design>>;\n",
+            "starter": "____\n\nconst money = (value: number) => \"$\" + value.toFixed(2);\nmoney.label = \"money\";\n\nconst percent = (value: number) => (value * 100).toFixed(0) + \"%\";\npercent.label = \"percent\";\n\nconst formatters: Formatter[] = [money, percent];\nfor (const f of formatters) {\n  console.log(f.label + \": \" + f(0.256));\n}\n",
+            "solution": "type Formatter = {\n  (value: number): string;\n  label: string;\n};\n\nconst money = (value: number) => \"$\" + value.toFixed(2);\nmoney.label = \"money\";\n\nconst percent = (value: number) => (value * 100).toFixed(0) + \"%\";\npercent.label = \"percent\";\n\nconst formatters: Formatter[] = [money, percent];\nfor (const f of formatters) {\n  console.log(f.label + \": \" + f(0.256));\n}\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "money: $0.26\npercent: 26%"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-ts_function_types-dz2",
+            "title": "Design: Shape (A construct signature)",
+            "prompt": "This is the worked example “A construct signature” from Function Types in Depth, with its `Shape` declaration taken out. Write `Shape` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Shape` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Shape` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = {\n  area(): number;\n};\ntype _d1 = Expect<Equal<Shape, __Design>>;\n",
+            "starter": "____\ntype ShapeMaker = new (size: number) => Shape;\n\nclass Square implements Shape {\n  size: number;\n  constructor(size: number) {\n    this.size = size;\n  }\n  area() {\n    return this.size * this.size;\n  }\n}\nclass Circle implements Shape {\n  radius: number;\n  constructor(radius: number) {\n    this.radius = radius;\n  }\n  area() {\n    return Math.round(Math.PI * this.radius * this.radius);\n  }\n}\n\nfunction build(maker: ShapeMaker, sizes: number[]): Shape[] {\n  return sizes.map((size) => new maker(size));\n}\n\nfor (const shape of [...build(Square, [2, 3]), ...build(Circle, [1])]) {\n  console.log(shape.area());\n}\n",
+            "solution": "interface Shape {\n  area(): number;\n}\ntype ShapeMaker = new (size: number) => Shape;\n\nclass Square implements Shape {\n  size: number;\n  constructor(size: number) {\n    this.size = size;\n  }\n  area() {\n    return this.size * this.size;\n  }\n}\nclass Circle implements Shape {\n  radius: number;\n  constructor(radius: number) {\n    this.radius = radius;\n  }\n  area() {\n    return Math.round(Math.PI * this.radius * this.radius);\n  }\n}\n\nfunction build(maker: ShapeMaker, sizes: number[]): Shape[] {\n  return sizes.map((size) => new maker(size));\n}\n\nfor (const shape of [...build(Square, [2, 3]), ...build(Circle, [1])]) {\n  console.log(shape.area());\n}\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "4\n9\n3"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_function_types-dx1",
             "title": "Read the error: Function Types in Depth #1",
             "prompt": "The compiler rejects this program:\n\n    error TS2345: Argument of type '(value: number, index: number) => void' is not assignable to parameter of type 'Visit'.\n\nFix the cause so it compiles — keep what the program is for; deleting the line that fails is not a fix.",
@@ -34955,6 +35611,33 @@
               {
                 "input": "",
                 "output": "7"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-ts_type_testing-dz1",
+            "title": "Design: Shape (A negative test: the misuse must be rejected)",
+            "prompt": "This is the worked example “A negative test: the misuse must be rejected” from Testing Types, with its `Shape` declaration taken out. Write `Shape` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Shape` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Shape` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { kind: \"square\"; size: number } | { kind: \"circle\"; radius: number };\ntype _d1 = Expect<Equal<Shape, __Design>>;\n",
+            "starter": "____\n\nfunction area(shape: Shape): number {\n  return shape.kind === \"square\" ? shape.size * shape.size : Math.round(3.14159 * shape.radius ** 2);\n}\n\nfunction _typeTests() {\n  // @ts-expect-error — a square has no radius\n  area({ kind: \"square\", radius: 2 });\n  // @ts-expect-error — \"triangle\" is not a kind\n  area({ kind: \"triangle\", size: 1 });\n}\n\nconsole.log(area({ kind: \"square\", size: 3 }));\nconsole.log(area({ kind: \"circle\", radius: 1 }));\n",
+            "solution": "type Shape = { kind: \"square\"; size: number } | { kind: \"circle\"; radius: number };\n\nfunction area(shape: Shape): number {\n  return shape.kind === \"square\" ? shape.size * shape.size : Math.round(3.14159 * shape.radius ** 2);\n}\n\nfunction _typeTests() {\n  // @ts-expect-error — a square has no radius\n  area({ kind: \"square\", radius: 2 });\n  // @ts-expect-error — \"triangle\" is not a kind\n  area({ kind: \"triangle\", size: 1 });\n}\n\nconsole.log(area({ kind: \"square\", size: 3 }));\nconsole.log(area({ kind: \"circle\", radius: 1 }));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "9\n3"
               }
             ],
             "source_slug": "",
@@ -37025,6 +37708,33 @@
             ]
           },
           {
+            "id": "tsm-ts_tsconfig-dz1",
+            "title": "Design: Profile (Absent versus explicitly undefined)",
+            "prompt": "This is the worked example “Absent versus explicitly undefined” from Compiler Strictness & tsconfig, with its `Profile` declaration taken out. Write `Profile` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Profile` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Profile` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { nickname?: string };\ntype _d1 = Expect<Equal<Profile, __Design>>;\n",
+            "starter": "____\nconst absent: Profile = {};\nconst cleared: Profile = { nickname: undefined };\nconsole.log(\"nickname\" in absent, \"nickname\" in cleared);\nconsole.log(JSON.stringify(absent), JSON.stringify(cleared));\n",
+            "solution": "type Profile = { nickname?: string };\nconst absent: Profile = {};\nconst cleared: Profile = { nickname: undefined };\nconsole.log(\"nickname\" in absent, \"nickname\" in cleared);\nconsole.log(JSON.stringify(absent), JSON.stringify(cleared));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "false true\n{} {}"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_tsconfig-rt1",
             "title": "Retype: Every path returns",
             "prompt": "This is the worked example “Every path returns” from Compiler Strictness & tsconfig, with every type on the signatures of `price` replaced by `any`. It still runs and prints the right thing — and the compiler checks none of it. Give every parameter and return type its real type again.",
@@ -37614,6 +38324,33 @@
             "lines": [
               3
             ]
+          },
+          {
+            "id": "tsm-ts_erasable_syntax-dz1",
+            "title": "Design: User (Everything here is deleted before it runs)",
+            "prompt": "This is the worked example “Everything here is deleted before it runs” from Erasable Syntax & Type Stripping, with its `User` declaration taken out. Write `User` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `User` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `User` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = {\n  name: string;\n  admin?: boolean;\n};\ntype _d1 = Expect<Equal<User, __Design>>;\n",
+            "starter": "____\n\nfunction first<T>(xs: readonly T[]): T | undefined {\n  return xs[0];\n}\n\nconst users = [{ name: \"ana\" }, { name: \"bo\", admin: true }] satisfies User[];\nconst lead = first(users)!;\nconst count = users.length as number;\n\nconsole.log(lead.name, count);\nconsole.log(typeof lead, Array.isArray(users));\n",
+            "solution": "interface User {\n  name: string;\n  admin?: boolean;\n}\n\nfunction first<T>(xs: readonly T[]): T | undefined {\n  return xs[0];\n}\n\nconst users = [{ name: \"ana\" }, { name: \"bo\", admin: true }] satisfies User[];\nconst lead = first(users)!;\nconst count = users.length as number;\n\nconsole.log(lead.name, count);\nconsole.log(typeof lead, Array.isArray(users));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "ana 2\nobject true"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           },
           {
             "id": "tsm-ts_erasable_syntax-rt1",
@@ -39966,6 +40703,33 @@
             "explanation": "**A double assertion.** `as unknown as T` forces any conversion past the compiler. It's occasionally necessary at a boundary; it's never a way to turn text into a number."
           },
           {
+            "id": "tsm-ts_assertions-dz1",
+            "title": "Design: Point (A checked assertion helper)",
+            "prompt": "This is the worked example “A checked assertion helper” from Type Assertions (as), with its `Point` declaration taken out. Write `Point` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Point` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Point` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { x: number; y: number };\ntype _d1 = Expect<Equal<Point, __Design>>;\n",
+            "starter": "____\nfunction asPoint(v: unknown): Point {\n  if (typeof v === \"object\" && v !== null && \"x\" in v && \"y\" in v && typeof v.x === \"number\" && typeof v.y === \"number\") {\n    return { x: v.x, y: v.y };\n  }\n  throw new TypeError(\"not a point: \" + JSON.stringify(v));\n}\nfor (const t of ['{\"x\":1,\"y\":2}', '{\"x\":1}']) {\n  try {\n    const p = asPoint(JSON.parse(t));\n    console.log(p.x + p.y);\n  } catch (e) {\n    console.log(e instanceof Error ? e.message : String(e));\n  }\n}\n",
+            "solution": "type Point = { x: number; y: number };\nfunction asPoint(v: unknown): Point {\n  if (typeof v === \"object\" && v !== null && \"x\" in v && \"y\" in v && typeof v.x === \"number\" && typeof v.y === \"number\") {\n    return { x: v.x, y: v.y };\n  }\n  throw new TypeError(\"not a point: \" + JSON.stringify(v));\n}\nfor (const t of ['{\"x\":1,\"y\":2}', '{\"x\":1}']) {\n  try {\n    const p = asPoint(JSON.parse(t));\n    console.log(p.x + p.y);\n  } catch (e) {\n    console.log(e instanceof Error ? e.message : String(e));\n  }\n}\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "3\nnot a point: {\"x\":1}"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_assertions-rt1",
             "title": "Retype: An assertion after a check the compiler can't follow",
             "prompt": "This is the worked example “An assertion after a check the compiler can't follow” from Type Assertions (as), with every type on the signatures of `take` replaced by `any`. It still runs and prints the right thing — and the compiler checks none of it. Give every parameter and return type its real type again.",
@@ -40222,6 +40986,60 @@
             ]
           },
           {
+            "id": "tsm-ts_satisfies-dz1",
+            "title": "Design: Route (Checked, with the keys kept)",
+            "prompt": "This is the worked example “Checked, with the keys kept” from The satisfies Operator, with its `Route` declaration taken out. Write `Route` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Route` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Route` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { path: string; auth: boolean };\ntype _d1 = Expect<Equal<Route, __Design>>;\n",
+            "starter": "____\nconst routes = {\n  home: { path: \"/\", auth: false },\n  settings: { path: \"/settings\", auth: true },\n  billing: { path: \"/billing\", auth: true },\n} satisfies Record<string, Route>;\ntype RouteName = keyof typeof routes;\nconst protectedRoutes = (Object.keys(routes) as RouteName[]).filter((n) => routes[n].auth);\nconsole.log(protectedRoutes.join(\",\"));\n",
+            "solution": "type Route = { path: string; auth: boolean };\nconst routes = {\n  home: { path: \"/\", auth: false },\n  settings: { path: \"/settings\", auth: true },\n  billing: { path: \"/billing\", auth: true },\n} satisfies Record<string, Route>;\ntype RouteName = keyof typeof routes;\nconst protectedRoutes = (Object.keys(routes) as RouteName[]).filter((n) => routes[n].auth);\nconsole.log(protectedRoutes.join(\",\"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "settings,billing"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-ts_satisfies-dz2",
+            "title": "Design: Field (Each entry keeps its own shape)",
+            "prompt": "This is the worked example “Each entry keeps its own shape” from The satisfies Operator, with its `Field` declaration taken out. Write `Field` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Field` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Field` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { kind: \"text\"; maxLength: number } | { kind: \"number\"; min: number; max: number };\ntype _d1 = Expect<Equal<Field, __Design>>;\n",
+            "starter": "____\nconst form = {\n  name: { kind: \"text\", maxLength: 20 },\n  age: { kind: \"number\", min: 0, max: 150 },\n} satisfies Record<string, Field>;\nconsole.log(form.name.maxLength, form.age.max - form.age.min);\n",
+            "solution": "type Field = { kind: \"text\"; maxLength: number } | { kind: \"number\"; min: number; max: number };\nconst form = {\n  name: { kind: \"text\", maxLength: 20 },\n  age: { kind: \"number\", min: 0, max: 150 },\n} satisfies Record<string, Field>;\nconsole.log(form.name.maxLength, form.age.max - form.age.min);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "20 150"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_satisfies-dx1",
             "title": "Read the error: The satisfies Operator #1",
             "prompt": "The compiler rejects this program:\n\n    error TS2322: Type 'string' is not assignable to type 'number'.\n\nFix the cause so it compiles — keep what the program is for; deleting the line that fails is not a fix.",
@@ -40398,6 +41216,33 @@
             "lines": [
               11
             ]
+          },
+          {
+            "id": "tsm-ts_structural_typing-dz1",
+            "title": "Design: Point (Same shape, same type)",
+            "prompt": "This is the worked example “Same shape, same type” from Structural Typing & Excess Properties, with its `Point` declaration taken out. Write `Point` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Point` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Point` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { x: number; y: number };\ntype _d1 = Expect<Equal<Point, __Design>>;\n",
+            "starter": "____\ntype Vector = { x: number; y: number };\nconst p: Point = { x: 3, y: 4 };\nconst v: Vector = p;\nconst len = (vec: Vector) => Math.hypot(vec.x, vec.y);\nconsole.log(len(v), len(p));\n",
+            "solution": "type Point = { x: number; y: number };\ntype Vector = { x: number; y: number };\nconst p: Point = { x: 3, y: 4 };\nconst v: Vector = p;\nconst len = (vec: Vector) => Math.hypot(vec.x, vec.y);\nconsole.log(len(v), len(p));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "5 5"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           },
           {
             "id": "tsm-ts_structural_typing-rt1",
@@ -40603,6 +41448,60 @@
             "lines": [
               1
             ]
+          },
+          {
+            "id": "tsm-ts_variance-dz1",
+            "title": "Design: Animal (Producers follow the subtype)",
+            "prompt": "This is the worked example “Producers follow the subtype” from Variance, with its `Animal` declaration taken out. Write `Animal` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Animal` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Animal` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { name: string };\ntype _d1 = Expect<Equal<Animal, __Design>>;\n",
+            "starter": "____\ntype Dog = { name: string; bark: () => string };\ntype Getter<T> = () => T;\n\nconst rex: Dog = { name: \"rex\", bark: () => \"woof\" };\nconst getDog: Getter<Dog> = () => rex;\nconst getAnimal: Getter<Animal> = getDog; // covariant: fine\n\nconsole.log(getAnimal().name);\nconsole.log(getDog().bark());\n",
+            "solution": "type Animal = { name: string };\ntype Dog = { name: string; bark: () => string };\ntype Getter<T> = () => T;\n\nconst rex: Dog = { name: \"rex\", bark: () => \"woof\" };\nconst getDog: Getter<Dog> = () => rex;\nconst getAnimal: Getter<Animal> = getDog; // covariant: fine\n\nconsole.log(getAnimal().name);\nconsole.log(getDog().bark());\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "rex\nwoof"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-ts_variance-dz2",
+            "title": "Design: Animal (Consumers go the other way)",
+            "prompt": "This is the worked example “Consumers go the other way” from Variance, with its `Animal` declaration taken out. Write `Animal` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Animal` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Animal` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { name: string };\ntype _d1 = Expect<Equal<Animal, __Design>>;\n",
+            "starter": "____\ntype Dog = { name: string; bark: () => string };\ntype Handler<T> = (x: T) => string;\n\nconst describeAnimal: Handler<Animal> = (a) => \"an animal called \" + a.name;\nconst describeDog: Handler<Dog> = describeAnimal; // contravariant: fine\n\nconst dogs: Dog[] = [{ name: \"rex\", bark: () => \"woof\" }, { name: \"fido\", bark: () => \"arf\" }];\nconsole.log(dogs.map(describeDog).join(\"; \"));\n",
+            "solution": "type Animal = { name: string };\ntype Dog = { name: string; bark: () => string };\ntype Handler<T> = (x: T) => string;\n\nconst describeAnimal: Handler<Animal> = (a) => \"an animal called \" + a.name;\nconst describeDog: Handler<Dog> = describeAnimal; // contravariant: fine\n\nconst dogs: Dog[] = [{ name: \"rex\", bark: () => \"woof\" }, { name: \"fido\", bark: () => \"arf\" }];\nconsole.log(dogs.map(describeDog).join(\"; \"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "an animal called rex; an animal called fido"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           },
           {
             "id": "tsm-ts_variance-dx1",
@@ -42566,6 +43465,60 @@
             "explanation": "**Comparing different brands.** Two brands of the same base type have no overlap, so comparing them is flagged — it's nearly always a mix-up."
           },
           {
+            "id": "tsm-ts_branded_types-dz1",
+            "title": "Design: Meters (Units that can't be mixed)",
+            "prompt": "This is the worked example “Units that can't be mixed” from Branded (Nominal) Types, with its `Meters` declaration taken out. Write `Meters` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Meters` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Meters` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = number & { readonly [unit]: \"m\" };\ntype _d1 = Expect<Equal<Meters, __Design>>;\n",
+            "starter": "declare const unit: unique symbol;\n____\ntype Feet = number & { readonly [unit]: \"ft\" };\nconst meters = (n: number) => n as Meters;\nconst feetToMeters = (f: Feet): Meters => meters(f * 0.3048);\nconst feet = (n: number) => n as Feet;\nconst total: Meters = meters(meters(100) + feetToMeters(feet(328)));\nconsole.log(total.toFixed(1));\n",
+            "solution": "declare const unit: unique symbol;\ntype Meters = number & { readonly [unit]: \"m\" };\ntype Feet = number & { readonly [unit]: \"ft\" };\nconst meters = (n: number) => n as Meters;\nconst feetToMeters = (f: Feet): Meters => meters(f * 0.3048);\nconst feet = (n: number) => n as Feet;\nconst total: Meters = meters(meters(100) + feetToMeters(feet(328)));\nconsole.log(total.toFixed(1));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "200.0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-ts_branded_types-dz2",
+            "title": "Design: Title (A validated non-empty string)",
+            "prompt": "This is the worked example “A validated non-empty string” from Branded (Nominal) Types, with its `Title` declaration taken out. Write `Title` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Title` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Title` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = string & { readonly [brand]: \"Title\" };\ntype _d1 = Expect<Equal<Title, __Design>>;\n",
+            "starter": "declare const brand: unique symbol;\n____\nfunction parseTitle(raw: string): Title | undefined {\n  const t = raw.trim().replace(/\\s+/g, \" \");\n  return t.length > 0 && t.length <= 40 ? (t as Title) : undefined;\n}\nconst publish = (t: Title) => `published \"${t}\"`;\nfor (const raw of [\"  Hello   world \", \"   \", \"x\".repeat(50)]) {\n  const t = parseTitle(raw);\n  console.log(t === undefined ? \"rejected\" : publish(t));\n}\n",
+            "solution": "declare const brand: unique symbol;\ntype Title = string & { readonly [brand]: \"Title\" };\nfunction parseTitle(raw: string): Title | undefined {\n  const t = raw.trim().replace(/\\s+/g, \" \");\n  return t.length > 0 && t.length <= 40 ? (t as Title) : undefined;\n}\nconst publish = (t: Title) => `published \"${t}\"`;\nfor (const raw of [\"  Hello   world \", \"   \", \"x\".repeat(50)]) {\n  const t = parseTitle(raw);\n  console.log(t === undefined ? \"rejected\" : publish(t));\n}\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "published \"Hello world\"\nrejected\nrejected"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_branded_types-rt1",
             "title": "Retype: A validated non-empty string",
             "prompt": "This is the worked example “A validated non-empty string” from Branded (Nominal) Types, with every type on the signatures of `parseTitle` replaced by `any`. It still runs and prints the right thing — and the compiler checks none of it. Give every parameter and return type its real type again.",
@@ -42800,6 +43753,33 @@
             "explanation": "**`Object.freeze` is shallow.** Freezing the outer object left `db` writable. Freeze recursively when the whole structure must stay fixed."
           },
           {
+            "id": "tsm-ts_immutability-dz1",
+            "title": "Design: State (Updating a nested value)",
+            "prompt": "This is the worked example “Updating a nested value” from readonly & Immutability, with its `State` declaration taken out. Write `State` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `State` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `State` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { user: { name: string; prefs: { theme: string; lang: string } }; version: number };\ntype _d1 = Expect<Equal<State, __Design>>;\n",
+            "starter": "____\nconst before: State = { user: { name: \"ana\", prefs: { theme: \"dark\", lang: \"en\" } }, version: 1 };\nconst after: State = { ...before, user: { ...before.user, prefs: { ...before.user.prefs, theme: \"light\" } }, version: 2 };\nconsole.log(before.user.prefs.theme, after.user.prefs.theme, before.user === after.user);\n",
+            "solution": "type State = { user: { name: string; prefs: { theme: string; lang: string } }; version: number };\nconst before: State = { user: { name: \"ana\", prefs: { theme: \"dark\", lang: \"en\" } }, version: 1 };\nconst after: State = { ...before, user: { ...before.user, prefs: { ...before.user.prefs, theme: \"light\" } }, version: 2 };\nconsole.log(before.user.prefs.theme, after.user.prefs.theme, before.user === after.user);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "dark light false"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_immutability-dx1",
             "title": "Read the error: readonly & Immutability #1",
             "prompt": "The compiler rejects this program:\n\n    error TS2540: Cannot assign to 'port' because it is a read-only property.\n\nFix the cause so it compiles — keep what the program is for; deleting the line that fails is not a fix.",
@@ -42999,6 +43979,60 @@
             "lines": [
               3
             ]
+          },
+          {
+            "id": "tsm-ts_parse_dont_validate-dz1",
+            "title": "Design: Email (An `Email` only a parser can make)",
+            "prompt": "This is the worked example “An `Email` only a parser can make” from Parse, Don't Validate, with its `Email` declaration taken out. Write `Email` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Email` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Email` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = string & { readonly [EmailBrand]: true };\ntype _d1 = Expect<Equal<Email, __Design>>;\n",
+            "starter": "declare const EmailBrand: unique symbol;\n____\n\nfunction parseEmail(raw: string): Email | undefined {\n  const s = raw.trim().toLowerCase();\n  return /^[^@\\s]+@[^@\\s]+\\.[a-z]+$/.test(s) ? (s as Email) : undefined;\n}\n\nfunction sendWelcome(to: Email): string {\n  return \"welcome mail -> \" + to;\n}\n\nfor (const raw of [\"  Ana@Example.COM \", \"bob\", \"cy@x.io\"]) {\n  const email = parseEmail(raw);\n  console.log(email === undefined ? `rejected \"${raw.trim()}\"` : sendWelcome(email));\n}\n",
+            "solution": "declare const EmailBrand: unique symbol;\ntype Email = string & { readonly [EmailBrand]: true };\n\nfunction parseEmail(raw: string): Email | undefined {\n  const s = raw.trim().toLowerCase();\n  return /^[^@\\s]+@[^@\\s]+\\.[a-z]+$/.test(s) ? (s as Email) : undefined;\n}\n\nfunction sendWelcome(to: Email): string {\n  return \"welcome mail -> \" + to;\n}\n\nfor (const raw of [\"  Ana@Example.COM \", \"bob\", \"cy@x.io\"]) {\n  const email = parseEmail(raw);\n  console.log(email === undefined ? `rejected \"${raw.trim()}\"` : sendWelcome(email));\n}\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "welcome mail -> ana@example.com\nrejected \"bob\"\nwelcome mail -> cy@x.io"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-ts_parse_dont_validate-dz2",
+            "title": "Design: Cents (Parse at the edge, trust inside)",
+            "prompt": "This is the worked example “Parse at the edge, trust inside” from Parse, Don't Validate, with its `Cents` declaration taken out. Write `Cents` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Cents` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Cents` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = number & { readonly [CentsBrand]: true };\ntype _d1 = Expect<Equal<Cents, __Design>>;\n",
+            "starter": "declare const CentsBrand: unique symbol;\n____\ntype Order = { sku: string; qty: number; price: Cents };\n\nfunction parseCents(text: string): Cents | undefined {\n  const m = /^(\\d+)(?:\\.(\\d{2}))?$/.exec(text);\n  if (m === null) return undefined;\n  return (Number(m[1]) * 100 + Number(m[2] ?? \"0\")) as Cents;\n}\n\nfunction parseOrder(line: string): Order | string {\n  const [sku = \"\", qty = \"\", price = \"\"] = line.split(\",\");\n  const n = Number(qty);\n  if (!/^[A-Z]{3}\\d{2}$/.test(sku)) return `bad sku ${sku}`;\n  if (!Number.isInteger(n) || n <= 0) return `bad qty ${qty}`;\n  const cents = parseCents(price);\n  return cents === undefined ? `bad price ${price}` : { sku, qty: n, price: cents };\n}\n\nfunction lineTotal(o: Order): Cents {\n  return (o.qty * o.price) as Cents;\n}\n\nfor (const line of [\"ABC12,3,1.50\", \"XYZ99,1,20\", \"abc,1,1.00\", \"DEF10,2,1.5\"]) {\n  const o = parseOrder(line);\n  console.log(typeof o === \"string\" ? o : `${o.sku}: ${(lineTotal(o) / 100).toFixed(2)}`);\n}\n",
+            "solution": "declare const CentsBrand: unique symbol;\ntype Cents = number & { readonly [CentsBrand]: true };\ntype Order = { sku: string; qty: number; price: Cents };\n\nfunction parseCents(text: string): Cents | undefined {\n  const m = /^(\\d+)(?:\\.(\\d{2}))?$/.exec(text);\n  if (m === null) return undefined;\n  return (Number(m[1]) * 100 + Number(m[2] ?? \"0\")) as Cents;\n}\n\nfunction parseOrder(line: string): Order | string {\n  const [sku = \"\", qty = \"\", price = \"\"] = line.split(\",\");\n  const n = Number(qty);\n  if (!/^[A-Z]{3}\\d{2}$/.test(sku)) return `bad sku ${sku}`;\n  if (!Number.isInteger(n) || n <= 0) return `bad qty ${qty}`;\n  const cents = parseCents(price);\n  return cents === undefined ? `bad price ${price}` : { sku, qty: n, price: cents };\n}\n\nfunction lineTotal(o: Order): Cents {\n  return (o.qty * o.price) as Cents;\n}\n\nfor (const line of [\"ABC12,3,1.50\", \"XYZ99,1,20\", \"abc,1,1.00\", \"DEF10,2,1.5\"]) {\n  const o = parseOrder(line);\n  console.log(typeof o === \"string\" ? o : `${o.sku}: ${(lineTotal(o) / 100).toFixed(2)}`);\n}\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "ABC12: 4.50\nXYZ99: 20.00\nbad sku abc\nbad price 1.5"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           },
           {
             "id": "tsm-ts_parse_dont_validate-rt1",
@@ -45044,6 +46078,60 @@
             ]
           },
           {
+            "id": "tsm-ts_compose-dz1",
+            "title": "Design: Identified (Types built from parts)",
+            "prompt": "This is the worked example “Types built from parts” from Extending & Combining Types, with its `Identified` declaration taken out. Write `Identified` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Identified` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Identified` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { id: number };\ntype _d1 = Expect<Equal<Identified, __Design>>;\n",
+            "starter": "____\ntype Named = { name: string };\ntype Timestamped = { createdAt: string; updatedAt: string };\ntype Product = Identified & Named & Timestamped & { price: number };\nconst p: Product = { id: 1, name: \"pen\", price: 2, createdAt: \"2026-09-01\", updatedAt: \"2026-09-26\" };\nconsole.log(Object.keys(p).length, `${p.name} #${p.id}`);\n",
+            "solution": "type Identified = { id: number };\ntype Named = { name: string };\ntype Timestamped = { createdAt: string; updatedAt: string };\ntype Product = Identified & Named & Timestamped & { price: number };\nconst p: Product = { id: 1, name: \"pen\", price: 2, createdAt: \"2026-09-01\", updatedAt: \"2026-09-26\" };\nconsole.log(Object.keys(p).length, `${p.name} #${p.id}`);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "5 pen #1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-ts_compose-dz2",
+            "title": "Design: Shape (`extends` for a named family)",
+            "prompt": "This is the worked example “`extends` for a named family” from Extending & Combining Types, with its `Shape` declaration taken out. Write `Shape` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Shape` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Shape` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = {\n  name: string;\n  area(): number;\n};\ntype _d1 = Expect<Equal<Shape, __Design>>;\n",
+            "starter": "____\ninterface Solid extends Shape {\n  volume(): number;\n}\nconst cube: Solid = { name: \"cube\", area: () => 6 * 4, volume: () => 8 };\nconst shapes: Shape[] = [cube, { name: \"square\", area: () => 4 }];\nconsole.log(shapes.map((s) => `${s.name}:${s.area()}`).join(\" \"), cube.volume());\n",
+            "solution": "interface Shape {\n  name: string;\n  area(): number;\n}\ninterface Solid extends Shape {\n  volume(): number;\n}\nconst cube: Solid = { name: \"cube\", area: () => 6 * 4, volume: () => 8 };\nconst shapes: Shape[] = [cube, { name: \"square\", area: () => 4 }];\nconsole.log(shapes.map((s) => `${s.name}:${s.area()}`).join(\" \"), cube.volume());\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "cube:24 square:4 8"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_compose-dx1",
             "title": "Read the error: Extending & Combining Types #1",
             "prompt": "The compiler rejects this program:\n\n    error TS2322: Type 'number' is not assignable to type 'never'.\n\nFix the cause so it compiles — keep what the program is for; deleting the line that fails is not a fix.",
@@ -45296,6 +46384,60 @@
             "source_slug": "",
             "dataset": "",
             "explanation": "**`Required` at the type level isn't a default at runtime.** A type can't fill in a missing value. Produce a `Required<T>` by actually supplying defaults."
+          },
+          {
+            "id": "tsm-ts_utility_types-dz1",
+            "title": "Design: Task (A patch, applied)",
+            "prompt": "This is the worked example “A patch, applied” from Utility Types, with its `Task` declaration taken out. Write `Task` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Task` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Task` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { id: number; title: string; done: boolean; priority: \"low\" | \"high\" };\ntype _d1 = Expect<Equal<Task, __Design>>;\n",
+            "starter": "____\ntype TaskPatch = Partial<Omit<Task, \"id\">>;\nfunction update(task: Task, patch: TaskPatch): Task {\n  return { ...task, ...patch };\n}\nconst t: Task = { id: 1, title: \"write\", done: false, priority: \"low\" };\nconsole.log(JSON.stringify(update(t, { done: true, priority: \"high\" })));\n",
+            "solution": "type Task = { id: number; title: string; done: boolean; priority: \"low\" | \"high\" };\ntype TaskPatch = Partial<Omit<Task, \"id\">>;\nfunction update(task: Task, patch: TaskPatch): Task {\n  return { ...task, ...patch };\n}\nconst t: Task = { id: 1, title: \"write\", done: false, priority: \"low\" };\nconsole.log(JSON.stringify(update(t, { done: true, priority: \"high\" })));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "{\"id\":1,\"title\":\"write\",\"done\":true,\"priority\":\"high\"}"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-ts_utility_types-dz2",
+            "title": "Design: Category (Totals for every category)",
+            "prompt": "This is the worked example “Totals for every category” from Utility Types, with its `Category` declaration taken out. Write `Category` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Category` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Category` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = \"food\" | \"rent\" | \"fun\";\ntype _d1 = Expect<Equal<Category, __Design>>;\n",
+            "starter": "____\nconst totals: Record<Category, number> = { food: 0, rent: 0, fun: 0 };\nfor (const [c, amount] of [[\"food\", 12], [\"fun\", 30], [\"food\", 8]] as const) totals[c] += amount;\nconsole.log(JSON.stringify(totals));\n",
+            "solution": "type Category = \"food\" | \"rent\" | \"fun\";\nconst totals: Record<Category, number> = { food: 0, rent: 0, fun: 0 };\nfor (const [c, amount] of [[\"food\", 12], [\"fun\", 30], [\"food\", 8]] as const) totals[c] += amount;\nconsole.log(JSON.stringify(totals));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "{\"food\":20,\"rent\":0,\"fun\":30}"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           },
           {
             "id": "tsm-ts_utility_types-rt1",
@@ -47674,6 +48816,33 @@
             ]
           },
           {
+            "id": "tsm-ts_generic_constraints-dz1",
+            "title": "Design: Todo (Upsert anything with an id)",
+            "prompt": "This is the worked example “Upsert anything with an id” from Generic Constraints, with its `Todo` declaration taken out. Write `Todo` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Todo` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Todo` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { id: string; title: string; done: boolean };\ntype _d1 = Expect<Equal<Todo, __Design>>;\n",
+            "starter": "function upsert<T extends { id: string }>(items: readonly T[], item: T): T[] {\n  const i = items.findIndex((x) => x.id === item.id);\n  return i < 0 ? [...items, item] : items.with(i, item);\n}\n____\nlet todos: Todo[] = [{ id: \"a\", title: \"write\", done: false }];\ntodos = upsert(todos, { id: \"a\", title: \"write\", done: true });\ntodos = upsert(todos, { id: \"b\", title: \"test\", done: false });\nconsole.log(todos.map((t) => `${t.id}:${t.done}`).join(\" \"));\n",
+            "solution": "function upsert<T extends { id: string }>(items: readonly T[], item: T): T[] {\n  const i = items.findIndex((x) => x.id === item.id);\n  return i < 0 ? [...items, item] : items.with(i, item);\n}\ntype Todo = { id: string; title: string; done: boolean };\nlet todos: Todo[] = [{ id: \"a\", title: \"write\", done: false }];\ntodos = upsert(todos, { id: \"a\", title: \"write\", done: true });\ntodos = upsert(todos, { id: \"b\", title: \"test\", done: false });\nconsole.log(todos.map((t) => `${t.id}:${t.done}`).join(\" \"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "a:true b:false"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_generic_constraints-dx1",
             "title": "Read the error: Generic Constraints #1",
             "prompt": "The compiler rejects this program:\n\n    error TS2345: Argument of type 'number' is not assignable to parameter of type '{ length: number; }'.\n\nFix the cause so it compiles — keep what the program is for; deleting the line that fails is not a fix.",
@@ -49833,6 +51002,33 @@
             ]
           },
           {
+            "id": "tsm-ts_keyof_indexed-dz1",
+            "title": "Design: Events (An event map)",
+            "prompt": "This is the worked example “An event map” from keyof, typeof & Indexed Access, with its `Events` declaration taken out. Write `Events` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Events` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Events` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { login: { user: string }; logout: { user: string; reason: string }; tick: number };\ntype _d1 = Expect<Equal<Events, __Design>>;\n",
+            "starter": "____\nconst log: string[] = [];\nfunction emit<E extends keyof Events>(name: E, payload: Events[E]): void {\n  log.push(`${name} ${JSON.stringify(payload)}`);\n}\nemit(\"login\", { user: \"ana\" });\nemit(\"tick\", 3);\nemit(\"logout\", { user: \"ana\", reason: \"timeout\" });\nconsole.log(log.join(\"\\n\"));\n",
+            "solution": "type Events = { login: { user: string }; logout: { user: string; reason: string }; tick: number };\nconst log: string[] = [];\nfunction emit<E extends keyof Events>(name: E, payload: Events[E]): void {\n  log.push(`${name} ${JSON.stringify(payload)}`);\n}\nemit(\"login\", { user: \"ana\" });\nemit(\"tick\", 3);\nemit(\"logout\", { user: \"ana\", reason: \"timeout\" });\nconsole.log(log.join(\"\\n\"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "login {\"user\":\"ana\"}\ntick 3\nlogout {\"user\":\"ana\",\"reason\":\"timeout\"}"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_keyof_indexed-dx1",
             "title": "Read the error: keyof, typeof & Indexed Access #1",
             "prompt": "The compiler rejects this program:\n\n    error TS2339: Property 'color' does not exist on type 'Settings'.\n\nFix the cause so it compiles — keep what the program is for; deleting the line that fails is not a fix.",
@@ -50010,6 +51206,33 @@
               2,
               6
             ]
+          },
+          {
+            "id": "tsm-ts_lookup_types-dz1",
+            "title": "Design: User (Types read from one model)",
+            "prompt": "This is the worked example “Types read from one model” from Lookup Types, with its `User` declaration taken out. Write `User` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `User` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `User` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { id: number; email: string; role: \"admin\" | \"member\"; tags: string[] };\ntype _d1 = Expect<Equal<User, __Design>>;\n",
+            "starter": "____\ntype Role = User[\"role\"];\ntype Tag = User[\"tags\"][number];\n\nconst canEdit = (role: Role): boolean => role === \"admin\";\nconst badge = (tag: Tag): string => \"#\" + tag;\n\nconst u: User = { id: 1, email: \"ana@x.io\", role: \"admin\", tags: [\"ops\", \"web\"] };\nconsole.log(canEdit(u.role), u.tags.map(badge).join(\" \"));\n",
+            "solution": "type User = { id: number; email: string; role: \"admin\" | \"member\"; tags: string[] };\ntype Role = User[\"role\"];\ntype Tag = User[\"tags\"][number];\n\nconst canEdit = (role: Role): boolean => role === \"admin\";\nconst badge = (tag: Tag): string => \"#\" + tag;\n\nconst u: User = { id: 1, email: \"ana@x.io\", role: \"admin\", tags: [\"ops\", \"web\"] };\nconsole.log(canEdit(u.role), u.tags.map(badge).join(\" \"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "true #ops #web"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           },
           {
             "id": "tsm-ts_lookup_types-dx1",
@@ -51911,6 +53134,60 @@
             ]
           },
           {
+            "id": "tsm-ts_mapped_types-dz1",
+            "title": "Design: Signup (A validator for every field)",
+            "prompt": "This is the worked example “A validator for every field” from Mapped Types, with its `Signup` declaration taken out. Write `Signup` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Signup` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Signup` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { name: string; age: number; email: string };\ntype _d1 = Expect<Equal<Signup, __Design>>;\n",
+            "starter": "____\ntype Validators<T> = { [K in keyof T]: (value: T[K]) => string | undefined };\nconst rules: Validators<Signup> = {\n  name: (v) => (v.trim().length < 2 ? \"too short\" : undefined),\n  age: (v) => (v < 13 ? \"too young\" : undefined),\n  email: (v) => (v.includes(\"@\") ? undefined : \"invalid\"),\n};\nfunction validate(form: Signup): string[] {\n  return (Object.keys(rules) as (keyof Signup)[]).flatMap((k) => {\n    const message = k === \"age\" ? rules.age(form.age) : rules[k](form[k]);\n    return message === undefined ? [] : [`${k}: ${message}`];\n  });\n}\nconsole.log(validate({ name: \"A\", age: 9, email: \"nope\" }).join(\"; \"));\nconsole.log(validate({ name: \"Ana\", age: 31, email: \"ana@x.io\" }).length);\n",
+            "solution": "type Signup = { name: string; age: number; email: string };\ntype Validators<T> = { [K in keyof T]: (value: T[K]) => string | undefined };\nconst rules: Validators<Signup> = {\n  name: (v) => (v.trim().length < 2 ? \"too short\" : undefined),\n  age: (v) => (v < 13 ? \"too young\" : undefined),\n  email: (v) => (v.includes(\"@\") ? undefined : \"invalid\"),\n};\nfunction validate(form: Signup): string[] {\n  return (Object.keys(rules) as (keyof Signup)[]).flatMap((k) => {\n    const message = k === \"age\" ? rules.age(form.age) : rules[k](form[k]);\n    return message === undefined ? [] : [`${k}: ${message}`];\n  });\n}\nconsole.log(validate({ name: \"A\", age: 9, email: \"nope\" }).join(\"; \"));\nconsole.log(validate({ name: \"Ana\", age: 31, email: \"ana@x.io\" }).length);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "name: too short; age: too young; email: invalid\n0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-ts_mapped_types-dz2",
+            "title": "Design: Row (Nullable columns from a model)",
+            "prompt": "This is the worked example “Nullable columns from a model” from Mapped Types, with its `Row` declaration taken out. Write `Row` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Row` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Row` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { id: number; name: string; email: string };\ntype _d1 = Expect<Equal<Row, __Design>>;\n",
+            "starter": "____\ntype Nullable<T> = { [K in keyof T]: T[K] | null };\nconst fromDb: Nullable<Row> = { id: 1, name: \"ana\", email: null };\nconst display = Object.entries(fromDb).map(([k, v]) => `${k}=${v ?? \"(none)\"}`).join(\" \");\nconsole.log(display);\n",
+            "solution": "type Row = { id: number; name: string; email: string };\ntype Nullable<T> = { [K in keyof T]: T[K] | null };\nconst fromDb: Nullable<Row> = { id: 1, name: \"ana\", email: null };\nconst display = Object.entries(fromDb).map(([k, v]) => `${k}=${v ?? \"(none)\"}`).join(\" \");\nconsole.log(display);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "id=1 name=ana email=(none)"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_mapped_types-rt1",
             "title": "Retype: A validator for every field",
             "prompt": "This is the worked example “A validator for every field” from Mapped Types, with every type on the signatures of `validate` replaced by `any`. It still runs and prints the right thing — and the compiler checks none of it. Give every parameter and return type its real type again.",
@@ -52090,6 +53367,33 @@
             "lines": [
               1
             ]
+          },
+          {
+            "id": "tsm-ts_key_remapping-dz1",
+            "title": "Design: Events (Event handlers named from events)",
+            "prompt": "This is the worked example “Event handlers named from events” from Key Remapping in Mapped Types, with its `Events` declaration taken out. Write `Events` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Events` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Events` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { open: { path: string }; close: { code: number }; error: { message: string } };\ntype _d1 = Expect<Equal<Events, __Design>>;\n",
+            "starter": "____\ntype Handlers<E> = {\n  [K in keyof E as `on${Capitalize<string & K>}`]?: (payload: E[K]) => string;\n};\n\nfunction emit<K extends keyof Events>(handlers: Handlers<Events>, name: K, payload: Events[K]): string {\n  const key = \"on\" + name.charAt(0).toUpperCase() + name.slice(1);\n  const handler = (handlers as Record<string, ((p: Events[K]) => string) | undefined>)[key];\n  return handler === undefined ? `(no handler for ${name})` : handler(payload);\n}\n\nconst handlers: Handlers<Events> = {\n  onOpen: (p) => \"opened \" + p.path,\n  onClose: (p) => \"closed with \" + p.code,\n};\nconsole.log(emit(handlers, \"open\", { path: \"/tmp/a\" }));\nconsole.log(emit(handlers, \"close\", { code: 0 }));\nconsole.log(emit(handlers, \"error\", { message: \"disk\" }));\n",
+            "solution": "type Events = { open: { path: string }; close: { code: number }; error: { message: string } };\ntype Handlers<E> = {\n  [K in keyof E as `on${Capitalize<string & K>}`]?: (payload: E[K]) => string;\n};\n\nfunction emit<K extends keyof Events>(handlers: Handlers<Events>, name: K, payload: Events[K]): string {\n  const key = \"on\" + name.charAt(0).toUpperCase() + name.slice(1);\n  const handler = (handlers as Record<string, ((p: Events[K]) => string) | undefined>)[key];\n  return handler === undefined ? `(no handler for ${name})` : handler(payload);\n}\n\nconst handlers: Handlers<Events> = {\n  onOpen: (p) => \"opened \" + p.path,\n  onClose: (p) => \"closed with \" + p.code,\n};\nconsole.log(emit(handlers, \"open\", { path: \"/tmp/a\" }));\nconsole.log(emit(handlers, \"close\", { code: 0 }));\nconsole.log(emit(handlers, \"error\", { message: \"disk\" }));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "opened /tmp/a\nclosed with 0\n(no handler for error)"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           },
           {
             "id": "tsm-ts_key_remapping-dx1",
@@ -54166,6 +55470,60 @@
             ]
           },
           {
+            "id": "tsm-ts_distributive-dz1",
+            "title": "Design: Event (`Exclude` and `Extract` are one line each)",
+            "prompt": "This is the worked example “`Exclude` and `Extract` are one line each” from Distributive Conditional Types, with its `Event` declaration taken out. Write `Event` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Event` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Event` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = \"click\" | \"keydown\" | \"keyup\" | \"scroll\";\ntype _d1 = Expect<Equal<Event, __Design>>;\n",
+            "starter": "type MyExclude<T, U> = T extends U ? never : T;\ntype MyExtract<T, U> = T extends U ? T : never;\n\n____\ntype KeyEvent = MyExtract<Event, `key${string}`>;\ntype OtherEvent = MyExclude<Event, KeyEvent>;\n\nconst keys: KeyEvent[] = [\"keydown\", \"keyup\"];\nconst others: OtherEvent[] = [\"click\", \"scroll\"];\nconsole.log(keys.join(\" \"), \"|\", others.join(\" \"));\n",
+            "solution": "type MyExclude<T, U> = T extends U ? never : T;\ntype MyExtract<T, U> = T extends U ? T : never;\n\ntype Event = \"click\" | \"keydown\" | \"keyup\" | \"scroll\";\ntype KeyEvent = MyExtract<Event, `key${string}`>;\ntype OtherEvent = MyExclude<Event, KeyEvent>;\n\nconst keys: KeyEvent[] = [\"keydown\", \"keyup\"];\nconst others: OtherEvent[] = [\"click\", \"scroll\"];\nconsole.log(keys.join(\" \"), \"|\", others.join(\" \"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "keydown keyup | click scroll"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-ts_distributive-dz2",
+            "title": "Design: Shape (`never` goes in, `never` comes out)",
+            "prompt": "This is the worked example “`never` goes in, `never` comes out” from Distributive Conditional Types, with its `Shape` declaration taken out. Write `Shape` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Shape` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Shape` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { kind: \"circle\"; r: number } | { kind: \"square\"; side: number };\ntype _d1 = Expect<Equal<Shape, __Design>>;\n",
+            "starter": "type IsString<T> = T extends string ? \"yes\" : \"no\";\ntype IsNever<T> = [T] extends [never] ? true : false;\n\nfunction assertNever(value: never): never {\n  throw new Error(\"unhandled: \" + JSON.stringify(value));\n}\n____\nfunction area(s: Shape): number {\n  if (s.kind === \"circle\") return Math.round(3.14159 * s.r * s.r);\n  if (s.kind === \"square\") return s.side * s.side;\n  return assertNever(s);\n}\n\nconst neverCheck: IsNever<never> = true;\nconst stringCheck: IsString<\"a\"> = \"yes\";\nconsole.log(area({ kind: \"circle\", r: 2 }), area({ kind: \"square\", side: 3 }), neverCheck, stringCheck);\n",
+            "solution": "type IsString<T> = T extends string ? \"yes\" : \"no\";\ntype IsNever<T> = [T] extends [never] ? true : false;\n\nfunction assertNever(value: never): never {\n  throw new Error(\"unhandled: \" + JSON.stringify(value));\n}\ntype Shape = { kind: \"circle\"; r: number } | { kind: \"square\"; side: number };\nfunction area(s: Shape): number {\n  if (s.kind === \"circle\") return Math.round(3.14159 * s.r * s.r);\n  if (s.kind === \"square\") return s.side * s.side;\n  return assertNever(s);\n}\n\nconst neverCheck: IsNever<never> = true;\nconst stringCheck: IsString<\"a\"> = \"yes\";\nconsole.log(area({ kind: \"circle\", r: 2 }), area({ kind: \"square\", side: 3 }), neverCheck, stringCheck);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "13 9 true yes"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_distributive-dx1",
             "title": "Read the error: Distributive Conditional Types #1",
             "prompt": "The compiler rejects this program:\n\n    error TS2322: Type '(string | number)[]' is not assignable to type 'string[] | number[]'.\n\nFix the cause so it compiles — keep what the program is for; deleting the line that fails is not a fix.",
@@ -56073,6 +57431,60 @@
             ]
           },
           {
+            "id": "tsm-ts_template_literal_types-dz1",
+            "title": "Design: Size (CSS sizes, checked and parsed)",
+            "prompt": "This is the worked example “CSS sizes, checked and parsed” from Template Literal Types, with its `Size` declaration taken out. Write `Size` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Size` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Size` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = `${number}px` | `${number}%`;\ntype _d1 = Expect<Equal<Size, __Design>>;\n",
+            "starter": "____\nfunction toPixels(size: Size, container: number): number {\n  return size.endsWith(\"%\") ? (parseFloat(size) / 100) * container : parseFloat(size);\n}\nconst sizes: Size[] = [\"120px\", \"50%\", \"12.5px\"];\nconsole.log(sizes.map((s) => toPixels(s, 400)).join(\" \"));\n",
+            "solution": "type Size = `${number}px` | `${number}%`;\nfunction toPixels(size: Size, container: number): number {\n  return size.endsWith(\"%\") ? (parseFloat(size) / 100) * container : parseFloat(size);\n}\nconst sizes: Size[] = [\"120px\", \"50%\", \"12.5px\"];\nconsole.log(sizes.map((s) => toPixels(s, 400)).join(\" \"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "120 200 12.5"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-ts_template_literal_types-dz2",
+            "title": "Design: Entity (Event names from two unions)",
+            "prompt": "This is the worked example “Event names from two unions” from Template Literal Types, with its `Entity` declaration taken out. Write `Entity` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Entity` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Entity` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = \"user\" | \"order\";\ntype _d1 = Expect<Equal<Entity, __Design>>;\n",
+            "starter": "____\ntype Action = \"created\" | \"deleted\";\ntype EventName = `${Entity}:${Action}`;\nconst counts = new Map<EventName, number>();\nconst emit = (e: EventName) => counts.set(e, (counts.get(e) ?? 0) + 1);\nemit(\"user:created\");\nemit(\"order:deleted\");\nemit(\"user:created\");\nconsole.log([...counts].map(([e, n]) => `${e}=${n}`).join(\" \"));\n",
+            "solution": "type Entity = \"user\" | \"order\";\ntype Action = \"created\" | \"deleted\";\ntype EventName = `${Entity}:${Action}`;\nconst counts = new Map<EventName, number>();\nconst emit = (e: EventName) => counts.set(e, (counts.get(e) ?? 0) + 1);\nemit(\"user:created\");\nemit(\"order:deleted\");\nemit(\"user:created\");\nconsole.log([...counts].map(([e, n]) => `${e}=${n}`).join(\" \"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "user:created=2 order:deleted=1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_template_literal_types-rt1",
             "title": "Retype: CSS sizes, checked and parsed",
             "prompt": "This is the worked example “CSS sizes, checked and parsed” from Template Literal Types, with every type on the signatures of `toPixels` replaced by `any`. It still runs and prints the right thing — and the compiler checks none of it. Give every parameter and return type its real type again.",
@@ -56381,6 +57793,60 @@
             ]
           },
           {
+            "id": "tsm-ts_type_level-dz1",
+            "title": "Design: Json (A recursive JSON type and a walker)",
+            "prompt": "This is the worked example “A recursive JSON type and a walker” from Recursive Types & Type-Level Programming, with its `Json` declaration taken out. Write `Json` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Json` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Json` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = null | boolean | number | string | Json[] | { [key: string]: Json };\ntype _d1 = Expect<Equal<Json, __Design>>;\n",
+            "starter": "____\nfunction countLeaves(v: Json): number {\n  if (Array.isArray(v)) return v.reduce<number>((n, x) => n + countLeaves(x), 0);\n  if (v !== null && typeof v === \"object\") return Object.values(v).reduce<number>((n, x) => n + countLeaves(x), 0);\n  return 1;\n}\nconst doc: Json = { name: \"ana\", tags: [\"a\", \"b\"], address: { city: \"Oslo\", geo: [59.9, 10.7] }, active: true };\nconsole.log(countLeaves(doc));\n",
+            "solution": "type Json = null | boolean | number | string | Json[] | { [key: string]: Json };\nfunction countLeaves(v: Json): number {\n  if (Array.isArray(v)) return v.reduce<number>((n, x) => n + countLeaves(x), 0);\n  if (v !== null && typeof v === \"object\") return Object.values(v).reduce<number>((n, x) => n + countLeaves(x), 0);\n  return 1;\n}\nconst doc: Json = { name: \"ana\", tags: [\"a\", \"b\"], address: { city: \"Oslo\", geo: [59.9, 10.7] }, active: true };\nconsole.log(countLeaves(doc));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "7"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-ts_type_level-dz2",
+            "title": "Design: Config (A deeply read-only parameter)",
+            "prompt": "This is the worked example “A deeply read-only parameter” from Recursive Types & Type-Level Programming, with its `Config` declaration taken out. Write `Config` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Config` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Config` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { server: { host: string; ports: number[] }; debug: boolean };\ntype _d1 = Expect<Equal<Config, __Design>>;\n",
+            "starter": "type DeepReadonly<T> = { readonly [K in keyof T]: T[K] extends object ? DeepReadonly<T[K]> : T[K] };\n____\nfunction describe(c: DeepReadonly<Config>): string {\n  return `${c.server.host}:${c.server.ports.join(\"/\")} debug=${c.debug}`;\n}\nconsole.log(describe({ server: { host: \"localhost\", ports: [80, 443] }, debug: false }));\n",
+            "solution": "type DeepReadonly<T> = { readonly [K in keyof T]: T[K] extends object ? DeepReadonly<T[K]> : T[K] };\ntype Config = { server: { host: string; ports: number[] }; debug: boolean };\nfunction describe(c: DeepReadonly<Config>): string {\n  return `${c.server.host}:${c.server.ports.join(\"/\")} debug=${c.debug}`;\n}\nconsole.log(describe({ server: { host: \"localhost\", ports: [80, 443] }, debug: false }));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "localhost:80/443 debug=false"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_type_level-rt1",
             "title": "Retype: A recursive JSON type and a walker",
             "prompt": "This is the worked example “A recursive JSON type and a walker” from Recursive Types & Type-Level Programming, with every type on the signatures of `countLeaves` replaced by `any`. It still runs and prints the right thing — and the compiler checks none of it. Give every parameter and return type its real type again.",
@@ -56615,6 +58081,33 @@
             "source_slug": "",
             "dataset": "",
             "explanation": "**Enumerating what a pattern can describe.** A million-member union is too big to check. A parser and a brand (week 16) give the same guarantee — only valid PINs reach code that takes `Pin` — at no type-level cost."
+          },
+          {
+            "id": "tsm-ts_type_performance-dz1",
+            "title": "Design: Hex (A pattern instead of an enumeration)",
+            "prompt": "This is the worked example “A pattern instead of an enumeration” from Type-Level Performance & Limits, with its `Hex` declaration taken out. Write `Hex` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Hex` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Hex` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = `#${string}`;\ntype _d1 = Expect<Equal<Hex, __Design>>;\n",
+            "starter": "____\ntype Percent = `${number}%`;\n\nfunction parseColour(text: string): Hex | undefined {\n  return /^#[0-9a-f]{6}$/i.test(text) ? (text.toLowerCase() as Hex) : undefined;\n}\nfunction scale(p: Percent, of: number): number {\n  return (parseFloat(p) / 100) * of;\n}\nconsole.log(parseColour(\"#3355FF\"), parseColour(\"blue\"));\nconsole.log(scale(\"25%\", 80), scale(\"12.5%\", 8));\n",
+            "solution": "type Hex = `#${string}`;\ntype Percent = `${number}%`;\n\nfunction parseColour(text: string): Hex | undefined {\n  return /^#[0-9a-f]{6}$/i.test(text) ? (text.toLowerCase() as Hex) : undefined;\n}\nfunction scale(p: Percent, of: number): number {\n  return (parseFloat(p) / 100) * of;\n}\nconsole.log(parseColour(\"#3355FF\"), parseColour(\"blue\"));\nconsole.log(scale(\"25%\", 80), scale(\"12.5%\", 8));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "#3355ff undefined\n20 1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           },
           {
             "id": "tsm-ts_type_performance-rt1",
@@ -58566,6 +60059,33 @@
             ]
           },
           {
+            "id": "tsm-ts_classes-dz1",
+            "title": "Design: Shape (`implements` checks a class against an interface)",
+            "prompt": "This is the worked example “`implements` checks a class against an interface” from Classes, with its `Shape` declaration taken out. Write `Shape` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Shape` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Shape` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = {\n  readonly name: string;\n  area(): number;\n};\ntype _d1 = Expect<Equal<Shape, __Design>>;\n",
+            "starter": "____\nclass Circle implements Shape {\n  readonly name = \"circle\";\n  readonly r: number;\n  constructor(r: number) {\n    this.r = r;\n  }\n  area(): number {\n    return Math.PI * this.r ** 2;\n  }\n}\nclass Square implements Shape {\n  readonly name = \"square\";\n  readonly side: number;\n  constructor(side: number) {\n    this.side = side;\n  }\n  area(): number {\n    return this.side ** 2;\n  }\n}\nconst shapes: Shape[] = [new Circle(1), new Square(3)];\nfor (const s of shapes) console.log(s.name + \": \" + s.area().toFixed(2));\n",
+            "solution": "interface Shape {\n  readonly name: string;\n  area(): number;\n}\nclass Circle implements Shape {\n  readonly name = \"circle\";\n  readonly r: number;\n  constructor(r: number) {\n    this.r = r;\n  }\n  area(): number {\n    return Math.PI * this.r ** 2;\n  }\n}\nclass Square implements Shape {\n  readonly name = \"square\";\n  readonly side: number;\n  constructor(side: number) {\n    this.side = side;\n  }\n  area(): number {\n    return this.side ** 2;\n  }\n}\nconst shapes: Shape[] = [new Circle(1), new Square(3)];\nfor (const s of shapes) console.log(s.name + \": \" + s.area().toFixed(2));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "circle: 3.14\nsquare: 9.00"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_classes-dx1",
             "title": "Read the error: Classes #1",
             "prompt": "The compiler rejects this program:\n\n    error TS2564: Property 'count' has no initializer and is not definitely assigned in the constructor.\n\nFix the cause so it compiles — keep what the program is for; deleting the line that fails is not a fix.",
@@ -58743,6 +60263,33 @@
             ]
           },
           {
+            "id": "tsm-ts_this_accessors-dz1",
+            "title": "Design: Named (One function, three `this` values)",
+            "prompt": "This is the worked example “One function, three `this` values” from this, Getters & Setters, with its `Named` declaration taken out. Write `Named` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Named` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Named` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { name: string; greet(): string };\ntype _d1 = Expect<Equal<Named, __Design>>;\n",
+            "starter": "____\nconst ana: Named = {\n  name: \"ana\",\n  greet() {\n    return \"hi from \" + this.name;\n  },\n};\nconst ben: Named = { name: \"ben\", greet: ana.greet };\nconst bound = ana.greet.bind(ben);\nconsole.log(ana.greet(), \"|\", ben.greet(), \"|\", bound());\n",
+            "solution": "type Named = { name: string; greet(): string };\nconst ana: Named = {\n  name: \"ana\",\n  greet() {\n    return \"hi from \" + this.name;\n  },\n};\nconst ben: Named = { name: \"ben\", greet: ana.greet };\nconst bound = ana.greet.bind(ben);\nconsole.log(ana.greet(), \"|\", ben.greet(), \"|\", bound());\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "hi from ana | hi from ben | hi from ben"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_this_accessors-dx1",
             "title": "Read the error: this, Getters & Setters #1",
             "prompt": "The compiler rejects this program:\n\n    error TS2684: The 'this' context of type 'void' is not assignable to method's 'this' of type 'Counter'.\n\nFix the cause so it compiles — keep what the program is for; deleting the line that fails is not a fix.",
@@ -58918,6 +60465,33 @@
               4,
               5
             ]
+          },
+          {
+            "id": "tsm-ts_class_design-dz1",
+            "title": "Design: Clock (Composition: behaviour passed in)",
+            "prompt": "This is the worked example “Composition: behaviour passed in” from Designing with Classes, with its `Clock` declaration taken out. Write `Clock` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Clock` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Clock` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = {\n  now(): number;\n};\ntype _d1 = Expect<Equal<Clock, __Design>>;\n",
+            "starter": "____\ninterface Log {\n  write(line: string): void;\n}\nclass RateLimiter {\n  readonly #clock: Clock;\n  readonly #log: Log;\n  readonly #hits: number[] = [];\n  readonly #limit: number;\n  constructor(clock: Clock, log: Log, limit: number) {\n    this.#clock = clock;\n    this.#log = log;\n    this.#limit = limit;\n  }\n  allow(user: string): boolean {\n    const t = this.#clock.now();\n    while (this.#hits.length > 0 && (this.#hits[0] ?? 0) <= t - 1000) this.#hits.shift();\n    const ok = this.#hits.length < this.#limit;\n    if (ok) this.#hits.push(t);\n    this.#log.write(`${t}ms ${user} ${ok ? \"allowed\" : \"limited\"}`);\n    return ok;\n  }\n}\nlet fake = 0;\nconst lines: string[] = [];\nconst limiter = new RateLimiter({ now: () => fake }, { write: (l) => lines.push(l) }, 2);\nfor (const t of [0, 100, 200, 1150, 1200]) {\n  fake = t;\n  limiter.allow(\"ana\");\n}\nconsole.log(lines.join(\"\\n\"));\n",
+            "solution": "interface Clock {\n  now(): number;\n}\ninterface Log {\n  write(line: string): void;\n}\nclass RateLimiter {\n  readonly #clock: Clock;\n  readonly #log: Log;\n  readonly #hits: number[] = [];\n  readonly #limit: number;\n  constructor(clock: Clock, log: Log, limit: number) {\n    this.#clock = clock;\n    this.#log = log;\n    this.#limit = limit;\n  }\n  allow(user: string): boolean {\n    const t = this.#clock.now();\n    while (this.#hits.length > 0 && (this.#hits[0] ?? 0) <= t - 1000) this.#hits.shift();\n    const ok = this.#hits.length < this.#limit;\n    if (ok) this.#hits.push(t);\n    this.#log.write(`${t}ms ${user} ${ok ? \"allowed\" : \"limited\"}`);\n    return ok;\n  }\n}\nlet fake = 0;\nconst lines: string[] = [];\nconst limiter = new RateLimiter({ now: () => fake }, { write: (l) => lines.push(l) }, 2);\nfor (const t of [0, 100, 200, 1150, 1200]) {\n  fake = t;\n  limiter.allow(\"ana\");\n}\nconsole.log(lines.join(\"\\n\"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "0ms ana allowed\n100ms ana allowed\n200ms ana limited\n1150ms ana allowed\n1200ms ana allowed"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           },
           {
             "id": "tsm-ts_class_design-dx1",
@@ -60905,6 +62479,33 @@
             ]
           },
           {
+            "id": "tsm-ts_iterators-dz1",
+            "title": "Design: Tree (A generator that walks a tree)",
+            "prompt": "This is the worked example “A generator that walks a tree” from Iterators & Generators, with its `Tree` declaration taken out. Write `Tree` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Tree` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Tree` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { value: number; children: Tree[] };\ntype _d1 = Expect<Equal<Tree, __Design>>;\n",
+            "starter": "____\nfunction* walk(t: Tree, depth = 0): Generator<string> {\n  yield \"  \".repeat(depth) + t.value;\n  for (const child of t.children) yield* walk(child, depth + 1);\n}\nconst tree: Tree = {\n  value: 1,\n  children: [\n    { value: 2, children: [{ value: 4, children: [] }] },\n    { value: 3, children: [] },\n  ],\n};\nconsole.log([...walk(tree)].join(\"\\n\"));\n",
+            "solution": "type Tree = { value: number; children: Tree[] };\nfunction* walk(t: Tree, depth = 0): Generator<string> {\n  yield \"  \".repeat(depth) + t.value;\n  for (const child of t.children) yield* walk(child, depth + 1);\n}\nconst tree: Tree = {\n  value: 1,\n  children: [\n    { value: 2, children: [{ value: 4, children: [] }] },\n    { value: 3, children: [] },\n  ],\n};\nconsole.log([...walk(tree)].join(\"\\n\"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "1\n  2\n    4\n  3"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_iterators-dx1",
             "title": "Read the error: Iterators & Generators #1",
             "prompt": "The compiler rejects this program:\n\n    error TS2488: Type '{ ana: number; ben: number; }' must have a '[Symbol.iterator]()' method that returns an iterator.\n\nFix the cause so it compiles — keep what the program is for; deleting the line that fails is not a fix.",
@@ -61362,6 +62963,33 @@
             "lines": [
               2
             ]
+          },
+          {
+            "id": "tsm-ts_heap_pq-dz1",
+            "title": "Design: Job (A scheduler with stable ties)",
+            "prompt": "This is the worked example “A scheduler with stable ties” from Heaps & Priority Queues, with its `Job` declaration taken out. Write `Job` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Job` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Job` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { name: string; priority: number; seq: number };\ntype _d1 = Expect<Equal<Job, __Design>>;\n",
+            "starter": "class Heap<T> {\n  readonly #items: T[] = [];\n  readonly #compare: (a: T, b: T) => number;\n  constructor(compare: (a: T, b: T) => number) {\n    this.#compare = compare;\n  }\n  get size(): number {\n    return this.#items.length;\n  }\n  peek(): T | undefined {\n    return this.#items[0];\n  }\n  push(item: T): void {\n    const a = this.#items;\n    a.push(item);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      const child = a[i] as T;\n      const up = a[parent] as T;\n      if (this.#compare(child, up) >= 0) break;\n      a[i] = up;\n      a[parent] = child;\n      i = parent;\n    }\n  }\n  pop(): T | undefined {\n    const a = this.#items;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length > 0 && last !== undefined) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.#compare(a[l] as T, a[m] as T) < 0) m = l;\n        if (r < a.length && this.#compare(a[r] as T, a[m] as T) < 0) m = r;\n        if (m === i) break;\n        const tmp = a[i] as T;\n        a[i] = a[m] as T;\n        a[m] = tmp;\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\n____\nconst queue = new Heap<Job>((a, b) => a.priority - b.priority || a.seq - b.seq);\nlet seq = 0;\nfor (const [name, priority] of [[\"backup\", 2], [\"email\", 1], [\"report\", 2], [\"alert\", 0], [\"cleanup\", 2]] as const) {\n  queue.push({ name, priority, seq: seq++ });\n}\nconst order: string[] = [];\nfor (let j = queue.pop(); j !== undefined; j = queue.pop()) order.push(`${j.name}(${j.priority})`);\nconsole.log(order.join(\" \"));\n",
+            "solution": "class Heap<T> {\n  readonly #items: T[] = [];\n  readonly #compare: (a: T, b: T) => number;\n  constructor(compare: (a: T, b: T) => number) {\n    this.#compare = compare;\n  }\n  get size(): number {\n    return this.#items.length;\n  }\n  peek(): T | undefined {\n    return this.#items[0];\n  }\n  push(item: T): void {\n    const a = this.#items;\n    a.push(item);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      const child = a[i] as T;\n      const up = a[parent] as T;\n      if (this.#compare(child, up) >= 0) break;\n      a[i] = up;\n      a[parent] = child;\n      i = parent;\n    }\n  }\n  pop(): T | undefined {\n    const a = this.#items;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length > 0 && last !== undefined) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.#compare(a[l] as T, a[m] as T) < 0) m = l;\n        if (r < a.length && this.#compare(a[r] as T, a[m] as T) < 0) m = r;\n        if (m === i) break;\n        const tmp = a[i] as T;\n        a[i] = a[m] as T;\n        a[m] = tmp;\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\ntype Job = { name: string; priority: number; seq: number };\nconst queue = new Heap<Job>((a, b) => a.priority - b.priority || a.seq - b.seq);\nlet seq = 0;\nfor (const [name, priority] of [[\"backup\", 2], [\"email\", 1], [\"report\", 2], [\"alert\", 0], [\"cleanup\", 2]] as const) {\n  queue.push({ name, priority, seq: seq++ });\n}\nconst order: string[] = [];\nfor (let j = queue.pop(); j !== undefined; j = queue.pop()) order.push(`${j.name}(${j.priority})`);\nconsole.log(order.join(\" \"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "alert(0) email(1) backup(2) report(2) cleanup(2)"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           },
           {
             "id": "tsm-ts_heap_pq-rt1",
@@ -63562,6 +65190,60 @@
             "source_slug": "",
             "dataset": "",
             "explanation": "**Mixing `throw` and `Result` at one boundary.** The signature promised a `Result`, but `JSON.parse` still threw through it. A function that returns `Result` must convert every expected failure inside, or callers need both a check and a `try`."
+          },
+          {
+            "id": "tsm-ts_error_types-dz1",
+            "title": "Design: Person (Collecting every validation error with `Result`)",
+            "prompt": "This is the worked example “Collecting every validation error with `Result`” from Result Types & Typed Errors, with its `Person` declaration taken out. Write `Person` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `Person` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `Person` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { name: string; age: number };\ntype _d1 = Expect<Equal<Person, __Design>>;\n",
+            "starter": "type Result<T, E = string> = { ok: true; value: T } | { ok: false; error: E };\n____\nfunction parsePerson(line: string): Result<Person> {\n  const [name = \"\", ageText = \"\"] = line.split(\",\");\n  if (!name.trim()) return { ok: false, error: \"missing name\" };\n  const age = Number(ageText);\n  if (!Number.isInteger(age) || age < 0) return { ok: false, error: `bad age \"${ageText}\"` };\n  return { ok: true, value: { name: name.trim(), age } };\n}\nconst lines = [\"ana,31\", \",20\", \"ben,x\", \"cy,7\"];\nconst results = lines.map(parsePerson);\nconst people = results.flatMap((r) => (r.ok ? [r.value] : []));\nconst problems = results.flatMap((r, i) => (r.ok ? [] : [`line ${i + 1}: ${r.error}`]));\nconsole.log(people.map((p) => p.name).join(\",\"), \"|\", problems.join(\"; \"));\n",
+            "solution": "type Result<T, E = string> = { ok: true; value: T } | { ok: false; error: E };\ntype Person = { name: string; age: number };\nfunction parsePerson(line: string): Result<Person> {\n  const [name = \"\", ageText = \"\"] = line.split(\",\");\n  if (!name.trim()) return { ok: false, error: \"missing name\" };\n  const age = Number(ageText);\n  if (!Number.isInteger(age) || age < 0) return { ok: false, error: `bad age \"${ageText}\"` };\n  return { ok: true, value: { name: name.trim(), age } };\n}\nconst lines = [\"ana,31\", \",20\", \"ben,x\", \"cy,7\"];\nconst results = lines.map(parsePerson);\nconst people = results.flatMap((r) => (r.ok ? [r.value] : []));\nconst problems = results.flatMap((r, i) => (r.ok ? [] : [`line ${i + 1}: ${r.error}`]));\nconsole.log(people.map((p) => p.name).join(\",\"), \"|\", problems.join(\"; \"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "ana,cy | line 2: missing name; line 3: bad age \"x\""
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-ts_error_types-dz2",
+            "title": "Design: NameError (A union of error codes, handled exhaustively)",
+            "prompt": "This is the worked example “A union of error codes, handled exhaustively” from Result Types & Typed Errors, with its `NameError` declaration taken out. Write `NameError` again — a type alias or an interface — from the way the rest of the program uses it.",
+            "hint": "List every place `NameError` is used: which properties are read, what is assigned to it.",
+            "hints": [
+              "List every place `NameError` is used: which properties are read, what is assigned to it.",
+              "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "",
+            "strictness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype __Design = { kind: \"empty\" } | { kind: \"tooLong\"; max: number } | { kind: \"badChar\"; char: string };\ntype _d1 = Expect<Equal<NameError, __Design>>;\n",
+            "starter": "____\ntype Result<T, E> = { ok: true; value: T } | { ok: false; error: E };\nfunction checkName(s: string): Result<string, NameError> {\n  if (s.length === 0) return { ok: false, error: { kind: \"empty\" } };\n  if (s.length > 8) return { ok: false, error: { kind: \"tooLong\", max: 8 } };\n  const bad = [...s].find((c) => !/[a-z]/.test(c));\n  if (bad !== undefined) return { ok: false, error: { kind: \"badChar\", char: bad } };\n  return { ok: true, value: s };\n}\nfunction message(e: NameError): string {\n  switch (e.kind) {\n    case \"empty\": return \"name is required\";\n    case \"tooLong\": return `at most ${e.max} letters`;\n    case \"badChar\": return `\"${e.char}\" is not allowed`;\n    default: {\n      const unreachable: never = e;\n      return unreachable;\n    }\n  }\n}\nfor (const s of [\"ana\", \"\", \"bartholomew\", \"jo3\"]) {\n  const r = checkName(s);\n  console.log(r.ok ? \"ok: \" + r.value : \"error: \" + message(r.error));\n}\n",
+            "solution": "type NameError = { kind: \"empty\" } | { kind: \"tooLong\"; max: number } | { kind: \"badChar\"; char: string };\ntype Result<T, E> = { ok: true; value: T } | { ok: false; error: E };\nfunction checkName(s: string): Result<string, NameError> {\n  if (s.length === 0) return { ok: false, error: { kind: \"empty\" } };\n  if (s.length > 8) return { ok: false, error: { kind: \"tooLong\", max: 8 } };\n  const bad = [...s].find((c) => !/[a-z]/.test(c));\n  if (bad !== undefined) return { ok: false, error: { kind: \"badChar\", char: bad } };\n  return { ok: true, value: s };\n}\nfunction message(e: NameError): string {\n  switch (e.kind) {\n    case \"empty\": return \"name is required\";\n    case \"tooLong\": return `at most ${e.max} letters`;\n    case \"badChar\": return `\"${e.char}\" is not allowed`;\n    default: {\n      const unreachable: never = e;\n      return unreachable;\n    }\n  }\n}\nfor (const s of [\"ana\", \"\", \"bartholomew\", \"jo3\"]) {\n  const r = checkName(s);\n  console.log(r.ok ? \"ok: \" + r.value : \"error: \" + message(r.error));\n}\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "ok: ana\nerror: name is required\nerror: at most 8 letters\nerror: \"3\" is not allowed"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           },
           {
             "id": "tsm-ts_error_types-rt1",

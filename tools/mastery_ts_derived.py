@@ -244,6 +244,39 @@ def _tsd_retypes(key, name, data):
     return out
 
 
+try:
+    with open(os.path.join(HERE, "ts_designs.json"), encoding="utf-8") as _tsd_df:
+        _TSD_DESIGNS = json.load(_tsd_df)
+except FileNotFoundError:
+    _TSD_DESIGNS = {}
+
+
+def _tsd_designs(key, name, data):
+    """Design drills (X-10) cached by tools/gen_ts_designs.py: a worked example
+    with one type declaration blanked, recovered from how the program uses it,
+    judged on the output and on `Equal` with the original shape."""
+    examples = {ex["code"]: ex for ex in data["examples"]}
+    out = []
+    for i, p in enumerate(_TSD_DESIGNS.get(key, []), start=1):
+        ex = examples.get(p["code"])
+        if ex is None:
+            continue
+        t = p["name"]
+        out.append({
+            "id": f"tsm-{key}-dz{i}", "title": f"Design: {t} ({p['title']})",
+            "prompt": (f"This is the worked example “{p['title']}” from {name}, with its `{t}` declaration taken out. "
+                       f"Write `{t}` again — a type alias or an interface — from the way the rest of the program uses it."),
+            "hint": f"List every place `{t}` is used: which properties are read, what is assigned to it.",
+            "hints": [f"List every place `{t}` is used: which properties are read, what is assigned to it.",
+                      "The hidden check compares your type with the original exactly — optional properties, readonly and literal types included."],
+            "language": "typescript", "kind": "design", "difficulty": "",
+            "strictness": "", "judge_mode": "", "forbid": [],
+            "harness": _KM_PRELUDE + f"\ntype __Design = {p['shape']};\ntype _d1 = Expect<Equal<{t}, __Design>>;\n",
+            "starter": p["starter"], "solution": p["code"], "tests": ex["tests"], "source_slug": "", "dataset": "",
+        })
+    return out
+
+
 def _tsd_cards(name, data):
     cards = []
     for ex in data["examples"]:
@@ -333,7 +366,7 @@ def _tsd_predicts(key, name, data):
     return out
 
 
-TS_DERIVED_COUNTS = {"order": 0, "spot": 0, "cards": 0, "output": 0, "predict": 0, "repair": 0, "diagnose": 0, "retype": 0}
+TS_DERIVED_COUNTS = {"order": 0, "spot": 0, "cards": 0, "output": 0, "predict": 0, "repair": 0, "diagnose": 0, "retype": 0, "design": 0}
 _tsd_fronts = {c["front"] for w in TS_WEEKS for c in w["flashcards"]}
 _tsd_fronts |= {f for cs in TS_CARDS_MORE.values() for f, _ in cs}
 for _tsd_w in TS_WEEKS:
@@ -367,6 +400,9 @@ for _tsd_w in TS_WEEKS:
                 _tsd_r += 1
                 _tsd_more.append(_tsd_ex)
                 TS_DERIVED_COUNTS["repair"] += 1
+        for _tsd_ex in _tsd_designs(_tsd_key, _tsd_name, _tsd_data):
+            _tsd_more.append(_tsd_ex)
+            TS_DERIVED_COUNTS["design"] += 1
         for _tsd_ex in _tsd_retypes(_tsd_key, _tsd_name, _tsd_data):
             _tsd_more.append(_tsd_ex)
             TS_DERIVED_COUNTS["retype"] += 1
@@ -394,7 +430,7 @@ for _tsd_w in TS_WEEKS:
             TS_DERIVED_COUNTS["cards"] += 1
 print(f"  derived from chapters: {TS_DERIVED_COUNTS['cards']} cards, "
       f"{TS_DERIVED_COUNTS['order']} order, {TS_DERIVED_COUNTS['spot']} spot exercises, "
-      f"{TS_DERIVED_COUNTS['output']} code-output questions, {TS_DERIVED_COUNTS['predict']} predict drills, {TS_DERIVED_COUNTS['repair']} repairs, {TS_DERIVED_COUNTS['diagnose']} read-the-error, {TS_DERIVED_COUNTS['retype']} retype")
+      f"{TS_DERIVED_COUNTS['output']} code-output questions, {TS_DERIVED_COUNTS['predict']} predict drills, {TS_DERIVED_COUNTS['repair']} repairs, {TS_DERIVED_COUNTS['diagnose']} read-the-error, {TS_DERIVED_COUNTS['retype']} retype, {TS_DERIVED_COUNTS['design']} design")
 
 # X-07: every compiler error a chapter shows has a glossary entry, so its
 # TsErrorLinks badge leads somewhere. Add missing ones to ts_errors_more.py.

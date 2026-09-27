@@ -1,0 +1,588 @@
+{
+ "ts_aliases": [
+  {
+   "title": "Names that document a domain",
+   "code": "type Cents = number;\ntype Sku = string;\ntype LineItem = { sku: Sku; qty: number; unit: Cents };\nconst total = (items: readonly LineItem[]): Cents => items.reduce((s, i) => s + i.qty * i.unit, 0);\nconsole.log(total([{ sku: \"PEN-1\", qty: 3, unit: 150 }, { sku: \"CUP-2\", qty: 1, unit: 400 }]));\n",
+   "name": "LineItem",
+   "decl": "type LineItem = { sku: Sku; qty: number; unit: Cents };",
+   "shape": "{ sku: Sku; qty: number; unit: Cents }",
+   "starter": "type Cents = number;\ntype Sku = string;\n____\nconst total = (items: readonly LineItem[]): Cents => items.reduce((s, i) => s + i.qty * i.unit, 0);\nconsole.log(total([{ sku: \"PEN-1\", qty: 3, unit: 150 }, { sku: \"CUP-2\", qty: 1, unit: 400 }]));\n"
+  },
+  {
+   "title": "Extending an interface, intersecting a type",
+   "code": "interface Named {\n  name: string;\n}\ninterface Employee extends Named {\n  team: string;\n}\ntype Timestamped = { createdAt: string };\ntype Record_ = Employee & Timestamped;\nconst r: Record_ = { name: \"ana\", team: \"web\", createdAt: \"2026-09-01\" };\nconsole.log(Object.keys(r).join(\",\"));\n",
+   "name": "Named",
+   "decl": "interface Named {\n  name: string;\n}",
+   "shape": "{\n  name: string;\n}",
+   "starter": "____\ninterface Employee extends Named {\n  team: string;\n}\ntype Timestamped = { createdAt: string };\ntype Record_ = Employee & Timestamped;\nconst r: Record_ = { name: \"ana\", team: \"web\", createdAt: \"2026-09-01\" };\nconsole.log(Object.keys(r).join(\",\"));\n"
+  }
+ ],
+ "ts_assertions": [
+  {
+   "title": "A checked assertion helper",
+   "code": "type Point = { x: number; y: number };\nfunction asPoint(v: unknown): Point {\n  if (typeof v === \"object\" && v !== null && \"x\" in v && \"y\" in v && typeof v.x === \"number\" && typeof v.y === \"number\") {\n    return { x: v.x, y: v.y };\n  }\n  throw new TypeError(\"not a point: \" + JSON.stringify(v));\n}\nfor (const t of ['{\"x\":1,\"y\":2}', '{\"x\":1}']) {\n  try {\n    const p = asPoint(JSON.parse(t));\n    console.log(p.x + p.y);\n  } catch (e) {\n    console.log(e instanceof Error ? e.message : String(e));\n  }\n}\n",
+   "name": "Point",
+   "decl": "type Point = { x: number; y: number };",
+   "shape": "{ x: number; y: number }",
+   "starter": "____\nfunction asPoint(v: unknown): Point {\n  if (typeof v === \"object\" && v !== null && \"x\" in v && \"y\" in v && typeof v.x === \"number\" && typeof v.y === \"number\") {\n    return { x: v.x, y: v.y };\n  }\n  throw new TypeError(\"not a point: \" + JSON.stringify(v));\n}\nfor (const t of ['{\"x\":1,\"y\":2}', '{\"x\":1}']) {\n  try {\n    const p = asPoint(JSON.parse(t));\n    console.log(p.x + p.y);\n  } catch (e) {\n    console.log(e instanceof Error ? e.message : String(e));\n  }\n}\n"
+  }
+ ],
+ "ts_branded_types": [
+  {
+   "title": "Units that can't be mixed",
+   "code": "declare const unit: unique symbol;\ntype Meters = number & { readonly [unit]: \"m\" };\ntype Feet = number & { readonly [unit]: \"ft\" };\nconst meters = (n: number) => n as Meters;\nconst feetToMeters = (f: Feet): Meters => meters(f * 0.3048);\nconst feet = (n: number) => n as Feet;\nconst total: Meters = meters(meters(100) + feetToMeters(feet(328)));\nconsole.log(total.toFixed(1));\n",
+   "name": "Meters",
+   "decl": "type Meters = number & { readonly [unit]: \"m\" };",
+   "shape": "number & { readonly [unit]: \"m\" }",
+   "starter": "declare const unit: unique symbol;\n____\ntype Feet = number & { readonly [unit]: \"ft\" };\nconst meters = (n: number) => n as Meters;\nconst feetToMeters = (f: Feet): Meters => meters(f * 0.3048);\nconst feet = (n: number) => n as Feet;\nconst total: Meters = meters(meters(100) + feetToMeters(feet(328)));\nconsole.log(total.toFixed(1));\n"
+  },
+  {
+   "title": "A validated non-empty string",
+   "code": "declare const brand: unique symbol;\ntype Title = string & { readonly [brand]: \"Title\" };\nfunction parseTitle(raw: string): Title | undefined {\n  const t = raw.trim().replace(/\\s+/g, \" \");\n  return t.length > 0 && t.length <= 40 ? (t as Title) : undefined;\n}\nconst publish = (t: Title) => `published \"${t}\"`;\nfor (const raw of [\"  Hello   world \", \"   \", \"x\".repeat(50)]) {\n  const t = parseTitle(raw);\n  console.log(t === undefined ? \"rejected\" : publish(t));\n}\n",
+   "name": "Title",
+   "decl": "type Title = string & { readonly [brand]: \"Title\" };",
+   "shape": "string & { readonly [brand]: \"Title\" }",
+   "starter": "declare const brand: unique symbol;\n____\nfunction parseTitle(raw: string): Title | undefined {\n  const t = raw.trim().replace(/\\s+/g, \" \");\n  return t.length > 0 && t.length <= 40 ? (t as Title) : undefined;\n}\nconst publish = (t: Title) => `published \"${t}\"`;\nfor (const raw of [\"  Hello   world \", \"   \", \"x\".repeat(50)]) {\n  const t = parseTitle(raw);\n  console.log(t === undefined ? \"rejected\" : publish(t));\n}\n"
+  }
+ ],
+ "ts_class_design": [
+  {
+   "title": "Composition: behaviour passed in",
+   "code": "interface Clock {\n  now(): number;\n}\ninterface Log {\n  write(line: string): void;\n}\nclass RateLimiter {\n  readonly #clock: Clock;\n  readonly #log: Log;\n  readonly #hits: number[] = [];\n  readonly #limit: number;\n  constructor(clock: Clock, log: Log, limit: number) {\n    this.#clock = clock;\n    this.#log = log;\n    this.#limit = limit;\n  }\n  allow(user: string): boolean {\n    const t = this.#clock.now();\n    while (this.#hits.length > 0 && (this.#hits[0] ?? 0) <= t - 1000) this.#hits.shift();\n    const ok = this.#hits.length < this.#limit;\n    if (ok) this.#hits.push(t);\n    this.#log.write(`${t}ms ${user} ${ok ? \"allowed\" : \"limited\"}`);\n    return ok;\n  }\n}\nlet fake = 0;\nconst lines: string[] = [];\nconst limiter = new RateLimiter({ now: () => fake }, { write: (l) => lines.push(l) }, 2);\nfor (const t of [0, 100, 200, 1150, 1200]) {\n  fake = t;\n  limiter.allow(\"ana\");\n}\nconsole.log(lines.join(\"\\n\"));\n",
+   "name": "Clock",
+   "decl": "interface Clock {\n  now(): number;\n}",
+   "shape": "{\n  now(): number;\n}",
+   "starter": "____\ninterface Log {\n  write(line: string): void;\n}\nclass RateLimiter {\n  readonly #clock: Clock;\n  readonly #log: Log;\n  readonly #hits: number[] = [];\n  readonly #limit: number;\n  constructor(clock: Clock, log: Log, limit: number) {\n    this.#clock = clock;\n    this.#log = log;\n    this.#limit = limit;\n  }\n  allow(user: string): boolean {\n    const t = this.#clock.now();\n    while (this.#hits.length > 0 && (this.#hits[0] ?? 0) <= t - 1000) this.#hits.shift();\n    const ok = this.#hits.length < this.#limit;\n    if (ok) this.#hits.push(t);\n    this.#log.write(`${t}ms ${user} ${ok ? \"allowed\" : \"limited\"}`);\n    return ok;\n  }\n}\nlet fake = 0;\nconst lines: string[] = [];\nconst limiter = new RateLimiter({ now: () => fake }, { write: (l) => lines.push(l) }, 2);\nfor (const t of [0, 100, 200, 1150, 1200]) {\n  fake = t;\n  limiter.allow(\"ana\");\n}\nconsole.log(lines.join(\"\\n\"));\n"
+  }
+ ],
+ "ts_classes": [
+  {
+   "title": "`implements` checks a class against an interface",
+   "code": "interface Shape {\n  readonly name: string;\n  area(): number;\n}\nclass Circle implements Shape {\n  readonly name = \"circle\";\n  readonly r: number;\n  constructor(r: number) {\n    this.r = r;\n  }\n  area(): number {\n    return Math.PI * this.r ** 2;\n  }\n}\nclass Square implements Shape {\n  readonly name = \"square\";\n  readonly side: number;\n  constructor(side: number) {\n    this.side = side;\n  }\n  area(): number {\n    return this.side ** 2;\n  }\n}\nconst shapes: Shape[] = [new Circle(1), new Square(3)];\nfor (const s of shapes) console.log(s.name + \": \" + s.area().toFixed(2));\n",
+   "name": "Shape",
+   "decl": "interface Shape {\n  readonly name: string;\n  area(): number;\n}",
+   "shape": "{\n  readonly name: string;\n  area(): number;\n}",
+   "starter": "____\nclass Circle implements Shape {\n  readonly name = \"circle\";\n  readonly r: number;\n  constructor(r: number) {\n    this.r = r;\n  }\n  area(): number {\n    return Math.PI * this.r ** 2;\n  }\n}\nclass Square implements Shape {\n  readonly name = \"square\";\n  readonly side: number;\n  constructor(side: number) {\n    this.side = side;\n  }\n  area(): number {\n    return this.side ** 2;\n  }\n}\nconst shapes: Shape[] = [new Circle(1), new Square(3)];\nfor (const s of shapes) console.log(s.name + \": \" + s.area().toFixed(2));\n"
+  }
+ ],
+ "ts_compose": [
+  {
+   "title": "Types built from parts",
+   "code": "type Identified = { id: number };\ntype Named = { name: string };\ntype Timestamped = { createdAt: string; updatedAt: string };\ntype Product = Identified & Named & Timestamped & { price: number };\nconst p: Product = { id: 1, name: \"pen\", price: 2, createdAt: \"2026-09-01\", updatedAt: \"2026-09-26\" };\nconsole.log(Object.keys(p).length, `${p.name} #${p.id}`);\n",
+   "name": "Identified",
+   "decl": "type Identified = { id: number };",
+   "shape": "{ id: number }",
+   "starter": "____\ntype Named = { name: string };\ntype Timestamped = { createdAt: string; updatedAt: string };\ntype Product = Identified & Named & Timestamped & { price: number };\nconst p: Product = { id: 1, name: \"pen\", price: 2, createdAt: \"2026-09-01\", updatedAt: \"2026-09-26\" };\nconsole.log(Object.keys(p).length, `${p.name} #${p.id}`);\n"
+  },
+  {
+   "title": "`extends` for a named family",
+   "code": "interface Shape {\n  name: string;\n  area(): number;\n}\ninterface Solid extends Shape {\n  volume(): number;\n}\nconst cube: Solid = { name: \"cube\", area: () => 6 * 4, volume: () => 8 };\nconst shapes: Shape[] = [cube, { name: \"square\", area: () => 4 }];\nconsole.log(shapes.map((s) => `${s.name}:${s.area()}`).join(\" \"), cube.volume());\n",
+   "name": "Shape",
+   "decl": "interface Shape {\n  name: string;\n  area(): number;\n}",
+   "shape": "{\n  name: string;\n  area(): number;\n}",
+   "starter": "____\ninterface Solid extends Shape {\n  volume(): number;\n}\nconst cube: Solid = { name: \"cube\", area: () => 6 * 4, volume: () => 8 };\nconst shapes: Shape[] = [cube, { name: \"square\", area: () => 4 }];\nconsole.log(shapes.map((s) => `${s.name}:${s.area()}`).join(\" \"), cube.volume());\n"
+  }
+ ],
+ "ts_control_flow": [
+  {
+   "title": "Early returns narrow the rest of the function",
+   "code": "import * as fs from \"fs\";\ntype User = { name: string; email?: string };\n\nfunction contact(user: User | undefined): string {\n  if (user === undefined) return \"no user\";\n  if (user.email === undefined) return `${user.name} (no email)`;\n  return `${user.name} <${user.email.toLowerCase()}>`;\n}\n\nconst users: (User | undefined)[] = JSON.parse(fs.readFileSync(0, \"utf8\").trim());\nfor (const u of users) console.log(contact(u ?? undefined));\n",
+   "name": "User",
+   "decl": "type User = { name: string; email?: string };",
+   "shape": "{ name: string; email?: string }",
+   "starter": "import * as fs from \"fs\";\n____\n\nfunction contact(user: User | undefined): string {\n  if (user === undefined) return \"no user\";\n  if (user.email === undefined) return `${user.name} (no email)`;\n  return `${user.name} <${user.email.toLowerCase()}>`;\n}\n\nconst users: (User | undefined)[] = JSON.parse(fs.readFileSync(0, \"utf8\").trim());\nfor (const u of users) console.log(contact(u ?? undefined));\n"
+  },
+  {
+   "title": "An assertion function",
+   "code": "import * as fs from \"fs\";\ntype Order = { id: string; qty: number };\n\nfunction assertOrder(value: unknown): asserts value is Order {\n  if (typeof value !== \"object\" || value === null) throw new Error(\"not an object\");\n  if (!(\"id\" in value) || typeof value.id !== \"string\") throw new Error(\"bad id\");\n  if (!(\"qty\" in value) || typeof value.qty !== \"number\") throw new Error(\"bad qty\");\n}\n\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const data: unknown = JSON.parse(line);\n  try {\n    assertOrder(data);\n    console.log(`${data.id}: ${data.qty * 2} units`);\n  } catch (e) {\n    console.log(`rejected: ${e instanceof Error ? e.message : String(e)}`);\n  }\n}\n",
+   "name": "Order",
+   "decl": "type Order = { id: string; qty: number };",
+   "shape": "{ id: string; qty: number }",
+   "starter": "import * as fs from \"fs\";\n____\n\nfunction assertOrder(value: unknown): asserts value is Order {\n  if (typeof value !== \"object\" || value === null) throw new Error(\"not an object\");\n  if (!(\"id\" in value) || typeof value.id !== \"string\") throw new Error(\"bad id\");\n  if (!(\"qty\" in value) || typeof value.qty !== \"number\") throw new Error(\"bad qty\");\n}\n\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const data: unknown = JSON.parse(line);\n  try {\n    assertOrder(data);\n    console.log(`${data.id}: ${data.qty * 2} units`);\n  } catch (e) {\n    console.log(`rejected: ${e instanceof Error ? e.message : String(e)}`);\n  }\n}\n"
+  }
+ ],
+ "ts_destructuring": [
+  {
+   "title": "Destructuring in a parameter list",
+   "code": "type Order = { id: number; items: { name: string; qty: number }[]; note?: string };\nfunction summary({ id, items, note = \"none\" }: Order): string {\n  const units = items.reduce((n, { qty }) => n + qty, 0);\n  return `#${id}: ${units} units, note: ${note}`;\n}\nconsole.log(summary({ id: 7, items: [{ name: \"pen\", qty: 2 }, { name: \"cup\", qty: 1 }] }));\n",
+   "name": "Order",
+   "decl": "type Order = { id: number; items: { name: string; qty: number }[]; note?: string };",
+   "shape": "{ id: number; items: { name: string; qty: number }[]; note?: string }",
+   "starter": "____\nfunction summary({ id, items, note = \"none\" }: Order): string {\n  const units = items.reduce((n, { qty }) => n + qty, 0);\n  return `#${id}: ${units} units, note: ${note}`;\n}\nconsole.log(summary({ id: 7, items: [{ name: \"pen\", qty: 2 }, { name: \"cup\", qty: 1 }] }));\n"
+  }
+ ],
+ "ts_discriminated_unions": [
+  {
+   "title": "Processing results",
+   "code": "type Result = { ok: true; value: number } | { ok: false; error: string };\nconst results: Result[] = [{ ok: true, value: 4 }, { ok: false, error: \"timeout\" }, { ok: true, value: 6 }];\nlet sum = 0;\nfor (const r of results) {\n  if (r.ok) sum += r.value;\n  else console.log(\"skipped: \" + r.error);\n}\nconsole.log(\"sum \" + sum);\n",
+   "name": "Result",
+   "decl": "type Result = { ok: true; value: number } | { ok: false; error: string };",
+   "shape": "{ ok: true; value: number } | { ok: false; error: string }",
+   "starter": "____\nconst results: Result[] = [{ ok: true, value: 4 }, { ok: false, error: \"timeout\" }, { ok: true, value: 6 }];\nlet sum = 0;\nfor (const r of results) {\n  if (r.ok) sum += r.value;\n  else console.log(\"skipped: \" + r.error);\n}\nconsole.log(\"sum \" + sum);\n"
+  },
+  {
+   "title": "A state machine",
+   "code": "type Light = { state: \"red\"; waited: number } | { state: \"green\" } | { state: \"amber\" };\nfunction next(l: Light): Light {\n  switch (l.state) {\n    case \"red\":\n      return l.waited >= 2 ? { state: \"green\" } : { state: \"red\", waited: l.waited + 1 };\n    case \"green\":\n      return { state: \"amber\" };\n    case \"amber\":\n      return { state: \"red\", waited: 0 };\n  }\n}\nlet light: Light = { state: \"red\", waited: 0 };\nconst seen: string[] = [];\nfor (let i = 0; i < 6; i++) {\n  light = next(light);\n  seen.push(light.state);\n}\nconsole.log(seen.join(\" \"));\n",
+   "name": "Light",
+   "decl": "type Light = { state: \"red\"; waited: number } | { state: \"green\" } | { state: \"amber\" };",
+   "shape": "{ state: \"red\"; waited: number } | { state: \"green\" } | { state: \"amber\" }",
+   "starter": "____\nfunction next(l: Light): Light {\n  switch (l.state) {\n    case \"red\":\n      return l.waited >= 2 ? { state: \"green\" } : { state: \"red\", waited: l.waited + 1 };\n    case \"green\":\n      return { state: \"amber\" };\n    case \"amber\":\n      return { state: \"red\", waited: 0 };\n  }\n}\nlet light: Light = { state: \"red\", waited: 0 };\nconst seen: string[] = [];\nfor (let i = 0; i < 6; i++) {\n  light = next(light);\n  seen.push(light.state);\n}\nconsole.log(seen.join(\" \"));\n"
+  }
+ ],
+ "ts_distributive": [
+  {
+   "title": "`Exclude` and `Extract` are one line each",
+   "code": "type MyExclude<T, U> = T extends U ? never : T;\ntype MyExtract<T, U> = T extends U ? T : never;\n\ntype Event = \"click\" | \"keydown\" | \"keyup\" | \"scroll\";\ntype KeyEvent = MyExtract<Event, `key${string}`>;\ntype OtherEvent = MyExclude<Event, KeyEvent>;\n\nconst keys: KeyEvent[] = [\"keydown\", \"keyup\"];\nconst others: OtherEvent[] = [\"click\", \"scroll\"];\nconsole.log(keys.join(\" \"), \"|\", others.join(\" \"));\n",
+   "name": "Event",
+   "decl": "type Event = \"click\" | \"keydown\" | \"keyup\" | \"scroll\";",
+   "shape": "\"click\" | \"keydown\" | \"keyup\" | \"scroll\"",
+   "starter": "type MyExclude<T, U> = T extends U ? never : T;\ntype MyExtract<T, U> = T extends U ? T : never;\n\n____\ntype KeyEvent = MyExtract<Event, `key${string}`>;\ntype OtherEvent = MyExclude<Event, KeyEvent>;\n\nconst keys: KeyEvent[] = [\"keydown\", \"keyup\"];\nconst others: OtherEvent[] = [\"click\", \"scroll\"];\nconsole.log(keys.join(\" \"), \"|\", others.join(\" \"));\n"
+  },
+  {
+   "title": "`never` goes in, `never` comes out",
+   "code": "type IsString<T> = T extends string ? \"yes\" : \"no\";\ntype IsNever<T> = [T] extends [never] ? true : false;\n\nfunction assertNever(value: never): never {\n  throw new Error(\"unhandled: \" + JSON.stringify(value));\n}\ntype Shape = { kind: \"circle\"; r: number } | { kind: \"square\"; side: number };\nfunction area(s: Shape): number {\n  if (s.kind === \"circle\") return Math.round(3.14159 * s.r * s.r);\n  if (s.kind === \"square\") return s.side * s.side;\n  return assertNever(s);\n}\n\nconst neverCheck: IsNever<never> = true;\nconst stringCheck: IsString<\"a\"> = \"yes\";\nconsole.log(area({ kind: \"circle\", r: 2 }), area({ kind: \"square\", side: 3 }), neverCheck, stringCheck);\n",
+   "name": "Shape",
+   "decl": "type Shape = { kind: \"circle\"; r: number } | { kind: \"square\"; side: number };",
+   "shape": "{ kind: \"circle\"; r: number } | { kind: \"square\"; side: number }",
+   "starter": "type IsString<T> = T extends string ? \"yes\" : \"no\";\ntype IsNever<T> = [T] extends [never] ? true : false;\n\nfunction assertNever(value: never): never {\n  throw new Error(\"unhandled: \" + JSON.stringify(value));\n}\n____\nfunction area(s: Shape): number {\n  if (s.kind === \"circle\") return Math.round(3.14159 * s.r * s.r);\n  if (s.kind === \"square\") return s.side * s.side;\n  return assertNever(s);\n}\n\nconst neverCheck: IsNever<never> = true;\nconst stringCheck: IsString<\"a\"> = \"yes\";\nconsole.log(area({ kind: \"circle\", r: 2 }), area({ kind: \"square\", side: 3 }), neverCheck, stringCheck);\n"
+  }
+ ],
+ "ts_erasable_syntax": [
+  {
+   "title": "Everything here is deleted before it runs",
+   "code": "interface User {\n  name: string;\n  admin?: boolean;\n}\n\nfunction first<T>(xs: readonly T[]): T | undefined {\n  return xs[0];\n}\n\nconst users = [{ name: \"ana\" }, { name: \"bo\", admin: true }] satisfies User[];\nconst lead = first(users)!;\nconst count = users.length as number;\n\nconsole.log(lead.name, count);\nconsole.log(typeof lead, Array.isArray(users));\n",
+   "name": "User",
+   "decl": "interface User {\n  name: string;\n  admin?: boolean;\n}",
+   "shape": "{\n  name: string;\n  admin?: boolean;\n}",
+   "starter": "____\n\nfunction first<T>(xs: readonly T[]): T | undefined {\n  return xs[0];\n}\n\nconst users = [{ name: \"ana\" }, { name: \"bo\", admin: true }] satisfies User[];\nconst lead = first(users)!;\nconst count = users.length as number;\n\nconsole.log(lead.name, count);\nconsole.log(typeof lead, Array.isArray(users));\n"
+  }
+ ],
+ "ts_error_types": [
+  {
+   "title": "Collecting every validation error with `Result`",
+   "code": "type Result<T, E = string> = { ok: true; value: T } | { ok: false; error: E };\ntype Person = { name: string; age: number };\nfunction parsePerson(line: string): Result<Person> {\n  const [name = \"\", ageText = \"\"] = line.split(\",\");\n  if (!name.trim()) return { ok: false, error: \"missing name\" };\n  const age = Number(ageText);\n  if (!Number.isInteger(age) || age < 0) return { ok: false, error: `bad age \"${ageText}\"` };\n  return { ok: true, value: { name: name.trim(), age } };\n}\nconst lines = [\"ana,31\", \",20\", \"ben,x\", \"cy,7\"];\nconst results = lines.map(parsePerson);\nconst people = results.flatMap((r) => (r.ok ? [r.value] : []));\nconst problems = results.flatMap((r, i) => (r.ok ? [] : [`line ${i + 1}: ${r.error}`]));\nconsole.log(people.map((p) => p.name).join(\",\"), \"|\", problems.join(\"; \"));\n",
+   "name": "Person",
+   "decl": "type Person = { name: string; age: number };",
+   "shape": "{ name: string; age: number }",
+   "starter": "type Result<T, E = string> = { ok: true; value: T } | { ok: false; error: E };\n____\nfunction parsePerson(line: string): Result<Person> {\n  const [name = \"\", ageText = \"\"] = line.split(\",\");\n  if (!name.trim()) return { ok: false, error: \"missing name\" };\n  const age = Number(ageText);\n  if (!Number.isInteger(age) || age < 0) return { ok: false, error: `bad age \"${ageText}\"` };\n  return { ok: true, value: { name: name.trim(), age } };\n}\nconst lines = [\"ana,31\", \",20\", \"ben,x\", \"cy,7\"];\nconst results = lines.map(parsePerson);\nconst people = results.flatMap((r) => (r.ok ? [r.value] : []));\nconst problems = results.flatMap((r, i) => (r.ok ? [] : [`line ${i + 1}: ${r.error}`]));\nconsole.log(people.map((p) => p.name).join(\",\"), \"|\", problems.join(\"; \"));\n"
+  },
+  {
+   "title": "A union of error codes, handled exhaustively",
+   "code": "type NameError = { kind: \"empty\" } | { kind: \"tooLong\"; max: number } | { kind: \"badChar\"; char: string };\ntype Result<T, E> = { ok: true; value: T } | { ok: false; error: E };\nfunction checkName(s: string): Result<string, NameError> {\n  if (s.length === 0) return { ok: false, error: { kind: \"empty\" } };\n  if (s.length > 8) return { ok: false, error: { kind: \"tooLong\", max: 8 } };\n  const bad = [...s].find((c) => !/[a-z]/.test(c));\n  if (bad !== undefined) return { ok: false, error: { kind: \"badChar\", char: bad } };\n  return { ok: true, value: s };\n}\nfunction message(e: NameError): string {\n  switch (e.kind) {\n    case \"empty\": return \"name is required\";\n    case \"tooLong\": return `at most ${e.max} letters`;\n    case \"badChar\": return `\"${e.char}\" is not allowed`;\n    default: {\n      const unreachable: never = e;\n      return unreachable;\n    }\n  }\n}\nfor (const s of [\"ana\", \"\", \"bartholomew\", \"jo3\"]) {\n  const r = checkName(s);\n  console.log(r.ok ? \"ok: \" + r.value : \"error: \" + message(r.error));\n}\n",
+   "name": "NameError",
+   "decl": "type NameError = { kind: \"empty\" } | { kind: \"tooLong\"; max: number } | { kind: \"badChar\"; char: string };",
+   "shape": "{ kind: \"empty\" } | { kind: \"tooLong\"; max: number } | { kind: \"badChar\"; char: string }",
+   "starter": "____\ntype Result<T, E> = { ok: true; value: T } | { ok: false; error: E };\nfunction checkName(s: string): Result<string, NameError> {\n  if (s.length === 0) return { ok: false, error: { kind: \"empty\" } };\n  if (s.length > 8) return { ok: false, error: { kind: \"tooLong\", max: 8 } };\n  const bad = [...s].find((c) => !/[a-z]/.test(c));\n  if (bad !== undefined) return { ok: false, error: { kind: \"badChar\", char: bad } };\n  return { ok: true, value: s };\n}\nfunction message(e: NameError): string {\n  switch (e.kind) {\n    case \"empty\": return \"name is required\";\n    case \"tooLong\": return `at most ${e.max} letters`;\n    case \"badChar\": return `\"${e.char}\" is not allowed`;\n    default: {\n      const unreachable: never = e;\n      return unreachable;\n    }\n  }\n}\nfor (const s of [\"ana\", \"\", \"bartholomew\", \"jo3\"]) {\n  const r = checkName(s);\n  console.log(r.ok ? \"ok: \" + r.value : \"error: \" + message(r.error));\n}\n"
+  }
+ ],
+ "ts_function_types": [
+  {
+   "title": "A function that carries a property",
+   "code": "type Formatter = {\n  (value: number): string;\n  label: string;\n};\n\nconst money = (value: number) => \"$\" + value.toFixed(2);\nmoney.label = \"money\";\n\nconst percent = (value: number) => (value * 100).toFixed(0) + \"%\";\npercent.label = \"percent\";\n\nconst formatters: Formatter[] = [money, percent];\nfor (const f of formatters) {\n  console.log(f.label + \": \" + f(0.256));\n}\n",
+   "name": "Formatter",
+   "decl": "type Formatter = {\n  (value: number): string;\n  label: string;\n};",
+   "shape": "{\n  (value: number): string;\n  label: string;\n}",
+   "starter": "____\n\nconst money = (value: number) => \"$\" + value.toFixed(2);\nmoney.label = \"money\";\n\nconst percent = (value: number) => (value * 100).toFixed(0) + \"%\";\npercent.label = \"percent\";\n\nconst formatters: Formatter[] = [money, percent];\nfor (const f of formatters) {\n  console.log(f.label + \": \" + f(0.256));\n}\n"
+  },
+  {
+   "title": "A construct signature",
+   "code": "interface Shape {\n  area(): number;\n}\ntype ShapeMaker = new (size: number) => Shape;\n\nclass Square implements Shape {\n  size: number;\n  constructor(size: number) {\n    this.size = size;\n  }\n  area() {\n    return this.size * this.size;\n  }\n}\nclass Circle implements Shape {\n  radius: number;\n  constructor(radius: number) {\n    this.radius = radius;\n  }\n  area() {\n    return Math.round(Math.PI * this.radius * this.radius);\n  }\n}\n\nfunction build(maker: ShapeMaker, sizes: number[]): Shape[] {\n  return sizes.map((size) => new maker(size));\n}\n\nfor (const shape of [...build(Square, [2, 3]), ...build(Circle, [1])]) {\n  console.log(shape.area());\n}\n",
+   "name": "Shape",
+   "decl": "interface Shape {\n  area(): number;\n}",
+   "shape": "{\n  area(): number;\n}",
+   "starter": "____\ntype ShapeMaker = new (size: number) => Shape;\n\nclass Square implements Shape {\n  size: number;\n  constructor(size: number) {\n    this.size = size;\n  }\n  area() {\n    return this.size * this.size;\n  }\n}\nclass Circle implements Shape {\n  radius: number;\n  constructor(radius: number) {\n    this.radius = radius;\n  }\n  area() {\n    return Math.round(Math.PI * this.radius * this.radius);\n  }\n}\n\nfunction build(maker: ShapeMaker, sizes: number[]): Shape[] {\n  return sizes.map((size) => new maker(size));\n}\n\nfor (const shape of [...build(Square, [2, 3]), ...build(Circle, [1])]) {\n  console.log(shape.area());\n}\n"
+  }
+ ],
+ "ts_generic_constraints": [
+  {
+   "title": "Upsert anything with an id",
+   "code": "function upsert<T extends { id: string }>(items: readonly T[], item: T): T[] {\n  const i = items.findIndex((x) => x.id === item.id);\n  return i < 0 ? [...items, item] : items.with(i, item);\n}\ntype Todo = { id: string; title: string; done: boolean };\nlet todos: Todo[] = [{ id: \"a\", title: \"write\", done: false }];\ntodos = upsert(todos, { id: \"a\", title: \"write\", done: true });\ntodos = upsert(todos, { id: \"b\", title: \"test\", done: false });\nconsole.log(todos.map((t) => `${t.id}:${t.done}`).join(\" \"));\n",
+   "name": "Todo",
+   "decl": "type Todo = { id: string; title: string; done: boolean };",
+   "shape": "{ id: string; title: string; done: boolean }",
+   "starter": "function upsert<T extends { id: string }>(items: readonly T[], item: T): T[] {\n  const i = items.findIndex((x) => x.id === item.id);\n  return i < 0 ? [...items, item] : items.with(i, item);\n}\n____\nlet todos: Todo[] = [{ id: \"a\", title: \"write\", done: false }];\ntodos = upsert(todos, { id: \"a\", title: \"write\", done: true });\ntodos = upsert(todos, { id: \"b\", title: \"test\", done: false });\nconsole.log(todos.map((t) => `${t.id}:${t.done}`).join(\" \"));\n"
+  }
+ ],
+ "ts_heap_pq": [
+  {
+   "title": "A scheduler with stable ties",
+   "code": "class Heap<T> {\n  readonly #items: T[] = [];\n  readonly #compare: (a: T, b: T) => number;\n  constructor(compare: (a: T, b: T) => number) {\n    this.#compare = compare;\n  }\n  get size(): number {\n    return this.#items.length;\n  }\n  peek(): T | undefined {\n    return this.#items[0];\n  }\n  push(item: T): void {\n    const a = this.#items;\n    a.push(item);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      const child = a[i] as T;\n      const up = a[parent] as T;\n      if (this.#compare(child, up) >= 0) break;\n      a[i] = up;\n      a[parent] = child;\n      i = parent;\n    }\n  }\n  pop(): T | undefined {\n    const a = this.#items;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length > 0 && last !== undefined) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.#compare(a[l] as T, a[m] as T) < 0) m = l;\n        if (r < a.length && this.#compare(a[r] as T, a[m] as T) < 0) m = r;\n        if (m === i) break;\n        const tmp = a[i] as T;\n        a[i] = a[m] as T;\n        a[m] = tmp;\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\ntype Job = { name: string; priority: number; seq: number };\nconst queue = new Heap<Job>((a, b) => a.priority - b.priority || a.seq - b.seq);\nlet seq = 0;\nfor (const [name, priority] of [[\"backup\", 2], [\"email\", 1], [\"report\", 2], [\"alert\", 0], [\"cleanup\", 2]] as const) {\n  queue.push({ name, priority, seq: seq++ });\n}\nconst order: string[] = [];\nfor (let j = queue.pop(); j !== undefined; j = queue.pop()) order.push(`${j.name}(${j.priority})`);\nconsole.log(order.join(\" \"));\n",
+   "name": "Job",
+   "decl": "type Job = { name: string; priority: number; seq: number };",
+   "shape": "{ name: string; priority: number; seq: number }",
+   "starter": "class Heap<T> {\n  readonly #items: T[] = [];\n  readonly #compare: (a: T, b: T) => number;\n  constructor(compare: (a: T, b: T) => number) {\n    this.#compare = compare;\n  }\n  get size(): number {\n    return this.#items.length;\n  }\n  peek(): T | undefined {\n    return this.#items[0];\n  }\n  push(item: T): void {\n    const a = this.#items;\n    a.push(item);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      const child = a[i] as T;\n      const up = a[parent] as T;\n      if (this.#compare(child, up) >= 0) break;\n      a[i] = up;\n      a[parent] = child;\n      i = parent;\n    }\n  }\n  pop(): T | undefined {\n    const a = this.#items;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length > 0 && last !== undefined) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.#compare(a[l] as T, a[m] as T) < 0) m = l;\n        if (r < a.length && this.#compare(a[r] as T, a[m] as T) < 0) m = r;\n        if (m === i) break;\n        const tmp = a[i] as T;\n        a[i] = a[m] as T;\n        a[m] = tmp;\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\n____\nconst queue = new Heap<Job>((a, b) => a.priority - b.priority || a.seq - b.seq);\nlet seq = 0;\nfor (const [name, priority] of [[\"backup\", 2], [\"email\", 1], [\"report\", 2], [\"alert\", 0], [\"cleanup\", 2]] as const) {\n  queue.push({ name, priority, seq: seq++ });\n}\nconst order: string[] = [];\nfor (let j = queue.pop(); j !== undefined; j = queue.pop()) order.push(`${j.name}(${j.priority})`);\nconsole.log(order.join(\" \"));\n"
+  }
+ ],
+ "ts_higher_order": [
+  {
+   "title": "A validator built from rules",
+   "code": "type Rule = (s: string) => string | undefined;\nconst minLength = (n: number): Rule => (s) => (s.length < n ? `at least ${n} characters` : undefined);\nconst hasDigit: Rule = (s) => (/\\d/.test(s) ? undefined : \"needs a digit\");\nfunction validator(...rules: Rule[]) {\n  return (s: string) => rules.map((r) => r(s)).filter((m) => m !== undefined);\n}\nconst password = validator(minLength(8), hasDigit);\nfor (const p of [\"short\", \"longenough\", \"longer123\"]) {\n  console.log(`${p}: ${password(p).join(\", \") || \"ok\"}`);\n}\n",
+   "name": "Rule",
+   "decl": "type Rule = (s: string) => string | undefined;",
+   "shape": "(s: string) => string | undefined",
+   "starter": "____\nconst minLength = (n: number): Rule => (s) => (s.length < n ? `at least ${n} characters` : undefined);\nconst hasDigit: Rule = (s) => (/\\d/.test(s) ? undefined : \"needs a digit\");\nfunction validator(...rules: Rule[]) {\n  return (s: string) => rules.map((r) => r(s)).filter((m) => m !== undefined);\n}\nconst password = validator(minLength(8), hasDigit);\nfor (const p of [\"short\", \"longenough\", \"longer123\"]) {\n  console.log(`${p}: ${password(p).join(\", \") || \"ok\"}`);\n}\n"
+  }
+ ],
+ "ts_immutability": [
+  {
+   "title": "Updating a nested value",
+   "code": "type State = { user: { name: string; prefs: { theme: string; lang: string } }; version: number };\nconst before: State = { user: { name: \"ana\", prefs: { theme: \"dark\", lang: \"en\" } }, version: 1 };\nconst after: State = { ...before, user: { ...before.user, prefs: { ...before.user.prefs, theme: \"light\" } }, version: 2 };\nconsole.log(before.user.prefs.theme, after.user.prefs.theme, before.user === after.user);\n",
+   "name": "State",
+   "decl": "type State = { user: { name: string; prefs: { theme: string; lang: string } }; version: number };",
+   "shape": "{ user: { name: string; prefs: { theme: string; lang: string } }; version: number }",
+   "starter": "____\nconst before: State = { user: { name: \"ana\", prefs: { theme: \"dark\", lang: \"en\" } }, version: 1 };\nconst after: State = { ...before, user: { ...before.user, prefs: { ...before.user.prefs, theme: \"light\" } }, version: 2 };\nconsole.log(before.user.prefs.theme, after.user.prefs.theme, before.user === after.user);\n"
+  }
+ ],
+ "ts_index_signatures": [
+  {
+   "title": "An exhaustive table",
+   "code": "import * as fs from \"fs\";\ntype Level = \"debug\" | \"info\" | \"warn\" | \"error\";\nconst prefix: Record<Level, string> = {\n  debug: \"[.]\",\n  info: \"[i]\",\n  warn: \"[!]\",\n  error: \"[x]\",\n};\nconst levels: Level[] = [\"debug\", \"info\", \"warn\", \"error\"];\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const [first = \"\", ...rest] = line.split(\" \");\n  const level = levels.find((l) => l === first);\n  console.log(level === undefined ? `[?] ${line}` : `${prefix[level]} ${rest.join(\" \")}`);\n}\n",
+   "name": "Level",
+   "decl": "type Level = \"debug\" | \"info\" | \"warn\" | \"error\";",
+   "shape": "\"debug\" | \"info\" | \"warn\" | \"error\"",
+   "starter": "import * as fs from \"fs\";\n____\nconst prefix: Record<Level, string> = {\n  debug: \"[.]\",\n  info: \"[i]\",\n  warn: \"[!]\",\n  error: \"[x]\",\n};\nconst levels: Level[] = [\"debug\", \"info\", \"warn\", \"error\"];\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const [first = \"\", ...rest] = line.split(\" \");\n  const level = levels.find((l) => l === first);\n  console.log(level === undefined ? `[?] ${line}` : `${prefix[level]} ${rest.join(\" \")}`);\n}\n"
+  },
+  {
+   "title": "Absent versus present-but-undefined",
+   "code": "type Profile = { name: string; nickname?: string };\nconst a: Profile = { name: \"Ada\" };\nconst b: Profile = { name: \"Bo\", nickname: undefined };\nfor (const p of [a, b]) {\n  console.log(p.name, \"nickname\" in p, Object.hasOwn(p, \"nickname\"), p.nickname ?? \"(none)\");\n}\n",
+   "name": "Profile",
+   "decl": "type Profile = { name: string; nickname?: string };",
+   "shape": "{ name: string; nickname?: string }",
+   "starter": "____\nconst a: Profile = { name: \"Ada\" };\nconst b: Profile = { name: \"Bo\", nickname: undefined };\nfor (const p of [a, b]) {\n  console.log(p.name, \"nickname\" in p, Object.hasOwn(p, \"nickname\"), p.nickname ?? \"(none)\");\n}\n"
+  }
+ ],
+ "ts_interfaces_types": [
+  {
+   "title": "The same shape, two spellings",
+   "code": "interface Point {\n  x: number;\n  y: number;\n}\ntype Size = { width: number; height: number };\ntype Rect = Point & Size;\n\nconst r: Rect = { x: 1, y: 2, width: 10, height: 4 };\nconst p: Point = r;\nconsole.log(`at (${p.x}, ${p.y}), area ${r.width * r.height}`);\n",
+   "name": "Point",
+   "decl": "interface Point {\n  x: number;\n  y: number;\n}",
+   "shape": "{\n  x: number;\n  y: number;\n}",
+   "starter": "____\ntype Size = { width: number; height: number };\ntype Rect = Point & Size;\n\nconst r: Rect = { x: 1, y: 2, width: 10, height: 4 };\nconst p: Point = r;\nconsole.log(`at (${p.x}, ${p.y}), area ${r.width * r.height}`);\n"
+  },
+  {
+   "title": "Extending, and what only a type can say",
+   "code": "interface Animal {\n  name: string;\n}\ninterface Dog extends Animal {\n  breed: string;\n}\ntype Pet = Dog | { kind: \"fish\"; name: string };\n\nfunction describe(pet: Pet): string {\n  return \"breed\" in pet ? `${pet.name} the ${pet.breed}` : `${pet.name} the fish`;\n}\n\nconsole.log(describe({ name: \"Rex\", breed: \"collie\" }));\nconsole.log(describe({ kind: \"fish\", name: \"Bubbles\" }));\n",
+   "name": "Animal",
+   "decl": "interface Animal {\n  name: string;\n}",
+   "shape": "{\n  name: string;\n}",
+   "starter": "____\ninterface Dog extends Animal {\n  breed: string;\n}\ntype Pet = Dog | { kind: \"fish\"; name: string };\n\nfunction describe(pet: Pet): string {\n  return \"breed\" in pet ? `${pet.name} the ${pet.breed}` : `${pet.name} the fish`;\n}\n\nconsole.log(describe({ name: \"Rex\", breed: \"collie\" }));\nconsole.log(describe({ kind: \"fish\", name: \"Bubbles\" }));\n"
+  }
+ ],
+ "ts_iterators": [
+  {
+   "title": "A generator that walks a tree",
+   "code": "type Tree = { value: number; children: Tree[] };\nfunction* walk(t: Tree, depth = 0): Generator<string> {\n  yield \"  \".repeat(depth) + t.value;\n  for (const child of t.children) yield* walk(child, depth + 1);\n}\nconst tree: Tree = {\n  value: 1,\n  children: [\n    { value: 2, children: [{ value: 4, children: [] }] },\n    { value: 3, children: [] },\n  ],\n};\nconsole.log([...walk(tree)].join(\"\\n\"));\n",
+   "name": "Tree",
+   "decl": "type Tree = { value: number; children: Tree[] };",
+   "shape": "{ value: number; children: Tree[] }",
+   "starter": "____\nfunction* walk(t: Tree, depth = 0): Generator<string> {\n  yield \"  \".repeat(depth) + t.value;\n  for (const child of t.children) yield* walk(child, depth + 1);\n}\nconst tree: Tree = {\n  value: 1,\n  children: [\n    { value: 2, children: [{ value: 4, children: [] }] },\n    { value: 3, children: [] },\n  ],\n};\nconsole.log([...walk(tree)].join(\"\\n\"));\n"
+  }
+ ],
+ "ts_key_remapping": [
+  {
+   "title": "Event handlers named from events",
+   "code": "type Events = { open: { path: string }; close: { code: number }; error: { message: string } };\ntype Handlers<E> = {\n  [K in keyof E as `on${Capitalize<string & K>}`]?: (payload: E[K]) => string;\n};\n\nfunction emit<K extends keyof Events>(handlers: Handlers<Events>, name: K, payload: Events[K]): string {\n  const key = \"on\" + name.charAt(0).toUpperCase() + name.slice(1);\n  const handler = (handlers as Record<string, ((p: Events[K]) => string) | undefined>)[key];\n  return handler === undefined ? `(no handler for ${name})` : handler(payload);\n}\n\nconst handlers: Handlers<Events> = {\n  onOpen: (p) => \"opened \" + p.path,\n  onClose: (p) => \"closed with \" + p.code,\n};\nconsole.log(emit(handlers, \"open\", { path: \"/tmp/a\" }));\nconsole.log(emit(handlers, \"close\", { code: 0 }));\nconsole.log(emit(handlers, \"error\", { message: \"disk\" }));\n",
+   "name": "Events",
+   "decl": "type Events = { open: { path: string }; close: { code: number }; error: { message: string } };",
+   "shape": "{ open: { path: string }; close: { code: number }; error: { message: string } }",
+   "starter": "____\ntype Handlers<E> = {\n  [K in keyof E as `on${Capitalize<string & K>}`]?: (payload: E[K]) => string;\n};\n\nfunction emit<K extends keyof Events>(handlers: Handlers<Events>, name: K, payload: Events[K]): string {\n  const key = \"on\" + name.charAt(0).toUpperCase() + name.slice(1);\n  const handler = (handlers as Record<string, ((p: Events[K]) => string) | undefined>)[key];\n  return handler === undefined ? `(no handler for ${name})` : handler(payload);\n}\n\nconst handlers: Handlers<Events> = {\n  onOpen: (p) => \"opened \" + p.path,\n  onClose: (p) => \"closed with \" + p.code,\n};\nconsole.log(emit(handlers, \"open\", { path: \"/tmp/a\" }));\nconsole.log(emit(handlers, \"close\", { code: 0 }));\nconsole.log(emit(handlers, \"error\", { message: \"disk\" }));\n"
+  }
+ ],
+ "ts_keyof_indexed": [
+  {
+   "title": "An event map",
+   "code": "type Events = { login: { user: string }; logout: { user: string; reason: string }; tick: number };\nconst log: string[] = [];\nfunction emit<E extends keyof Events>(name: E, payload: Events[E]): void {\n  log.push(`${name} ${JSON.stringify(payload)}`);\n}\nemit(\"login\", { user: \"ana\" });\nemit(\"tick\", 3);\nemit(\"logout\", { user: \"ana\", reason: \"timeout\" });\nconsole.log(log.join(\"\\n\"));\n",
+   "name": "Events",
+   "decl": "type Events = { login: { user: string }; logout: { user: string; reason: string }; tick: number };",
+   "shape": "{ login: { user: string }; logout: { user: string; reason: string }; tick: number }",
+   "starter": "____\nconst log: string[] = [];\nfunction emit<E extends keyof Events>(name: E, payload: Events[E]): void {\n  log.push(`${name} ${JSON.stringify(payload)}`);\n}\nemit(\"login\", { user: \"ana\" });\nemit(\"tick\", 3);\nemit(\"logout\", { user: \"ana\", reason: \"timeout\" });\nconsole.log(log.join(\"\\n\"));\n"
+  }
+ ],
+ "ts_literal_inference": [
+  {
+   "title": "Where a literal widens",
+   "code": "type Method = \"GET\" | \"POST\";\nfunction send(method: Method, path: string): string {\n  return `${method} ${path}`;\n}\n\nconst fixed = \"GET\";\nconst request = { method: \"POST\", path: \"/items\" } as const;\nconst table = { method: \"GET\" as Method, path: \"/\" };\n\nconsole.log(send(fixed, \"/health\"));\nconsole.log(send(request.method, request.path));\nconsole.log(send(table.method, table.path));\n",
+   "name": "Method",
+   "decl": "type Method = \"GET\" | \"POST\";",
+   "shape": "\"GET\" | \"POST\"",
+   "starter": "____\nfunction send(method: Method, path: string): string {\n  return `${method} ${path}`;\n}\n\nconst fixed = \"GET\";\nconst request = { method: \"POST\", path: \"/items\" } as const;\nconst table = { method: \"GET\" as Method, path: \"/\" };\n\nconsole.log(send(fixed, \"/health\"));\nconsole.log(send(request.method, request.path));\nconsole.log(send(table.method, table.path));\n"
+  }
+ ],
+ "ts_lookup_types": [
+  {
+   "title": "Types read from one model",
+   "code": "type User = { id: number; email: string; role: \"admin\" | \"member\"; tags: string[] };\ntype Role = User[\"role\"];\ntype Tag = User[\"tags\"][number];\n\nconst canEdit = (role: Role): boolean => role === \"admin\";\nconst badge = (tag: Tag): string => \"#\" + tag;\n\nconst u: User = { id: 1, email: \"ana@x.io\", role: \"admin\", tags: [\"ops\", \"web\"] };\nconsole.log(canEdit(u.role), u.tags.map(badge).join(\" \"));\n",
+   "name": "User",
+   "decl": "type User = { id: number; email: string; role: \"admin\" | \"member\"; tags: string[] };",
+   "shape": "{ id: number; email: string; role: \"admin\" | \"member\"; tags: string[] }",
+   "starter": "____\ntype Role = User[\"role\"];\ntype Tag = User[\"tags\"][number];\n\nconst canEdit = (role: Role): boolean => role === \"admin\";\nconst badge = (tag: Tag): string => \"#\" + tag;\n\nconst u: User = { id: 1, email: \"ana@x.io\", role: \"admin\", tags: [\"ops\", \"web\"] };\nconsole.log(canEdit(u.role), u.tags.map(badge).join(\" \"));\n"
+  }
+ ],
+ "ts_mapped_types": [
+  {
+   "title": "A validator for every field",
+   "code": "type Signup = { name: string; age: number; email: string };\ntype Validators<T> = { [K in keyof T]: (value: T[K]) => string | undefined };\nconst rules: Validators<Signup> = {\n  name: (v) => (v.trim().length < 2 ? \"too short\" : undefined),\n  age: (v) => (v < 13 ? \"too young\" : undefined),\n  email: (v) => (v.includes(\"@\") ? undefined : \"invalid\"),\n};\nfunction validate(form: Signup): string[] {\n  return (Object.keys(rules) as (keyof Signup)[]).flatMap((k) => {\n    const message = k === \"age\" ? rules.age(form.age) : rules[k](form[k]);\n    return message === undefined ? [] : [`${k}: ${message}`];\n  });\n}\nconsole.log(validate({ name: \"A\", age: 9, email: \"nope\" }).join(\"; \"));\nconsole.log(validate({ name: \"Ana\", age: 31, email: \"ana@x.io\" }).length);\n",
+   "name": "Signup",
+   "decl": "type Signup = { name: string; age: number; email: string };",
+   "shape": "{ name: string; age: number; email: string }",
+   "starter": "____\ntype Validators<T> = { [K in keyof T]: (value: T[K]) => string | undefined };\nconst rules: Validators<Signup> = {\n  name: (v) => (v.trim().length < 2 ? \"too short\" : undefined),\n  age: (v) => (v < 13 ? \"too young\" : undefined),\n  email: (v) => (v.includes(\"@\") ? undefined : \"invalid\"),\n};\nfunction validate(form: Signup): string[] {\n  return (Object.keys(rules) as (keyof Signup)[]).flatMap((k) => {\n    const message = k === \"age\" ? rules.age(form.age) : rules[k](form[k]);\n    return message === undefined ? [] : [`${k}: ${message}`];\n  });\n}\nconsole.log(validate({ name: \"A\", age: 9, email: \"nope\" }).join(\"; \"));\nconsole.log(validate({ name: \"Ana\", age: 31, email: \"ana@x.io\" }).length);\n"
+  },
+  {
+   "title": "Nullable columns from a model",
+   "code": "type Row = { id: number; name: string; email: string };\ntype Nullable<T> = { [K in keyof T]: T[K] | null };\nconst fromDb: Nullable<Row> = { id: 1, name: \"ana\", email: null };\nconst display = Object.entries(fromDb).map(([k, v]) => `${k}=${v ?? \"(none)\"}`).join(\" \");\nconsole.log(display);\n",
+   "name": "Row",
+   "decl": "type Row = { id: number; name: string; email: string };",
+   "shape": "{ id: number; name: string; email: string }",
+   "starter": "____\ntype Nullable<T> = { [K in keyof T]: T[K] | null };\nconst fromDb: Nullable<Row> = { id: 1, name: \"ana\", email: null };\nconst display = Object.entries(fromDb).map(([k, v]) => `${k}=${v ?? \"(none)\"}`).join(\" \");\nconsole.log(display);\n"
+  }
+ ],
+ "ts_maps_sets": [
+  {
+   "title": "Objects as keys",
+   "code": "type Task = { title: string };\nconst a: Task = { title: \"write\" };\nconst b: Task = { title: \"write\" };\nconst minutes = new Map<Task, number>();\nminutes.set(a, 30);\nminutes.set(b, 45);\nconsole.log(minutes.size, minutes.get(a), minutes.get(b));\n",
+   "name": "Task",
+   "decl": "type Task = { title: string };",
+   "shape": "{ title: string }",
+   "starter": "____\nconst a: Task = { title: \"write\" };\nconst b: Task = { title: \"write\" };\nconst minutes = new Map<Task, number>();\nminutes.set(a, 30);\nminutes.set(b, 45);\nconsole.log(minutes.size, minutes.get(a), minutes.get(b));\n"
+  }
+ ],
+ "ts_narrowing": [
+  {
+   "title": "Equality with a literal",
+   "code": "type Reply = \"yes\" | \"no\" | number;\nfunction explain(r: Reply): string {\n  if (r === \"yes\" || r === \"no\") return `answered ${r}`;\n  return `scored ${r.toFixed(1)}`;\n}\nconsole.log(explain(\"yes\"), \"|\", explain(7));\n",
+   "name": "Reply",
+   "decl": "type Reply = \"yes\" | \"no\" | number;",
+   "shape": "\"yes\" | \"no\" | number",
+   "starter": "____\nfunction explain(r: Reply): string {\n  if (r === \"yes\" || r === \"no\") return `answered ${r}`;\n  return `scored ${r.toFixed(1)}`;\n}\nconsole.log(explain(\"yes\"), \"|\", explain(7));\n"
+  }
+ ],
+ "ts_nullish": [
+  {
+   "title": "Defaults for nested, partial config",
+   "code": "type Config = { server?: { port?: number; host?: string }; debug?: boolean };\nfunction resolve(c: Config) {\n  return { port: c.server?.port ?? 3000, host: c.server?.host ?? \"localhost\", debug: c.debug ?? false };\n}\nconsole.log(JSON.stringify(resolve({})));\nconsole.log(JSON.stringify(resolve({ server: { port: 0 }, debug: true })));\n",
+   "name": "Config",
+   "decl": "type Config = { server?: { port?: number; host?: string }; debug?: boolean };",
+   "shape": "{ server?: { port?: number; host?: string }; debug?: boolean }",
+   "starter": "____\nfunction resolve(c: Config) {\n  return { port: c.server?.port ?? 3000, host: c.server?.host ?? \"localhost\", debug: c.debug ?? false };\n}\nconsole.log(JSON.stringify(resolve({})));\nconsole.log(JSON.stringify(resolve({ server: { port: 0 }, debug: true })));\n"
+  }
+ ],
+ "ts_objects": [
+  {
+   "title": "Optional chaining through nested data",
+   "code": "type Account = { owner?: { address?: { city?: string } } };\nconst accounts: Account[] = [{ owner: { address: { city: \"Oslo\" } } }, { owner: {} }, {}];\nfor (const a of accounts) console.log(a.owner?.address?.city ?? \"unknown city\");\n",
+   "name": "Account",
+   "decl": "type Account = { owner?: { address?: { city?: string } } };",
+   "shape": "{ owner?: { address?: { city?: string } } }",
+   "starter": "____\nconst accounts: Account[] = [{ owner: { address: { city: \"Oslo\" } } }, { owner: {} }, {}];\nfor (const a of accounts) console.log(a.owner?.address?.city ?? \"unknown city\");\n"
+  }
+ ],
+ "ts_parse_dont_validate": [
+  {
+   "title": "An `Email` only a parser can make",
+   "code": "declare const EmailBrand: unique symbol;\ntype Email = string & { readonly [EmailBrand]: true };\n\nfunction parseEmail(raw: string): Email | undefined {\n  const s = raw.trim().toLowerCase();\n  return /^[^@\\s]+@[^@\\s]+\\.[a-z]+$/.test(s) ? (s as Email) : undefined;\n}\n\nfunction sendWelcome(to: Email): string {\n  return \"welcome mail -> \" + to;\n}\n\nfor (const raw of [\"  Ana@Example.COM \", \"bob\", \"cy@x.io\"]) {\n  const email = parseEmail(raw);\n  console.log(email === undefined ? `rejected \"${raw.trim()}\"` : sendWelcome(email));\n}\n",
+   "name": "Email",
+   "decl": "type Email = string & { readonly [EmailBrand]: true };",
+   "shape": "string & { readonly [EmailBrand]: true }",
+   "starter": "declare const EmailBrand: unique symbol;\n____\n\nfunction parseEmail(raw: string): Email | undefined {\n  const s = raw.trim().toLowerCase();\n  return /^[^@\\s]+@[^@\\s]+\\.[a-z]+$/.test(s) ? (s as Email) : undefined;\n}\n\nfunction sendWelcome(to: Email): string {\n  return \"welcome mail -> \" + to;\n}\n\nfor (const raw of [\"  Ana@Example.COM \", \"bob\", \"cy@x.io\"]) {\n  const email = parseEmail(raw);\n  console.log(email === undefined ? `rejected \"${raw.trim()}\"` : sendWelcome(email));\n}\n"
+  },
+  {
+   "title": "Parse at the edge, trust inside",
+   "code": "declare const CentsBrand: unique symbol;\ntype Cents = number & { readonly [CentsBrand]: true };\ntype Order = { sku: string; qty: number; price: Cents };\n\nfunction parseCents(text: string): Cents | undefined {\n  const m = /^(\\d+)(?:\\.(\\d{2}))?$/.exec(text);\n  if (m === null) return undefined;\n  return (Number(m[1]) * 100 + Number(m[2] ?? \"0\")) as Cents;\n}\n\nfunction parseOrder(line: string): Order | string {\n  const [sku = \"\", qty = \"\", price = \"\"] = line.split(\",\");\n  const n = Number(qty);\n  if (!/^[A-Z]{3}\\d{2}$/.test(sku)) return `bad sku ${sku}`;\n  if (!Number.isInteger(n) || n <= 0) return `bad qty ${qty}`;\n  const cents = parseCents(price);\n  return cents === undefined ? `bad price ${price}` : { sku, qty: n, price: cents };\n}\n\nfunction lineTotal(o: Order): Cents {\n  return (o.qty * o.price) as Cents;\n}\n\nfor (const line of [\"ABC12,3,1.50\", \"XYZ99,1,20\", \"abc,1,1.00\", \"DEF10,2,1.5\"]) {\n  const o = parseOrder(line);\n  console.log(typeof o === \"string\" ? o : `${o.sku}: ${(lineTotal(o) / 100).toFixed(2)}`);\n}\n",
+   "name": "Cents",
+   "decl": "type Cents = number & { readonly [CentsBrand]: true };",
+   "shape": "number & { readonly [CentsBrand]: true }",
+   "starter": "declare const CentsBrand: unique symbol;\n____\ntype Order = { sku: string; qty: number; price: Cents };\n\nfunction parseCents(text: string): Cents | undefined {\n  const m = /^(\\d+)(?:\\.(\\d{2}))?$/.exec(text);\n  if (m === null) return undefined;\n  return (Number(m[1]) * 100 + Number(m[2] ?? \"0\")) as Cents;\n}\n\nfunction parseOrder(line: string): Order | string {\n  const [sku = \"\", qty = \"\", price = \"\"] = line.split(\",\");\n  const n = Number(qty);\n  if (!/^[A-Z]{3}\\d{2}$/.test(sku)) return `bad sku ${sku}`;\n  if (!Number.isInteger(n) || n <= 0) return `bad qty ${qty}`;\n  const cents = parseCents(price);\n  return cents === undefined ? `bad price ${price}` : { sku, qty: n, price: cents };\n}\n\nfunction lineTotal(o: Order): Cents {\n  return (o.qty * o.price) as Cents;\n}\n\nfor (const line of [\"ABC12,3,1.50\", \"XYZ99,1,20\", \"abc,1,1.00\", \"DEF10,2,1.5\"]) {\n  const o = parseOrder(line);\n  console.log(typeof o === \"string\" ? o : `${o.sku}: ${(lineTotal(o) / 100).toFixed(2)}`);\n}\n"
+  }
+ ],
+ "ts_recursion": [
+  {
+   "title": "Recursing on nested data",
+   "code": "import * as fs from \"fs\";\ntype Nested = number | Nested[];\n\nfunction total(value: Nested): number {\n  if (typeof value === \"number\") return value;\n  let sum = 0;\n  for (const item of value) sum += total(item);\n  return sum;\n}\n\nfunction depth(value: Nested): number {\n  if (typeof value === \"number\") return 0;\n  let deepest = 0;\n  for (const item of value) deepest = Math.max(deepest, depth(item));\n  return 1 + deepest;\n}\n\nconst data = JSON.parse(fs.readFileSync(0, \"utf8\").trim()) as Nested;\nconsole.log(`total ${total(data)}, depth ${depth(data)}`);\n",
+   "name": "Nested",
+   "decl": "type Nested = number | Nested[];",
+   "shape": "number | Nested[]",
+   "starter": "import * as fs from \"fs\";\n____\n\nfunction total(value: Nested): number {\n  if (typeof value === \"number\") return value;\n  let sum = 0;\n  for (const item of value) sum += total(item);\n  return sum;\n}\n\nfunction depth(value: Nested): number {\n  if (typeof value === \"number\") return 0;\n  let deepest = 0;\n  for (const item of value) deepest = Math.max(deepest, depth(item));\n  return 1 + deepest;\n}\n\nconst data = JSON.parse(fs.readFileSync(0, \"utf8\").trim()) as Nested;\nconsole.log(`total ${total(data)}, depth ${depth(data)}`);\n"
+  }
+ ],
+ "ts_satisfies": [
+  {
+   "title": "Checked, with the keys kept",
+   "code": "type Route = { path: string; auth: boolean };\nconst routes = {\n  home: { path: \"/\", auth: false },\n  settings: { path: \"/settings\", auth: true },\n  billing: { path: \"/billing\", auth: true },\n} satisfies Record<string, Route>;\ntype RouteName = keyof typeof routes;\nconst protectedRoutes = (Object.keys(routes) as RouteName[]).filter((n) => routes[n].auth);\nconsole.log(protectedRoutes.join(\",\"));\n",
+   "name": "Route",
+   "decl": "type Route = { path: string; auth: boolean };",
+   "shape": "{ path: string; auth: boolean }",
+   "starter": "____\nconst routes = {\n  home: { path: \"/\", auth: false },\n  settings: { path: \"/settings\", auth: true },\n  billing: { path: \"/billing\", auth: true },\n} satisfies Record<string, Route>;\ntype RouteName = keyof typeof routes;\nconst protectedRoutes = (Object.keys(routes) as RouteName[]).filter((n) => routes[n].auth);\nconsole.log(protectedRoutes.join(\",\"));\n"
+  },
+  {
+   "title": "Each entry keeps its own shape",
+   "code": "type Field = { kind: \"text\"; maxLength: number } | { kind: \"number\"; min: number; max: number };\nconst form = {\n  name: { kind: \"text\", maxLength: 20 },\n  age: { kind: \"number\", min: 0, max: 150 },\n} satisfies Record<string, Field>;\nconsole.log(form.name.maxLength, form.age.max - form.age.min);\n",
+   "name": "Field",
+   "decl": "type Field = { kind: \"text\"; maxLength: number } | { kind: \"number\"; min: number; max: number };",
+   "shape": "{ kind: \"text\"; maxLength: number } | { kind: \"number\"; min: number; max: number }",
+   "starter": "____\nconst form = {\n  name: { kind: \"text\", maxLength: 20 },\n  age: { kind: \"number\", min: 0, max: 150 },\n} satisfies Record<string, Field>;\nconsole.log(form.name.maxLength, form.age.max - form.age.min);\n"
+  }
+ ],
+ "ts_set_algebra": [
+  {
+   "title": "Remembering things about objects",
+   "code": "type Node = { id: string; children: Node[] };\nconst sizeCache = new WeakMap<Node, number>();\nlet computed = 0;\nfunction size(node: Node): number {\n  const cached = sizeCache.get(node);\n  if (cached !== undefined) return cached;\n  computed++;\n  let total = 1;\n  for (const child of node.children) total += size(child);\n  sizeCache.set(node, total);\n  return total;\n}\nconst leaf = { id: \"leaf\", children: [] };\nconst tree: Node = { id: \"root\", children: [{ id: \"a\", children: [leaf] }, leaf] };\nconsole.log(size(tree), size(tree), `computed ${computed}`);\n",
+   "name": "Node",
+   "decl": "type Node = { id: string; children: Node[] };",
+   "shape": "{ id: string; children: Node[] }",
+   "starter": "____\nconst sizeCache = new WeakMap<Node, number>();\nlet computed = 0;\nfunction size(node: Node): number {\n  const cached = sizeCache.get(node);\n  if (cached !== undefined) return cached;\n  computed++;\n  let total = 1;\n  for (const child of node.children) total += size(child);\n  sizeCache.set(node, total);\n  return total;\n}\nconst leaf = { id: \"leaf\", children: [] };\nconst tree: Node = { id: \"root\", children: [{ id: \"a\", children: [leaf] }, leaf] };\nconsole.log(size(tree), size(tree), `computed ${computed}`);\n"
+  }
+ ],
+ "ts_structural_typing": [
+  {
+   "title": "Same shape, same type",
+   "code": "type Point = { x: number; y: number };\ntype Vector = { x: number; y: number };\nconst p: Point = { x: 3, y: 4 };\nconst v: Vector = p;\nconst len = (vec: Vector) => Math.hypot(vec.x, vec.y);\nconsole.log(len(v), len(p));\n",
+   "name": "Point",
+   "decl": "type Point = { x: number; y: number };",
+   "shape": "{ x: number; y: number }",
+   "starter": "____\ntype Vector = { x: number; y: number };\nconst p: Point = { x: 3, y: 4 };\nconst v: Vector = p;\nconst len = (vec: Vector) => Math.hypot(vec.x, vec.y);\nconsole.log(len(v), len(p));\n"
+  }
+ ],
+ "ts_template_literal_types": [
+  {
+   "title": "CSS sizes, checked and parsed",
+   "code": "type Size = `${number}px` | `${number}%`;\nfunction toPixels(size: Size, container: number): number {\n  return size.endsWith(\"%\") ? (parseFloat(size) / 100) * container : parseFloat(size);\n}\nconst sizes: Size[] = [\"120px\", \"50%\", \"12.5px\"];\nconsole.log(sizes.map((s) => toPixels(s, 400)).join(\" \"));\n",
+   "name": "Size",
+   "decl": "type Size = `${number}px` | `${number}%`;",
+   "shape": "`${number}px` | `${number}%`",
+   "starter": "____\nfunction toPixels(size: Size, container: number): number {\n  return size.endsWith(\"%\") ? (parseFloat(size) / 100) * container : parseFloat(size);\n}\nconst sizes: Size[] = [\"120px\", \"50%\", \"12.5px\"];\nconsole.log(sizes.map((s) => toPixels(s, 400)).join(\" \"));\n"
+  },
+  {
+   "title": "Event names from two unions",
+   "code": "type Entity = \"user\" | \"order\";\ntype Action = \"created\" | \"deleted\";\ntype EventName = `${Entity}:${Action}`;\nconst counts = new Map<EventName, number>();\nconst emit = (e: EventName) => counts.set(e, (counts.get(e) ?? 0) + 1);\nemit(\"user:created\");\nemit(\"order:deleted\");\nemit(\"user:created\");\nconsole.log([...counts].map(([e, n]) => `${e}=${n}`).join(\" \"));\n",
+   "name": "Entity",
+   "decl": "type Entity = \"user\" | \"order\";",
+   "shape": "\"user\" | \"order\"",
+   "starter": "____\ntype Action = \"created\" | \"deleted\";\ntype EventName = `${Entity}:${Action}`;\nconst counts = new Map<EventName, number>();\nconst emit = (e: EventName) => counts.set(e, (counts.get(e) ?? 0) + 1);\nemit(\"user:created\");\nemit(\"order:deleted\");\nemit(\"user:created\");\nconsole.log([...counts].map(([e, n]) => `${e}=${n}`).join(\" \"));\n"
+  }
+ ],
+ "ts_this_accessors": [
+  {
+   "title": "One function, three `this` values",
+   "code": "type Named = { name: string; greet(): string };\nconst ana: Named = {\n  name: \"ana\",\n  greet() {\n    return \"hi from \" + this.name;\n  },\n};\nconst ben: Named = { name: \"ben\", greet: ana.greet };\nconst bound = ana.greet.bind(ben);\nconsole.log(ana.greet(), \"|\", ben.greet(), \"|\", bound());\n",
+   "name": "Named",
+   "decl": "type Named = { name: string; greet(): string };",
+   "shape": "{ name: string; greet(): string }",
+   "starter": "____\nconst ana: Named = {\n  name: \"ana\",\n  greet() {\n    return \"hi from \" + this.name;\n  },\n};\nconst ben: Named = { name: \"ben\", greet: ana.greet };\nconst bound = ana.greet.bind(ben);\nconsole.log(ana.greet(), \"|\", ben.greet(), \"|\", bound());\n"
+  }
+ ],
+ "ts_top_bottom": [
+  {
+   "title": "An exhaustive switch",
+   "code": "import * as fs from \"fs\";\ntype Shape =\n  | { kind: \"circle\"; radius: number }\n  | { kind: \"square\"; side: number }\n  | { kind: \"rect\"; width: number; height: number };\n\nfunction area(s: Shape): number {\n  switch (s.kind) {\n    case \"circle\":\n      return Math.PI * s.radius ** 2;\n    case \"square\":\n      return s.side ** 2;\n    case \"rect\":\n      return s.width * s.height;\n    default: {\n      const unhandled: never = s;\n      throw new Error(`unhandled ${JSON.stringify(unhandled)}`);\n    }\n  }\n}\n\nconst shapes = JSON.parse(fs.readFileSync(0, \"utf8\").trim()) as Shape[];\nconsole.log(shapes.map((s) => area(s).toFixed(2)).join(\" \"));\n",
+   "name": "Shape",
+   "decl": "type Shape =\n  | { kind: \"circle\"; radius: number }\n  | { kind: \"square\"; side: number }\n  | { kind: \"rect\"; width: number; height: number };",
+   "shape": "| { kind: \"circle\"; radius: number }\n  | { kind: \"square\"; side: number }\n  | { kind: \"rect\"; width: number; height: number }",
+   "starter": "import * as fs from \"fs\";\n____\n\nfunction area(s: Shape): number {\n  switch (s.kind) {\n    case \"circle\":\n      return Math.PI * s.radius ** 2;\n    case \"square\":\n      return s.side ** 2;\n    case \"rect\":\n      return s.width * s.height;\n    default: {\n      const unhandled: never = s;\n      throw new Error(`unhandled ${JSON.stringify(unhandled)}`);\n    }\n  }\n}\n\nconst shapes = JSON.parse(fs.readFileSync(0, \"utf8\").trim()) as Shape[];\nconsole.log(shapes.map((s) => area(s).toFixed(2)).join(\" \"));\n"
+  }
+ ],
+ "ts_tsconfig": [
+  {
+   "title": "Absent versus explicitly undefined",
+   "code": "type Profile = { nickname?: string };\nconst absent: Profile = {};\nconst cleared: Profile = { nickname: undefined };\nconsole.log(\"nickname\" in absent, \"nickname\" in cleared);\nconsole.log(JSON.stringify(absent), JSON.stringify(cleared));\n",
+   "name": "Profile",
+   "decl": "type Profile = { nickname?: string };",
+   "shape": "{ nickname?: string }",
+   "starter": "____\nconst absent: Profile = {};\nconst cleared: Profile = { nickname: undefined };\nconsole.log(\"nickname\" in absent, \"nickname\" in cleared);\nconsole.log(JSON.stringify(absent), JSON.stringify(cleared));\n"
+  }
+ ],
+ "ts_type_level": [
+  {
+   "title": "A recursive JSON type and a walker",
+   "code": "type Json = null | boolean | number | string | Json[] | { [key: string]: Json };\nfunction countLeaves(v: Json): number {\n  if (Array.isArray(v)) return v.reduce<number>((n, x) => n + countLeaves(x), 0);\n  if (v !== null && typeof v === \"object\") return Object.values(v).reduce<number>((n, x) => n + countLeaves(x), 0);\n  return 1;\n}\nconst doc: Json = { name: \"ana\", tags: [\"a\", \"b\"], address: { city: \"Oslo\", geo: [59.9, 10.7] }, active: true };\nconsole.log(countLeaves(doc));\n",
+   "name": "Json",
+   "decl": "type Json = null | boolean | number | string | Json[] | { [key: string]: Json };",
+   "shape": "null | boolean | number | string | Json[] | { [key: string]: Json }",
+   "starter": "____\nfunction countLeaves(v: Json): number {\n  if (Array.isArray(v)) return v.reduce<number>((n, x) => n + countLeaves(x), 0);\n  if (v !== null && typeof v === \"object\") return Object.values(v).reduce<number>((n, x) => n + countLeaves(x), 0);\n  return 1;\n}\nconst doc: Json = { name: \"ana\", tags: [\"a\", \"b\"], address: { city: \"Oslo\", geo: [59.9, 10.7] }, active: true };\nconsole.log(countLeaves(doc));\n"
+  },
+  {
+   "title": "A deeply read-only parameter",
+   "code": "type DeepReadonly<T> = { readonly [K in keyof T]: T[K] extends object ? DeepReadonly<T[K]> : T[K] };\ntype Config = { server: { host: string; ports: number[] }; debug: boolean };\nfunction describe(c: DeepReadonly<Config>): string {\n  return `${c.server.host}:${c.server.ports.join(\"/\")} debug=${c.debug}`;\n}\nconsole.log(describe({ server: { host: \"localhost\", ports: [80, 443] }, debug: false }));\n",
+   "name": "Config",
+   "decl": "type Config = { server: { host: string; ports: number[] }; debug: boolean };",
+   "shape": "{ server: { host: string; ports: number[] }; debug: boolean }",
+   "starter": "type DeepReadonly<T> = { readonly [K in keyof T]: T[K] extends object ? DeepReadonly<T[K]> : T[K] };\n____\nfunction describe(c: DeepReadonly<Config>): string {\n  return `${c.server.host}:${c.server.ports.join(\"/\")} debug=${c.debug}`;\n}\nconsole.log(describe({ server: { host: \"localhost\", ports: [80, 443] }, debug: false }));\n"
+  }
+ ],
+ "ts_type_performance": [
+  {
+   "title": "A pattern instead of an enumeration",
+   "code": "type Hex = `#${string}`;\ntype Percent = `${number}%`;\n\nfunction parseColour(text: string): Hex | undefined {\n  return /^#[0-9a-f]{6}$/i.test(text) ? (text.toLowerCase() as Hex) : undefined;\n}\nfunction scale(p: Percent, of: number): number {\n  return (parseFloat(p) / 100) * of;\n}\nconsole.log(parseColour(\"#3355FF\"), parseColour(\"blue\"));\nconsole.log(scale(\"25%\", 80), scale(\"12.5%\", 8));\n",
+   "name": "Hex",
+   "decl": "type Hex = `#${string}`;",
+   "shape": "`#${string}`",
+   "starter": "____\ntype Percent = `${number}%`;\n\nfunction parseColour(text: string): Hex | undefined {\n  return /^#[0-9a-f]{6}$/i.test(text) ? (text.toLowerCase() as Hex) : undefined;\n}\nfunction scale(p: Percent, of: number): number {\n  return (parseFloat(p) / 100) * of;\n}\nconsole.log(parseColour(\"#3355FF\"), parseColour(\"blue\"));\nconsole.log(scale(\"25%\", 80), scale(\"12.5%\", 8));\n"
+  }
+ ],
+ "ts_type_predicates": [
+  {
+   "title": "Validating `unknown` data",
+   "code": "type Point = { x: number; y: number };\nfunction isPoint(v: unknown): v is Point {\n  return typeof v === \"object\" && v !== null && \"x\" in v && \"y\" in v && typeof v.x === \"number\" && typeof v.y === \"number\";\n}\nfor (const text of ['{\"x\":1,\"y\":2}', '{\"x\":\"1\",\"y\":2}', \"[1,2]\"]) {\n  const v: unknown = JSON.parse(text);\n  console.log(isPoint(v) ? `distance ${Math.hypot(v.x, v.y).toFixed(2)}` : \"not a point\");\n}\n",
+   "name": "Point",
+   "decl": "type Point = { x: number; y: number };",
+   "shape": "{ x: number; y: number }",
+   "starter": "____\nfunction isPoint(v: unknown): v is Point {\n  return typeof v === \"object\" && v !== null && \"x\" in v && \"y\" in v && typeof v.x === \"number\" && typeof v.y === \"number\";\n}\nfor (const text of ['{\"x\":1,\"y\":2}', '{\"x\":\"1\",\"y\":2}', \"[1,2]\"]) {\n  const v: unknown = JSON.parse(text);\n  console.log(isPoint(v) ? `distance ${Math.hypot(v.x, v.y).toFixed(2)}` : \"not a point\");\n}\n"
+  }
+ ],
+ "ts_type_testing": [
+  {
+   "title": "A negative test: the misuse must be rejected",
+   "code": "type Shape = { kind: \"square\"; size: number } | { kind: \"circle\"; radius: number };\n\nfunction area(shape: Shape): number {\n  return shape.kind === \"square\" ? shape.size * shape.size : Math.round(3.14159 * shape.radius ** 2);\n}\n\nfunction _typeTests() {\n  // @ts-expect-error — a square has no radius\n  area({ kind: \"square\", radius: 2 });\n  // @ts-expect-error — \"triangle\" is not a kind\n  area({ kind: \"triangle\", size: 1 });\n}\n\nconsole.log(area({ kind: \"square\", size: 3 }));\nconsole.log(area({ kind: \"circle\", radius: 1 }));\n",
+   "name": "Shape",
+   "decl": "type Shape = { kind: \"square\"; size: number } | { kind: \"circle\"; radius: number };",
+   "shape": "{ kind: \"square\"; size: number } | { kind: \"circle\"; radius: number }",
+   "starter": "____\n\nfunction area(shape: Shape): number {\n  return shape.kind === \"square\" ? shape.size * shape.size : Math.round(3.14159 * shape.radius ** 2);\n}\n\nfunction _typeTests() {\n  // @ts-expect-error — a square has no radius\n  area({ kind: \"square\", radius: 2 });\n  // @ts-expect-error — \"triangle\" is not a kind\n  area({ kind: \"triangle\", size: 1 });\n}\n\nconsole.log(area({ kind: \"square\", size: 3 }));\nconsole.log(area({ kind: \"circle\", radius: 1 }));\n"
+  }
+ ],
+ "ts_unions": [
+  {
+   "title": "A literal union of commands",
+   "code": "type Command = \"start\" | \"stop\" | \"pause\";\nfunction run(cmd: Command): string {\n  switch (cmd) {\n    case \"start\":\n      return \"running\";\n    case \"stop\":\n      return \"stopped\";\n    case \"pause\":\n      return \"paused\";\n  }\n}\nconsole.log(([\"start\", \"pause\", \"stop\"] as const).map(run).join(\" -> \"));\n",
+   "name": "Command",
+   "decl": "type Command = \"start\" | \"stop\" | \"pause\";",
+   "shape": "\"start\" | \"stop\" | \"pause\"",
+   "starter": "____\nfunction run(cmd: Command): string {\n  switch (cmd) {\n    case \"start\":\n      return \"running\";\n    case \"stop\":\n      return \"stopped\";\n    case \"pause\":\n      return \"paused\";\n  }\n}\nconsole.log(([\"start\", \"pause\", \"stop\"] as const).map(run).join(\" -> \"));\n"
+  }
+ ],
+ "ts_utility_types": [
+  {
+   "title": "A patch, applied",
+   "code": "type Task = { id: number; title: string; done: boolean; priority: \"low\" | \"high\" };\ntype TaskPatch = Partial<Omit<Task, \"id\">>;\nfunction update(task: Task, patch: TaskPatch): Task {\n  return { ...task, ...patch };\n}\nconst t: Task = { id: 1, title: \"write\", done: false, priority: \"low\" };\nconsole.log(JSON.stringify(update(t, { done: true, priority: \"high\" })));\n",
+   "name": "Task",
+   "decl": "type Task = { id: number; title: string; done: boolean; priority: \"low\" | \"high\" };",
+   "shape": "{ id: number; title: string; done: boolean; priority: \"low\" | \"high\" }",
+   "starter": "____\ntype TaskPatch = Partial<Omit<Task, \"id\">>;\nfunction update(task: Task, patch: TaskPatch): Task {\n  return { ...task, ...patch };\n}\nconst t: Task = { id: 1, title: \"write\", done: false, priority: \"low\" };\nconsole.log(JSON.stringify(update(t, { done: true, priority: \"high\" })));\n"
+  },
+  {
+   "title": "Totals for every category",
+   "code": "type Category = \"food\" | \"rent\" | \"fun\";\nconst totals: Record<Category, number> = { food: 0, rent: 0, fun: 0 };\nfor (const [c, amount] of [[\"food\", 12], [\"fun\", 30], [\"food\", 8]] as const) totals[c] += amount;\nconsole.log(JSON.stringify(totals));\n",
+   "name": "Category",
+   "decl": "type Category = \"food\" | \"rent\" | \"fun\";",
+   "shape": "\"food\" | \"rent\" | \"fun\"",
+   "starter": "____\nconst totals: Record<Category, number> = { food: 0, rent: 0, fun: 0 };\nfor (const [c, amount] of [[\"food\", 12], [\"fun\", 30], [\"food\", 8]] as const) totals[c] += amount;\nconsole.log(JSON.stringify(totals));\n"
+  }
+ ],
+ "ts_variance": [
+  {
+   "title": "Producers follow the subtype",
+   "code": "type Animal = { name: string };\ntype Dog = { name: string; bark: () => string };\ntype Getter<T> = () => T;\n\nconst rex: Dog = { name: \"rex\", bark: () => \"woof\" };\nconst getDog: Getter<Dog> = () => rex;\nconst getAnimal: Getter<Animal> = getDog; // covariant: fine\n\nconsole.log(getAnimal().name);\nconsole.log(getDog().bark());\n",
+   "name": "Animal",
+   "decl": "type Animal = { name: string };",
+   "shape": "{ name: string }",
+   "starter": "____\ntype Dog = { name: string; bark: () => string };\ntype Getter<T> = () => T;\n\nconst rex: Dog = { name: \"rex\", bark: () => \"woof\" };\nconst getDog: Getter<Dog> = () => rex;\nconst getAnimal: Getter<Animal> = getDog; // covariant: fine\n\nconsole.log(getAnimal().name);\nconsole.log(getDog().bark());\n"
+  },
+  {
+   "title": "Consumers go the other way",
+   "code": "type Animal = { name: string };\ntype Dog = { name: string; bark: () => string };\ntype Handler<T> = (x: T) => string;\n\nconst describeAnimal: Handler<Animal> = (a) => \"an animal called \" + a.name;\nconst describeDog: Handler<Dog> = describeAnimal; // contravariant: fine\n\nconst dogs: Dog[] = [{ name: \"rex\", bark: () => \"woof\" }, { name: \"fido\", bark: () => \"arf\" }];\nconsole.log(dogs.map(describeDog).join(\"; \"));\n",
+   "name": "Animal",
+   "decl": "type Animal = { name: string };",
+   "shape": "{ name: string }",
+   "starter": "____\ntype Dog = { name: string; bark: () => string };\ntype Handler<T> = (x: T) => string;\n\nconst describeAnimal: Handler<Animal> = (a) => \"an animal called \" + a.name;\nconst describeDog: Handler<Dog> = describeAnimal; // contravariant: fine\n\nconst dogs: Dog[] = [{ name: \"rex\", bark: () => \"woof\" }, { name: \"fido\", bark: () => \"arf\" }];\nconsole.log(dogs.map(describeDog).join(\"; \"));\n"
+  }
+ ]
+}

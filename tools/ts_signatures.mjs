@@ -29,6 +29,22 @@ const out = JSON.parse(input).map(({ id, src }) => {
     const isAsync = (st.modifiers ?? []).some((m) => m.kind === ts.SyntaxKind.AsyncKeyword);
     fns.push({ name: st.name.text, async: isAsync, params: st.parameters.map((p) => span(p.type)), ret: span(st.type) });
   }
-  return { id, fns };
+  // Top-level, non-generic type declarations, for "design" drills
+  // (tools/gen_ts_designs.py): the statement's span, its name, and its shape as
+  // a type expression (an interface without `extends` becomes its `{ … }`).
+  const types = [];
+  for (const st of file.statements) {
+    const span = { start: st.getStart(file), end: st.getEnd() };
+    if (ts.isTypeAliasDeclaration(st) && !st.typeParameters) {
+      types.push({ name: st.name.text, ...span, shape: st.type.getText(file) });
+    } else if (ts.isInterfaceDeclaration(st) && !st.typeParameters && !st.heritageClauses) {
+      const open = st.members.pos;
+      const text = src.slice(st.getStart(file), st.getEnd());
+      const brace = text.indexOf("{");
+      types.push({ name: st.name.text, ...span, shape: brace >= 0 ? text.slice(brace) : "" });
+      void open;
+    }
+  }
+  return { id, fns, types };
 });
 process.stdout.write(JSON.stringify(out));
