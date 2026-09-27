@@ -2,10 +2,13 @@
 // `order` (Parsons: put shuffled lines back in order) and `spot` (click the
 // line that holds the bug). Logic lives in lib/parsons.ts.
 import { useState } from "react";
-import type { Exercise } from "../types";
+import { api } from "../api";
+import type { Exercise, JudgeReport, TestCase } from "../types";
 import { recordExerciseRun } from "../lib/learnProgress";
 import { fromLines, inPlace, isBugLine, moveLine, toLines } from "../lib/parsons";
 import { Markdown } from "./Markdown";
+import { CodeEditor } from "./CodeEditor";
+import { FailingCases } from "./OutputCompare";
 
 /** The reorderable list an `order` exercise shows instead of an editor. Drag a
  * line, or use its arrows; the program is `value`, one piece per line. */
@@ -177,9 +180,86 @@ export function SpotCard({
             {solved ? "Found it" : "The bug"}
           </div>
           {exercise.explanation && <Markdown>{exercise.explanation}</Markdown>}
-          <div className="io-label" style={{ marginTop: 8 }}>
-            The fix
-          </div>
+        </div>
+      )}
+      {show && <FixStage exercise={exercise} gaveUp={revealed && !solved} />}
+    </div>
+  );
+}
+
+/** Stage two of a spot-the-bug card (X-11): now repair it. The program is the
+ * one just read; the tests are what the corrected program prints, so any fix
+ * that behaves right passes — the reference fix stays hidden until asked for. */
+function FixStage({ exercise, gaveUp }: { exercise: Exercise; gaveUp: boolean }) {
+  const storeKey = `poodcode:learn-spot-fix:${exercise.id}`;
+  const [code, setCode] = useState(() => {
+    try {
+      return localStorage.getItem(storeKey) ?? exercise.starter;
+    } catch {
+      return exercise.starter;
+    }
+  });
+  const [report, setReport] = useState<JudgeReport | null>(null);
+  const [running, setRunning] = useState(false);
+  const [showFix, setShowFix] = useState(gaveUp);
+  const lang = exercise.language || "typescript";
+
+  function update(v: string) {
+    setCode(v);
+    try {
+      localStorage.setItem(storeKey, v);
+    } catch {
+      /* the draft is a convenience */
+    }
+  }
+
+  async function check() {
+    setRunning(true);
+    try {
+      const cases: TestCase[] = exercise.tests.map((t, i) => ({
+        id: 0,
+        problem_id: 0,
+        kind: "example",
+        name: `Test ${i + 1}`,
+        input: t.input,
+        expected_output: t.output,
+        ordering: i,
+      }));
+      setReport(await api.runTests(null, lang, code, cases, { strictness: exercise.strictness }));
+    } finally {
+      setRunning(false);
+    }
+  }
+
+  const fixed = report?.status === "accepted";
+  const failing = report ? report.results.filter((r) => !r.passed) : [];
+  return (
+    <div style={{ marginTop: 10 }}>
+      <div className="io-label">
+        {fixed ? <span style={{ color: "var(--good)" }}>✓ Fixed</span> : "Now fix it — the tests are what the corrected program prints"}
+      </div>
+      <div style={{ height: Math.min(360, toLines(exercise.starter).length * 20 + 30), border: "1px solid var(--border)", borderRadius: 6, overflow: "hidden" }}>
+        <CodeEditor language={lang} value={code} onChange={update} onRun={check} tsStrictness={exercise.strictness} />
+      </div>
+      <div className="row" style={{ marginTop: 8, gap: 8 }}>
+        <button onClick={check} disabled={running}>
+          {running ? "Checking…" : "Check"}
+        </button>
+        <button className="ghost" onClick={() => update(exercise.starter)} disabled={running}>
+          Reset
+        </button>
+        <button className="ghost" onClick={() => setShowFix((v) => !v)}>
+          {showFix ? "Hide the fix" : "Show the fix"}
+        </button>
+      </div>
+      {report?.compile_error && (
+        <pre className="io-block" style={{ marginTop: 8, whiteSpace: "pre-wrap", fontSize: 12, borderColor: "var(--bad)" }}>
+          {report.compile_error}
+        </pre>
+      )}
+      {report && !report.compile_error && !fixed && <FailingCases failing={failing} />}
+      {showFix && (
+        <div style={{ marginTop: 8 }}>
           <Markdown>{"```ts\n" + exercise.solution + "```"}</Markdown>
           {exercise.tests[0] && (
             <>
