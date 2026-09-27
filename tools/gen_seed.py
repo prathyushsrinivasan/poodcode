@@ -6505,6 +6505,14 @@ for d in HARNESS_DEFS:
         "checker": d.get("checker", ""),
     })
 
+# "Idiomatic TypeScript" editorials on the TypeScript Mastery track's curated
+# problems (X-22, ts_idiomatic.py). Coverage is asserted once the Mastery weeks
+# exist (mastery_ts_scope.py); the code is also a verified reference below.
+_idio_path = os.path.join(HERE, "ts_idiomatic.py")
+with open(_idio_path, encoding="utf-8") as _idiof:
+    exec(compile(_idiof.read(), _idio_path, "exec"))
+_idiomatic_editorials(out, [])
+
 # Assign a curated easiest→hardest global rank (used by the library's default sort):
 # primary axis is the difficulty tier, then the authoring order within the tier.
 _DIFF_RANK = {"Intro": 0, "Easy": 1, "Medium": 2, "Hard": 3}
@@ -6862,6 +6870,9 @@ REFERENCE_SOLUTIONS.update(globals().get("ONRAMP_REFS", {}))
 REFERENCE_SOLUTIONS.update(globals().get("DEPTH_REFS", {}))
 REFERENCE_SOLUTIONS.update(globals().get("FILL_REFS", {}))
 REFERENCE_SOLUTIONS.update(EXTRA_REFS)
+# The idiomatic TypeScript answers (X-22) are proven like every other reference.
+for _idio_slug, (_idio_notes, _idio_code) in TS_IDIOMATIC.items():
+    REFERENCE_SOLUTIONS.setdefault(_idio_slug, {})["typescript"] = _idio_code.strip("\n") + "\n"
 
 REFS_OUT = os.path.join(HERE, "..", "src-tauri", "seeds", "reference_solutions.json")
 with open(REFS_OUT, "w", encoding="utf-8", newline="\n") as f:

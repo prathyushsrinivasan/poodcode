@@ -119,3 +119,8 @@ _lint_ts_scope(TS_WEEKS)
 for _sc_w in TS_WEEKS:
     for _sc_ex in _sc_w.get("practice", []) + _sc_w.get("problem_set", []):
         _ts_ladder(_sc_ex)
+
+# X-22: every problem the TypeScript track curates has an idiomatic editorial.
+_sc_curated = sorted({r["slug"] for w in TS_WEEKS for r in w["problems"]})
+_sc_no_editorial = [s for s in _sc_curated if s not in TS_IDIOMATIC]
+assert not _sc_no_editorial, f"X-22: curated problems without an idiomatic TypeScript editorial: {_sc_no_editorial}"
