@@ -391,6 +391,7 @@ _MODULE_FILES = (
     "java_m31_executors.py",   #          executors, tasks and results - closes Part 10
     "java_m32_stdlib.py",      # Part 11 - Math, Objects, Random, java.time, formatting
     "java_m33_enums.py",       # Part 13 - enums, switch and nested classes
+    "java_m34_records.py",     #           records, sealed types, pattern matching
     # Parts 9 and 11-14 are deliberately NOT planned; see JAVA_ROADMAP.md for
     # what was dropped and why.
 )
@@ -452,6 +453,7 @@ _PRACTICE_FILES = (
     "java_p31_practice.py",
     "java_p32_practice.py",
     "java_p33_practice.py",
+    "java_p34_practice.py",
 )
 
 for _prac_file in _PRACTICE_FILES:
@@ -549,6 +551,9 @@ _SCOPE_RULES = [
     # was always fine, which is why the rule is "enum " with a space.
     ("enum ", 33), ("switch", 33), ("yield", 33), ("EnumMap", 33), ("EnumSet", 33),
     ("static class", 33), ("Iterable<", 33),
+    # Module 34 is the one module that needs JDK 21 - keep it that way.
+    ("record ", 34), ("sealed", 34), ("permits", 34), ("case null", 34),
+    ("List.copyOf", 34),   # (" when " is not a rule: module 30 prints the word)
 ]
 
 # Text that every program (or many early ones) contains and that would trip a
@@ -631,9 +636,9 @@ JAVA_COURSE = {
         "methods, object-oriented programming, exceptions, the collections "
         "framework, generics down to erasure and what it costs, then lambdas, "
         "stream pipelines from `filter` to `groupingBy`, `Optional`, multithreading from `start()` to thread pools, the "
-        "standard-library corners that fail quietly, and enums, switch and nested "
-        "classes, in "
-        "thirty-three judged modules. "
+        "standard-library corners that fail quietly, enums and switch, and "
+        "records, sealed types and pattern matching, in "
+        "thirty-four judged modules. "
         "Each module is a goal, four to six lessons, warm-ups that make you "
         "predict the output, fill-in-the-blank drills, fix-the-bug programs, a "
         "coding challenge, a glossary, a cheat sheet and a project - plus a "

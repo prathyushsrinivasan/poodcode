@@ -14,8 +14,8 @@ looking it up.
 ⬜ planned.
 
 **Built so far:** Parts 1–8, 10 and 11 complete, Part 13 under way (modules
-1–33) — **33 modules, 157 lessons, 675 judged exercises, plus 825 practice
-problems** in 165 variation families.
+1–34) — **34 modules, 162 lessons, 696 judged exercises, plus 850 practice
+problems** in 170 variation families.
 
 **Scope note.** Parts 9 and 14, and the JDBC/Maven/JUnit/logging half of Part
 13, are deliberately **not planned** — file I/O, build tools and the backend
@@ -462,7 +462,22 @@ enum needs no `default` · static nested vs inner classes, `Outer.this`, and the
 memory an inner class can pin · local and anonymous classes · `Iterable` with an
 inner iterator · state machines as an enum plus an exhaustive switch
 
-**34. Records, sealed types and pattern matching** ⬜ *(Java 16–21)*
+**34. Records, sealed types and pattern matching** ✅ *(needs JDK 21)*
+Records and everything they generate · accessors named after components ·
+value-based `equals`/`hashCode`/`toString` · the **compact constructor** and why
+it reassigns parameters, never fields · **shallow immutability** and
+`List.copyOf` · records as composite keys, `Comparable` records, and methods that
+return new records · `instanceof` **type patterns**, flow scoping (after a
+negated early return, and on the right of `||`), one-line `equals` · **sealed**
+interfaces and classes, `permits`, and `final` / `sealed` / `non-sealed`
+subtypes · algebraic data types (a sealed interface of records) · **pattern
+matching in `switch`**: type patterns, **record patterns** and nesting, `when`
+guards, **domination**, `case null`, and exhaustiveness over a sealed hierarchy
+with no `default` · an expression evaluator and simplifier
+
+*(The one module that requires JDK 21 — every other module compiles on 17. Its
+scope rules keep `record `, `sealed`, `permits`, `case null` and `List.copyOf`
+out of every earlier module.)*
 
 **35. Design patterns** ⬜
 
