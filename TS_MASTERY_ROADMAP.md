@@ -828,18 +828,18 @@ concurrency and cancellation.
 |---|---|---|
 | TypeScript Learn chapters | 50 | **87** (37 new) |
 | Lesson length | 0.9–2.1k chars | 4–8k chars, templated |
-| Learn exercises on those chapters | 176 (2 kinds) | **~1,300** (10+ kinds, ~20% type-graded) |
+| Learn exercises on those chapters | 176 (2 kinds) | **~1,300** (10+ kinds, ~20% type-graded) — ✅ **1,473** across Learn (301), week practice (884) and problem sets (288); 10 kinds; 296 type-graded (20%) |
 | Curated problems | 85 slots, 26 TS-startable | **~380 slots, all TS-startable** (~300 new originals, ~100 of them type-graded) |
-| Type-challenge bank | 0 | **~120** |
-| Quiz bank | 170 | **~1,050**, 10 sampled |
-| Flashcards | 0 | **~1,000** |
+| Type-challenge bank | 0 | **~120** — ✅ 121-rung ladder, 138 type-level exercises |
+| Quiz bank | 170 | **~1,050**, 10 sampled — ✅ **1,679** (multi-select, fill-the-type and code-output included; 8 sampled per sitting) |
+| Flashcards | 0 | **~1,000** — ✅ **1,260**, ≥ 12 per chapter asserted |
 | Final tests | 94 (2–5/week) | **~200** (≥ 6 per final, most 8) + hidden sets, + 26 alternates — ✅ 220 + 213 alternate tests, hidden sets, 8 two-part finals |
 | Checkpoints | 2 | 6 monthly + final exam — ✅ |
 | Projects | 26 ungraded sentences | 26 structured, runnable, tested + 1 arc project across 6 months |
 
 ---
 
-**Status, 2026-09-27 (end of the second build session).** Part B's content is built for all 26 core weeks and optional week 27, and most of Part A has landed — see *Shipped so far*. TypeScript Learn chapters: **87**, all on the X-02 template (5k–19k characters). Mastery TS track: **276** problem-set problems (**55** type-graded) — every core week has 12–16; **218** practice exercises; **27** weekly projects plus **3** arc versions (v1–v3), all runnable with acceptance tests (week 14's is a four-module workspace); **1,324** week-bank questions (40+ every week); **527** review cards; **27** finals with 220 tests plus **26** alternate finals, hidden test sets, and two-part finals for weeks 15–22; a **3-hour programme final exam**; **6** monthly checkpoints, each with a 20-question quiz (and a type section in months 4–5); a **121-rung** type-challenge ladder served as a daily puzzle. Tools: TS playground, step-by-step page (call stack, array pipeline, event loop, promise combinators), stdin/stdout visualiser, assertion panel, multi-file workspace, tsconfig explorer. Still open: see *Handoff* below.
+**Status, 2026-09-27 (end of the third build session).** Every volume target in the table above is met: 1,473 exercises in 10 kinds (20% type-graded), 1,679 quiz questions, 1,260 cards, 121 type-ladder rungs, all 26 core weeks with projects, finals, alternates and families, and 81 curated Library problems with verified idiomatic TypeScript editorials. What remains is listed under *Handoff*: mostly per-chapter authoring (X-10 predict/diagnose/retype/design per chapter, more families, why-not notes for the authored single-choice bank), the chapter glossaries (X-08), and X-105, which needs registry access.
 
 ---
 
