@@ -96,6 +96,7 @@ the gap stays visible. This is what has landed since.
 | Library, round two (X-22, X-25) | curated problems had algorithm editorials only; no link back to the programme | every one of the **81** Library problems the TS track curates has an **Idiomatic TypeScript** editorial — the types as much as the algorithm, with a complete answer that is also the problem's `typescript` reference, all 81 judged accepted by `verify_seeds`; Library browse shows the **Mastery week** that first sets each problem and a **Solvable now** filter | `tools/ts_idiomatic.py`, `masteryWeekBySlug` in `mastery.ts`, `LibraryBrowse.tsx` |
 | Same problem, three ways (X-26) | — | four sets (weeks 7, 12, 18, 24): loops / pipeline / class-or-generator, each style enforced by the judge, the three references asserted to agree, and the comparison shown once solved | `tools/mastery_ts_three_ways.py` |
 | Repairs and comparisons (X-11, X-09) | 42 fix exercises; comparisons for Java only | **68 repair exercises** from pitfalls too spread out for spot-the-bug (fix 42 → 102, diagnose 51 → 59); every chapter's comparison box now speaks to **Python and JavaScript** programmers too | `_tsd_repair` in `mastery_ts_derived.py`, `tools/ts_compare_notes.py` |
+| Key terms (X-08) | none | the TS course's glossary mapped onto the chapters — each term in the first chapter (programme order, read from the week tables) whose prose uses it: **270 terms in 70 chapters**, in the lesson and on the cheat sheet | `tools/ts_chapter_glossary.py` |
 | Practice families (X-19) | none | **26 families, 130 exercises** — one per core week, five variations each that twist one dimension (input shape, output format, an edge case, a rule, a generalisation); weeks 17, 19, 20, 21 and 22 are type-level families. Every exercise verified through the real judge | `tools/mastery_ts_families.py` |
 | Fast authoring loop (X-102) | none for Mastery | `python tools/verify_ts_mastery.py --weeks 11-14` / `--only ts_regex` — type-checks and runs chapters, practice, problems, finals and projects in seconds | `tools/verify_ts_mastery.py` |
 
@@ -223,7 +224,7 @@ Everything here is built once and then used by every week in Part B.
 | ✅ X-05 | `pitfalls` field per chapter: short "this looks right but…" cases, each with the wrong code, the symptom, and the fix. Rendered as collapsible cards. | P1 | M |
 | ✅ X-06 | `interview` field per chapter: 3–5 questions an interviewer actually asks about the topic ("`any` vs `unknown` vs `never`?", "`interface` vs `type`?"), with model answers. | P1 | M |
 | ✅ X-07 | `errors` field per chapter: the 3–5 `TSnnnn` codes a learner will hit in this chapter, verified against `ts_typecheck.mjs`, feeding a global error glossary (X-66). | P1 | M |
-| 🚧 X-08 | Chapter **cheat sheet** (one screen, printable) and **glossary** entries, as the TS course already has per week. | P2 | M |
+| ✅ X-08 | Chapter **cheat sheet** (one screen, printable) and **glossary** entries, as the TS course already has per week. | P2 | M |
 | ✅ X-09 | "Compared with Java" notes (`java` field exists) rewritten to cover Python and JavaScript too — the learner may arrive from any of them. | P3 | M |
 
 ### A2. Exercise kinds — bring the Course's toolkit to Mastery
@@ -839,7 +840,7 @@ concurrency and cancellation.
 
 ---
 
-**Status, 2026-09-27 (end of the third build session).** Every volume target in the table above is met: 1,473 exercises in 10 kinds (20% type-graded), 1,679 quiz questions, 1,260 cards, 121 type-ladder rungs, all 26 core weeks with projects, finals, alternates and families, and 81 curated Library problems with verified idiomatic TypeScript editorials. What remains is listed under *Handoff*: mostly per-chapter authoring (X-10 predict/diagnose/retype/design per chapter, more families, why-not notes for the authored single-choice bank), the chapter glossaries (X-08), and X-105, which needs registry access.
+**Status, 2026-09-27 (end of the third build session).** Every volume target in the table above is met: 1,473 exercises in 10 kinds (20% type-graded), 1,679 quiz questions, 1,260 cards, 121 type-ladder rungs, all 26 core weeks with projects, finals, alternates and families, and 81 curated Library problems with verified idiomatic TypeScript editorials. What remains is listed under *Handoff*: mostly per-chapter authoring (X-10 predict/diagnose/retype/design per chapter, more families, why-not notes for the authored single-choice bank), and X-105, which needs registry access.
 
 ---
 
@@ -861,7 +862,7 @@ month-6 checkpoint · 31b5280 29 type challenges · 56e0cfb predict-first + ques
 | X-17 | Chapter-level strictness for Learn exercises | Learn's `ExerciseCard` (in `Learn.tsx`) does not pass strictness/harness to the judge yet — no Learn exercise needs it today. |
 | X-37 | Explanations for wrong options | Field and UI shipped; the 251 code-output questions have them. The ~1,100 authored bank questions need authoring. |
 | X-12 | Type-graded **Library** problems | Deliberately not done: a type-only problem cannot have the Java starter every Library problem is required to have (`verify_seeds`), and the Mastery weeks already carry 55 type-graded problems plus the 121-rung ladder. Revisit only with a TypeScript-only Library category. |
-| X-08 / X-19 | Glossary entries per chapter; more practice families | One family per core week shipped (26); the roadmap's target is four per chapter. Glossary: the TS course's 623 terms could be mapped onto chapters, but the build writes concepts before the Mastery weeks exist, so it needs a reordering first. |
+| X-19 | More practice families | One family per core week shipped (26 × 5); the roadmap's target is four per chapter — authoring. |
 | X-105 | TypeScript 6.x checker | Blocked here: this machine has no registry access (`npm view typescript` times out). Upgrade `typescript` in package.json, then re-run every verifier; Monaco's bundled TS is separate. |
 
 **Traps met this session** (also in the project memory): the Bash tool's heredocs mangle `\n` and `\b` inside
