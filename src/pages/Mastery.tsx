@@ -1653,7 +1653,13 @@ function ProjectPanel({
                   <button
                     className="ghost"
                     onClick={() => {
-                      if (window.confirm("Replace the code in the editor with this version?")) setCode(v.code);
+                      // Undo rather than a confirm: the code being replaced is
+                      // kept for one click (E5).
+                      const current = code;
+                      setCode(v.code);
+                      toast("Restored the saved version.", {
+                        action: { label: "Undo", onClick: () => setCode(current) },
+                      });
                     }}
                   >
                     Restore

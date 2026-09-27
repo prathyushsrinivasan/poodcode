@@ -14,6 +14,7 @@ import {
   toWorkspace,
   type WorkspaceFile,
 } from "../lib/projectFiles";
+import { useToast } from "./Toast";
 
 export function WorkspaceEditor({
   workspaceId,
@@ -34,6 +35,7 @@ export function WorkspaceEditor({
   const files = useMemo(() => splitFiles(value), [value]);
   const [active, setActive] = useState(0);
   const [naming, setNaming] = useState<{ mode: "add" | "rename"; text: string } | null>(null);
+  const toast = useToast();
   const monaco = useMonaco();
   const folder = `file:///ws/${workspaceId.replace(/[^A-Za-z0-9_-]/g, "-")}/`;
   const index = files ? Math.min(active, files.length - 1) : 0;
@@ -135,9 +137,20 @@ export function WorkspaceEditor({
                 aria-label={`Delete ${f.name}`}
                 title={`Delete ${f.name}`}
                 onClick={() => {
-                  if (!window.confirm(`Delete ${f.name}? Its code is removed from the workspace.`)) return;
+                  // Undo rather than a confirm: deleting is one click to
+                  // reverse, and a dialog on every close is friction (E5).
+                  const before = files;
                   update(files.filter((_, k) => k !== i));
                   setActive(Math.max(0, i - 1));
+                  toast(`Deleted ${f.name}.`, {
+                    action: {
+                      label: "Undo",
+                      onClick: () => {
+                        update(before);
+                        setActive(i);
+                      },
+                    },
+                  });
                 }}
               >
                 ×
