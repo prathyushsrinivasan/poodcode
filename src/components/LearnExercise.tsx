@@ -554,7 +554,9 @@ export function Feedback({
     return (
       <div className="card" style={{ marginTop: 10, marginBottom: 0, borderColor: "var(--good)" }}>
         <div className="io-label" style={{ color: "var(--good)" }}>
-          Types check out — every assertion compiled 🎉
+          {check && check.harness.trim() === ""
+            ? "It compiles now — the compiler has nothing left to say 🎉"
+            : "Types check out — every assertion compiled 🎉"}
         </div>
       </div>
     );
