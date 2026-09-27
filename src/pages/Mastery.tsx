@@ -1123,6 +1123,8 @@ function WeekCard({
                       exercises={practice}
                       onSolved={(id) => setSolvedEx(new Set(markMasterySolved(id)))}
                       predictFirst={predictFirst}
+                      collapsible
+                      solved={solvedEx}
                     />
                   </details>
                 )}
@@ -1187,6 +1189,8 @@ function WeekCard({
                       exercises={problemSet}
                       onSolved={(id) => setSolvedEx(new Set(markMasterySolved(id)))}
                       overrides={{ challenge: { heading: "🎯 Problems" } }}
+                      collapsible
+                      solved={solvedEx}
                       predictFirst={predictFirst}
                     />
                   </details>

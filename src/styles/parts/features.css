@@ -999,3 +999,14 @@ body.focus-mode .topbar {
     color: #000;
   }
 }
+
+/* A folded exercise section (ExerciseSections `collapsible`). */
+.exercise-fold {
+  margin: 8px 0;
+  border-top: 1px solid var(--border);
+  padding-top: 6px;
+}
+.exercise-fold > summary {
+  cursor: pointer;
+  padding: 4px 0;
+}
