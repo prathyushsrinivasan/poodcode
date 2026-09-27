@@ -28,3 +28,4 @@
 @import "./parts/reader.css"; /* Lesson outline, reading progress (G4) */
 @import "./parts/learn.css"; /* Learn library, chapters, 日本語 (G6) */
 @import "./parts/projects.css"; /* Projects track (G7) */
+@import "./parts/mastery.css"; /* 6-Month Mastery */

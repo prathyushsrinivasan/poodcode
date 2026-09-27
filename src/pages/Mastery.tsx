@@ -21,6 +21,7 @@ import { TsErrorLinks } from "../components/TsErrorLinks";
 import { DiffBadge, inlineCode } from "../components/common";
 import { QuizChoices } from "../components/QuizChoices";
 import { QuizCard } from "../components/exercise";
+import { Badge, Button, Card, EmptyState, ErrorState, Icon, PageHeader, ProgressBar, Segmented, type IconName } from "../components/ui";
 import { answerText, questionText } from "../lib/quizKinds";
 import {
   loadDoneChapters,
@@ -80,7 +81,6 @@ import {
   type ProgressMap,
   type WeekProgress,
 } from "../lib/mastery";
-import { EmptyState, ErrorState } from "../components/ui";
 import { ignore, loadFailed, saveFailed } from "../lib/failures";
 
 const TRACK_STORE_KEY = "poodcode:mastery-track";
@@ -428,72 +428,77 @@ export default function Mastery() {
 
   return (
     <div className="page">
-      <div className="row" style={{ justifyContent: "space-between", alignItems: "flex-start" }}>
-        <h1 className="page-title">🎓 {track.title}</h1>
-        {tracks.length > 1 && (
-          <div className="row" style={{ gap: 6 }}>
-            {tracks.map((t) => (
-              <button
-                key={t.key}
-                className={t.key === track.key ? "" : "ghost"}
-                onClick={() => pickTrack(t.key)}
-              >
-                {t.title}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-      <p className="page-sub">{track.subtitle}</p>
+      <PageHeader
+        title={track.title}
+        subtitle={track.subtitle}
+        actions={
+          tracks.length > 1 && (
+            <Segmented
+              label="Programme"
+              value={track.key}
+              onChange={pickTrack}
+              options={tracks.map((t) => ({ value: t.key, label: t.title }))}
+            />
+          )
+        }
+      />
 
-      <div className="card" style={{ marginBottom: 18 }}>
-        <p style={{ marginTop: 0 }}>{track.intro}</p>
-        <div className="row" style={{ gap: 22, flexWrap: "wrap", marginTop: 12 }}>
-          <span>
-            <strong style={{ fontSize: 22 }}>{completedWeeks}</strong>
-            <span className="dim"> / {core.length} weeks done</span>
-          </span>
-          <span>
-            <strong style={{ fontSize: 22 }}>{currentWeek}</strong>
-            <span className="dim"> current week</span>
-          </span>
-          <span>
-            <strong style={{ fontSize: 22 }}>{formatStudyTime(totalStudy)}</strong>
-            <span className="dim"> studied here</span>
-          </span>
-          <span>
-            <strong style={{ fontSize: 22 }}>{track.pass_mark}%</strong>
-            <span className="dim"> pass mark</span>
-          </span>
-        </div>
-        <Bar percent={Math.round((completedWeeks / core.length) * 100)} />
-        <details style={{ marginTop: 8 }}>
-          <summary className="dim quiz-note">📡 Skills — what kinds of work you have done</summary>
+      <Card className="unit-block mastery-summary">
+        <p className="mastery-intro">{track.intro}</p>
+        <dl className="mastery-stats">
+          <div>
+            <dt>Weeks done</dt>
+            <dd>
+              {completedWeeks}
+              <span className="dim"> / {core.length}</span>
+            </dd>
+          </div>
+          <div>
+            <dt>Current week</dt>
+            <dd>{currentWeek}</dd>
+          </div>
+          <div>
+            <dt>Studied here</dt>
+            <dd>{formatStudyTime(totalStudy)}</dd>
+          </div>
+          <div>
+            <dt>Pass mark</dt>
+            <dd>{track.pass_mark}%</dd>
+          </div>
+        </dl>
+        <ProgressBar
+          value={completedWeeks}
+          max={core.length}
+          tone={completedWeeks === core.length ? "good" : "accent"}
+          label="Weeks of the programme done"
+        />
+        <details className="mastery-skills">
+          <summary className="dim quiz-note">Skills — what kinds of work you have done</summary>
           <SkillRadar skills={skillProfile(track, solvedAll, perWeek)} />
         </details>
-        <div className="row" style={{ gap: 6, marginTop: 8, justifyContent: "flex-end" }}>
-          <button className="ghost" onClick={exportJson} title="Save every week's progress as JSON — for a portfolio or a mentor.">
-            ⬇ Export progress
-          </button>
-          <button className="ghost" onClick={copyMarkdown} title="Copy a progress table you can paste anywhere.">
-            📋 Copy as Markdown
-          </button>
+        <div className="mastery-summary-actions">
+          <Button variant="ghost" size="sm" icon="download" onClick={exportJson} title="Save every week's progress as JSON — for a portfolio or a mentor.">
+            Export progress
+          </Button>
+          <Button variant="ghost" size="sm" icon="copy" onClick={copyMarkdown} title="Copy a progress table you can paste anywhere.">
+            Copy as Markdown
+          </Button>
         </div>
 
         {pace ? (
-          <p className="dim" style={{ margin: "12px 0 0", fontSize: 13 }}>
+          <p className="section-lead mastery-pace">
             Started {new Date(startedRaw!).toLocaleDateString()} · the calendar says{" "}
             <strong>Week {pace.scheduledWeek}</strong> ·{" "}
             {pace.weeksBehind > 0 ? (
-              <span style={{ color: "var(--bad)" }}>
+              <span className="is-bad">
                 {pace.weeksBehind} week{pace.weeksBehind > 1 ? "s" : ""} behind
               </span>
             ) : pace.weeksBehind < 0 ? (
-              <span style={{ color: "var(--good)" }}>
+              <span className="is-good">
                 {-pace.weeksBehind} week{pace.weeksBehind < -1 ? "s" : ""} ahead
               </span>
             ) : (
-              <span style={{ color: "var(--good)" }}>on track</span>
+              <span className="is-good">on track</span>
             )}
             {!finished && (
               <> · at this pace you finish {pace.projectedFinish.toLocaleDateString()}</>
@@ -503,36 +508,36 @@ export default function Mastery() {
                 {" · "}
                 <button className="linklike" onClick={flipPause} title="A holiday stops the calendar: paused days never count against your pace.">
                   {pause.pausedAt
-                    ? `▶ resume (paused since ${new Date(pause.pausedAt).toLocaleDateString()})`
-                    : "⏸ pause for a holiday"}
+                    ? `resume (paused since ${new Date(pause.pausedAt).toLocaleDateString()})`
+                    : "pause for a holiday"}
                 </button>
               </>
             )}
           </p>
         ) : (
-          <div className="row" style={{ marginTop: 12, gap: 10, alignItems: "center" }}>
-            <button onClick={beginTrack}>Start the programme</button>
-            <span className="dim" style={{ fontSize: 12 }}>
-              Sets today as week 1 so pacing and a finish date can be tracked.
-            </span>
+          <div className="exercise-actions mastery-pace">
+            <Button variant="primary" icon="run" onClick={beginTrack}>
+              Start the programme
+            </Button>
+            <span className="exercise-note">Sets today as week 1 so pacing and a finish date can be tracked.</span>
           </div>
         )}
-      </div>
+      </Card>
 
       {plan.length > 0 && current && (
-        <div className="card mastery-today" style={{ marginBottom: 18 }}>
-          <div className="io-label" style={{ color: "var(--accent)" }}>
-            📅 Today, at your pace — Week {current.week}: {current.title}
+        <div className="card card-accent mastery-today unit-block">
+          <div className="io-label is-accent">
+            <Icon name="target" size={13} /> Today, at your pace — Week {current.week}: {current.title}
           </div>
-          <ol style={{ margin: "4px 0 6px" }}>
+          <ol className="unit-list">
             {plan.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ol>
-          <div className="row" style={{ gap: 8, alignItems: "center" }}>
-            <button className="ghost" onClick={() => openWeek(current.week)}>
+          <div className="exercise-actions">
+            <Button variant="ghost" iconRight="forward" onClick={() => openWeek(current.week)}>
               Open Week {current.week}
-            </button>
+            </Button>
             <span className="dim quiz-note">
               {effStart
                 ? `What is left of this week, spread over the ${daysLeftInWeek(effStart, currentWeek)} day(s) left in it.`
@@ -542,28 +547,37 @@ export default function Mastery() {
         </div>
       )}
 
-      <div className="row" style={{ gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="🔎 Search the programme — a topic, a chapter, a keyword"
-          style={{ flex: 1, maxWidth: 460 }}
-          aria-label="Search the programme"
-        />
-        {hits.length > 0 && <span className="dim quiz-note">{hits.length} week{hits.length === 1 ? "" : "s"}</span>}
+      <div className="learn-filters" role="search">
+        <label className="learn-search">
+          <Icon name="search" size={15} />
+          <span className="sr-only">Search the programme</span>
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search the programme — a topic, a chapter, a keyword"
+          />
+        </label>
+        {hits.length > 0 && (
+          <span className="exercise-note" role="status">
+            {hits.length} week{hits.length === 1 ? "" : "s"}
+          </span>
+        )}
       </div>
       {hits.length > 0 && (
-        <div className="card" style={{ marginBottom: 18 }}>
-          {hits.slice(0, 12).map((w) => (
-            <div key={w.week} className="row" style={{ gap: 8, alignItems: "baseline", margin: "4px 0" }}>
-              <button className="linklike" onClick={() => openWeek(w.week)}>
-                Week {w.week} — {w.title}
-              </button>
-              <span className="dim quiz-note">{w.phase}</span>
-              {!unlocked.has(w.week) && <span className="dim quiz-note">🔒</span>}
-            </div>
-          ))}
-        </div>
+        <Card className="unit-block">
+          <ul className="mastery-hits">
+            {hits.slice(0, 12).map((w) => (
+              <li key={w.week}>
+                <button type="button" className="link-button" onClick={() => openWeek(w.week)}>
+                  Week {w.week} — {w.title}
+                </button>
+                <span className="exercise-note">{w.phase}</span>
+                {!unlocked.has(w.week) && <Icon name="locked" size={12} label="Locked" />}
+              </li>
+            ))}
+          </ul>
+        </Card>
       )}
 
       {completedWeeks === 0 && (
@@ -633,9 +647,9 @@ function QuestionStats() {
   const [open, setOpen] = useState(false);
   const flagged = open ? flaggedQuestions(quizStats()) : null;
   return (
-    <details className="card mastery-practice" style={{ marginTop: 18 }} onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}>
+    <details className="card mastery-practice mastery-stats-panel" onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}>
       <summary>
-        <strong>🔬 Question stats</strong>{" "}
+        <strong>Question stats</strong>{" "}
         <span className="dim quiz-note">which questions you keep missing, and which you never miss</span>
       </summary>
       {flagged && (
@@ -643,20 +657,20 @@ function QuestionStats() {
           <div className="io-label">Missed most — a real gap, or an ambiguous question</div>
           {flagged.missed.length === 0 && <p className="dim quiz-note">Nothing yet — a question needs two sittings.</p>}
           {flagged.missed.slice(0, 15).map((r) => (
-            <div key={r.question} className="quiz-note" style={{ margin: "3px 0" }}>
-              <span className="badge" style={{ color: "var(--bad)" }}>
+            <div key={r.question} className="quiz-note mastery-stat-row">
+              <Badge tone="bad">
                 {r.right}/{r.attempts}
-              </span>{" "}
+              </Badge>{" "}
               {inlineCode(r.question)}
             </div>
           ))}
-          <div className="io-label" style={{ marginTop: 10 }}>Never missed — maybe too easy</div>
+          <div className="io-label">Never missed — maybe too easy</div>
           {flagged.tooEasy.length === 0 && <p className="dim quiz-note">Nothing yet — a question needs three sittings.</p>}
           {flagged.tooEasy.slice(0, 15).map((r) => (
-            <div key={r.question} className="quiz-note" style={{ margin: "3px 0" }}>
-              <span className="badge" style={{ color: "var(--good)" }}>
+            <div key={r.question} className="quiz-note mastery-stat-row">
+              <Badge tone="good">
                 {r.right}/{r.attempts}
-              </span>{" "}
+              </Badge>{" "}
               {inlineCode(r.question)}
             </div>
           ))}
@@ -666,23 +680,22 @@ function QuestionStats() {
   );
 }
 
-function Bar({ percent }: { percent: number }) {
+function Bar({ percent, label }: { percent: number; label: string }) {
   return (
-    <div className="progress-track" title={`${percent}%`}>
-      <div
-        className="progress-fill"
-        style={{
-          width: `${percent}%`,
-          background: percent === 100 ? "var(--good)" : "var(--accent)",
-        }}
-      />
-    </div>
+    <ProgressBar
+      className="week-bar"
+      value={percent}
+      max={100}
+      tone={percent === 100 ? "good" : "accent"}
+      label={label}
+      size="sm"
+    />
   );
 }
 
 type SpineItem = {
   id: string;
-  icon: string;
+  icon: IconName;
   label: string;
   detail: string;
   done: boolean;
@@ -787,22 +800,20 @@ function WeekCard({
     // X-75: a sealed week still shows where the programme goes.
     return (
       <div className="card week-card locked" id={`week-${week.week}`} ref={cardRef}>
-        <div className="row" style={{ alignItems: "flex-start", gap: 10 }}>
-          <span className="week-num">🔒</span>
-          <div>
+        <div className="week-head is-locked">
+          <span className="week-num">
+            <Icon name="locked" size={14} label="Locked" />
+          </span>
+          <div className="week-head-text">
             <strong className="dim">
               Week {week.week} — {week.title}
             </strong>
-            <p className="dim" style={{ margin: "4px 0 0", fontSize: 13 }}>
-              {week.goal}
-            </p>
+            <p className="week-goal">{week.goal}</p>
             {week.concepts.length > 0 && (
-              <p className="dim quiz-note" style={{ margin: "4px 0 0" }}>
-                Chapters: {week.concepts.map((k) => conceptByKey.get(k)?.name ?? k).join(" · ")}
-              </p>
+              <p className="exercise-note">Chapters: {week.concepts.map((k) => conceptByKey.get(k)?.name ?? k).join(" · ")}</p>
             )}
-            <p className="dim quiz-note" style={{ margin: "4px 0 0" }}>
-              🔒 Opens when Week {week.week - 1} is finished — every chapter marked done, the quiz passed at{" "}
+            <p className="exercise-note">
+              Opens when Week {week.week - 1} is finished — every chapter marked done, the quiz passed at{" "}
               {track.pass_mark}%, and its coding final accepted.
             </p>
           </div>
@@ -843,7 +854,7 @@ function WeekCard({
   if (week.concepts.length > 0) {
     spine.push({
       id: "read",
-      icon: "📘",
+      icon: "learn",
       label: "Read",
       detail: `${progress.conceptsDone}/${progress.conceptsTotal}`,
       done: progress.conceptsDone === progress.conceptsTotal,
@@ -853,7 +864,7 @@ function WeekCard({
   if (practice.length + warmup.length > 0) {
     spine.push({
       id: "practice",
-      icon: "🧩",
+      icon: "edit",
       label: "Practise",
       detail: `${practiceSolved + warmupSolved}/${practice.length + warmup.length}`,
       done: practiceSolved + warmupSolved === practice.length + warmup.length,
@@ -862,27 +873,27 @@ function WeekCard({
   if (week.problems.length + problemSet.length > 0) {
     spine.push({
       id: "problems",
-      icon: "🎯",
+      icon: "target",
       label: "Problems",
       detail: `${progress.problemsSolved + setSolved}/${week.problems.length + problemSet.length}`,
       done: progress.problemsSolved + setSolved === week.problems.length + problemSet.length,
     });
   }
   if (week.project) {
-    spine.push({ id: "project", icon: "🔨", label: "Project", detail: progress.projectDone ? "shipped" : "open", done: progress.projectDone });
+    spine.push({ id: "project", icon: "build", label: "Project", detail: progress.projectDone ? "shipped" : "open", done: progress.projectDone });
   }
   spine.push({
     id: "quiz",
-    icon: "📝",
+    icon: "checklist",
     label: "Quiz",
     detail: progress.score === null ? "—" : `${progress.score}%`,
     done: progress.quizPassed,
     gate: true,
   });
   if (week.exam) {
-    spine.push({ id: "final", icon: "🧪", label: "Final", detail: progress.examPassed ? "passed" : "—", done: progress.examPassed, gate: true });
+    spine.push({ id: "final", icon: "playground", label: "Final", detail: progress.examPassed ? "passed" : "—", done: progress.examPassed, gate: true });
   }
-  spine.push({ id: "notes", icon: "🗒", label: "Notes", detail: notes.trim() ? "✎" : "", done: true });
+  spine.push({ id: "notes", icon: "notes", label: "Notes", detail: notes.trim() ? "✎" : "", done: true });
 
   const go = (id: string) =>
     document.getElementById(anchor(id))?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -893,76 +904,41 @@ function WeekCard({
   });
 
   return (
-    <div
-      className="card week-card"
-      id={`week-${week.week}`}
-      ref={cardRef}
-      style={{ borderColor: progress.complete ? "var(--good)" : undefined }}
-    >
-      <div
-        className="row"
-        style={{ alignItems: "center", gap: 10, cursor: "pointer" }}
-        onClick={() => setOpen((o) => !o)}
-      >
-        <span
-          className="week-num"
-          style={
-            progress.complete
-              ? { background: "var(--good)", borderColor: "var(--good)", color: "#fff" }
-              : undefined
-          }
-        >
-          {progress.complete ? "✓" : week.week}
+    <div className={`card week-card ${progress.complete ? "is-complete" : ""}`} id={`week-${week.week}`} ref={cardRef}>
+      {/* The whole header toggles the week — a button, so Tab and Enter do too (D3). */}
+      <button type="button" className="week-head" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+        <span className={`week-num ${progress.complete ? "complete" : ""}`}>
+          {progress.complete ? <Icon name="check" size={14} label="Complete" /> : week.week}
         </span>
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <span className="week-head-text">
           <strong>
             Week {week.week} — {week.title}
           </strong>
           {week.optional && (
-            <span className="badge" style={{ marginLeft: 8 }} title="After the programme proper — it never counts toward your total or pace.">
+            <Badge className="week-optional" title="After the programme proper — it never counts toward your total or pace.">
               optional
-            </span>
+            </Badge>
           )}
-          <p className="dim" style={{ margin: "3px 0 0", fontSize: 13 }}>
-            {week.goal}
-          </p>
-        </div>
-        <span className="row" style={{ gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
-          {progress.conceptsTotal > 0 && (
-            <span className="badge">
-              {progress.conceptsDone}/{progress.conceptsTotal} chapters
-            </span>
-          )}
-          <span className="badge">
-            {progress.problemsSolved}/{progress.problemsTotal} problems
-          </span>
-          <span
-            className="badge"
-            style={
-              progress.quizPassed
-                ? { borderColor: "var(--good)", color: "var(--good)" }
-                : { borderColor: "var(--accent)", color: "var(--accent)" }
-            }
-          >
-            {progress.score === null ? "quiz —" : `quiz ${progress.score}%`}
-          </span>
-          <span
-            className="badge"
-            style={
-              progress.examPassed
-                ? { borderColor: "var(--good)", color: "var(--good)" }
-                : { borderColor: "var(--accent)", color: "var(--accent)" }
-            }
-          >
-            {progress.examPassed ? "final ✓" : "final —"}
-          </span>
-          <span className={`caret ${open ? "open" : ""}`} aria-hidden>
-            ▸
-          </span>
+          <span className="week-goal">{week.goal}</span>
         </span>
-      </div>
+        <span className="week-badges">
+          {progress.conceptsTotal > 0 && (
+            <Badge>
+              {progress.conceptsDone}/{progress.conceptsTotal} chapters
+            </Badge>
+          )}
+          <Badge>
+            {progress.problemsSolved}/{progress.problemsTotal} problems
+          </Badge>
+          <Badge tone={progress.quizPassed ? "good" : "accent"}>
+            {progress.score === null ? "quiz —" : `quiz ${progress.score}%`}
+          </Badge>
+          <Badge tone={progress.examPassed ? "good" : "accent"}>{progress.examPassed ? "final ✓" : "final —"}</Badge>
+          <Icon name="chevronRight" size={14} className={`caret ${open ? "open" : ""}`} />
+        </span>
+      </button>
 
-      <Bar percent={progress.percent} />
+      <Bar percent={progress.percent} label={`Week ${week.week} progress`} />
 
       {open && (
         <div className="week-body">
@@ -975,7 +951,7 @@ function WeekCard({
                 onClick={() => go(s.id)}
                 title={s.gate ? "Part of the week's gate" : "Optional"}
               >
-                <span aria-hidden>{s.done && s.id !== "notes" ? "✓" : s.icon}</span>
+                <Icon name={s.done && s.id !== "notes" ? "check" : s.icon} size={14} />
                 <span className="week-spine-label">{s.label}</span>
                 <span className="week-spine-detail">{s.detail}</span>
                 {s.gate && !s.done && <span className="week-spine-gate">gate</span>}
@@ -988,18 +964,18 @@ function WeekCard({
 
           <div className="week-content">
             {week.week <= 8 && track.key === "typescript" && (
-              <label className="dim quiz-note" style={{ display: "flex", gap: 6, alignItems: "center", margin: "0 0 6px" }}>
+              <label className="dim quiz-note mastery-toggle-row">
                 <input
                   type="checkbox"
                   checked={predictFirst}
                   onChange={(e) => saveSetting(predictKey, e.target.checked ? "1" : "0")}
                 />
-                🔮 Predict first — before each run of a practice exercise or problem, write what it will print
+                Predict first — before each run of a practice exercise or problem, write what it will print
                 {predictionLog().length > 0 && ` (${predictionLog().length} learning moments logged)`}
               </label>
             )}
-            <p className="dim quiz-note" style={{ marginTop: 0, color: budget.over ? "var(--bad)" : undefined }}>
-              ⏱ {budget.text}
+            <p className={`dim quiz-note mastery-line ${budget.over ? "is-bad" : ""}`}>
+              <Icon name="clock" size={12} /> {budget.text}
               {budget.over && " — more than twice the plan. Worth asking what slowed you down."}
               {retried && (
                 <span className="dim">
@@ -1011,8 +987,8 @@ function WeekCard({
             </p>
 
             {weekTools(track.key, week.week).length > 0 && (
-              <p className="dim quiz-note" style={{ marginTop: 0 }}>
-                🧰 Tools for this week:{" "}
+              <p className="dim quiz-note mastery-line">
+                <Icon name="tools" size={12} /> Tools for this week:{" "}
                 {weekTools(track.key, week.week).map((t, k) => (
                   <span key={t.label}>
                     {k > 0 && " · "}
@@ -1025,8 +1001,8 @@ function WeekCard({
             )}
 
             {(links.course.length > 0 || links.dsa.length > 0 || links.projects.length > 0) && (
-              <p className="dim quiz-note" style={{ marginTop: 0 }}>
-                🔗 Elsewhere in the app:{" "}
+              <p className="dim quiz-note mastery-line">
+                <Icon name="external" size={12} /> Elsewhere in the app:{" "}
                 {links.course.map((n, k) => (
                   <span key={`c${n}`}>
                     {k > 0 && " · "}
@@ -1053,7 +1029,7 @@ function WeekCard({
 
             {strictStep && (
               <div className="card strict-step">
-                <strong>🔒 From this week on, the compiler is stricter.</strong> Every final, project and exercise is
+                <strong>From this week on, the compiler is stricter.</strong> Every final, project and exercise is
                 checked with <code>noUncheckedIndexedAccess</code>: reading <code>xs[i]</code> or{" "}
                 <code>record[key]</code> gives <code>T | undefined</code> until you deal with the missing case.{" "}
                 <Link to="/playground/ts">Try the flag in the playground</Link>.
@@ -1062,52 +1038,37 @@ function WeekCard({
 
             {week.concepts.length > 0 && (
               <section {...section("read")}>
-                <div className="io-label">📘 Chapters to study</div>
-                <div className="grid cols-2" style={{ marginBottom: 14 }}>
+                <div className="io-label">
+                  <Icon name="learn" size={13} /> Chapters to study
+                </div>
+                <ul className="mastery-items">
                   {week.concepts.map((key) => {
                     const c = conceptByKey.get(key);
                     const isDone = done.has(key);
                     return (
-                      <div
-                        key={key}
-                        className="card"
-                        style={{
-                          marginBottom: 0,
-                          cursor: "pointer",
-                          borderColor: isDone ? "var(--good)" : undefined,
-                        }}
-                        onClick={() => nav(`/learn/${key}`)}
-                      >
-                        <div className="row" style={{ justifyContent: "space-between", gap: 8 }}>
-                          <strong>
-                            {isDone && <span style={{ color: "var(--good)" }}>✓ </span>}
-                            {c?.name ?? key}
-                          </strong>
-                          <button
-                            className="ghost"
-                            style={{
-                              padding: "2px 8px",
-                              fontSize: 11,
-                              borderColor: isDone ? "var(--good)" : undefined,
-                              color: isDone ? "var(--good)" : undefined,
-                            }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onToggleChapter(key);
-                            }}
+                      <li key={key} className={`card mastery-item ${isDone ? "is-done" : ""}`}>
+                        <span className="mastery-item-head">
+                          {/* Stretched over the card: the whole card opens the
+                              chapter, and it is still one real link (D3). */}
+                          <Link className="stretched-link" to={`/learn/${key}`}>
+                            {isDone && <Icon name="done" size={14} label="Done" className="is-good" />}
+                            <strong>{c?.name ?? key}</strong>
+                          </Link>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className={`above-stretch ${isDone ? "is-good" : ""}`}
+                            aria-pressed={isDone}
+                            onClick={() => onToggleChapter(key)}
                           >
                             {isDone ? "Done" : "Mark done"}
-                          </button>
-                        </div>
-                        {c?.what && (
-                          <p className="dim" style={{ margin: "6px 0 0", fontSize: 12 }}>
-                            {c.what}
-                          </p>
-                        )}
-                      </div>
+                          </Button>
+                        </span>
+                        {c?.what && <span className="mastery-item-what">{c.what}</span>}
+                      </li>
                     );
                   })}
-                </div>
+                </ul>
               </section>
             )}
 
@@ -1116,7 +1077,7 @@ function WeekCard({
                 {warmup.length > 0 && (
                   <details className="card mastery-practice">
                     <summary>
-                      <strong>🔁 Warm-up from earlier weeks</strong>{" "}
+                      <strong>Warm-up from earlier weeks</strong>{" "}
                       <span className="dim quiz-note">
                         {warmupSolved}/{warmup.length} solved · from earlier weeks, plus anything you failed
                         twice and have not solved yet — interleaving is what makes it stick
@@ -1131,7 +1092,7 @@ function WeekCard({
                 {practice.length > 0 && (
                   <details className="card mastery-practice">
                     <summary>
-                      <strong>🧩 Practice</strong>{" "}
+                      <strong>Practice</strong>{" "}
                       <span className="dim quiz-note">
                         {practiceSolved}/{practice.length} solved · optional — not part of the week's gate
                       </span>
@@ -1157,46 +1118,35 @@ function WeekCard({
               <section {...section("problems")}>
                 {week.problems.length > 0 && (
                   <>
-                    <div className="io-label">🎯 Problems to solve</div>
-                    <div className="grid cols-2" style={{ marginBottom: 14 }}>
+                    <div className="io-label">
+                      <Icon name="target" size={13} /> Problems to solve
+                    </div>
+                    <ul className="mastery-items">
                       {week.problems.map((ref) => {
                         const p = problemBySlug.get(ref.slug);
                         if (!p) return null;
                         const solved = p.solved_status === "solved";
                         return (
-                          <div
-                            key={ref.slug}
-                            className="card"
-                            style={{
-                              marginBottom: 0,
-                              cursor: "pointer",
-                              borderColor: solved ? "var(--good)" : undefined,
-                            }}
-                            onClick={() => nav(`/solve/${p.id}`)}
-                          >
-                            <div className="row" style={{ justifyContent: "space-between", gap: 8 }}>
-                              <strong>
-                                {solved && <span style={{ color: "var(--good)" }}>✓ </span>}
-                                {p.title}
-                              </strong>
+                          <li key={ref.slug} className={`card mastery-item ${solved ? "is-done" : ""}`}>
+                            <span className="mastery-item-head">
+                              <Link className="stretched-link" to={`/solve/${p.id}`}>
+                                {solved && <Icon name="done" size={14} label="Solved" className="is-good" />}
+                                <strong>{p.title}</strong>
+                              </Link>
                               <DiffBadge d={p.difficulty} />
-                            </div>
-                            {ref.note && (
-                              <p className="dim" style={{ margin: "6px 0 0", fontSize: 12 }}>
-                                {ref.note}
-                              </p>
-                            )}
-                          </div>
+                            </span>
+                            {ref.note && <span className="mastery-item-what">{ref.note}</span>}
+                          </li>
                         );
                       })}
-                    </div>
+                    </ul>
                   </>
                 )}
 
                 {problemSet.length > 0 && (
                   <details className="card mastery-practice">
                     <summary>
-                      <strong>🏋️ Problem set</strong>{" "}
+                      <strong>Problem set</strong>{" "}
                       <span className="dim quiz-note">
                         {setSolved}/{problemSet.length} solved · warm-up, core and stretch · optional —
                         not part of the week's gate
@@ -1210,7 +1160,7 @@ function WeekCard({
                     <ExerciseSections
                       exercises={problemSet}
                       onSolved={(id) => setSolvedEx(new Set(markMasterySolved(id)))}
-                      overrides={{ challenge: { heading: "🎯 Problems" } }}
+                      overrides={{ challenge: { heading: "Problems" } }}
                       collapsible
                       solved={solvedEx}
                       predictFirst={predictFirst}
@@ -1240,8 +1190,8 @@ function WeekCard({
 
                 {week.arc_project && (
                   <>
-                    <div className="io-label" style={{ marginTop: 4 }}>
-                      🧵 The arc project — one ledger that grows all programme
+                    <div className="io-label">
+                      <Icon name="layers" size={13} /> The arc project — one ledger that grows all programme
                     </div>
                     <ProjectPanel
                       workspaceId={`${track.key}-w${week.week}-arc`}
@@ -1261,7 +1211,9 @@ function WeekCard({
                   <div className="card mastery-checkpoint">
                     <div className="row wrap">
                       <div>
-                        <strong>⏱ {week.contest.title}</strong>
+                        <strong>
+                          <Icon name="timer" size={14} /> {week.contest.title}
+                        </strong>
                         <div className="dim quiz-note">
                           {Math.round(week.contest.duration_seconds / 60)} minutes ·{" "}
                           {(week.contest.slugs?.length ?? 0) > 0
@@ -1271,23 +1223,23 @@ function WeekCard({
                         </div>
                       </div>
                       <span className="spacer" />
-                      <button
+                      <Button
+                        variant="primary"
+                        icon="timer"
                         onClick={async () => {
                           try {
                             const id = await api.masteryStartContest(track.key, week.week);
                             nav(`/contest/${id}`);
                           } catch (e) {
-                            toast(`Could not start the checkpoint: ${e}`);
+                            toast.error("Could not start the checkpoint", { detail: String(e) });
                           }
                         }}
                       >
                         Start the checkpoint
-                      </button>
+                      </Button>
                     </div>
-                    <details style={{ marginTop: 8 }}>
-                      <summary className="quiz-note">
-                        📝 The checkpoint quiz — 20 questions from the whole month
-                      </summary>
+                    <details className="mastery-sub">
+                      <summary className="quiz-note">The checkpoint quiz — 20 questions from the whole month</summary>
                       <MixedQuiz
                         weeks={monthWeeks}
                         size={20}
@@ -1296,9 +1248,9 @@ function WeekCard({
                       />
                     </details>
                     {monthPuzzles.length > 0 && (
-                      <details style={{ marginTop: 8 }}>
+                      <details className="mastery-sub">
                         <summary className="quiz-note">
-                          🧬 The type-challenge section — {monthPuzzles.length} puzzles from the month
+                          The type-challenge section — {monthPuzzles.length} puzzles from the month
                         </summary>
                         <ExerciseSections
                           exercises={monthPuzzles}
@@ -1314,8 +1266,9 @@ function WeekCard({
             <CapstonePractice week={week} trackKey={track.key} />
 
             {(week.flashcards?.length ?? 0) > 0 && (
-              <p className="dim quiz-note">
-                🃏 {progress.complete ? (
+              <p className="dim quiz-note mastery-line">
+                <Icon name="layers" size={12} />{" "}
+                {progress.complete ? (
                   <>
                     This week's {week.flashcards!.length} review cards are in{" "}
                     <Link to="/flashcards">Flashcards</Link>.
@@ -1354,16 +1307,19 @@ function WeekCard({
               </section>
             )}
 
-            <section {...section("notes")} style={{ marginTop: 14 }}>
-              <div className="io-label">🗒 Your notes for this week</div>
+            <section {...section("notes")} className="mastery-notes">
+              <label className="io-label" htmlFor={`notes-${week.week}`}>
+                <Icon name="notes" size={13} /> Your notes for this week
+              </label>
               <textarea
+                id={`notes-${week.week}`}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 onBlur={() => {
                   if (notes !== (settings[notesKey] ?? "")) saveSetting(notesKey, notes);
                 }}
                 placeholder="What clicked, what didn't, what to revisit. Saved with your backups."
-                style={{ width: "100%", minHeight: 80 }}
+                className="mastery-notes-text"
               />
             </section>
           </div>

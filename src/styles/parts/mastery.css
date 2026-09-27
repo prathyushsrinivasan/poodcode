@@ -1,0 +1,213 @@
+/* ========================================================================
+   6-Month Mastery (UI_ROADMAP C2, D3)
+   ======================================================================== */
+
+.mastery-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.mastery-intro {
+  margin: 0;
+}
+.mastery-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+}
+.mastery-stats dt {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-dim);
+}
+.mastery-stats dd {
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+.mastery-summary-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+.mastery-pace {
+  margin: 0;
+}
+.mastery-hits {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.mastery-hits li {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+.mastery-stats-panel {
+  margin-top: var(--space-4);
+}
+.mastery-stat-row {
+  margin: 3px 0;
+}
+
+/* ---- A week ---- */
+.week-card.is-complete {
+  border-color: var(--good);
+}
+.week-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+.week-head:hover:not(:disabled) {
+  background: none;
+  border: 0;
+}
+.week-head:hover:not(:disabled) strong {
+  color: var(--accent);
+}
+.week-head:active:not(:disabled) {
+  transform: none;
+}
+.week-head.is-locked {
+  align-items: flex-start;
+}
+.week-head-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+.week-goal {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--text-dim);
+}
+.week-optional {
+  margin-left: var(--space-2);
+}
+.week-badges {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-1);
+}
+.week-badges .caret {
+  color: var(--text-faint);
+  transition: transform var(--dur-1) var(--ease-out);
+}
+.week-badges .caret.open {
+  transform: rotate(90deg);
+}
+.week-num.complete {
+  background: var(--good);
+  border-color: var(--good);
+  color: var(--on-good);
+}
+.week-bar {
+  margin-top: var(--space-3);
+}
+.mastery-toggle-row {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  margin: 0 0 var(--space-2);
+}
+.mastery-line {
+  margin-top: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1);
+}
+.mastery-line .icon {
+  align-self: center;
+}
+.mastery-sub {
+  margin-top: var(--space-2);
+}
+.mastery-notes {
+  margin-top: var(--space-4);
+}
+.mastery-notes-text {
+  width: 100%;
+  min-height: 80px;
+}
+
+/* ---- Chapter and problem cards: one stretched link each ---- */
+.mastery-items {
+  list-style: none;
+  margin: var(--space-1) 0 var(--space-4);
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-3);
+}
+.mastery-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  transition: border-color var(--dur-1) var(--ease-out), background var(--dur-1) var(--ease-out);
+}
+.mastery-item:hover {
+  border-color: var(--accent);
+  background: var(--bg-elev-2);
+}
+.mastery-item.is-done {
+  border-color: color-mix(in srgb, var(--good) 60%, var(--border));
+}
+.mastery-item-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+.mastery-item-what {
+  font-size: var(--text-xs);
+  color: var(--text-dim);
+}
+
+/* A link whose hit area is its whole card. The card is `position: relative`;
+   anything else in the card that is clickable sits above it. */
+.stretched-link {
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.stretched-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.stretched-link:hover {
+  text-decoration: none;
+}
+.stretched-link:focus-visible {
+  outline: none;
+}
+.stretched-link:focus-visible::after {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+.above-stretch {
+  position: relative;
+  z-index: 1;
+}
