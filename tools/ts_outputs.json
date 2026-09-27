@@ -8985,6 +8985,43 @@
    "count 3\nmin 7\nmax 7"
   ]
  },
+ "tsm-w1-fam-temps-1": {
+  "hash": "2f98055c62fe47eece51",
+  "outputs": [
+   "212.0",
+   "32.0",
+   "-40.0",
+   "97.9"
+  ]
+ },
+ "tsm-w1-fam-temps-2": {
+  "hash": "d6e82a5c5563e194415a",
+  "outputs": [
+   "32.0\n212.0\n-40.0",
+   "70.7"
+  ]
+ },
+ "tsm-w1-fam-temps-3": {
+  "hash": "ea95d35bebb6de249866",
+  "outputs": [
+   "0.0C -> 32.0F\n37.5C -> 99.5F",
+   "-10.0C -> 14.0F"
+  ]
+ },
+ "tsm-w1-fam-temps-4": {
+  "hash": "4e613cfec7d4ad807ddf",
+  "outputs": [
+   "212.0F\n100.0C\n-40.0F\n37.0C",
+   "-17.8C"
+  ]
+ },
+ "tsm-w1-fam-temps-5": {
+  "hash": "136550331ba7290fde7a",
+  "outputs": [
+   "min -40.0 max 212.0",
+   "min 41.0 max 41.0"
+  ]
+ },
  "tsm-w1-hours": {
   "hash": "89ad638de0384f60cbaf",
   "outputs": [
@@ -9163,6 +9200,46 @@
    "info=0 warn=1 error=0\nskipped 1"
   ]
  },
+ "tsm-w11-fam-settings-1": {
+  "hash": "0218932965d47302b3c1",
+  "outputs": [
+   "port 8080",
+   "port 3000"
+  ]
+ },
+ "tsm-w11-fam-settings-2": {
+  "hash": "8c3a4bec69357aa413c9",
+  "outputs": [
+   "port 8080",
+   "invalid port 99999",
+   "invalid port eighty",
+   "port 3000"
+  ]
+ },
+ "tsm-w11-fam-settings-3": {
+  "hash": "775782a8c90fc0906a91",
+  "outputs": [
+   "retries 0",
+   "retries 5",
+   "retries 3"
+  ]
+ },
+ "tsm-w11-fam-settings-4": {
+  "hash": "cec120a54d7948298250",
+  "outputs": [
+   "db.local:6543",
+   "localhost:80",
+   "y:1"
+  ]
+ },
+ "tsm-w11-fam-settings-5": {
+  "hash": "d980f094f64fd11b93d2",
+  "outputs": [
+   "host=db.local (file)\nport=6543 (env)",
+   "host=localhost (default)\nport=80 (file)",
+   "host=localhost (default)\nport=3000 (default)"
+  ]
+ },
  "tsm-w11-mixed-lines": {
   "hash": "eef09d26bdd6d87ca3e6",
   "outputs": [
@@ -9267,6 +9344,41 @@
   "outputs": [
    "(1 + (2 * 3)) = 7\n-(2 - 7) = 5\nmax(4, min(9, 6)) = 6\n42 = 42",
    "error: bad atom )\nerror: bad operator ^\nerror: expected )\nerror: trailing input\nerror: bad atom x"
+  ]
+ },
+ "tsm-w12-fam-shapes-1": {
+  "hash": "8fffae126c1acf858979",
+  "outputs": [
+   "3.14\n6.00",
+   "3.00\n0.79"
+  ]
+ },
+ "tsm-w12-fam-shapes-2": {
+  "hash": "880cf42993f3b5b99283",
+  "outputs": [
+   "6.28\n10.00",
+   "7.00"
+  ]
+ },
+ "tsm-w12-fam-shapes-3": {
+  "hash": "4b50b713dbbb4c9e3a4b",
+  "outputs": [
+   "rect 6.00",
+   "circle 12.57"
+  ]
+ },
+ "tsm-w12-fam-shapes-4": {
+  "hash": "835d621fcafa7fdf394a",
+  "outputs": [
+   "6.00\n3.14\n4.00",
+   "1.73"
+  ]
+ },
+ "tsm-w12-fam-shapes-5": {
+  "hash": "345eb2db21af052b991e",
+  "outputs": [
+   "3.14\nskip\nskip\nskip\n6.00",
+   "skip"
   ]
  },
  "tsm-w12-http": {
@@ -9840,6 +9952,46 @@
    "invalid"
   ]
  },
+ "tsm-w2-fam-grades-1": {
+  "hash": "51f2294b3038069a583a",
+  "outputs": [
+   "A",
+   "B",
+   "C",
+   "F",
+   "A"
+  ]
+ },
+ "tsm-w2-fam-grades-2": {
+  "hash": "15be389c2561fb6d397b",
+  "outputs": [
+   "invalid",
+   "invalid",
+   "C",
+   "F"
+  ]
+ },
+ "tsm-w2-fam-grades-3": {
+  "hash": "66ff5e238f497d239864",
+  "outputs": [
+   "A B D F",
+   "C"
+  ]
+ },
+ "tsm-w2-fam-grades-4": {
+  "hash": "f0682f7e81457226d871",
+  "outputs": [
+   "A:2 B:1 C:1 D:1 F:1",
+   "A:1 B:0 C:0 D:0 F:0"
+  ]
+ },
+ "tsm-w2-fam-grades-5": {
+  "hash": "52d008f784f0f644e3ce",
+  "outputs": [
+   "A+ A- B+ C- D- F A+ B",
+   "D"
+  ]
+ },
  "tsm-w2-grade": {
   "hash": "f145cf21bc2ae66db9bd",
   "outputs": [
@@ -10070,6 +10222,41 @@
   "outputs": [
    "t=1 floor 1\nt=2 floor 2\nt=3 floor 3\nt=3 stop 3\nt=4 floor 2\nt=5 floor 1\nt=5 stop 1\nt=7 floor 0\nt=7 stop 0\nt=8 floor 1\nt=9 floor 2\nt=10 floor 3\nt=11 floor 4\nt=12 floor 5\nt=12 stop 5",
    "t=2 stop 0\nt=3 floor 1\nt=4 floor 2\nt=4 stop 2\nt=5 floor 1\nt=6 floor 0\nt=7 floor -1\nt=8 floor -2\nt=8 stop -2"
+  ]
+ },
+ "tsm-w23-fam-counter-1": {
+  "hash": "25b4e8166781bf0425b4",
+  "outputs": [
+   "3",
+   "1"
+  ]
+ },
+ "tsm-w23-fam-counter-2": {
+  "hash": "449666f6138e097382d8",
+  "outputs": [
+   "10",
+   "2"
+  ]
+ },
+ "tsm-w23-fam-counter-3": {
+  "hash": "32f0ba830368800f4c60",
+  "outputs": [
+   "1",
+   "1"
+  ]
+ },
+ "tsm-w23-fam-counter-4": {
+  "hash": "7c978ffbce5047a7add0",
+  "outputs": [
+   "1 2 1 0 0 1",
+   "1"
+  ]
+ },
+ "tsm-w23-fam-counter-5": {
+  "hash": "0b358d47b6c6d76d199a",
+  "outputs": [
+   "2",
+   "1"
   ]
  },
  "tsm-w23-library": {
@@ -10333,6 +10520,41 @@
    "25"
   ]
  },
+ "tsm-w26-fam-fetch-1": {
+  "hash": "c61dd0af4fc2213dc1c7",
+  "outputs": [
+   "user1\nuser2\nuser3",
+   "user7"
+  ]
+ },
+ "tsm-w26-fam-fetch-2": {
+  "hash": "8e7ddde9ae8b9478d9d6",
+  "outputs": [
+   "user1,user2,user3",
+   "user7"
+  ]
+ },
+ "tsm-w26-fam-fetch-3": {
+  "hash": "e31f4423da0221fd7208",
+  "outputs": [
+   "ok user1\nfailed bad id -2\nok user3",
+   "failed bad id -1"
+  ]
+ },
+ "tsm-w26-fam-fetch-4": {
+  "hash": "ae89391848529899337f",
+  "outputs": [
+   "user4",
+   "none"
+  ]
+ },
+ "tsm-w26-fam-fetch-5": {
+  "hash": "e26b73553e7e2cea2cbb",
+  "outputs": [
+   "user1,user2,user3,user4,user5",
+   "user9"
+  ]
+ },
  "tsm-w26-loader": {
   "hash": "a6680ed3f059b365d815",
   "outputs": [
@@ -10455,6 +10677,45 @@
    "10 1"
   ]
  },
+ "tsm-w3-fam-digits-1": {
+  "hash": "7acead8aed6094f5c0ec",
+  "outputs": [
+   "15",
+   "0",
+   "36"
+  ]
+ },
+ "tsm-w3-fam-digits-2": {
+  "hash": "b5720640118724238605",
+  "outputs": [
+   "5",
+   "7",
+   "1"
+  ]
+ },
+ "tsm-w3-fam-digits-3": {
+  "hash": "6e4f1776ba3b05862f52",
+  "outputs": [
+   "38 -> 11 -> 2",
+   "5",
+   "9875 -> 29 -> 11 -> 2"
+  ]
+ },
+ "tsm-w3-fam-digits-4": {
+  "hash": "f98fcca87fd00d0e729e",
+  "outputs": [
+   "2",
+   "30",
+   "0"
+  ]
+ },
+ "tsm-w3-fam-digits-5": {
+  "hash": "ac38333766094f4111f0",
+  "outputs": [
+   "19",
+   "7"
+  ]
+ },
  "tsm-w3-gcd": {
   "hash": "12e89aaf66ec71b25268",
   "outputs": [
@@ -10561,6 +10822,44 @@
    "ada@example.com\ngrace.h+work@mail.co.uk\n2 found",
    "0 found",
    "x@y.io\n1 found"
+  ]
+ },
+ "tsm-w4-fam-cases-1": {
+  "hash": "5278a099fc16c0df66c4",
+  "outputs": [
+   "The Quick Brown Fox",
+   "Hello World"
+  ]
+ },
+ "tsm-w4-fam-cases-2": {
+  "hash": "bfd6d55c7bf509b5c926",
+  "outputs": [
+   "userFirstName",
+   "aB",
+   "single"
+  ]
+ },
+ "tsm-w4-fam-cases-3": {
+  "hash": "a7c413197ea48a2f2695",
+  "outputs": [
+   "user-first-name",
+   "x",
+   "parse-h-t-t-p-body"
+  ]
+ },
+ "tsm-w4-fam-cases-4": {
+  "hash": "5dfe0993c4ef473d4bd3",
+  "outputs": [
+   "olleh dlrow ba",
+   "racecar"
+  ]
+ },
+ "tsm-w4-fam-cases-5": {
+  "hash": "4def9751a7e63c03bc06",
+  "outputs": [
+   "BW",
+   "PNG",
+   "SP"
   ]
  },
  "tsm-w4-justify": {
@@ -10671,6 +10970,41 @@
   "outputs": [
    "3\n3.14\n3.14m",
    "10\n10.0\n10.0kg"
+  ]
+ },
+ "tsm-w5-fam-tips-1": {
+  "hash": "e0fb7b76381146e57dc1",
+  "outputs": [
+   "tip 10.00 total 60.00",
+   "tip 3.00 total 22.99"
+  ]
+ },
+ "tsm-w5-fam-tips-2": {
+  "hash": "8acb6fee9037994dc2df",
+  "outputs": [
+   "tip 12.00 total 92.00",
+   "tip 8.00 total 88.00"
+  ]
+ },
+ "tsm-w5-fam-tips-3": {
+  "hash": "e7ae2619627b9be08f61",
+  "outputs": [
+   "tip 18.00 total 118.00 each 29.50",
+   "tip 9.00 total 69.00"
+  ]
+ },
+ "tsm-w5-fam-tips-4": {
+  "hash": "ce73d801091381b89e17",
+  "outputs": [
+   "total 55 tip 15.8%",
+   "total 110 tip 10.0%"
+  ]
+ },
+ "tsm-w5-fam-tips-5": {
+  "hash": "0032f45e735d5c027041",
+  "outputs": [
+   "1.50 3.00 4.58 sum 9.07",
+   "1.00 sum 1.00"
   ]
  },
  "tsm-w5-greet": {
@@ -10913,6 +11247,45 @@
    "solo 1\n1"
   ]
  },
+ "tsm-w7-fam-positions-1": {
+  "hash": "cae12cce2c3ab442987b",
+  "outputs": [
+   "1",
+   "0",
+   "0"
+  ]
+ },
+ "tsm-w7-fam-positions-2": {
+  "hash": "517da5b87cbe2a1a7dcd",
+  "outputs": [
+   "1 3",
+   "0"
+  ]
+ },
+ "tsm-w7-fam-positions-3": {
+  "hash": "e8737c5200848ba27ac7",
+  "outputs": [
+   "3",
+   "none",
+   "1"
+  ]
+ },
+ "tsm-w7-fam-positions-4": {
+  "hash": "46d60b6bb3ea99e03218",
+  "outputs": [
+   "3 4 5 1 2",
+   "2 3 1",
+   "9"
+  ]
+ },
+ "tsm-w7-fam-positions-5": {
+  "hash": "f81dbb31a3b880cd8a87",
+  "outputs": [
+   "3 5 7",
+   "",
+   "-3 0"
+  ]
+ },
  "tsm-w7-group-length": {
   "hash": "3bbc486eca8dd9f39e96",
   "outputs": [
@@ -11017,6 +11390,37 @@
    "A1: 3.00 (gift)\nB2: 11.50"
   ]
  },
+ "tsm-w8-fam-staff-1": {
+  "hash": "c907361963e8dc49ef65",
+  "outputs": [
+   "525"
+  ]
+ },
+ "tsm-w8-fam-staff-2": {
+  "hash": "ae7e10ef153e0d2d2340",
+  "outputs": [
+   "eng: 270\nhr: 70\nops: 185"
+  ]
+ },
+ "tsm-w8-fam-staff-3": {
+  "hash": "fa3139bd16ab45dbefd4",
+  "outputs": [
+   "eng: cy\nhr: ed\nops: di"
+  ]
+ },
+ "tsm-w8-fam-staff-4": {
+  "hash": "9cbdd50b903a46551e70",
+  "outputs": [
+   "{\"eng\":2,\"hr\":1,\"ops\":2}"
+  ]
+ },
+ "tsm-w8-fam-staff-5": {
+  "hash": "44dda75732b7b4df9fd4",
+  "outputs": [
+   "total 100\nmissing: gus,hal",
+   "total 525\nmissing: none"
+  ]
+ },
  "tsm-w8-flatten": {
   "hash": "751b25cf647cb9b0dab3",
   "outputs": [
@@ -11113,6 +11517,42 @@
   "outputs": [
    "a: b,c\nb: a,c\nc: a,b",
    "x: y\ny: x"
+  ]
+ },
+ "tsm-w9-fam-sets-1": {
+  "hash": "75099a5814262cba3f34",
+  "outputs": [
+   "blue red",
+   "none"
+  ]
+ },
+ "tsm-w9-fam-sets-2": {
+  "hash": "16cacd2f832b9042d0e5",
+  "outputs": [
+   "green",
+   "none"
+  ]
+ },
+ "tsm-w9-fam-sets-3": {
+  "hash": "514be1dea139a515ce60",
+  "outputs": [
+   "green yellow",
+   "none"
+  ]
+ },
+ "tsm-w9-fam-sets-4": {
+  "hash": "975871519177a3a65bd6",
+  "outputs": [
+   "0.50",
+   "0.00",
+   "1.00"
+  ]
+ },
+ "tsm-w9-fam-sets-5": {
+  "hash": "01971d7312536d1f9030",
+  "outputs": [
+   "blue 1\ngreen 2\nred 3",
+   "x 1"
   ]
  },
  "tsm-w9-first-repeat": {

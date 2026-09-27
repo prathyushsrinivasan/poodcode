@@ -1390,6 +1390,167 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w1-fam-temps-1",
+            "title": "Temperature table (1/5)",
+            "prompt": "The base problem. The input is a temperature in Celsius. Print it in Fahrenheit with one decimal (`F = C × 9/5 + 32`).",
+            "hint": "The reference solution is 2 lines and begins: `const c = Number(input);`",
+            "hints": [
+              "The reference solution is 2 lines and begins: `const c = Number(input);`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst c = Number(input);\nconsole.log(((c * 9) / 5 + 32).toFixed(1));\n",
+            "tests": [
+              {
+                "input": "100",
+                "output": "212.0"
+              },
+              {
+                "input": "0",
+                "output": "32.0"
+              },
+              {
+                "input": "-40",
+                "output": "-40.0"
+              },
+              {
+                "input": "36.6",
+                "output": "97.9"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w1-fam-temps-2",
+            "title": "Temperature table (2/5) — many values",
+            "prompt": "Twist 1: many values. The input is several Celsius values on one line. Print each in Fahrenheit, one decimal, one per line.",
+            "hint": "The answer begins `for (const t of input.split(/\\s+/)) console.log(((Number(t) …`",
+            "hints": [
+              "The answer begins `for (const t of input.split(/\\s+/)) console.log(((Number(t) …`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfor (const t of input.split(/\\s+/)) console.log(((Number(t) * 9) / 5 + 32).toFixed(1));\n",
+            "tests": [
+              {
+                "input": "0 100 -40",
+                "output": "32.0\n212.0\n-40.0"
+              },
+              {
+                "input": "21.5",
+                "output": "70.7"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w1-fam-temps-3",
+            "title": "Temperature table (3/5) — labelled output",
+            "prompt": "Twist 2: labelled output. Several Celsius values again; print each as `<C>C -> <F>F`, both with one decimal.",
+            "hint": "The reference solution uses `split` and a `for` loop.",
+            "hints": [
+              "The reference solution uses `split` and a `for` loop.",
+              "The reference solution is 4 lines and begins: `for (const t of input.split(/\\s+/)) {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfor (const t of input.split(/\\s+/)) {\n  const c = Number(t);\n  console.log(`${c.toFixed(1)}C -> ${((c * 9) / 5 + 32).toFixed(1)}F`);\n}\n",
+            "tests": [
+              {
+                "input": "0 37.5",
+                "output": "0.0C -> 32.0F\n37.5C -> 99.5F"
+              },
+              {
+                "input": "-10",
+                "output": "-10.0C -> 14.0F"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w1-fam-temps-4",
+            "title": "Temperature table (4/5) — either unit",
+            "prompt": "Twist 3: either unit. Each value now carries its unit: `100C` or `212F`. Convert each to the other unit, one decimal, printed with the new unit's letter.",
+            "hint": "The reference solution uses `split`, `slice` and a `for` loop.",
+            "hints": [
+              "The reference solution uses `split`, `slice` and a `for` loop.",
+              "The reference solution is 5 lines and begins: `for (const t of input.split(/\\s+/)) {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfor (const t of input.split(/\\s+/)) {\n  const unit = t.slice(-1);\n  const v = Number(t.slice(0, -1));\n  console.log(unit === \"C\" ? `${((v * 9) / 5 + 32).toFixed(1)}F` : `${(((v - 32) * 5) / 9).toFixed(1)}C`);\n}\n",
+            "tests": [
+              {
+                "input": "100C 212F -40C 98.6F",
+                "output": "212.0F\n100.0C\n-40.0F\n37.0C"
+              },
+              {
+                "input": "0F",
+                "output": "-17.8C"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w1-fam-temps-5",
+            "title": "Temperature table (5/5) — summary",
+            "prompt": "Twist 4: summary. Several Celsius values; print only the lowest and highest in Fahrenheit: `min <F> max <F>`, one decimal each.",
+            "hint": "The reference solution uses `split`, `map` and `Math`.",
+            "hints": [
+              "The reference solution uses `split`, `map` and `Math`.",
+              "The reference solution is 2 lines and begins: `const fs2 = input.split(/\\s+/).map((t) => (Number(t) * 9) / 5 + 32);`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst fs2 = input.split(/\\s+/).map((t) => (Number(t) * 9) / 5 + 32);\nconsole.log(`min ${Math.min(...fs2).toFixed(1)} max ${Math.max(...fs2).toFixed(1)}`);\n",
+            "tests": [
+              {
+                "input": "0 100 -40 20",
+                "output": "min -40.0 max 212.0"
+              },
+              {
+                "input": "5",
+                "output": "min 41.0 max 41.0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_program_io-order1",
             "title": "Put it in order: Two numbers on one line",
             "prompt": "The lines of the worked example “Two numbers on one line” from Program I/O — stdin and stdout, shuffled. Put them back in an order that compiles and — given the input below — prints exactly the output below.\n\nInput:\n    3 4\n\nPrints:\n    area 12\n    perimeter 14",
@@ -3868,6 +4029,179 @@
               {
                 "input": "G",
                 "output": "green"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w2-fam-grades-1",
+            "title": "Grade bands (1/5)",
+            "prompt": "The base problem. The input is a score from 0 to 100. Print its letter: `A` for 90+, `B` for 80+, `C` for 70+, `D` for 60+, otherwise `F`.",
+            "hint": "The reference solution is 2 lines and begins: `const s = Number(input);`",
+            "hints": [
+              "The reference solution is 2 lines and begins: `const s = Number(input);`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst s = Number(input);\nconsole.log(s >= 90 ? \"A\" : s >= 80 ? \"B\" : s >= 70 ? \"C\" : s >= 60 ? \"D\" : \"F\");\n",
+            "tests": [
+              {
+                "input": "95",
+                "output": "A"
+              },
+              {
+                "input": "80",
+                "output": "B"
+              },
+              {
+                "input": "79",
+                "output": "C"
+              },
+              {
+                "input": "59",
+                "output": "F"
+              },
+              {
+                "input": "100",
+                "output": "A"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w2-fam-grades-2",
+            "title": "Grade bands (2/5) — bad input",
+            "prompt": "Twist 1: bad input. Now a score may be out of range: print `invalid` for anything below 0 or above 100.",
+            "hint": "The reference solution is 3 lines and begins: `const s = Number(input);`",
+            "hints": [
+              "The reference solution is 3 lines and begins: `const s = Number(input);`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst s = Number(input);\nif (s < 0 || s > 100) console.log(\"invalid\");\nelse console.log(s >= 90 ? \"A\" : s >= 80 ? \"B\" : s >= 70 ? \"C\" : s >= 60 ? \"D\" : \"F\");\n",
+            "tests": [
+              {
+                "input": "101",
+                "output": "invalid"
+              },
+              {
+                "input": "-5",
+                "output": "invalid"
+              },
+              {
+                "input": "70",
+                "output": "C"
+              },
+              {
+                "input": "0",
+                "output": "F"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w2-fam-grades-3",
+            "title": "Grade bands (3/5) — many scores",
+            "prompt": "Twist 2: many scores. The input is several scores on one line. Print their letters on one line, separated by spaces.",
+            "hint": "The reference solution uses `split`, `map` and `join`.",
+            "hints": [
+              "The reference solution uses `split`, `map` and `join`.",
+              "The reference solution is 2 lines and begins: `const letter = (s: number) => (s >= 90 ? \"A\" : s >= 80 ? \"B\" : s >= 70 ? \"C\" : s >= 60 ? \"D\" : \"F\");`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst letter = (s: number) => (s >= 90 ? \"A\" : s >= 80 ? \"B\" : s >= 70 ? \"C\" : s >= 60 ? \"D\" : \"F\");\nconsole.log(input.split(/\\s+/).map((t) => letter(Number(t))).join(\" \"));\n",
+            "tests": [
+              {
+                "input": "90 85 60 12",
+                "output": "A B D F"
+              },
+              {
+                "input": "71",
+                "output": "C"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w2-fam-grades-4",
+            "title": "Grade bands (4/5) — a tally",
+            "prompt": "Twist 3: a tally. Several scores; print how many got each letter, as `A:<n> B:<n> C:<n> D:<n> F:<n>`.",
+            "hint": "The reference solution uses `split`, `map`, `join`, a `for` loop, `Object.entries` and `??`.",
+            "hints": [
+              "The reference solution uses `split`, `map`, `join`, a `for` loop, `Object.entries` and `??`.",
+              "The reference solution is 4 lines and begins: `const letter = (s: number) => (s >= 90 ? \"A\" : s >= 80 ? \"B\" : s >= 70 ? \"C\" : s >= 60 ? \"D\" : \"F\");`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst letter = (s: number) => (s >= 90 ? \"A\" : s >= 80 ? \"B\" : s >= 70 ? \"C\" : s >= 60 ? \"D\" : \"F\");\nconst counts: Record<string, number> = { A: 0, B: 0, C: 0, D: 0, F: 0 };\nfor (const t of input.split(/\\s+/)) counts[letter(Number(t))] = (counts[letter(Number(t))] ?? 0) + 1;\nconsole.log(Object.entries(counts).map(([k, n]) => `${k}:${n}`).join(\" \"));\n",
+            "tests": [
+              {
+                "input": "90 85 60 12 99 70",
+                "output": "A:2 B:1 C:1 D:1 F:1"
+              },
+              {
+                "input": "100",
+                "output": "A:1 B:0 C:0 D:0 F:0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w2-fam-grades-5",
+            "title": "Grade bands (5/5) — plus and minus",
+            "prompt": "Twist 4: plus and minus. Several scores; now a letter (except `F`) gets `+` when the last digit is 7 or more and `-` when it is 2 or less. 100 is `A+`.",
+            "hint": "The reference solution uses `split`, `map` and `join`.",
+            "hints": [
+              "The reference solution uses `split`, `map` and `join`.",
+              "The reference solution is 9 lines and begins: `const letter = (s: number) => (s >= 90 ? \"A\" : s >= 80 ? \"B\" : s >= 70 ? \"C\" : s >= 60 ? \"D\" : \"F\");`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst letter = (s: number) => (s >= 90 ? \"A\" : s >= 80 ? \"B\" : s >= 70 ? \"C\" : s >= 60 ? \"D\" : \"F\");\nconst graded = (s: number): string => {\n  const base = letter(s);\n  if (base === \"F\") return base;\n  if (s === 100) return \"A+\";\n  const d = s % 10;\n  return base + (d >= 7 ? \"+\" : d <= 2 ? \"-\" : \"\");\n};\nconsole.log(input.split(/\\s+/).map((t) => graded(Number(t))).join(\" \"));\n",
+            "tests": [
+              {
+                "input": "97 91 88 72 60 55 100 83",
+                "output": "A+ A- B+ C- D- F A+ B"
+              },
+              {
+                "input": "65",
+                "output": "D"
               }
             ],
             "source_slug": "",
@@ -6371,6 +6705,177 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w3-fam-digits-1",
+            "title": "Digit work (1/5)",
+            "prompt": "The base problem. The input is a non-negative integer. Print the sum of its digits.",
+            "hint": "The reference solution uses a `while` loop and `Math`.",
+            "hints": [
+              "The reference solution uses a `while` loop and `Math`.",
+              "The reference solution is 7 lines and begins: `let n = Number(input);`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nlet n = Number(input);\nlet sum = 0;\ndo {\n  sum += n % 10;\n  n = Math.floor(n / 10);\n} while (n > 0);\nconsole.log(sum);\n",
+            "tests": [
+              {
+                "input": "12345",
+                "output": "15"
+              },
+              {
+                "input": "0",
+                "output": "0"
+              },
+              {
+                "input": "9999",
+                "output": "36"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w3-fam-digits-2",
+            "title": "Digit work (2/5) — a different fold",
+            "prompt": "Twist 1: a different fold. Print the product of the non-zero digits instead (a number with no non-zero digits gives 1).",
+            "hint": "The reference solution uses a `while` loop and `Math`.",
+            "hints": [
+              "The reference solution uses a `while` loop and `Math`.",
+              "The reference solution is 8 lines and begins: `let n = Number(input);`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nlet n = Number(input);\nlet product = 1;\nwhile (n > 0) {\n  const d = n % 10;\n  if (d !== 0) product *= d;\n  n = Math.floor(n / 10);\n}\nconsole.log(product);\n",
+            "tests": [
+              {
+                "input": "105",
+                "output": "5"
+              },
+              {
+                "input": "7",
+                "output": "7"
+              },
+              {
+                "input": "0",
+                "output": "1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w3-fam-digits-3",
+            "title": "Digit work (3/5) — repeat until done",
+            "prompt": "Twist 2: repeat until done. Sum the digits again and again until one digit is left, printing every step: `38 -> 11 -> 2`. A single digit prints just itself.",
+            "hint": "The reference solution uses `join`, a `while` loop, a `for` loop and `Math`.",
+            "hints": [
+              "The reference solution uses `join`, a `while` loop, a `for` loop and `Math`.",
+              "The reference solution is 9 lines and begins: `let n = Number(input);`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nlet n = Number(input);\nconst steps = [n];\nwhile (n >= 10) {\n  let sum = 0;\n  for (let m = n; m > 0; m = Math.floor(m / 10)) sum += m % 10;\n  n = sum;\n  steps.push(n);\n}\nconsole.log(steps.join(\" -> \"));\n",
+            "tests": [
+              {
+                "input": "38",
+                "output": "38 -> 11 -> 2"
+              },
+              {
+                "input": "5",
+                "output": "5"
+              },
+              {
+                "input": "9875",
+                "output": "9875 -> 29 -> 11 -> 2"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w3-fam-digits-4",
+            "title": "Digit work (4/5) — another base",
+            "prompt": "Twist 3: another base. The input is `n b`: sum the digits of `n` written in base `b` (2 to 16).",
+            "hint": "The reference solution uses `split`, a `while` loop and `Math`.",
+            "hints": [
+              "The reference solution uses `split`, a `while` loop and `Math`.",
+              "The reference solution is 9 lines and begins: `const [nText, bText] = input.split(/\\s+/);`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst [nText, bText] = input.split(/\\s+/);\nlet n = Number(nText);\nconst b = Number(bText);\nlet sum = 0;\nwhile (n > 0) {\n  sum += n % b;\n  n = Math.floor(n / b);\n}\nconsole.log(sum);\n",
+            "tests": [
+              {
+                "input": "10 2",
+                "output": "2"
+              },
+              {
+                "input": "255 16",
+                "output": "30"
+              },
+              {
+                "input": "0 7",
+                "output": "0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w3-fam-digits-5",
+            "title": "Digit work (5/5) — pick the winner",
+            "prompt": "Twist 4: pick the winner. The input is several numbers; print the one with the largest digit sum (the first, on a tie).",
+            "hint": "The reference solution uses `split`, a `for` loop and `Math`.",
+            "hints": [
+              "The reference solution uses `split`, a `for` loop and `Math`.",
+              "The reference solution is 15 lines and begins: `const digitSum = (n: number): number => {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst digitSum = (n: number): number => {\n  let sum = 0;\n  for (let m = n; m > 0; m = Math.floor(m / 10)) sum += m % 10;\n  return sum;\n};\nlet best = -1;\nlet bestSum = -1;\nfor (const t of input.split(/\\s+/)) {\n  const n = Number(t);\n  if (digitSum(n) > bestSum) {\n    best = n;\n    bestSum = digitSum(n);\n  }\n}\nconsole.log(best);\n",
+            "tests": [
+              {
+                "input": "19 91 28 1000",
+                "output": "19"
+              },
+              {
+                "input": "7",
+                "output": "7"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_loops-order1",
             "title": "Put it in order: Breaking out of nested loops",
             "prompt": "The lines of the worked example “Breaking out of nested loops” from Loops, shuffled. Put them back in an order that compiles and prints exactly:\n\n    8 + 11",
@@ -8728,6 +9233,169 @@
               {
                 "input": "alan,turing,wilmslow",
                 "output": "Name: TURING, alan (wilmslow)"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w4-fam-cases-1",
+            "title": "Word styles (1/5)",
+            "prompt": "The base problem. The input is words separated by single spaces. Print them in Title Case (each word's first letter upper-case, the rest lower-case).",
+            "hint": "The answer begins `console.log(input.split(\" \").map((w) => w.charAt(0).toUpperCase() …`",
+            "hints": [
+              "The answer begins `console.log(input.split(\" \").map((w) => w.charAt(0).toUpperCase() …`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(input.split(\" \").map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(\" \"));\n",
+            "tests": [
+              {
+                "input": "the quick brown fox",
+                "output": "The Quick Brown Fox"
+              },
+              {
+                "input": "hELLO wORLD",
+                "output": "Hello World"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w4-fam-cases-2",
+            "title": "Word styles (2/5) — snake to camel",
+            "prompt": "Twist 1: snake to camel. The input is a `snake_case` name. Print it in `camelCase`.",
+            "hint": "The answer begins `console.log(input.replace(/_([a-z])/g, (_m, c: …`",
+            "hints": [
+              "The answer begins `console.log(input.replace(/_([a-z])/g, (_m, c: …`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(input.replace(/_([a-z])/g, (_m, c: string) => c.toUpperCase()));\n",
+            "tests": [
+              {
+                "input": "user_first_name",
+                "output": "userFirstName"
+              },
+              {
+                "input": "a_b",
+                "output": "aB"
+              },
+              {
+                "input": "single",
+                "output": "single"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w4-fam-cases-3",
+            "title": "Word styles (3/5) — camel to kebab",
+            "prompt": "Twist 2: camel to kebab. The input is a `camelCase` name. Print it in `kebab-case`.",
+            "hint": "The answer begins `console.log(input.replace(/[A-Z]/g, (c) => …`",
+            "hints": [
+              "The answer begins `console.log(input.replace(/[A-Z]/g, (c) => …`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(input.replace(/[A-Z]/g, (c) => \"-\" + c.toLowerCase()));\n",
+            "tests": [
+              {
+                "input": "userFirstName",
+                "output": "user-first-name"
+              },
+              {
+                "input": "x",
+                "output": "x"
+              },
+              {
+                "input": "parseHTTPBody",
+                "output": "parse-h-t-t-p-body"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w4-fam-cases-4",
+            "title": "Word styles (4/5) — inside out",
+            "prompt": "Twist 3: inside out. Reverse the letters of each word but keep the words in their order.",
+            "hint": "The answer begins `console.log(input.split(\" \").map((w) => …`",
+            "hints": [
+              "The answer begins `console.log(input.split(\" \").map((w) => …`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(input.split(\" \").map((w) => [...w].reverse().join(\"\")).join(\" \"));\n",
+            "tests": [
+              {
+                "input": "hello world ab",
+                "output": "olleh dlrow ba"
+              },
+              {
+                "input": "racecar",
+                "output": "racecar"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w4-fam-cases-5",
+            "title": "Word styles (5/5) — acronym",
+            "prompt": "Twist 4: acronym. Print the acronym: the first letter of each word, upper-cased — skipping the words `and`, `of` and `the`.",
+            "hint": "The reference solution uses `split`, a `Set`, `map`, `filter` and `join`.",
+            "hints": [
+              "The reference solution uses `split`, a `Set`, `map`, `filter` and `join`.",
+              "The reference solution is 8 lines and begins: `const SKIP = new Set([\"and\", \"of\", \"the\"]);`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst SKIP = new Set([\"and\", \"of\", \"the\"]);\nconsole.log(\n  input\n    .split(\" \")\n    .filter((w) => !SKIP.has(w.toLowerCase()))\n    .map((w) => w.charAt(0).toUpperCase())\n    .join(\"\"),\n);\n",
+            "tests": [
+              {
+                "input": "bank of the west",
+                "output": "BW"
+              },
+              {
+                "input": "portable network graphics",
+                "output": "PNG"
+              },
+              {
+                "input": "salt and pepper",
+                "output": "SP"
               }
             ],
             "source_slug": "",
@@ -11229,6 +11897,161 @@
               {
                 "input": "Bo, Welcome",
                 "output": "Hello, friend!\nHello, Bo!\nWelcome, Bo!"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w5-fam-tips-1",
+            "title": "Tip calculator (1/5)",
+            "prompt": "The base problem. The input is `bill percent`. Print `tip <tip> total <total>`, both with two decimals.",
+            "hint": "The reference solution uses `split` and `map`.",
+            "hints": [
+              "The reference solution uses `split` and `map`.",
+              "The reference solution is 3 lines and begins: `const [bill, pct] = input.split(/\\s+/).map(Number);`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst [bill, pct] = input.split(/\\s+/).map(Number);\nconst tip = (bill * pct) / 100;\nconsole.log(`tip ${tip.toFixed(2)} total ${(bill + tip).toFixed(2)}`);\n",
+            "tests": [
+              {
+                "input": "50 20",
+                "output": "tip 10.00 total 60.00"
+              },
+              {
+                "input": "19.99 15",
+                "output": "tip 3.00 total 22.99"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w5-fam-tips-2",
+            "title": "Tip calculator (2/5) — a default",
+            "prompt": "Twist 1: a default. The percentage may now be left out: it defaults to 15. Write a function with a default parameter.",
+            "hint": "The reference solution uses `split`.",
+            "hints": [
+              "The reference solution uses `split`.",
+              "The reference solution is 7 lines and begins: `function tipFor(bill: number, pct = 15): { tip: number; total: number } {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction tipFor(bill: number, pct = 15): { tip: number; total: number } {\n  const tip = (bill * pct) / 100;\n  return { tip, total: bill + tip };\n}\nconst [billText, pctText] = input.split(/\\s+/);\nconst { tip, total } = pctText === undefined ? tipFor(Number(billText)) : tipFor(Number(billText), Number(pctText));\nconsole.log(`tip ${tip.toFixed(2)} total ${total.toFixed(2)}`);\n",
+            "tests": [
+              {
+                "input": "80",
+                "output": "tip 12.00 total 92.00"
+              },
+              {
+                "input": "80 10",
+                "output": "tip 8.00 total 88.00"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w5-fam-tips-3",
+            "title": "Tip calculator (3/5) — splitting it",
+            "prompt": "Twist 2: splitting it. An optional third number is how many people share the bill. Also print `each <amount>` (two decimals) when it is given.",
+            "hint": "The reference solution uses `split` and `map`.",
+            "hints": [
+              "The reference solution uses `split` and `map`.",
+              "The reference solution is 8 lines and begins: `function tipFor(bill: number, pct = 15, people?: number): string {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction tipFor(bill: number, pct = 15, people?: number): string {\n  const tip = (bill * pct) / 100;\n  const total = bill + tip;\n  const base = `tip ${tip.toFixed(2)} total ${total.toFixed(2)}`;\n  return people === undefined ? base : `${base} each ${(total / people).toFixed(2)}`;\n}\nconst [b, p, n] = input.split(/\\s+/).map(Number);\nconsole.log(tipFor(b, p, n));\n",
+            "tests": [
+              {
+                "input": "100 18 4",
+                "output": "tip 18.00 total 118.00 each 29.50"
+              },
+              {
+                "input": "60 15",
+                "output": "tip 9.00 total 69.00"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w5-fam-tips-4",
+            "title": "Tip calculator (4/5) — round it up",
+            "prompt": "Twist 3: round it up. `bill percent` again, but the total is rounded up to a whole number; print `total <n> tip <effective %>` with the effective percentage to one decimal.",
+            "hint": "The reference solution uses `split`, `map` and `Math`.",
+            "hints": [
+              "The reference solution uses `split`, `map` and `Math`.",
+              "The reference solution is 3 lines and begins: `const [bill, pct] = input.split(/\\s+/).map(Number);`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst [bill, pct] = input.split(/\\s+/).map(Number);\nconst total = Math.ceil(bill + (bill * pct) / 100);\nconsole.log(`total ${total} tip ${(((total - bill) / bill) * 100).toFixed(1)}%`);\n",
+            "tests": [
+              {
+                "input": "47.5 15",
+                "output": "total 55 tip 15.8%"
+              },
+              {
+                "input": "100 10",
+                "output": "total 110 tip 10.0%"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w5-fam-tips-5",
+            "title": "Tip calculator (5/5) — any number of bills",
+            "prompt": "Twist 4: any number of bills. The first number is the percentage; the rest are separate bills. Print each bill's tip (two decimals, space-separated), then `sum <all tips>`. Use a rest parameter.",
+            "hint": "The reference solution uses `split`, `reduce`, `map` and `join`.",
+            "hints": [
+              "The reference solution uses `split`, `reduce`, `map` and `join`.",
+              "The reference solution is 6 lines and begins: `function tips(pct: number, ...bills: number[]): number[] {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction tips(pct: number, ...bills: number[]): number[] {\n  return bills.map((b) => (b * pct) / 100);\n}\nconst [pct, ...bills] = input.split(/\\s+/).map(Number);\nconst each = tips(pct, ...bills);\nconsole.log(`${each.map((t) => t.toFixed(2)).join(\" \")} sum ${each.reduce((a, b) => a + b, 0).toFixed(2)}`);\n",
+            "tests": [
+              {
+                "input": "15 10 20 30.5",
+                "output": "1.50 3.00 4.58 sum 9.07"
+              },
+              {
+                "input": "20 5",
+                "output": "1.00 sum 1.00"
               }
             ],
             "source_slug": "",
@@ -15492,6 +16315,177 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w7-fam-positions-1",
+            "title": "Array positions (1/5)",
+            "prompt": "The base problem. The input is a list of numbers. Print the index of the largest (the first, if it repeats).",
+            "hint": "The reference solution uses `split`, `map` and `Math`.",
+            "hints": [
+              "The reference solution uses `split`, `map` and `Math`.",
+              "The reference solution is 2 lines and begins: `const xs = input.split(/\\s+/).map(Number);`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst xs = input.split(/\\s+/).map(Number);\nconsole.log(xs.indexOf(Math.max(...xs)));\n",
+            "tests": [
+              {
+                "input": "3 9 2 9",
+                "output": "1"
+              },
+              {
+                "input": "5",
+                "output": "0"
+              },
+              {
+                "input": "-1 -7",
+                "output": "0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w7-fam-positions-2",
+            "title": "Array positions (2/5) — every match",
+            "prompt": "Twist 1: every match. Print every index where the largest value appears, space-separated.",
+            "hint": "The reference solution uses `split`, `map`, `join` and `Math`.",
+            "hints": [
+              "The reference solution uses `split`, `map`, `join` and `Math`.",
+              "The reference solution is 3 lines and begins: `const xs = input.split(/\\s+/).map(Number);`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst xs = input.split(/\\s+/).map(Number);\nconst max = Math.max(...xs);\nconsole.log(xs.flatMap((x, i) => (x === max ? [i] : [])).join(\" \"));\n",
+            "tests": [
+              {
+                "input": "3 9 2 9",
+                "output": "1 3"
+              },
+              {
+                "input": "5",
+                "output": "0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w7-fam-positions-3",
+            "title": "Array positions (3/5) — the runner-up",
+            "prompt": "Twist 2: the runner-up. Print the second largest *distinct* value, or `none` if there is only one distinct value.",
+            "hint": "The reference solution uses `split`, a `Set`, `map` and `toSorted`.",
+            "hints": [
+              "The reference solution uses `split`, a `Set`, `map` and `toSorted`.",
+              "The reference solution is 2 lines and begins: `const distinct = [...new Set(input.split(/\\s+/).map(Number))].toSorted((a, b) => b - a);`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst distinct = [...new Set(input.split(/\\s+/).map(Number))].toSorted((a, b) => b - a);\nconsole.log(distinct.length > 1 ? distinct[1] : \"none\");\n",
+            "tests": [
+              {
+                "input": "3 9 2 9",
+                "output": "3"
+              },
+              {
+                "input": "4 4",
+                "output": "none"
+              },
+              {
+                "input": "1 2",
+                "output": "1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w7-fam-positions-4",
+            "title": "Array positions (4/5) — rotation",
+            "prompt": "Twist 3: rotation. The first number is `k`; rotate the rest left by `k` places (`k` may be larger than the list) and print them.",
+            "hint": "The reference solution uses `split`, `map`, `join` and `slice`.",
+            "hints": [
+              "The reference solution uses `split`, `map`, `join` and `slice`.",
+              "The reference solution is 3 lines and begins: `const [k, ...xs] = input.split(/\\s+/).map(Number);`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst [k, ...xs] = input.split(/\\s+/).map(Number);\nconst s = xs.length === 0 ? 0 : k % xs.length;\nconsole.log([...xs.slice(s), ...xs.slice(0, s)].join(\" \"));\n",
+            "tests": [
+              {
+                "input": "2 1 2 3 4 5",
+                "output": "3 4 5 1 2"
+              },
+              {
+                "input": "7 1 2 3",
+                "output": "2 3 1"
+              },
+              {
+                "input": "0 9",
+                "output": "9"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w7-fam-positions-5",
+            "title": "Array positions (5/5) — differences",
+            "prompt": "Twist 4: differences. Print the difference between each number and the next (`next - current`), space-separated; a single number prints nothing.",
+            "hint": "The reference solution uses `split`, `map`, `join` and `slice`.",
+            "hints": [
+              "The reference solution uses `split`, `map`, `join` and `slice`.",
+              "The reference solution is 2 lines and begins: `const xs = input.split(/\\s+/).map(Number);`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst xs = input.split(/\\s+/).map(Number);\nconsole.log(xs.slice(1).map((x, i) => x - xs[i]).join(\" \"));\n",
+            "tests": [
+              {
+                "input": "1 4 9 16",
+                "output": "3 5 7"
+              },
+              {
+                "input": "5",
+                "output": ""
+              },
+              {
+                "input": "10 7 7",
+                "output": "-3 0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_arrays-order1",
             "title": "Put it in order: A grid without shared rows",
             "prompt": "The lines of the worked example “A grid without shared rows” from Arrays & Tuples, shuffled. Put them back in an order that compiles and prints exactly:\n\n    @.#.\n    .#.#\n    #.#.",
@@ -18261,6 +19255,145 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w8-fam-staff-1",
+            "title": "Staff records (1/5)",
+            "prompt": "The base problem. The input is a JSON array of `{ name, dept, salary }`. Print the total salary.",
+            "hint": "The reference solution uses `reduce` and `JSON.parse`.",
+            "hints": [
+              "The reference solution uses `reduce` and `JSON.parse`.",
+              "The reference solution is 3 lines and begins: `type Person = { name: string; dept: string; salary: number };`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Person = { name: string; dept: string; salary: number };\nconst staff: Person[] = JSON.parse(input);\nconsole.log(staff.reduce((sum, p) => sum + p.salary, 0));\n",
+            "tests": [
+              {
+                "input": "[{\"name\":\"ana\",\"dept\":\"eng\",\"salary\":120},{\"name\":\"bo\",\"dept\":\"ops\",\"salary\":90},{\"name\":\"cy\",\"dept\":\"eng\",\"salary\":150},{\"name\":\"di\",\"dept\":\"ops\",\"salary\":95},{\"name\":\"ed\",\"dept\":\"hr\",\"salary\":70}]",
+                "output": "525"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w8-fam-staff-2",
+            "title": "Staff records (2/5) — grouped",
+            "prompt": "Twist 1: grouped. Print the total per department, one `dept: total` line each, departments in alphabetical order.",
+            "hint": "The reference solution uses `sort`, `JSON.parse`, a `for` loop and `??`.",
+            "hints": [
+              "The reference solution uses `sort`, `JSON.parse`, a `for` loop and `??`.",
+              "The reference solution is 5 lines and begins: `type Person = { name: string; dept: string; salary: number };`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Person = { name: string; dept: string; salary: number };\nconst staff: Person[] = JSON.parse(input);\nconst totals: Record<string, number> = {};\nfor (const p of staff) totals[p.dept] = (totals[p.dept] ?? 0) + p.salary;\nfor (const dept of Object.keys(totals).sort()) console.log(`${dept}: ${totals[dept]}`);\n",
+            "tests": [
+              {
+                "input": "[{\"name\":\"ana\",\"dept\":\"eng\",\"salary\":120},{\"name\":\"bo\",\"dept\":\"ops\",\"salary\":90},{\"name\":\"cy\",\"dept\":\"eng\",\"salary\":150},{\"name\":\"di\",\"dept\":\"ops\",\"salary\":95},{\"name\":\"ed\",\"dept\":\"hr\",\"salary\":70}]",
+                "output": "eng: 270\nhr: 70\nops: 185"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w8-fam-staff-3",
+            "title": "Staff records (3/5) — the top of each group",
+            "prompt": "Twist 2: the top of each group. Print the best-paid person per department, `dept: name`, departments in alphabetical order.",
+            "hint": "The reference solution uses `sort`, `JSON.parse` and a `for` loop.",
+            "hints": [
+              "The reference solution uses `sort`, `JSON.parse` and a `for` loop.",
+              "The reference solution is 8 lines and begins: `type Person = { name: string; dept: string; salary: number };`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Person = { name: string; dept: string; salary: number };\nconst staff: Person[] = JSON.parse(input);\nconst best: Record<string, Person> = {};\nfor (const p of staff) {\n  const cur = best[p.dept];\n  if (cur === undefined || p.salary > cur.salary) best[p.dept] = p;\n}\nfor (const dept of Object.keys(best).sort()) console.log(`${dept}: ${best[dept]?.name}`);\n",
+            "tests": [
+              {
+                "input": "[{\"name\":\"ana\",\"dept\":\"eng\",\"salary\":120},{\"name\":\"bo\",\"dept\":\"ops\",\"salary\":90},{\"name\":\"cy\",\"dept\":\"eng\",\"salary\":150},{\"name\":\"di\",\"dept\":\"ops\",\"salary\":95},{\"name\":\"ed\",\"dept\":\"hr\",\"salary\":70}]",
+                "output": "eng: cy\nhr: ed\nops: di"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w8-fam-staff-4",
+            "title": "Staff records (4/5) — JSON out",
+            "prompt": "Twist 3: JSON out. Print a JSON object mapping each department to its head count, keys in alphabetical order (no spaces).",
+            "hint": "The reference solution uses `map`, `sort`, `JSON.parse`, a `for` loop and `??`.",
+            "hints": [
+              "The reference solution uses `map`, `sort`, `JSON.parse`, a `for` loop and `??`.",
+              "The reference solution is 5 lines and begins: `type Person = { name: string; dept: string; salary: number };`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Person = { name: string; dept: string; salary: number };\nconst staff: Person[] = JSON.parse(input);\nconst counts: Record<string, number> = {};\nfor (const dept of staff.map((p) => p.dept).sort()) counts[dept] = (counts[dept] ?? 0) + 1;\nconsole.log(JSON.stringify(counts));\n",
+            "tests": [
+              {
+                "input": "[{\"name\":\"ana\",\"dept\":\"eng\",\"salary\":120},{\"name\":\"bo\",\"dept\":\"ops\",\"salary\":90},{\"name\":\"cy\",\"dept\":\"eng\",\"salary\":150},{\"name\":\"di\",\"dept\":\"ops\",\"salary\":95},{\"name\":\"ed\",\"dept\":\"hr\",\"salary\":70}]",
+                "output": "{\"eng\":2,\"hr\":1,\"ops\":2}"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w8-fam-staff-5",
+            "title": "Staff records (5/5) — missing fields",
+            "prompt": "Twist 4: missing fields. Some records have no `salary`. Count it as 0 in the total, print `total <n>`, then `missing: <names>` (comma-separated, input order) or `missing: none`.",
+            "hint": "The reference solution uses `reduce`, `map`, `filter`, `join`, `JSON.parse` and `??`.",
+            "hints": [
+              "The reference solution uses `reduce`, `map`, `filter`, `join`, `JSON.parse` and `??`.",
+              "The reference solution is 6 lines and begins: `type Person = { name: string; dept: string; salary?: number };`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Person = { name: string; dept: string; salary?: number };\nconst staff: Person[] = JSON.parse(input);\nconst total = staff.reduce((sum, p) => sum + (p.salary ?? 0), 0);\nconst missing = staff.filter((p) => p.salary === undefined).map((p) => p.name);\nconsole.log(`total ${total}`);\nconsole.log(`missing: ${missing.length ? missing.join(\",\") : \"none\"}`);\n",
+            "tests": [
+              {
+                "input": "[{\"name\":\"fay\",\"dept\":\"eng\",\"salary\":100},{\"name\":\"gus\",\"dept\":\"eng\"},{\"name\":\"hal\",\"dept\":\"hr\"}]",
+                "output": "total 100\nmissing: gus,hal"
+              },
+              {
+                "input": "[{\"name\":\"ana\",\"dept\":\"eng\",\"salary\":120},{\"name\":\"bo\",\"dept\":\"ops\",\"salary\":90},{\"name\":\"cy\",\"dept\":\"eng\",\"salary\":150},{\"name\":\"di\",\"dept\":\"ops\",\"salary\":95},{\"name\":\"ed\",\"dept\":\"hr\",\"salary\":70}]",
+                "output": "total 525\nmissing: none"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_destructuring-order1",
             "title": "Put it in order: Destructuring in a parameter list",
             "prompt": "The lines of the worked example “Destructuring in a parameter list” from Destructuring, Spread & Rest, shuffled. Put them back in an order that compiles and prints exactly:\n\n    #7: 3 units, note: none",
@@ -20698,6 +21831,165 @@
               {
                 "input": "x y z",
                 "output": "none"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w9-fam-sets-1",
+            "title": "Set talk (1/5)",
+            "prompt": "The base problem. Two lines of words. Print the words that appear in both, in alphabetical order, space-separated (or `none`).",
+            "hint": "The reference solution uses `split`, a `Set`, `filter`, `sort` and `join`.",
+            "hints": [
+              "The reference solution uses `split`, a `Set`, `filter`, `sort` and `join`.",
+              "The reference solution is 4 lines and begins: `const [a = \"\", b = \"\"] = input.split(\"\\n\");`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst [a = \"\", b = \"\"] = input.split(\"\\n\");\nconst second = new Set(b.split(/\\s+/));\nconst both = [...new Set(a.split(/\\s+/))].filter((w) => second.has(w)).sort();\nconsole.log(both.length ? both.join(\" \") : \"none\");\n",
+            "tests": [
+              {
+                "input": "red green blue\nblue yellow red",
+                "output": "blue red"
+              },
+              {
+                "input": "a b\nc d",
+                "output": "none"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w9-fam-sets-2",
+            "title": "Set talk (2/5) — one side only",
+            "prompt": "Twist 1: one side only. Print the words in the first line that are not in the second, alphabetical (or `none`).",
+            "hint": "The reference solution uses `split`, a `Set`, `filter`, `sort` and `join`.",
+            "hints": [
+              "The reference solution uses `split`, a `Set`, `filter`, `sort` and `join`.",
+              "The reference solution is 4 lines and begins: `const [a = \"\", b = \"\"] = input.split(\"\\n\");`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst [a = \"\", b = \"\"] = input.split(\"\\n\");\nconst second = new Set(b.split(/\\s+/));\nconst only = [...new Set(a.split(/\\s+/))].filter((w) => !second.has(w)).sort();\nconsole.log(only.length ? only.join(\" \") : \"none\");\n",
+            "tests": [
+              {
+                "input": "red green blue\nblue yellow red",
+                "output": "green"
+              },
+              {
+                "input": "a b\na b",
+                "output": "none"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w9-fam-sets-3",
+            "title": "Set talk (3/5) — either but not both",
+            "prompt": "Twist 2: either but not both. Print the words in exactly one of the two lines, alphabetical (or `none`).",
+            "hint": "The reference solution uses `split`, a `Set`, `filter`, `sort` and `join`.",
+            "hints": [
+              "The reference solution uses `split`, a `Set`, `filter`, `sort` and `join`.",
+              "The reference solution is 5 lines and begins: `const [a = \"\", b = \"\"] = input.split(\"\\n\");`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst [a = \"\", b = \"\"] = input.split(\"\\n\");\nconst x = new Set(a.split(/\\s+/));\nconst y = new Set(b.split(/\\s+/));\nconst out = [...x].filter((w) => !y.has(w)).concat([...y].filter((w) => !x.has(w))).sort();\nconsole.log(out.length ? out.join(\" \") : \"none\");\n",
+            "tests": [
+              {
+                "input": "red green blue\nblue yellow red",
+                "output": "green yellow"
+              },
+              {
+                "input": "a b\nb a",
+                "output": "none"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w9-fam-sets-4",
+            "title": "Set talk (4/5) — a score",
+            "prompt": "Twist 3: a score. Print the Jaccard similarity of the two word sets — shared words divided by all distinct words — with two decimals.",
+            "hint": "The reference solution uses `split`, a `Set` and `filter`.",
+            "hints": [
+              "The reference solution uses `split`, a `Set` and `filter`.",
+              "The reference solution is 6 lines and begins: `const [a = \"\", b = \"\"] = input.split(\"\\n\");`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst [a = \"\", b = \"\"] = input.split(\"\\n\");\nconst x = new Set(a.split(/\\s+/));\nconst y = new Set(b.split(/\\s+/));\nconst shared = [...x].filter((w) => y.has(w)).length;\nconst all = new Set([...x, ...y]).size;\nconsole.log((shared / all).toFixed(2));\n",
+            "tests": [
+              {
+                "input": "red green blue\nblue yellow red",
+                "output": "0.50"
+              },
+              {
+                "input": "a b\nc d",
+                "output": "0.00"
+              },
+              {
+                "input": "same\nsame",
+                "output": "1.00"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w9-fam-sets-5",
+            "title": "Set talk (5/5) — many lines",
+            "prompt": "Twist 4: many lines. Any number of lines now. For each distinct word, print `word <number of lines containing it>`, words in alphabetical order.",
+            "hint": "The reference solution uses `split`, a `Map`, a `Set`, `sort`, a `for` loop and `??`.",
+            "hints": [
+              "The reference solution uses `split`, a `Map`, a `Set`, `sort`, a `for` loop and `??`.",
+              "The reference solution is 5 lines and begins: `const counts = new Map<string, number>();`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst counts = new Map<string, number>();\nfor (const line of input.split(\"\\n\")) {\n  for (const w of new Set(line.split(/\\s+/))) counts.set(w, (counts.get(w) ?? 0) + 1);\n}\nfor (const w of [...counts.keys()].sort()) console.log(`${w} ${counts.get(w)}`);\n",
+            "tests": [
+              {
+                "input": "red green\ngreen blue red\nred",
+                "output": "blue 1\ngreen 2\nred 3"
+              },
+              {
+                "input": "x",
+                "output": "x 1"
               }
             ],
             "source_slug": "",
@@ -25038,6 +26330,181 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w11-fam-settings-1",
+            "title": "Optional settings (1/5)",
+            "prompt": "The base problem. Each input line is `key=value`. Print `port <value>` — or `port 3000` when no `port` line is given.",
+            "hint": "The reference solution uses `split`, a `Map`, a `for` loop and `??`.",
+            "hints": [
+              "The reference solution uses `split`, a `Map`, a `for` loop and `??`.",
+              "The reference solution is 6 lines and begins: `const settings = new Map<string, string>();`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst settings = new Map<string, string>();\nfor (const line of input.split(\"\\n\")) {\n  const [k = \"\", v = \"\"] = line.split(\"=\");\n  if (k.trim()) settings.set(k.trim(), v.trim());\n}\n\nconsole.log(`port ${settings.get(\"port\") ?? \"3000\"}`);\n",
+            "tests": [
+              {
+                "input": "port=8080\nhost=x",
+                "output": "port 8080"
+              },
+              {
+                "input": "host=x",
+                "output": "port 3000"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w11-fam-settings-2",
+            "title": "Optional settings (2/5) — check it",
+            "prompt": "Twist 1: check it. Now the port must be a whole number from 1 to 65535: print `invalid port <raw text>` otherwise (still `port 3000` when absent).",
+            "hint": "The reference solution uses `split`, a `Map` and a `for` loop.",
+            "hints": [
+              "The reference solution uses `split`, a `Map` and a `for` loop.",
+              "The reference solution is 11 lines and begins: `const settings = new Map<string, string>();`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst settings = new Map<string, string>();\nfor (const line of input.split(\"\\n\")) {\n  const [k = \"\", v = \"\"] = line.split(\"=\");\n  if (k.trim()) settings.set(k.trim(), v.trim());\n}\n\nconst raw = settings.get(\"port\");\nif (raw === undefined) console.log(\"port 3000\");\nelse {\n  const n = Number(raw);\n  console.log(Number.isInteger(n) && n >= 1 && n <= 65535 ? `port ${n}` : `invalid port ${raw}`);\n}\n",
+            "tests": [
+              {
+                "input": "port=8080",
+                "output": "port 8080"
+              },
+              {
+                "input": "port=99999",
+                "output": "invalid port 99999"
+              },
+              {
+                "input": "port=eighty",
+                "output": "invalid port eighty"
+              },
+              {
+                "input": "host=x",
+                "output": "port 3000"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w11-fam-settings-3",
+            "title": "Optional settings (3/5) — zero is a value",
+            "prompt": "Twist 2: zero is a value. Print `retries <n>` from a `retries` line, defaulting to 3 — and `retries=0` means zero retries, not the default.",
+            "hint": "The reference solution uses `split`, a `Map` and a `for` loop.",
+            "hints": [
+              "The reference solution uses `split`, a `Map` and a `for` loop.",
+              "The reference solution is 7 lines and begins: `const settings = new Map<string, string>();`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst settings = new Map<string, string>();\nfor (const line of input.split(\"\\n\")) {\n  const [k = \"\", v = \"\"] = line.split(\"=\");\n  if (k.trim()) settings.set(k.trim(), v.trim());\n}\n\nconst r = settings.get(\"retries\");\nconsole.log(`retries ${r === undefined ? 3 : Number(r)}`);\n",
+            "tests": [
+              {
+                "input": "retries=0",
+                "output": "retries 0"
+              },
+              {
+                "input": "retries=5",
+                "output": "retries 5"
+              },
+              {
+                "input": "port=80",
+                "output": "retries 3"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w11-fam-settings-4",
+            "title": "Optional settings (4/5) — two sources",
+            "prompt": "Twist 3: two sources. Line 1 holds the file's settings and line 2 (possibly absent) the environment's, each as comma-separated `key=value`. The environment overrides the file, which overrides the defaults `host=localhost` and `port=3000`. Print `host:port`.",
+            "hint": "The reference solution uses `split`, a `Map`, a `for` loop and `??`.",
+            "hints": [
+              "The reference solution uses `split`, a `Map`, a `for` loop and `??`.",
+              "The reference solution is 13 lines and begins: `const parse = (line: string | undefined): Map<string, string> => {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst parse = (line: string | undefined): Map<string, string> => {\n  const m = new Map<string, string>();\n  for (const pair of (line ?? \"\").split(\",\")) {\n    const [k = \"\", v = \"\"] = pair.split(\"=\");\n    if (k.trim()) m.set(k.trim(), v.trim());\n  }\n  return m;\n};\nconst [fileLine, envLine] = input.split(\"\\n\");\nconst file = parse(fileLine);\nconst env = parse(envLine);\n\nconst pick = (k: string, fallback: string) => env.get(k) ?? file.get(k) ?? fallback;\nconsole.log(`${pick(\"host\", \"localhost\")}:${pick(\"port\", \"3000\")}`);\n",
+            "tests": [
+              {
+                "input": "host=db.local,port=5432\nport=6543",
+                "output": "db.local:6543"
+              },
+              {
+                "input": "port=80",
+                "output": "localhost:80"
+              },
+              {
+                "input": "host=x\nhost=y,port=1",
+                "output": "y:1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w11-fam-settings-5",
+            "title": "Optional settings (5/5) — say where it came from",
+            "prompt": "Twist 4: say where it came from. Same two sources; print `host=<v> (<source>)` and `port=<v> (<source>)`, where the source is `env`, `file` or `default`.",
+            "hint": "The reference solution uses `split`, a `Map`, a `for` loop and `??`.",
+            "hints": [
+              "The reference solution uses `split`, a `Map`, a `for` loop and `??`.",
+              "The reference solution is 16 lines and begins: `const parse = (line: string | undefined): Map<string, string> => {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst parse = (line: string | undefined): Map<string, string> => {\n  const m = new Map<string, string>();\n  for (const pair of (line ?? \"\").split(\",\")) {\n    const [k = \"\", v = \"\"] = pair.split(\"=\");\n    if (k.trim()) m.set(k.trim(), v.trim());\n  }\n  return m;\n};\nconst [fileLine, envLine] = input.split(\"\\n\");\nconst file = parse(fileLine);\nconst env = parse(envLine);\n\nconst DEFAULTS = [[\"host\", \"localhost\"], [\"port\", \"3000\"]] as const;\nfor (const [k, fallback] of DEFAULTS) {\n  const source = env.has(k) ? \"env\" : file.has(k) ? \"file\" : \"default\";\n  console.log(`${k}=${env.get(k) ?? file.get(k) ?? fallback} (${source})`);\n}\n",
+            "tests": [
+              {
+                "input": "host=db.local,port=5432\nport=6543",
+                "output": "host=db.local (file)\nport=6543 (env)"
+              },
+              {
+                "input": "port=80",
+                "output": "host=localhost (default)\nport=80 (file)"
+              },
+              {
+                "input": "x=1",
+                "output": "host=localhost (default)\nport=3000 (default)"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_narrowing-order1",
             "title": "Put it in order: Normalising input of several shapes",
             "prompt": "The lines of the worked example “Normalising input of several shapes” from Type Narrowing, shuffled. Put them back in an order that compiles and prints exactly:\n\n    2 7 z",
@@ -27135,6 +28602,161 @@
               {
                 "input": "mul 5",
                 "output": "0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w12-fam-shapes-1",
+            "title": "Shapes (1/5)",
+            "prompt": "The base problem. Each line is `circle r` or `rect w h`. Model them as a discriminated union and print each area with two decimals.",
+            "hint": "The reference solution uses `split`, a `switch`, a `for` loop and `Math`.",
+            "hints": [
+              "The reference solution uses `split`, a `switch`, a `for` loop and `Math`.",
+              "The reference solution is 14 lines and begins: `type Shape = { kind: \"circle\"; r: number } | { kind: \"rect\"; w: number; h: number };`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Shape = { kind: \"circle\"; r: number } | { kind: \"rect\"; w: number; h: number };\nconst parse = (line: string): Shape => {\n  const [k, a = \"0\", b = \"0\"] = line.trim().split(/\\s+/);\n  return k === \"circle\" ? { kind: \"circle\", r: Number(a) } : { kind: \"rect\", w: Number(a), h: Number(b) };\n};\nconst area = (s: Shape): number => {\n  switch (s.kind) {\n    case \"circle\":\n      return Math.PI * s.r ** 2;\n    case \"rect\":\n      return s.w * s.h;\n  }\n};\n\nfor (const line of input.split(\"\\n\")) console.log(area(parse(line)).toFixed(2));\n",
+            "tests": [
+              {
+                "input": "circle 1\nrect 2 3",
+                "output": "3.14\n6.00"
+              },
+              {
+                "input": "rect 1.5 2\ncircle 0.5",
+                "output": "3.00\n0.79"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w12-fam-shapes-2",
+            "title": "Shapes (2/5) — another measure",
+            "prompt": "Twist 1: another measure. Print each perimeter instead (circle `2πr`, rectangle `2(w + h)`), two decimals.",
+            "hint": "The reference solution uses `split`, a `switch`, a `for` loop and `Math`.",
+            "hints": [
+              "The reference solution uses `split`, a `switch`, a `for` loop and `Math`.",
+              "The reference solution is 22 lines and begins: `type Shape = { kind: \"circle\"; r: number } | { kind: \"rect\"; w: number; h: number };`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Shape = { kind: \"circle\"; r: number } | { kind: \"rect\"; w: number; h: number };\nconst parse = (line: string): Shape => {\n  const [k, a = \"0\", b = \"0\"] = line.trim().split(/\\s+/);\n  return k === \"circle\" ? { kind: \"circle\", r: Number(a) } : { kind: \"rect\", w: Number(a), h: Number(b) };\n};\nconst area = (s: Shape): number => {\n  switch (s.kind) {\n    case \"circle\":\n      return Math.PI * s.r ** 2;\n    case \"rect\":\n      return s.w * s.h;\n  }\n};\n\nconst perimeter = (s: Shape): number => {\n  switch (s.kind) {\n    case \"circle\":\n      return 2 * Math.PI * s.r;\n    case \"rect\":\n      return 2 * (s.w + s.h);\n  }\n};\nfor (const line of input.split(\"\\n\")) console.log(perimeter(parse(line)).toFixed(2));\n",
+            "tests": [
+              {
+                "input": "circle 1\nrect 2 3",
+                "output": "6.28\n10.00"
+              },
+              {
+                "input": "rect 1.5 2",
+                "output": "7.00"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w12-fam-shapes-3",
+            "title": "Shapes (3/5) — the biggest",
+            "prompt": "Twist 2: the biggest. Print only the largest shape's kind and area: `rect 6.00` (the first, on a tie).",
+            "hint": "The reference solution uses `split`, a `switch`, a `for` loop and `Math`.",
+            "hints": [
+              "The reference solution uses `split`, a `switch`, a `for` loop and `Math`.",
+              "The reference solution is 19 lines and begins: `type Shape = { kind: \"circle\"; r: number } | { kind: \"rect\"; w: number; h: number };`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Shape = { kind: \"circle\"; r: number } | { kind: \"rect\"; w: number; h: number };\nconst parse = (line: string): Shape => {\n  const [k, a = \"0\", b = \"0\"] = line.trim().split(/\\s+/);\n  return k === \"circle\" ? { kind: \"circle\", r: Number(a) } : { kind: \"rect\", w: Number(a), h: Number(b) };\n};\nconst area = (s: Shape): number => {\n  switch (s.kind) {\n    case \"circle\":\n      return Math.PI * s.r ** 2;\n    case \"rect\":\n      return s.w * s.h;\n  }\n};\n\nlet best: Shape | undefined;\nfor (const line of input.split(\"\\n\")) {\n  const s = parse(line);\n  if (best === undefined || area(s) > area(best)) best = s;\n}\nif (best) console.log(`${best.kind} ${area(best).toFixed(2)}`);\n",
+            "tests": [
+              {
+                "input": "circle 1\nrect 2 3",
+                "output": "rect 6.00"
+              },
+              {
+                "input": "circle 2\nrect 3 4",
+                "output": "circle 12.57"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w12-fam-shapes-4",
+            "title": "Shapes (4/5) — a new kind",
+            "prompt": "Twist 3: a new kind. Add `tri a b c` — a triangle by its sides, area by Heron's formula — and print every area with two decimals. The compiler should point you at every `switch` to update.",
+            "hint": "The reference solution uses `split`, a `switch`, a `for` loop and `Math`.",
+            "hints": [
+              "The reference solution uses `split`, a `switch`, a `for` loop and `Math`.",
+              "The reference solution is 23 lines and begins: `type Shape =`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Shape =\n  | { kind: \"circle\"; r: number }\n  | { kind: \"rect\"; w: number; h: number }\n  | { kind: \"tri\"; a: number; b: number; c: number };\nconst parse = (line: string): Shape => {\n  const [k, x = \"0\", y = \"0\", z = \"0\"] = line.trim().split(/\\s+/);\n  if (k === \"circle\") return { kind: \"circle\", r: Number(x) };\n  if (k === \"tri\") return { kind: \"tri\", a: Number(x), b: Number(y), c: Number(z) };\n  return { kind: \"rect\", w: Number(x), h: Number(y) };\n};\nconst area = (s: Shape): number => {\n  switch (s.kind) {\n    case \"circle\":\n      return Math.PI * s.r ** 2;\n    case \"rect\":\n      return s.w * s.h;\n    case \"tri\": {\n      const p = (s.a + s.b + s.c) / 2;\n      return Math.sqrt(p * (p - s.a) * (p - s.b) * (p - s.c));\n    }\n  }\n};\nfor (const line of input.split(\"\\n\")) console.log(area(parse(line)).toFixed(2));\n",
+            "tests": [
+              {
+                "input": "tri 3 4 5\ncircle 1\nrect 2 2",
+                "output": "6.00\n3.14\n4.00"
+              },
+              {
+                "input": "tri 2 2 2",
+                "output": "1.73"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w12-fam-shapes-5",
+            "title": "Shapes (5/5) — bad lines",
+            "prompt": "Twist 4: bad lines. Lines may be wrong now: an unknown kind, the wrong number of values, or a value that is not positive. Print `skip` for those and the area (two decimals) for the rest. Let the parser return `Shape | null`.",
+            "hint": "The reference solution uses `split`, `map`, a `for` loop and `Math`.",
+            "hints": [
+              "The reference solution uses `split`, `map`, a `for` loop and `Math`.",
+              "The reference solution is 14 lines and begins: `type Shape = { kind: \"circle\"; r: number } | { kind: \"rect\"; w: number; h: number };`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Shape = { kind: \"circle\"; r: number } | { kind: \"rect\"; w: number; h: number };\nconst parse = (line: string): Shape | null => {\n  const [k, ...rest] = line.trim().split(/\\s+/);\n  const nums = rest.map(Number);\n  if (nums.some((n) => !(n > 0))) return null;\n  if (k === \"circle\" && nums.length === 1) return { kind: \"circle\", r: nums[0] };\n  if (k === \"rect\" && nums.length === 2) return { kind: \"rect\", w: nums[0], h: nums[1] };\n  return null;\n};\nconst area = (s: Shape): number => (s.kind === \"circle\" ? Math.PI * s.r ** 2 : s.w * s.h);\nfor (const line of input.split(\"\\n\")) {\n  const s = parse(line);\n  console.log(s === null ? \"skip\" : area(s).toFixed(2));\n}\n",
+            "tests": [
+              {
+                "input": "circle 1\nhex 2\nrect 2\nrect -1 2\nrect 2 3",
+                "output": "3.14\nskip\nskip\nskip\n6.00"
+              },
+              {
+                "input": "circle x",
+                "output": "skip"
               }
             ],
             "source_slug": "",
@@ -37647,6 +39269,111 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w17-fam-keys-1",
+            "title": "Change some keys (1/5)",
+            "prompt": "The base problem. Write `Optional<T, K extends keyof T>`: `T` with the keys in `K` made optional and every other key unchanged — built from utility types.",
+            "hint": "The answer begins `Omit<T, K> & …`",
+            "hints": [
+              "The answer begins `Omit<T, K> & …`"
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype Flat<T> = { [P in keyof T]: T[P] };\ntype User = { id: number; name: string; email: string; age?: number };\ntype _1 = Expect<Equal<Flat<Optional<User, \"email\">>, { id: number; name: string; email?: string; age?: number }>>;\ntype _2 = Expect<Equal<Flat<Optional<User, \"id\" | \"name\">>, { id?: number; name?: string; email: string; age?: number }>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Optional<T, K extends keyof T> = ____;\n",
+            "solution": "type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w17-fam-keys-2",
+            "title": "Change some keys (2/5) — the other way",
+            "prompt": "Twist 1: the other way. Write `RequiredKeys<T, K extends keyof T>`: the keys in `K` become required.",
+            "hint": "The answer begins `Omit<T, K> & …`",
+            "hints": [
+              "The answer begins `Omit<T, K> & …`"
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype Flat<T> = { [P in keyof T]: T[P] };\ntype User = { id: number; name: string; email: string; age?: number };\ntype _1 = Expect<Equal<Flat<RequiredKeys<User, \"age\">>, { id: number; name: string; email: string; age: number }>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type RequiredKeys<T, K extends keyof T> = ____;\n",
+            "solution": "type RequiredKeys<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w17-fam-keys-3",
+            "title": "Change some keys (3/5) — lock them",
+            "prompt": "Twist 2: lock them. Write `ReadonlyKeys<T, K extends keyof T>`: the keys in `K` become `readonly`, the rest stay writable.",
+            "hint": "The answer begins `Omit<T, K> & …`",
+            "hints": [
+              "The answer begins `Omit<T, K> & …`"
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype Flat<T> = { [P in keyof T]: T[P] };\ntype User = { id: number; name: string; email: string; age?: number };\ntype _1 = Expect<Equal<Flat<ReadonlyKeys<User, \"id\">>, { readonly id: number; name: string; email: string; age?: number }>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type ReadonlyKeys<T, K extends keyof T> = ____;\n",
+            "solution": "type ReadonlyKeys<T, K extends keyof T> = Omit<T, K> & Readonly<Pick<T, K>>;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w17-fam-keys-4",
+            "title": "Change some keys (4/5) — one key stays",
+            "prompt": "Twist 3: one key stays. Write `Patch<T extends { id: unknown }>`: `id` required, every other key optional — the shape of an update request.",
+            "hint": "The answer begins `Pick<T, \"id\"> & …`",
+            "hints": [
+              "The answer begins `Pick<T, \"id\"> & …`"
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype Flat<T> = { [P in keyof T]: T[P] };\ntype User = { id: number; name: string; email: string; age?: number };\ntype _1 = Expect<Equal<Flat<Patch<User>>, { id: number; name?: string; email?: string; age?: number }>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Patch<T extends { id: unknown }> = ____;\n",
+            "solution": "type Patch<T extends { id: unknown }> = Pick<T, \"id\"> & Partial<Omit<T, \"id\">>;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w17-fam-keys-5",
+            "title": "Change some keys (5/5) — keys that may not exist",
+            "prompt": "Twist 4: keys that may not exist. Write `Summary<T>`: only `T`'s `id` and `name` keys — whichever of them `T` has.",
+            "hint": "The answer begins `Pick<T, Extract<keyof T, …`",
+            "hints": [
+              "The answer begins `Pick<T, Extract<keyof T, …`"
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype Flat<T> = { [P in keyof T]: T[P] };\ntype User = { id: number; name: string; email: string; age?: number };\ntype _1 = Expect<Equal<Flat<Summary<User>>, { id: number; name: string }>>;\ntype _2 = Expect<Equal<Flat<Summary<{ id: string; x: 1 }>>, { id: string }>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Summary<T> = ____;\n",
+            "solution": "type Summary<T> = Pick<T, Extract<keyof T, \"id\" | \"name\">>;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_compose-order1",
             "title": "Put it in order: `extends` for a named family",
             "prompt": "The lines of the worked example “`extends` for a named family” from Extending & Combining Types, shuffled. Put them back in an order that compiles and prints exactly:\n\n    cube:24 square:4 8",
@@ -43537,6 +45264,111 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w20-fam-handlers-1",
+            "title": "Typed handlers (1/5)",
+            "prompt": "The base problem. Write `Handlers<E>`: for each event name in `E`, a function taking that event's payload and returning `void`.",
+            "hint": "The answer begins `{ [K in keyof E]: …`",
+            "hints": [
+              "The answer begins `{ [K in keyof E]: …`"
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype Events = { click: { x: number; y: number }; key: { code: string } };\ntype _1 = Expect<Equal<Handlers<Events>, { click: (event: { x: number; y: number }) => void; key: (event: { code: string }) => void }>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Handlers<E> = ____;\n",
+            "solution": "type Handlers<E> = { [K in keyof E]: (event: E[K]) => void };\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w20-fam-handlers-2",
+            "title": "Typed handlers (2/5) — all optional",
+            "prompt": "Twist 1: all optional. Write `MaybeHandlers<E>`: the same, but every handler optional.",
+            "hint": "The answer begins `{ [K in keyof E]?: …`",
+            "hints": [
+              "The answer begins `{ [K in keyof E]?: …`"
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype Events = { click: { x: number; y: number }; key: { code: string } };\ntype _1 = Expect<Equal<MaybeHandlers<Events>, { click?: (event: { x: number; y: number }) => void; key?: (event: { code: string }) => void }>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type MaybeHandlers<E> = ____;\n",
+            "solution": "type MaybeHandlers<E> = { [K in keyof E]?: (event: E[K]) => void };\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w20-fam-handlers-3",
+            "title": "Typed handlers (3/5) — renamed",
+            "prompt": "Twist 2: renamed. Write `OnHandlers<E>`: the keys become `onClick`, `onKey`… — remap them with `as` and `Capitalize`.",
+            "hint": "The answer begins `{ [K in keyof E & string …`",
+            "hints": [
+              "The answer begins `{ [K in keyof E & string …`"
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype Events = { click: { x: number; y: number }; key: { code: string } };\ntype _1 = Expect<Equal<OnHandlers<Events>, { onClick: (event: { x: number; y: number }) => void; onKey: (event: { code: string }) => void }>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type OnHandlers<E> = ____;\n",
+            "solution": "type OnHandlers<E> = { [K in keyof E & string as `on${Capitalize<K>}`]: (event: E[K]) => void };\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w20-fam-handlers-4",
+            "title": "Typed handlers (4/5) — did it handle it?",
+            "prompt": "Twist 3: did it handle it?. Write `Checkers<E>`: each handler now returns `boolean` — whether it handled the event.",
+            "hint": "The answer begins `{ [K in keyof E]: …`",
+            "hints": [
+              "The answer begins `{ [K in keyof E]: …`"
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype Events = { click: { x: number; y: number }; key: { code: string } };\ntype _1 = Expect<Equal<Checkers<Events>[\"key\"], (event: { code: string }) => boolean>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Checkers<E> = ____;\n",
+            "solution": "type Checkers<E> = { [K in keyof E]: (event: E[K]) => boolean };\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w20-fam-handlers-5",
+            "title": "Typed handlers (5/5) — the other direction",
+            "prompt": "Twist 4: the other direction. Write `Creators<E>`: for each event, a function taking its payload and returning `{ type: K; payload: E[K] }` — an action creator.",
+            "hint": "The answer begins `{ [K in keyof E]: (payload: E[K]) => …`",
+            "hints": [
+              "The answer begins `{ [K in keyof E]: (payload: E[K]) => …`"
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype Events = { click: { x: number; y: number }; key: { code: string } };\ntype _1 = Expect<Equal<ReturnType<Creators<Events>[\"click\"]>, { type: \"click\"; payload: { x: number; y: number } }>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Creators<E> = ____;\n",
+            "solution": "type Creators<E> = { [K in keyof E]: (payload: E[K]) => { type: K; payload: E[K] } };\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_mapped_types-order1",
             "title": "Put it in order: Tracking which fields changed",
             "prompt": "The lines of the worked example “Tracking which fields changed” from Mapped Types, shuffled. Put them back in an order that compiles and prints exactly:\n\n    age,city",
@@ -49243,6 +51075,161 @@
               {
                 "input": "5 1",
                 "output": "5"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w23-fam-counter-1",
+            "title": "A counter class (1/5)",
+            "prompt": "The base problem. Write `class Counter` with a private `#count`, an `inc()` method and a `value` getter. The input is a line of `inc` words; print the final value.",
+            "hint": "The reference solution uses `split`, a `for` loop and a class.",
+            "hints": [
+              "The reference solution uses `split`, a `for` loop and a class.",
+              "The reference solution is 12 lines and begins: `class Counter {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nclass Counter {\n  #count = 0;\n  inc(): void {\n    this.#count++;\n  }\n  get value(): number {\n    return this.#count;\n  }\n}\nconst c = new Counter();\nfor (const op of input.split(/\\s+/)) if (op === \"inc\") c.inc();\nconsole.log(c.value);\n",
+            "tests": [
+              {
+                "input": "inc inc inc",
+                "output": "3"
+              },
+              {
+                "input": "inc",
+                "output": "1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w23-fam-counter-2",
+            "title": "A counter class (2/5) — a step",
+            "prompt": "Twist 1: a step. The first token is a step size given to the constructor; each `inc` adds the step.",
+            "hint": "The reference solution uses `split`, a `for` loop and a class.",
+            "hints": [
+              "The reference solution uses `split`, a `for` loop and a class.",
+              "The reference solution is 17 lines and begins: `class Counter {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nclass Counter {\n  #count = 0;\n  readonly #step: number;\n  constructor(step: number) {\n    this.#step = step;\n  }\n  inc(): void {\n    this.#count += this.#step;\n  }\n  get value(): number {\n    return this.#count;\n  }\n}\nconst [step = \"1\", ...ops] = input.split(/\\s+/);\nconst c = new Counter(Number(step));\nfor (const op of ops) if (op === \"inc\") c.inc();\nconsole.log(c.value);\n",
+            "tests": [
+              {
+                "input": "5 inc inc",
+                "output": "10"
+              },
+              {
+                "input": "2 inc",
+                "output": "2"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w23-fam-counter-3",
+            "title": "A counter class (3/5) — more operations",
+            "prompt": "Twist 2: more operations. Ops are now `inc`, `dec` and `reset`; the count never goes below zero.",
+            "hint": "The reference solution uses `split`, a `for` loop, `Math` and a class.",
+            "hints": [
+              "The reference solution uses `split`, a `for` loop, `Math` and a class.",
+              "The reference solution is 22 lines and begins: `class Counter {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nclass Counter {\n  #count = 0;\n  inc(): void {\n    this.#count++;\n  }\n  dec(): void {\n    this.#count = Math.max(0, this.#count - 1);\n  }\n  reset(): void {\n    this.#count = 0;\n  }\n  get value(): number {\n    return this.#count;\n  }\n}\nconst c = new Counter();\nfor (const op of input.split(/\\s+/)) {\n  if (op === \"inc\") c.inc();\n  else if (op === \"dec\") c.dec();\n  else if (op === \"reset\") c.reset();\n}\nconsole.log(c.value);\n",
+            "tests": [
+              {
+                "input": "inc inc dec dec dec inc",
+                "output": "1"
+              },
+              {
+                "input": "inc reset inc",
+                "output": "1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w23-fam-counter-4",
+            "title": "A counter class (4/5) — a history",
+            "prompt": "Twist 3: a history. Also keep the value after every operation, exposed as a `readonly number[]`; print the history space-separated.",
+            "hint": "The reference solution uses `split`, `join`, a `for` loop, `Math` and a class.",
+            "hints": [
+              "The reference solution uses `split`, `join`, a `for` loop, `Math` and a class.",
+              "The reference solution is 24 lines and begins: `class Counter {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nclass Counter {\n  #count = 0;\n  readonly #history: number[] = [];\n  #record(): void {\n    this.#history.push(this.#count);\n  }\n  inc(): void {\n    this.#count++;\n    this.#record();\n  }\n  dec(): void {\n    this.#count = Math.max(0, this.#count - 1);\n    this.#record();\n  }\n  get history(): readonly number[] {\n    return this.#history;\n  }\n}\nconst c = new Counter();\nfor (const op of input.split(/\\s+/)) {\n  if (op === \"inc\") c.inc();\n  else if (op === \"dec\") c.dec();\n}\nconsole.log(c.history.join(\" \"));\n",
+            "tests": [
+              {
+                "input": "inc inc dec dec dec inc",
+                "output": "1 2 1 0 0 1"
+              },
+              {
+                "input": "inc",
+                "output": "1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w23-fam-counter-5",
+            "title": "A counter class (5/5) — a limit",
+            "prompt": "Twist 4: a limit. Write `class BoundedCounter extends Counter` whose constructor takes a maximum; `inc()` past it stays at the maximum (override it and call `super.inc()`). The first token is the maximum.",
+            "hint": "The reference solution uses `split`, a `for` loop and a class.",
+            "hints": [
+              "The reference solution uses `split`, a `for` loop and a class.",
+              "The reference solution is 23 lines and begins: `class Counter {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nclass Counter {\n  #count = 0;\n  inc(): void {\n    this.#count++;\n  }\n  get value(): number {\n    return this.#count;\n  }\n}\nclass BoundedCounter extends Counter {\n  readonly #max: number;\n  constructor(max: number) {\n    super();\n    this.#max = max;\n  }\n  override inc(): void {\n    if (this.value < this.#max) super.inc();\n  }\n}\nconst [max = \"0\", ...ops] = input.split(/\\s+/);\nconst c = new BoundedCounter(Number(max));\nfor (const op of ops) if (op === \"inc\") c.inc();\nconsole.log(c.value);\n",
+            "tests": [
+              {
+                "input": "2 inc inc inc inc",
+                "output": "2"
+              },
+              {
+                "input": "5 inc",
+                "output": "1"
               }
             ],
             "source_slug": "",
@@ -55230,6 +57217,161 @@
               {
                 "input": "7",
                 "output": "item7\nextra item1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w26-fam-fetch-1",
+            "title": "Asynchronous lookups (1/5)",
+            "prompt": "The base problem. `fetchUser(id)` is an async function resolving to `user<id>`. For each id on the input line, await it in turn and print the result.",
+            "hint": "The reference solution uses `split`, a `for` loop and `await`.",
+            "hints": [
+              "The reference solution uses `split`, a `for` loop and `await`.",
+              "The reference solution is 7 lines and begins: `async function fetchUser(id: number): Promise<string> {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nasync function fetchUser(id: number): Promise<string> {\n  return `user${id}`;\n}\nasync function main(): Promise<void> {\n  for (const t of input.split(/\\s+/)) console.log(await fetchUser(Number(t)));\n}\nmain();\n",
+            "tests": [
+              {
+                "input": "1 2 3",
+                "output": "user1\nuser2\nuser3"
+              },
+              {
+                "input": "7",
+                "output": "user7"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w26-fam-fetch-2",
+            "title": "Asynchronous lookups (2/5) — all at once",
+            "prompt": "Twist 1: all at once. Start every lookup at once and print the results joined by commas.",
+            "hint": "The reference solution uses `split`, `map`, `join` and `await`.",
+            "hints": [
+              "The reference solution uses `split`, `map`, `join` and `await`.",
+              "The reference solution is 8 lines and begins: `async function fetchUser(id: number): Promise<string> {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nasync function fetchUser(id: number): Promise<string> {\n  return `user${id}`;\n}\nasync function main(): Promise<void> {\n  const users = await Promise.all(input.split(/\\s+/).map((t) => fetchUser(Number(t))));\n  console.log(users.join(\",\"));\n}\nmain();\n",
+            "tests": [
+              {
+                "input": "1 2 3",
+                "output": "user1,user2,user3"
+              },
+              {
+                "input": "7",
+                "output": "user7"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w26-fam-fetch-3",
+            "title": "Asynchronous lookups (3/5) — some fail",
+            "prompt": "Twist 2: some fail. A negative id now rejects with `Error(\"bad id <id>\")`. Print `ok <user>` or `failed <message>` for every id, in input order.",
+            "hint": "The reference solution uses `split`, `map`, a `for` loop and `await`.",
+            "hints": [
+              "The reference solution uses `split`, `map`, a `for` loop and `await`.",
+              "The reference solution is 11 lines and begins: `async function fetchUser(id: number): Promise<string> {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nasync function fetchUser(id: number): Promise<string> {\n  if (id < 0) throw new Error(`bad id ${id}`);\n  return `user${id}`;\n}\nasync function main(): Promise<void> {\n  const results = await Promise.allSettled(input.split(/\\s+/).map((t) => fetchUser(Number(t))));\n  for (const r of results) {\n    console.log(r.status === \"fulfilled\" ? `ok ${r.value}` : `failed ${r.reason instanceof Error ? r.reason.message : String(r.reason)}`);\n  }\n}\nmain();\n",
+            "tests": [
+              {
+                "input": "1 -2 3",
+                "output": "ok user1\nfailed bad id -2\nok user3"
+              },
+              {
+                "input": "-1",
+                "output": "failed bad id -1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w26-fam-fetch-4",
+            "title": "Asynchronous lookups (4/5) — first success",
+            "prompt": "Twist 3: first success. Print the first lookup to succeed — or `none` if every one fails.",
+            "hint": "The reference solution uses `split`, `map`, `await` and `try`/`catch`.",
+            "hints": [
+              "The reference solution uses `split`, `map`, `await` and `try`/`catch`.",
+              "The reference solution is 12 lines and begins: `async function fetchUser(id: number): Promise<string> {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nasync function fetchUser(id: number): Promise<string> {\n  if (id < 0) throw new Error(`bad id ${id}`);\n  return `user${id}`;\n}\nasync function main(): Promise<void> {\n  try {\n    console.log(await Promise.any(input.split(/\\s+/).map((t) => fetchUser(Number(t)))));\n  } catch {\n    console.log(\"none\");\n  }\n}\nmain();\n",
+            "tests": [
+              {
+                "input": "-1 4 5",
+                "output": "user4"
+              },
+              {
+                "input": "-1 -2",
+                "output": "none"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w26-fam-fetch-5",
+            "title": "Asynchronous lookups (5/5) — two at a time",
+            "prompt": "Twist 4: two at a time. Look the ids up with at most two in flight, and print the results in input order, comma-separated.",
+            "hint": "The reference solution uses `split`, `map`, `join`, `slice`, a `while` loop, `Math` and `await`.",
+            "hints": [
+              "The reference solution uses `split`, `map`, `join`, `slice`, a `while` loop, `Math` and `await`.",
+              "The reference solution is 21 lines and begins: `async function fetchUser(id: number): Promise<string> {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nasync function fetchUser(id: number): Promise<string> {\n  return `user${id}`;\n}\nasync function mapLimit<T, R>(items: readonly T[], limit: number, fn: (x: T) => Promise<R>): Promise<R[]> {\n  const out: R[] = [];\n  let next = 0;\n  const worker = async (): Promise<void> => {\n    while (next < items.length) {\n      const i = next++;\n      const item = items[i];\n      if (item !== undefined) out[i] = await fn(item);\n    }\n  };\n  await Promise.all([worker(), worker()].slice(0, Math.min(limit, items.length)));\n  return out;\n}\nasync function main(): Promise<void> {\n  const ids = input.split(/\\s+/).map(Number);\n  console.log((await mapLimit(ids, 2, fetchUser)).join(\",\"));\n}\nmain();\n",
+            "tests": [
+              {
+                "input": "1 2 3 4 5",
+                "output": "user1,user2,user3,user4,user5"
+              },
+              {
+                "input": "9",
+                "output": "user9"
               }
             ],
             "source_slug": "",
