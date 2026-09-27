@@ -154,7 +154,7 @@ export function TestCaseManager({ problemId, cases, onChange }: Props) {
 
   return (
     <div>
-      <div className="row wrap" style={{ marginBottom: 10 }}>
+      <div className="row wrap mb-2">
         <button onClick={() => setEditing(blank())}>+ Add case</button>
         <button className={showGen ? "primary" : ""} onClick={() => setShowGen((v) => !v)}>
           ✨ Generate cases
@@ -162,19 +162,19 @@ export function TestCaseManager({ problemId, cases, onChange }: Props) {
       </div>
 
       {showGen && (
-        <div className="card" style={{ marginBottom: 12 }}>
+        <div className="card mb-3">
           {!canGenerate ? (
             <div className="dim">
               Generation computes expected outputs by running a known-correct solution against
               reshaped versions of an existing test input.
               {oracles.length === 0 && (
-                <div style={{ marginTop: 6 }}>
+                <div className="mt-1">
                   • No oracle yet — <strong>solve this problem</strong> (an accepted submission) or
                   save a solution in the Solutions tab.
                 </div>
               )}
               {templates.length === 0 && (
-                <div style={{ marginTop: 6 }}>
+                <div className="mt-1">
                   • No usable template input — this problem needs at least one example/test case with
                   numeric input to reshape.
                 </div>
@@ -182,7 +182,7 @@ export function TestCaseManager({ problemId, cases, onChange }: Props) {
             </div>
           ) : (
             <>
-              <div className="row wrap" style={{ gap: 10, marginBottom: 8 }}>
+              <div className="row wrap gap-2 mb-2">
                 <label className="dim">
                   Oracle{" "}
                   <select value={activeOracle?.id} onChange={(e) => setOracleId(e.target.value)}>
@@ -208,7 +208,7 @@ export function TestCaseManager({ problemId, cases, onChange }: Props) {
                   {generating ? "Generating…" : "Generate"}
                 </button>
               </div>
-              <p className="faint" style={{ fontSize: 12, margin: 0 }}>
+              <p className="faint text-xs m-0">
                 Inputs are reshaped from your existing cases (counts/dimensions kept valid); expected
                 outputs come from running the selected solution. Review generated cases before trusting
                 them — they're only as correct as the oracle.
@@ -219,32 +219,29 @@ export function TestCaseManager({ problemId, cases, onChange }: Props) {
       )}
 
       {editing && (
-        <div className="card" style={{ marginBottom: 12 }}>
-          <div className="row" style={{ marginBottom: 8 }}>
-            <input
+        <div className="card mb-3">
+          <div className="row mb-2">
+            <input className="flex-1"
               placeholder="Name"
               value={editing.name}
               onChange={(e) => setEditing({ ...editing, name: e.target.value })}
-              style={{ flex: 1 }}
             />
           </div>
           <div className="io-label">Input (stdin)</div>
-          <textarea
+          <textarea className="w-full"
             rows={4}
-            style={{ width: "100%" }}
             value={editing.input}
             onChange={(e) => setEditing({ ...editing, input: e.target.value })}
           />
-          <div className="io-label" style={{ marginTop: 8 }}>
+          <div className="io-label mt-2">
             Expected output (optional for “Run”)
           </div>
-          <textarea
+          <textarea className="w-full"
             rows={3}
-            style={{ width: "100%" }}
             value={editing.expected_output}
             onChange={(e) => setEditing({ ...editing, expected_output: e.target.value })}
           />
-          <div className="row" style={{ marginTop: 8 }}>
+          <div className="row mt-2">
             <button className="primary" onClick={() => save(editing)}>
               Save
             </button>

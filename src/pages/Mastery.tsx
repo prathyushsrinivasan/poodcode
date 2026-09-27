@@ -1501,7 +1501,7 @@ function ProjectPanel({
         borderColor: shipped ? "var(--good)" : "var(--accent)",
       }}
     >
-      <div className="row" style={{ justifyContent: "space-between", alignItems: "flex-start" }}>
+      <div className="row justify-between items-start">
         <div className="io-label" style={{ color: shipped ? "var(--good)" : "var(--accent)" }}>
           🔨 {spec ? `Build it: ${spec.title}` : "Build it yourself"} {shipped && "— shipped"}
         </div>
@@ -1517,7 +1517,7 @@ function ProjectPanel({
         <>
           <Markdown>{spec.goal}</Markdown>
           <div className="io-label">Requirements</div>
-          <ol style={{ marginTop: 0 }}>
+          <ol className="mt-0">
             {spec.requirements.map((r, i) => (
               <li key={i}>
                 <Markdown>{r}</Markdown>
@@ -1527,7 +1527,7 @@ function ProjectPanel({
           {spec.stretch.length > 0 && (
             <>
               <div className="io-label">Stretch (not tested)</div>
-              <ul style={{ marginTop: 0 }}>
+              <ul className="mt-0">
                 {spec.stretch.map((r, i) => (
                   <li key={i}>
                     <Markdown>{r}</Markdown>
@@ -1536,7 +1536,7 @@ function ProjectPanel({
               </ul>
             </>
           )}
-          <p className="dim quiz-note" style={{ marginTop: 0 }}>
+          <p className="dim quiz-note mt-0">
             Done when all {spec.tests.length} acceptance tests pass — then mark it shipped.
           </p>
         </>
@@ -1572,7 +1572,7 @@ function ProjectPanel({
               tsStrictness={spec?.strictness}
             />
           </div>
-          <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
+          <div className="row gap-2 flex-wrap">
             {spec && (
               <button onClick={runTests} disabled={running}>
                 {running ? "Running…" : `Run ${spec.tests.length} acceptance tests`}
@@ -1608,9 +1608,9 @@ function ProjectPanel({
           </div>
 
           {runErr && (
-            <div className="card" style={{ marginTop: 10, marginBottom: 0, borderColor: "var(--bad)" }}>
-              <div className="io-label" style={{ color: "var(--bad)" }}>Couldn&rsquo;t run</div>
-              <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontSize: 12 }}>{runErr}</pre>
+            <div className="card mt-2 mb-0 border-bad">
+              <div className="io-label c-bad">Couldn&rsquo;t run</div>
+              <pre className="m-0 pre-wrap text-xs">{runErr}</pre>
             </div>
           )}
           {report && (
@@ -1626,7 +1626,7 @@ function ProjectPanel({
           )}
 
           {spec && spec.rubric.length > 0 && (
-            <div style={{ marginTop: 12 }}>
+            <div className="mt-3">
               <div className="io-label">Self-review</div>
               {spec.rubric.map((item, i) => (
                 <label
@@ -1641,7 +1641,7 @@ function ProjectPanel({
           )}
 
           {showHistory && history.length > 0 && (
-            <div className="card" style={{ marginTop: 10 }}>
+            <div className="card mt-2">
               <div className="io-label">Saved versions — newest first</div>
               {history.map((v, i) => (
                 <div key={v.at} className="row" style={{ gap: 8, alignItems: "center", margin: "4px 0" }}>
@@ -1667,14 +1667,14 @@ function ProjectPanel({
           )}
 
           {showReference && spec && shipped && (
-            <div style={{ marginTop: 10 }}>
+            <div className="mt-2">
               <p className="dim quiz-note">
                 One way to meet the brief — compare it with yours rather than copying it. The diff shows what the
-                reference does differently: <span style={{ color: "var(--bad)" }}>−</span> yours,{" "}
-                <span style={{ color: "var(--good)" }}>+</span> the reference.
+                reference does differently: <span className="c-bad">−</span> yours,{" "}
+                <span className="c-good">+</span> the reference.
               </p>
               <DiffView before={code} after={spec.solution} maxHeight={420} />
-              <details style={{ marginTop: 8 }}>
+              <details className="mt-2">
                 <summary className="dim quiz-note">The reference on its own</summary>
                 <Markdown>{"```" + spec.language + "\n" + spec.solution + "\n```"}</Markdown>
               </details>
@@ -1753,12 +1753,12 @@ function QuizPanel({
   }
 
   return (
-    <div className="card" style={{ marginBottom: 14 }}>
-      <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
-        <div className="io-label" style={{ margin: 0 }}>
+    <div className="card mb-3">
+      <div className="row justify-between items-center">
+        <div className="io-label m-0">
           📝 End-of-week quiz
         </div>
-        <span className="dim" style={{ fontSize: 12 }}>
+        <span className="dim text-xs">
           {paper.length} of {week.quiz.length} in the bank · {track.pass_mark}% to pass
           {best !== null && ` · best ${best}%`}
         </span>
@@ -1783,11 +1783,11 @@ function QuizPanel({
       ))}
 
       {!submitted ? (
-        <div className="row" style={{ gap: 10, alignItems: "center", marginTop: 10 }}>
+        <div className="row gap-2 items-center mt-2">
           <button onClick={submit} disabled={answered < paper.length}>
             Submit quiz
           </button>
-          <span className="dim" style={{ fontSize: 12 }}>
+          <span className="dim text-xs">
             {answered}/{paper.length} answered
             {answered < paper.length && " — answer every question first"}
           </span>
@@ -1993,11 +1993,11 @@ function ExamPanel({
       className="card"
       style={{ marginBottom: 0, borderColor: passed ? "var(--good)" : "var(--accent)" }}
     >
-      <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
+      <div className="row justify-between items-center">
         <div className="io-label" style={{ margin: 0, color: passed ? "var(--good)" : "var(--accent)" }}>
           🧪 Coding final — {exam.title} {passed && "✓"}
         </div>
-        <span className="row" style={{ gap: 6 }}>
+        <span className="row gap-1">
           {versions.length > 1 && (
             <span className="badge" title="Alternate versions are offered after a failed attempt.">
               version {variant + 1} of {versions.length}
@@ -2046,7 +2046,7 @@ function ExamPanel({
         />
       </div>
 
-      <div className="row" style={{ marginTop: 10, flexWrap: "wrap", gap: 8 }}>
+      <div className="row mt-2 flex-wrap gap-2">
         <button onClick={submit} disabled={running}>
           {running ? "Judging…" : "Submit final"}
         </button>
@@ -2095,16 +2095,16 @@ function ExamPanel({
       </div>
 
       {showHint && exam.hint && (
-        <div className="card" style={{ marginTop: 10, marginBottom: 0, background: "var(--accent-dim)" }}>
-          <div className="io-label" style={{ color: "var(--accent)" }}>Hint</div>
-          <p style={{ margin: 0 }}>{exam.hint}</p>
+        <div className="card mt-2 mb-0 bg-accent-dim">
+          <div className="io-label c-accent">Hint</div>
+          <p className="m-0">{exam.hint}</p>
         </div>
       )}
 
       {err && (
-        <div className="card" style={{ marginTop: 10, marginBottom: 0, borderColor: "var(--bad)" }}>
-          <div className="io-label" style={{ color: "var(--bad)" }}>Couldn&rsquo;t run</div>
-          <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontSize: 12 }}>{err}</pre>
+        <div className="card mt-2 mb-0 border-bad">
+          <div className="io-label c-bad">Couldn&rsquo;t run</div>
+          <pre className="m-0 pre-wrap text-xs">{err}</pre>
         </div>
       )}
 
@@ -2122,7 +2122,7 @@ function ExamPanel({
       )}
 
       {showSolution && passed && (
-        <div style={{ marginTop: 10 }}>
+        <div className="mt-2">
           <Markdown>{"```" + exam.language + "\n" + exam.solution + "\n```"}</Markdown>
           {types && <Markdown>{"```ts\n" + types.solution + "```"}</Markdown>}
         </div>
@@ -2146,9 +2146,9 @@ function ExamFeedback({
 }) {
   if (report.status === "not_installed") {
     return (
-      <div className="card" style={{ marginTop: 10, marginBottom: 0, borderColor: "var(--bad)" }}>
-        <div className="io-label" style={{ color: "var(--bad)" }}>Toolchain missing</div>
-        <p style={{ margin: 0 }}>
+      <div className="card mt-2 mb-0 border-bad">
+        <div className="io-label c-bad">Toolchain missing</div>
+        <p className="m-0">
           {report.not_installed_hint || "Install the language toolchain to run this final."}
         </p>
       </div>
@@ -2157,9 +2157,9 @@ function ExamFeedback({
 
   if (report.compile_error) {
     return (
-      <div className="card" style={{ marginTop: 10, marginBottom: 0, borderColor: "var(--bad)" }}>
-        <div className="io-label" style={{ color: "var(--bad)" }}>Compile error</div>
-        <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontSize: 12 }}>{report.compile_error}</pre>
+      <div className="card mt-2 mb-0 border-bad">
+        <div className="io-label c-bad">Compile error</div>
+        <pre className="m-0 pre-wrap text-xs">{report.compile_error}</pre>
         <TsErrorLinks text={report.compile_error} />
       </div>
     );
@@ -2177,7 +2177,7 @@ function ExamFeedback({
           : `${report.passed} / ${report.total} tests passed`}
       </div>
       {accepted ? (
-        <p style={{ margin: 0 }}>
+        <p className="m-0">
           {acceptedNote ?? (
             <>
               Week {weekNumber}&rsquo;s coding final is done. With the quiz passed and every

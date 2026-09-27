@@ -69,7 +69,7 @@ export function UnitLab({ lab }: { lab: Lab }) {
   const set = (k: string, v: string) => setValues((p) => ({ ...p, [k]: v }));
 
   return (
-    <div className="card" style={{ padding: 14 }}>
+    <div className="card p-3">
       <Markdown>{lab.intro}</Markdown>
       <div className="row" style={{ flexWrap: "wrap", gap: 6, margin: "8px 0 12px" }}>
         {lab.presets.map((p, i) => (
@@ -102,7 +102,7 @@ type LabProps = { v: Record<string, string>; set: (k: string, v: string) => void
 function Field({ label, name, v, set, width = 150 }: LabProps & { label: string; name: string; width?: number }) {
   const bad = parseBig(v[name] ?? "") === null;
   return (
-    <label className="dim" style={{ fontSize: 13, display: "inline-flex", alignItems: "center", gap: 6 }}>
+    <label className="dim text-sm d-inline-flex items-center gap-1">
       {label}
       <input
         className="mono"
@@ -119,7 +119,7 @@ function Bits({ value, compare }: { value: bigint; compare?: bigint }) {
   const s = bits32(value);
   const c = compare === undefined ? null : bits32(compare);
   return (
-    <span className="mono" style={{ fontSize: 12, whiteSpace: "nowrap" }}>
+    <span className="mono text-xs ws-nowrap">
       {s.split("").map((ch, i) => (
         <span
           key={i}
@@ -143,7 +143,7 @@ function BitsLab({ v, set }: LabProps) {
   const rows = a !== null && b !== null && k !== null ? bitRows(a, b, k) : null;
   return (
     <>
-      <div className="row" style={{ gap: 14, flexWrap: "wrap", marginBottom: 10 }}>
+      <div className="row gap-3 flex-wrap mb-2">
         <Field label="a" name="a" v={v} set={set} />
         <Field label="b" name="b" v={v} set={set} />
         <Field label="shift k" name="k" v={v} set={set} width={70} />
@@ -151,7 +151,7 @@ function BitsLab({ v, set }: LabProps) {
       {!rows ? (
         <div className="dim">Type integers (decimal, 0x… or 0b…).</div>
       ) : (
-        <div style={{ overflowX: "auto" }}>
+        <div className="overflow-x-auto">
           <table className="data">
             <thead>
               <tr>
@@ -162,20 +162,20 @@ function BitsLab({ v, set }: LabProps) {
               </tr>
             </thead>
             <tbody>
-              <tr style={{ cursor: "default" }}>
+              <tr className="cursor-default">
                 <td className="mono">a</td>
                 <td><Bits value={a!} /></td>
                 <td className="mono">{String(toInt32(a!))}</td>
                 <td className="dim">{toInt32(a!) !== a ? "wrapped to a Java int" : "as typed"}</td>
               </tr>
-              <tr style={{ cursor: "default" }}>
+              <tr className="cursor-default">
                 <td className="mono">b</td>
                 <td><Bits value={b!} /></td>
                 <td className="mono">{String(toInt32(b!))}</td>
                 <td />
               </tr>
               {rows.map((r) => (
-                <tr key={r.expr} style={{ cursor: "default" }}>
+                <tr className="cursor-default" key={r.expr}>
                   <td className="mono">{r.expr}</td>
                   <td>{r.expr.includes("(a)") ? "" : <Bits value={r.value} compare={a!} />}</td>
                   <td className="mono">{String(r.value)}</td>
@@ -207,7 +207,7 @@ function ModularLab({ v, set }: LabProps) {
 
   return (
     <>
-      <div className="row" style={{ gap: 14, flexWrap: "wrap", marginBottom: 10 }}>
+      <div className="row gap-3 flex-wrap mb-2">
         <Field label="a" name="a" v={v} set={set} width={190} />
         <Field label="exponent b" name="b" v={v} set={set} width={130} />
         <Field label="modulus m" name="m" v={v} set={set} width={130} />
@@ -216,7 +216,7 @@ function ModularLab({ v, set }: LabProps) {
         <div className="dim">Type non-negative integers, with m ≥ 1.</div>
       ) : (
         <>
-          <div className="grid cols-2" style={{ gap: 8, marginBottom: 12 }}>
+          <div className="grid cols-2 gap-2 mb-3">
             <Stat label="gcd(a, m)" value={String(res.g)} />
             <Stat label="lcm(a, m) = a / gcd · m" value={String(res.lcm)} />
             <Stat
@@ -252,14 +252,14 @@ function ModularLab({ v, set }: LabProps) {
             />
           </div>
           <h4 style={{ margin: "8px 0 4px" }}>Extended Euclid — every row keeps r ≡ a·s (mod m)</h4>
-          <div style={{ overflowX: "auto", marginBottom: 12 }}>
+          <div className="overflow-x-auto mb-3">
             <table className="data">
               <thead>
                 <tr><th>q</th><th>r₀</th><th>s₀</th><th>r₁</th><th>s₁</th></tr>
               </thead>
               <tbody>
                 {res.ee.steps.map((s, i) => (
-                  <tr key={i} style={{ cursor: "default" }}>
+                  <tr className="cursor-default" key={i}>
                     <td className="mono">{s.q === null ? "start" : String(s.q)}</td>
                     <td className="mono">{String(s.r0)}</td>
                     <td className="mono">{String(s.s0)}</td>
@@ -271,14 +271,14 @@ function ModularLab({ v, set }: LabProps) {
             </table>
           </div>
           <h4 style={{ margin: "8px 0 4px" }}>Square and multiply — one row per bit of b</h4>
-          <div style={{ overflowX: "auto" }}>
+          <div className="overflow-x-auto">
             <table className="data">
               <thead>
                 <tr><th>remaining e</th><th>low bit</th><th>base (squared each row)</th><th>result</th></tr>
               </thead>
               <tbody>
                 {res.pw.steps.map((s, i) => (
-                  <tr key={i} style={{ cursor: "default" }}>
+                  <tr className="cursor-default" key={i}>
                     <td className="mono">{String(s.e)}</td>
                     <td className="mono">{String(s.bit)}</td>
                     <td className="mono">{String(s.base)}</td>
@@ -297,8 +297,8 @@ function ModularLab({ v, set }: LabProps) {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="card" style={{ padding: "8px 10px", margin: 0 }}>
-      <div className="dim" style={{ fontSize: 12 }}>{label}</div>
-      <div className="mono" style={{ wordBreak: "break-all" }}>{value}</div>
+      <div className="dim text-xs">{label}</div>
+      <div className="mono wb-all">{value}</div>
     </div>
   );
 }
@@ -323,15 +323,15 @@ function GridLab({ v, set }: LabProps) {
 
   return (
     <>
-      <div className="row" style={{ gap: 14, flexWrap: "wrap", marginBottom: 10 }}>
+      <div className="row gap-3 flex-wrap mb-2">
         <Field label="rows" name="rows" v={v} set={set} width={50} />
         <Field label="cols" name="cols" v={v} set={set} width={50} />
-        <label className="dim" style={{ fontSize: 13 }}>
+        <label className="dim text-sm">
           <input type="checkbox" checked={eight} onChange={(e) => setEight(e.target.checked)} /> 8 neighbours
         </label>
-        <span className="faint" style={{ fontSize: 12 }}>Click a cell. Up to {GRID_MAX} × {GRID_MAX}.</span>
+        <span className="faint text-xs">Click a cell. Up to {GRID_MAX} × {GRID_MAX}.</span>
       </div>
-      <div className="row" style={{ gap: 20, flexWrap: "wrap", alignItems: "flex-start" }}>
+      <div className="row gap-4 flex-wrap items-start">
         <div
           role="grid"
           aria-label="grid"
@@ -375,13 +375,13 @@ function GridLab({ v, set }: LabProps) {
               <Kv k="Position in spiral order" v={`${spiralIndex} of ${r * c} (numbers on the cells)`} />
             </tbody>
           </table>
-          <div style={{ marginTop: 10 }}>
+          <div className="mt-2">
             <select value={show} onChange={(e) => setShow(e.target.value)} aria-label="transformation">
               {images.map((x) => (
                 <option key={x.name}>{x.name}</option>
               ))}
             </select>
-            <div className="mono" style={{ marginTop: 6 }}>
+            <div className="mono mt-1">
               ({i}, {j}) → ({img.to[0]}, {img.to[1]}) in a {img.shape} grid
             </div>
           </div>
@@ -393,7 +393,7 @@ function GridLab({ v, set }: LabProps) {
 
 function Kv({ k, v }: { k: string; v: string }) {
   return (
-    <tr style={{ cursor: "default" }}>
+    <tr className="cursor-default">
       <td className="dim">{k}</td>
       <td className="mono">{v}</td>
     </tr>

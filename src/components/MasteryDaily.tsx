@@ -52,7 +52,7 @@ export function DailyTypePuzzle({
 
   const index = ladder.findIndex((r) => r.exercise.id === rung.exercise.id);
   return (
-    <details className="card mastery-practice" style={{ marginBottom: 18 }} open={!done}>
+    <details className="card mastery-practice mb-4" open={!done}>
       <summary>
         <strong>🧬 Today&rsquo;s type puzzle</strong>{" "}
         <span className="dim quiz-note">
@@ -86,7 +86,7 @@ export function WeekZero({
 }) {
   if (settings[W0_KEY(track.key)] === "1") return null;
   return (
-    <details className="card mastery-practice mastery-today" style={{ marginBottom: 18 }} open>
+    <details className="card mastery-practice mastery-today mb-4" open>
       <summary>
         <strong>👋 Week 0 — how this programme works</strong>{" "}
         <span className="dim quiz-note">thirty minutes, before Week 1 · not part of any gate</span>
@@ -119,13 +119,13 @@ export function WeekZero({
       </ol>
       {exercise && (
         <>
-          <p className="quiz-note" style={{ marginBottom: 0 }}>
+          <p className="quiz-note mb-0">
             Try it once, now: a first program, judged exactly like every exercise to come.
           </p>
           <ExerciseSections exercises={[exercise]} onSolved={(id) => markMasterySolved(id)} />
         </>
       )}
-      <div className="row" style={{ gap: 8, marginTop: 8 }}>
+      <div className="row gap-2 mt-2">
         <button onClick={() => onOpenWeek(1)}>Go to Week 1</button>
         <button className="ghost" onClick={() => saveSetting(W0_KEY(track.key), "1")}>
           Hide this guide

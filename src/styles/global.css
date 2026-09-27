@@ -30,3 +30,4 @@
 @import "./parts/projects.css"; /* Projects track (G7) */
 @import "./parts/mastery.css"; /* 6-Month Mastery */
 @import "./parts/forms.css"; /* Problem form (H3) */
+@import "./parts/utilities.css"; /* Token utilities — last, like the inline styles they replace (C1) */

@@ -558,7 +558,7 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
             ))}
           </select>
           {openBuffers.length > 1 && (
-            <div className="pill-toggle" style={{ marginLeft: 4 }}>
+            <div className="pill-toggle ml-1">
               {openBuffers.map((l) => (
                 <button
                   type="button"
@@ -624,7 +624,7 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
         </div>
 
         {langInfo && !langInfo.installed && (
-          <div className="card" style={{ margin: 10, borderColor: "var(--medium)" }}>
+          <div className="card m-2 border-medium">
             <strong>{langInfo.label} isn't installed.</strong>{" "}
             <span className="dim">{langInfo.install_hint}</span>
           </div>
@@ -660,7 +660,7 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
                     </option>
                   ))}
                 </select>
-                <span className="faint" style={{ fontSize: 12 }}>
+                <span className="faint text-xs">
                   Reference / second buffer
                 </span>
               </div>
@@ -776,11 +776,11 @@ function DescriptionTab({
 }) {
   return (
     <div>
-      <div className="tag-row" style={{ marginBottom: 12 }}>
+      <div className="tag-row mb-3">
         <TaughtIn slug={problem.slug} />
         <NextInRung slug={problem.slug} />
         {problem.patterns.map((t) => (
-          <span key={t} className="badge" style={{ borderColor: "var(--accent)", color: "var(--accent)" }}>
+          <span key={t} className="badge border-accent c-accent">
             ◆ {t}
           </span>
         ))}
@@ -810,7 +810,7 @@ function DescriptionTab({
       )}
 
       {problem.function_spec && (
-        <div className="card" style={{ marginBottom: 12, borderColor: "var(--accent)" }}>
+        <div className="card mb-3 border-accent">
           <strong>ƒ Function mode.</strong>{" "}
           <span className="dim">
             Implement <span className="mono">{problem.function_spec.name}(
@@ -821,8 +821,8 @@ function DescriptionTab({
       )}
 
       {problem.judge_mode === "checker" && (
-        <div className="card" style={{ marginBottom: 12, borderColor: "var(--good)" }}>
-          <strong style={{ color: "var(--good)" }}>✓ Multiple answers accepted.</strong>{" "}
+        <div className="card mb-3 border-good">
+          <strong className="c-good">✓ Multiple answers accepted.</strong>{" "}
           <span className="dim">A special judge validates your output, so any correct answer passes — you don't have to match one exact string.</span>
         </div>
       )}
@@ -840,14 +840,14 @@ function DescriptionTab({
         <>
           <h2 className="solve-section-title">Examples</h2>
           {problem.examples.map((ex, i) => (
-            <div key={i} className="card" style={{ marginBottom: 10 }}>
+            <div key={i} className="card mb-2">
               <div className="io-label">Input</div>
               <div className="io-block">{ex.input}</div>
-              <div className="io-label" style={{ marginTop: 6 }}>
+              <div className="io-label mt-1">
                 Output
               </div>
               <div className="io-block">{ex.output}</div>
-              {ex.explanation && <p className="dim" style={{ marginBottom: 0 }}>{ex.explanation}</p>}
+              {ex.explanation && <p className="dim mb-0">{ex.explanation}</p>}
             </div>
           ))}
         </>
@@ -900,19 +900,19 @@ function PrerequisitesTab({
 
   return (
     <div>
-      <p className="dim" style={{ marginTop: 0 }}>
+      <p className="dim mt-0">
         Concepts that help you solve this problem. Tick the ones you already know; expand any you
         don't to learn what it is and how it applies here.
       </p>
-      <div className="row" style={{ marginBottom: 12 }}>
-        <div className="progress" style={{ flex: 1 }}>
+      <div className="row mb-3">
+        <div className="progress flex-1">
           <span style={{ width: `${(knownCount / total) * 100}%`, background: ready ? "var(--good)" : "var(--accent)" }} />
         </div>
         <span className="dim mono">{knownCount}/{total} known</span>
       </div>
       {ready && (
-        <div className="card" style={{ marginBottom: 12, borderColor: "var(--good)" }}>
-          <strong style={{ color: "var(--good)" }}>You know all the prerequisites 🎯</strong>{" "}
+        <div className="card mb-3 border-good">
+          <strong className="c-good">You know all the prerequisites 🎯</strong>{" "}
           <span className="dim">Go get it.</span>
         </div>
       )}
@@ -940,9 +940,9 @@ function PrerequisitesTab({
                 {p.name}
               </button>
               {isKnown ? (
-                <span className="badge" style={{ color: "var(--good)", borderColor: "var(--good)" }}>known</span>
+                <span className="badge c-good border-good">known</span>
               ) : (
-                <span className="badge" style={{ color: "var(--medium)", borderColor: "var(--medium)" }}>
+                <span className="badge c-medium border-medium">
                   learn
                 </span>
               )}
@@ -955,23 +955,23 @@ function PrerequisitesTab({
               <div className="result-body">
                 <div>
                   <div className="io-label">What it is</div>
-                  <p style={{ margin: 0 }}>{p.what || "—"}</p>
+                  <p className="m-0">{p.what || "—"}</p>
                 </div>
                 {p.deep && (
                   <div>
                     <div className="io-label">Deeper dive</div>
-                    <p style={{ margin: 0 }}>{p.deep}</p>
+                    <p className="m-0">{p.deep}</p>
                   </div>
                 )}
                 {p.java && (
                   <div>
-                    <div className="io-label" style={{ color: "var(--accent)" }}>In Java</div>
-                    <p style={{ margin: 0 }} className="mono" >{p.java}</p>
+                    <div className="io-label c-accent">In Java</div>
+                    <p className="mono m-0" >{p.java}</p>
                   </div>
                 )}
                 <div>
                   <div className="io-label">How it helps here</div>
-                  <p style={{ margin: 0 }}>{p.how || "—"}</p>
+                  <p className="m-0">{p.how || "—"}</p>
                 </div>
                 <div className="row">
                   <button onClick={() => nav(`/learn/${p.key}`)}>📘 Open full lesson</button>
@@ -1009,7 +1009,7 @@ function NotesTab({ problemId }: { problemId: number }) {
 
   return (
     <div>
-      <div className="row" style={{ marginBottom: 8 }}>
+      <div className="row mb-2">
         <button className={preview ? "" : "primary"} onClick={() => setPreview(false)}>
           Edit
         </button>
@@ -1039,7 +1039,7 @@ function NotesTab({ problemId }: { problemId: number }) {
           placeholder="Markdown notes — supports headings, code blocks, tables, checklists, links…"
         />
       )}
-      <div className="faint" style={{ fontSize: 12, marginTop: 6 }}>
+      <div className="faint text-xs mt-1">
         Autosaved.
       </div>
     </div>
@@ -1091,7 +1091,7 @@ function SolutionsTab({
 
   return (
     <div>
-      <div className="row" style={{ marginBottom: 10 }}>
+      <div className="row mb-2">
         <button onClick={() => setEditing(blank())}>+ New approach</button>
         <button
           className="ghost"
@@ -1102,8 +1102,8 @@ function SolutionsTab({
       </div>
 
       {editing && (
-        <div className="card" style={{ marginBottom: 12 }}>
-          <div className="row wrap" style={{ marginBottom: 8 }}>
+        <div className="card mb-3">
+          <div className="row wrap mb-2">
             <input placeholder="Title" value={editing.title} onChange={(e) => setEditing({ ...editing, title: e.target.value })} />
             <select value={editing.approach_kind} onChange={(e) => setEditing({ ...editing, approach_kind: e.target.value })}>
               {["Brute Force", "Optimized", "Recursive", "Iterative", "Dynamic Programming", "Two Pointers", "Greedy"].map((k) => (
@@ -1113,9 +1113,9 @@ function SolutionsTab({
             <input placeholder="Time e.g. O(n)" style={{ width: 120 }} value={editing.time_complexity} onChange={(e) => setEditing({ ...editing, time_complexity: e.target.value })} />
             <input placeholder="Space e.g. O(1)" style={{ width: 120 }} value={editing.space_complexity} onChange={(e) => setEditing({ ...editing, space_complexity: e.target.value })} />
           </div>
-          <textarea rows={10} style={{ width: "100%" }} value={editing.code} onChange={(e) => setEditing({ ...editing, code: e.target.value })} placeholder="Solution code" />
-          <textarea rows={2} style={{ width: "100%", marginTop: 8 }} value={editing.notes} onChange={(e) => setEditing({ ...editing, notes: e.target.value })} placeholder="Notes on this approach" />
-          <div className="row" style={{ marginTop: 8 }}>
+          <textarea className="w-full" rows={10} value={editing.code} onChange={(e) => setEditing({ ...editing, code: e.target.value })} placeholder="Solution code" />
+          <textarea className="w-full mt-2" rows={2} value={editing.notes} onChange={(e) => setEditing({ ...editing, notes: e.target.value })} placeholder="Notes on this approach" />
+          <div className="row mt-2">
             <button className="primary" onClick={() => save(editing)}>Save</button>
             <button className="ghost" onClick={() => setEditing(null)}>Cancel</button>
           </div>
@@ -1133,7 +1133,7 @@ function SolutionsTab({
         </EmptyState>
       )}
       {list.map((s) => (
-        <div key={s.id} className="card" style={{ marginBottom: 10 }}>
+        <div key={s.id} className="card mb-2">
           <div className="row">
             <strong>{s.title}</strong>
             <span className="badge">{s.approach_kind}</span>
@@ -1200,7 +1200,7 @@ function AttemptsTab({ problemId }: { problemId: number }) {
 
   return (
     <div>
-      <div className="row" style={{ marginBottom: 10 }}>
+      <div className="row mb-2">
         <span className="dim">{list.length} submissions · {accepted.length} accepted</span>
         <span className="spacer" />
         {list.length >= 2 && (
@@ -1211,8 +1211,8 @@ function AttemptsTab({ problemId }: { problemId: number }) {
       </div>
 
       {compare && (
-        <div className="card" style={{ marginBottom: 12 }}>
-          <div className="row wrap" style={{ marginBottom: 8, gap: 8 }}>
+        <div className="card mb-3">
+          <div className="row wrap mb-2 gap-2">
             <label className="dim">
               Left{" "}
               <select value={leftKey} onChange={(e) => setLeftKey(e.target.value as SnapshotKey)}>
@@ -1260,7 +1260,7 @@ function AttemptsTab({ problemId }: { problemId: number }) {
             </span>
             <span className="badge">{a.language}</span>
             {best && a.id === best.id && (
-              <span className="badge" style={{ color: "var(--good)", borderColor: "var(--good)" }}>
+              <span className="badge c-good border-good">
                 ★ best
               </span>
             )}
@@ -1274,7 +1274,7 @@ function AttemptsTab({ problemId }: { problemId: number }) {
           </button>
           {open === i && (
             <div className="result-body">
-              {a.error_text && <div className="io-block" style={{ color: "var(--bad)" }}>{a.error_text}</div>}
+              {a.error_text && <div className="io-block c-bad">{a.error_text}</div>}
               <pre className="io-block" style={{ maxHeight: 320 }}>{a.code}</pre>
             </div>
           )}
@@ -1308,15 +1308,15 @@ function CodeDiff({
 
   return (
     <div>
-      <div className="row" style={{ marginBottom: 6 }}>
-        <span className="dim" style={{ fontSize: 12 }}>
+      <div className="row mb-1">
+        <span className="dim text-xs">
           {aLabel} → {bLabel}
         </span>
         <span className="spacer" />
-        <span className="badge" style={{ color: "var(--good)", borderColor: "var(--good)" }}>
+        <span className="badge c-good border-good">
           +{added}
         </span>
-        <span className="badge" style={{ color: "var(--bad)", borderColor: "var(--bad)" }}>
+        <span className="badge c-bad border-bad">
           −{removed}
         </span>
       </div>
@@ -1329,7 +1329,7 @@ function CodeDiff({
         ))}
       </pre>
       {added === 0 && removed === 0 && (
-        <div className="dim" style={{ marginTop: 6 }}>These two snapshots are identical.</div>
+        <div className="dim mt-1">These two snapshots are identical.</div>
       )}
     </div>
   );
@@ -1378,12 +1378,12 @@ function ReflectTab({ problemId }: { problemId: number }) {
 
   return (
     <div>
-      <p className="dim" style={{ marginTop: 0 }}>
+      <p className="dim mt-0">
         Capture <em>why</em> a solve went wrong. Tagged mistakes roll up into "your top mistake
         types" on the Statistics page — the fastest way to see your recurring blind spots.
       </p>
-      <div className="card" style={{ marginBottom: 12 }}>
-        <div className="row wrap" style={{ gap: 8, marginBottom: 8 }}>
+      <div className="card mb-3">
+        <div className="row wrap gap-2 mb-2">
           <select value={category} onChange={(e) => setCategory(e.target.value)}>
             {MISTAKE_CATEGORIES.map((c) => (
               <option key={c} value={c}>
@@ -1408,7 +1408,7 @@ function ReflectTab({ problemId }: { problemId: number }) {
         list.map((m) => (
           <div key={m.id} className="result">
             <div className="result-head">
-              <span className="badge" style={{ color: "var(--bad)", borderColor: "var(--bad)" }}>
+              <span className="badge c-bad border-bad">
                 {m.category}
               </span>
               <span className="dim">{m.note}</span>
@@ -1435,13 +1435,13 @@ function EditorialTab({
 }) {
   return (
     <div>
-      <div className="card" style={{ marginBottom: 12 }}>
+      <div className="card mb-3">
         <div className="io-label">Optimal complexity</div>
-        <div className="row" style={{ marginTop: 4 }}>
+        <div className="row mt-1">
           <span className="badge">⏱ Time: {problem.optimal_time || "—"}</span>
           <span className="badge">💾 Space: {problem.optimal_space || "—"}</span>
         </div>
-        {problem.optimal_explanation && <p className="dim" style={{ marginBottom: 0, marginTop: 8 }}>{problem.optimal_explanation}</p>}
+        {problem.optimal_explanation && <p className="dim mb-0 mt-2">{problem.optimal_explanation}</p>}
       </div>
 
       {!showEditorial ? (
@@ -1455,10 +1455,10 @@ function EditorialTab({
       ) : (
         <>
           {problem.editorials.length > 0 && (
-            <div style={{ marginBottom: 12 }}>
+            <div className="mb-3">
               <div className="io-label">Approaches (brute force → optimal)</div>
               {problem.editorials.map((e, i) => (
-                <div key={i} className="card" style={{ marginBottom: 8 }}>
+                <div key={i} className="card mb-2">
                   <div className="row">
                     <strong>{e.title}</strong>
                     <span className="spacer" />
@@ -1468,7 +1468,7 @@ function EditorialTab({
                   {/* Markdown: editorial bodies quote code (`x`) and the
                       Idiomatic TypeScript one carries a whole answer. */}
                   {e.body && (
-                    <div className="dim" style={{ marginBottom: 0 }}>
+                    <div className="dim mb-0">
                       <Markdown>{e.body}</Markdown>
                     </div>
                   )}
@@ -1510,7 +1510,7 @@ function FollowUpLink({ slug, title, note }: { slug: string; title: string; note
   }, []);
   const target = problems?.find((p) => p.slug === slug);
   return (
-    <div className="card" style={{ marginBottom: 8 }}>
+    <div className="card mb-2">
       <div className="row">
         <strong>{title}</strong>
         <span className="spacer" />
@@ -1520,7 +1520,7 @@ function FollowUpLink({ slug, title, note }: { slug: string; title: string; note
           </button>
         )}
       </div>
-      {note && <p className="dim" style={{ marginBottom: 0 }}>{note}</p>}
+      {note && <p className="dim mb-0">{note}</p>}
     </div>
   );
 }
@@ -1541,23 +1541,23 @@ function ComplexityTab({ code, problem }: { code: string; problem: Problem }) {
       <div className="grid cols-2">
         <div className="card">
           <div className="io-label">Your solution (estimated)</div>
-          <div style={{ fontSize: 20, fontWeight: 700, marginTop: 4 }}>{est.time}</div>
+          <div className="text-xl fw-bold mt-1">{est.time}</div>
           <div className="dim">space {est.space}</div>
         </div>
         <div className="card">
           <div className="io-label">Optimal</div>
-          <div style={{ fontSize: 20, fontWeight: 700, marginTop: 4 }}>{problem.optimal_time || "—"}</div>
+          <div className="text-xl fw-bold mt-1">{problem.optimal_time || "—"}</div>
           <div className="dim">space {problem.optimal_space || "—"}</div>
         </div>
       </div>
       <div className="card" style={{ marginTop: 12, borderColor: verdictText[timeVerdict].c }}>
         <strong style={{ color: verdictText[timeVerdict].c }}>{verdictText[timeVerdict].t}</strong>
-        <ul style={{ marginBottom: 0 }}>
+        <ul className="mb-0">
           {est.signals.map((s, i) => (
             <li key={i} className="dim">{s}</li>
           ))}
         </ul>
-        <p className="faint" style={{ fontSize: 12, marginTop: 8, marginBottom: 0 }}>
+        <p className="faint text-xs mt-2 mb-0">
           Estimates are heuristic (based on loop nesting, recursion, sorting) — treat them as a prompt, not a proof.
         </p>
       </div>

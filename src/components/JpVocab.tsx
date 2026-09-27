@@ -202,7 +202,7 @@ export function JpVocabMenu({
 
   return (
     <div>
-      <div className="row" style={{ gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
+      <div className="row gap-1 flex-wrap mb-2">
         <button className={activeTag === "all" ? "" : "ghost"} onClick={() => pick("all")}>
           All <span className="jpv-count">{counts.all ?? 0}</span>
         </button>
@@ -233,10 +233,9 @@ export function JpVocabMenu({
       </div>
 
       <div
-        className="row"
-        style={{ gap: 6, flexWrap: "wrap", marginBottom: 10, alignItems: "center" }}
+        className="row gap-1 flex-wrap mb-2 items-center"
       >
-        <span className="dim" style={{ fontSize: 12 }}>
+        <span className="dim text-xs">
           Level
         </span>
         <button
@@ -258,14 +257,13 @@ export function JpVocabMenu({
             {l.label} <span className="jpv-count">{levels[l.id] ?? 0}</span>
           </button>
         ))}
-        <button
-          style={{ marginLeft: 6 }}
+        <button className="ml-1"
           onClick={() => onOpen(ready[0].id, ready.map((w) => w.id))}
           disabled={ready.length === 0}
         >
           🎴 Study due ({ready.length})
         </button>
-        <span className="dim" style={{ fontSize: 12 }}>
+        <span className="dim text-xs">
           {states.learning} learning · {states.new} new · {states.due} due
         </span>
       </div>
@@ -317,7 +315,7 @@ function TagBadges({
   level: number;
 }) {
   return (
-    <span className="row" style={{ gap: 3, flexWrap: "wrap" }}>
+    <span className="row gap-1 flex-wrap">
       {ids.map((id) => (
         <span key={id} className={`badge jpv-tag jpv-tag-${id}`}>
           {tagById.get(id)?.label ?? id}
@@ -446,9 +444,9 @@ export function JpVocabCard({
         aria-label={`${word.term} — ${word.meaning}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
+        <div className="row justify-between items-center">
           <TagBadges ids={word.tags} tagById={tagById} level={word.level} />
-          <span className="dim" style={{ fontSize: 12 }}>
+          <span className="dim text-xs">
             {index + 1} / {ids.length}
           </span>
           <button className="ghost" onClick={onClose} aria-label="Close" style={{ padding: "2px 10px" }}>
@@ -482,12 +480,12 @@ export function JpVocabCard({
         >
           {mode === "reverse" ? (
             <>
-              <div className="jpv-meaning" style={{ fontSize: 24, marginTop: 6 }}>
+              <div className="jpv-meaning text-2xl mt-1">
                 {word.meaning}
               </div>
               {revealed && (
                 <>
-                  <div className="jpv-term" lang="ja" style={{ fontSize: 44, marginTop: 12 }}>
+                  <div className="jpv-term text-2xl mt-3" lang="ja">
                     {word.term}
                   </div>
                   <div className="jpv-reading" lang="ja">
@@ -527,7 +525,7 @@ export function JpVocabCard({
         </div>
 
         {mode === "type" && (
-          <div style={{ textAlign: "center", marginTop: 12 }}>
+          <div className="text-center mt-3">
             <input
               autoFocus
               value={typed}
@@ -559,7 +557,7 @@ export function JpVocabCard({
         )}
 
         {mode === "cloze" && (
-          <div className="grid cols-2" style={{ marginTop: 12 }}>
+          <div className="grid cols-2 mt-3">
             {options.map((opt) => {
               let border: string | undefined;
               if (revealed) {
@@ -603,11 +601,11 @@ export function JpVocabCard({
         {revealed ? (
           <>
             {autoGraded ? (
-              <div className="row" style={{ marginTop: 14 }}>
+              <div className="row mt-3">
                 <button onClick={() => gradeAndAdvance(correct ? 2 : 0)}>Next →</button>
               </div>
             ) : (
-              <div className="row" style={{ marginTop: 14, gap: 8, flexWrap: "wrap" }}>
+              <div className="row mt-3 gap-2 flex-wrap">
                 {GRADES.map((g) => (
                   <button
                     key={g.q}
@@ -617,7 +615,7 @@ export function JpVocabCard({
                     title={`${g.label} — ${g.hint} (press ${g.q + 1})`}
                   >
                     <div>{g.label}</div>
-                    <div className="dim" style={{ fontSize: 11 }}>
+                    <div className="dim text-xs">
                       {g.hint}
                     </div>
                   </button>
@@ -632,7 +630,7 @@ export function JpVocabCard({
             </p>
           </>
         ) : (
-          <div className="row" style={{ justifyContent: "space-between", marginTop: 16, gap: 8 }}>
+          <div className="row justify-between mt-4 gap-2">
             <button className="ghost" onClick={() => onNavigate(ids[wrapIndex(index, -1, ids.length)])}>
               ← Prev
             </button>
@@ -739,11 +737,11 @@ function CardDetails({ word }: { word: JpVocabWord }) {
         <p lang="ja">{word.desc_ja}</p>
       </div>
       <div className="jpv-block jpv-example">
-        <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
+        <div className="row justify-between items-center">
           <div className="io-label" lang="ja">
             例文 · Example
           </div>
-          <span className="row" style={{ gap: 6 }}>
+          <span className="row gap-1">
             {voiceReady &&
               (voice ? (
                 <button
@@ -756,8 +754,7 @@ function CardDetails({ word }: { word: JpVocabWord }) {
                 </button>
               ) : (
                 <span
-                  className="dim"
-                  style={{ fontSize: 11 }}
+                  className="dim text-xs"
                   title="Speech uses voices installed in your operating system; no Japanese voice was found. Adding one in the OS language settings enables this."
                 >
                   no Japanese voice

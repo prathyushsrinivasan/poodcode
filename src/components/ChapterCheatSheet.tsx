@@ -22,7 +22,7 @@ export function ChapterCheatSheet({ name, what, lesson }: { name: string; what: 
 
   return (
     <div>
-      <div className="row" style={{ justifyContent: "flex-end", marginBottom: 6 }}>
+      <div className="row justify-end mb-1">
         <button className="ghost" onClick={print}>
           🖨 Print
         </button>

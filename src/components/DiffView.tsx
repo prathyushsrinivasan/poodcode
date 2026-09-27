@@ -16,9 +16,9 @@ const SIGN_COLOR: Record<DiffLine["op"], string | undefined> = {
 /** `+12 −3`, coloured, for a heading or a badge. */
 export function DiffStatBadge({ added, removed }: { added: number; removed: number }) {
   return (
-    <span className="mono" style={{ fontSize: 12, whiteSpace: "nowrap" }}>
-      <span style={{ color: "var(--good)" }}>+{added}</span>{" "}
-      <span style={{ color: "var(--bad)" }}>−{removed}</span>
+    <span className="mono text-xs ws-nowrap">
+      <span className="c-good">+{added}</span>{" "}
+      <span className="c-bad">−{removed}</span>
     </span>
   );
 }

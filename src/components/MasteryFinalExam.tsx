@@ -87,8 +87,8 @@ export function FinalExamPanel({
 
   if (!finished) {
     return (
-      <div className="card week-card locked" style={{ marginBottom: 18 }}>
-        <div className="row" style={{ alignItems: "center", gap: 10 }}>
+      <div className="card week-card locked mb-4">
+        <div className="row items-center gap-2">
           <span className="week-num">🔒</span>
           <div>
             <strong className="dim">{exam.title}</strong>
@@ -150,10 +150,10 @@ export function FinalExamPanel({
         <div className="io-label" style={{ color: passedBefore ? "var(--good)" : "var(--accent)" }}>
           🎓 {exam.title} {passedBefore && "— passed"}
         </div>
-        <p style={{ marginTop: 0 }}>{inlineCode(exam.intro)}</p>
+        <p className="mt-0">{inlineCode(exam.intro)}</p>
         {result && <AttemptLine attempt={result} exam={exam} label="This sitting" />}
         {headline && !result && <AttemptLine attempt={headline} exam={exam} label={passedBefore ? "Passed" : "Best so far"} />}
-        <div className="row" style={{ gap: 10, alignItems: "center", marginTop: 8 }}>
+        <div className="row gap-2 items-center mt-2">
           <button onClick={start}>{state.attempts.length > 0 ? "Sit it again" : "Start the final exam"}</button>
           <span className="dim quiz-note">
             {exam.minutes / 60} hours · the clock keeps running if you leave the page · {state.attempts.length}{" "}
@@ -170,9 +170,9 @@ export function FinalExamPanel({
   const solvedSet = new Set(sitting.solved);
 
   return (
-    <div className="card" style={{ marginBottom: 18, borderColor: "var(--accent)" }}>
-      <div className="row" style={{ alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-        <div className="io-label" style={{ margin: 0, color: "var(--accent)" }}>
+    <div className="card mb-4 border-accent">
+      <div className="row items-center gap-2 flex-wrap">
+        <div className="io-label m-0 c-accent">
           🎓 {exam.title} — in progress
         </div>
         <span className="spacer" />
@@ -210,7 +210,7 @@ export function FinalExamPanel({
       </H>
       <ExerciseSections exercises={exam.type_section} onSolved={solved} />
 
-      <div className="row" style={{ gap: 10, alignItems: "center", marginTop: 12 }}>
+      <div className="row gap-2 items-center mt-3">
         <button onClick={submit}>Hand in the exam</button>
         <button className="ghost" onClick={abandon}>
           Abandon this sitting
@@ -306,9 +306,9 @@ export function ProgrammeSummary({
   const lastCompleted = new Date().toLocaleDateString();
 
   return (
-    <div className="card" style={{ marginBottom: 18, borderColor: "var(--good)" }}>
-      <div className="row" style={{ alignItems: "center" }}>
-        <div className="io-label" style={{ color: "var(--good)", margin: 0 }}>
+    <div className="card mb-4 border-good">
+      <div className="row items-center">
+        <div className="io-label c-good m-0">
           🏁 Programme complete
         </div>
         <span className="spacer" />
@@ -325,25 +325,25 @@ export function ProgrammeSummary({
             : "The final exam below is the last step.")}
       </p>
       <div className="grid cols-4">
-        <div className="card" style={{ marginBottom: 0 }}>
+        <div className="card mb-0">
           <div className="stat-value">{perWeek.length}</div>
           <div className="stat-label">weeks completed</div>
         </div>
-        <div className="card" style={{ marginBottom: 0 }}>
+        <div className="card mb-0">
           <div className="stat-value">{avg}%</div>
           <div className="stat-label">average best quiz score</div>
         </div>
-        <div className="card" style={{ marginBottom: 0 }}>
+        <div className="card mb-0">
           <div className="stat-value">{problems}</div>
           <div className="stat-label">curated problems solved</div>
         </div>
-        <div className="card" style={{ marginBottom: 0 }}>
+        <div className="card mb-0">
           <div className="stat-value">{formatStudyTime(totalStudy)}</div>
           <div className="stat-label">time invested · {projects} projects shipped</div>
         </div>
       </div>
 
-      <div className="io-label" style={{ marginTop: 12 }}>
+      <div className="io-label mt-3">
         By month
       </div>
       <table className="summary-table">
@@ -372,7 +372,7 @@ export function ProgrammeSummary({
       </table>
 
       {revisit.length > 0 && (
-        <p className="dim quiz-note" style={{ marginBottom: 0 }}>
+        <p className="dim quiz-note mb-0">
           Worth a second look:{" "}
           {revisit.map((x, i) => (
             <span key={x.w.week}>

@@ -87,10 +87,10 @@ function WhyNot({ question, picked }: { question: QuizQuestion; picked: number }
   const notes = chosen.filter((i) => why[i]).map((i) => ({ i, text: why[i]! }));
   if (notes.length === 0) return null;
   return (
-    <div className="quiz-note" style={{ marginTop: 4 }}>
+    <div className="quiz-note mt-1">
       {notes.map((n) => (
         <p key={n.i} style={{ margin: "2px 0", color: "var(--bad)" }}>
-          Why not “{question.options[n.i]!.split("\n")[0]}”: <span style={{ color: "var(--text)" }}>{n.text}</span>
+          Why not “{question.options[n.i]!.split("\n")[0]}”: <span className="c-text">{n.text}</span>
         </p>
       ))}
     </div>

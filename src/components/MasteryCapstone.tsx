@@ -141,7 +141,7 @@ function InterviewBank({ bank }: { bank: MasteryInterviewQ[] }) {
         Answer out loud first — in a real interview nobody hands you the options. Then compare with the
         model answer: did you say the one sentence that matters, and could you give an example?
       </p>
-      <div className="row" style={{ gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
+      <div className="row gap-1 flex-wrap mb-2">
         <button className={topic === "" ? "" : "ghost"} onClick={() => setTopic("")}>
           All
         </button>
@@ -157,12 +157,12 @@ function InterviewBank({ bank }: { bank: MasteryInterviewQ[] }) {
       </div>
 
       {drill !== null && (
-        <div className="card" style={{ borderColor: "var(--accent)" }}>
-          <div className="io-label" style={{ color: "var(--accent)" }}>
+        <div className="card border-accent">
+          <div className="io-label c-accent">
             {bank[drill].topic}
           </div>
           <strong>{inlineCode(bank[drill].question)}</strong>
-          <div className="row" style={{ gap: 8, marginTop: 8 }}>
+          <div className="row gap-2 mt-2">
             <button className="ghost" onClick={() => setDrillShown((s) => !s)}>
               {drillShown ? "Hide the model answer" : "I've answered — show the model answer"}
             </button>
@@ -171,7 +171,7 @@ function InterviewBank({ bank }: { bank: MasteryInterviewQ[] }) {
             </button>
           </div>
           {drillShown && (
-            <div style={{ marginTop: 8 }}>
+            <div className="mt-2">
               <Markdown>{bank[drill].answer}</Markdown>
             </div>
           )}
@@ -180,14 +180,14 @@ function InterviewBank({ bank }: { bank: MasteryInterviewQ[] }) {
 
       {bank.map((q, i) =>
         topic && q.topic !== topic ? null : (
-          <div key={i} className="card" style={{ marginBottom: 8 }}>
+          <div key={i} className="card mb-2">
             <button type="button" className="disclosure-row" aria-expanded={open.has(i)} onClick={() => toggle(i)}>
               <Icon name="chevronRight" size={14} className={`caret ${open.has(i) ? "open" : ""}`} />
               <span className="disclosure-row-text">{inlineCode(q.question)}</span>
               {!topic && <span className="badge">{q.topic}</span>}
             </button>
             {open.has(i) && (
-              <div style={{ marginTop: 8 }}>
+              <div className="mt-2">
                 <Markdown>{q.answer}</Markdown>
               </div>
             )}
@@ -253,7 +253,7 @@ function MockSessionCard({
 
   return (
     <div className="card" style={{ borderColor: running ? "var(--accent)" : undefined }}>
-      <div className="row" style={{ alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+      <div className="row items-center gap-2 flex-wrap">
         <strong>{session.title}</strong>
         <span className="badge">{session.minutes} min</span>
         {summary && (
@@ -280,13 +280,13 @@ function MockSessionCard({
       </p>
 
       {running && (
-        <div style={{ marginTop: 10 }}>
+        <div className="mt-2">
           <div className="io-label">1 · Idiom questions — answer out loud, then compare</div>
           {session.questions.map((qi) => {
             const q = bank[qi];
             if (!q) return null;
             return (
-              <div key={qi} className="card" style={{ marginBottom: 8 }}>
+              <div key={qi} className="card mb-2">
                 <strong>{inlineCode(q.question)}</strong>
                 <div>
                   <button
@@ -305,7 +305,7 @@ function MockSessionCard({
                   </button>
                 </div>
                 {shown.has(qi) && (
-                  <div style={{ marginTop: 6 }}>
+                  <div className="mt-1">
                     <Markdown>{q.answer}</Markdown>
                   </div>
                 )}
@@ -319,12 +319,12 @@ function MockSessionCard({
             onSolved={(id) => markMasterySolved(id)}
           />
 
-          <div className="io-label" style={{ marginTop: 10 }}>
+          <div className="io-label mt-2">
             4 · Score yourself — 1 (not yet) to 4 (interview-ready)
           </div>
           {session.rubric.map((item, ri) => (
             <div key={ri} className="row" style={{ gap: 8, alignItems: "center", margin: "4px 0" }}>
-              <span style={{ flex: 1, fontSize: 13 }}>{inlineCode(item)}</span>
+              <span className="flex-1 text-sm">{inlineCode(item)}</span>
               {[1, 2, 3, 4].map((v) => (
                 <button
                   key={v}
@@ -337,7 +337,7 @@ function MockSessionCard({
               ))}
             </div>
           ))}
-          <div className="row" style={{ gap: 8, marginTop: 8 }}>
+          <div className="row gap-2 mt-2">
             <button onClick={finish} disabled={scores.some((s) => s === 0)}>
               Finish and record the attempt
             </button>
@@ -368,9 +368,9 @@ function CodeReviewCard({
 
   return (
     <div className="card" style={{ borderColor: state.compared ? "var(--good)" : undefined }}>
-      <div className="row" style={{ gap: 8, alignItems: "baseline" }}>
+      <div className="row gap-2 items-baseline">
         <strong>
-          {state.compared && <span style={{ color: "var(--good)" }}>✓ </span>}
+          {state.compared && <span className="c-good">✓ </span>}
           {review.title}
         </strong>
         {state.compared && (
@@ -396,8 +396,7 @@ function CodeReviewCard({
         style={{ width: "100%", minHeight: 80 }}
       />
       {!state.compared ? (
-        <button
-          style={{ marginTop: 8 }}
+        <button className="mt-2"
           disabled={text.trim().length === 0}
           onClick={() => onChange({ ...state, text, compared: true })}
           title={text.trim() ? undefined : "Write your review first."}
@@ -406,7 +405,7 @@ function CodeReviewCard({
         </button>
       ) : (
         <>
-          <div className="io-label" style={{ marginTop: 10 }}>
+          <div className="io-label mt-2">
             The model review — tick what you caught
           </div>
           {review.comments.map((c, i) => (
@@ -427,12 +426,12 @@ function CodeReviewCard({
               <span>{inlineCode(c)}</span>
             </label>
           ))}
-          <div className="io-label" style={{ marginTop: 10 }}>
+          <div className="io-label mt-2">
             After the review
           </div>
           <Markdown>{"```ts\n" + review.fixed + "```"}</Markdown>
           <div className="io-label">It prints</div>
-          <pre className="code-output" style={{ margin: 0 }}>
+          <pre className="code-output m-0">
             {review.fixed_runs || "(nothing)"}
           </pre>
         </>

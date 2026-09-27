@@ -239,16 +239,16 @@ export function CardStudy({
   if (!current) {
     return (
       <div className="card" style={{ textAlign: "center", padding: "26px 18px" }}>
-        <div style={{ fontSize: 30, marginBottom: 6 }}>{graded > 0 ? "🎉" : "🌸"}</div>
+        <div className="text-2xl mb-1">{graded > 0 ? "🎉" : "🌸"}</div>
         <h3 style={{ margin: "0 0 4px" }}>
           {graded > 0 ? "Session complete!" : "You're all caught up."}
         </h3>
-        <p className="dim" style={{ marginTop: 0 }}>
+        <p className="dim mt-0">
           {graded > 0 && `${graded} reviewed · ${againCount} need another look · `}
           {knownCount}/{cards.length} cards started
           {nextDue && ` · next due ${nextDue}`}
         </p>
-        <div className="row" style={{ justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
+        <div className="row justify-center gap-2 flex-wrap">
           <button onClick={() => build(false)}>Study due</button>
           <button className="ghost" onClick={() => build(true)}>
             Study ahead (all {cards.length})
@@ -275,8 +275,8 @@ export function CardStudy({
   return (
     <div>
       {/* header: mode switch + progress */}
-      <div className="row" style={{ justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
-        <div className="row" style={{ gap: 6, flexWrap: "wrap" }}>
+      <div className="row justify-between flex-wrap gap-2">
+        <div className="row gap-1 flex-wrap">
           {modes.map((m) => (
             <button
               key={m.id}
@@ -331,11 +331,11 @@ export function CardStudy({
               padding: "24px 20px",
             }}
           >
-            <div style={{ fontSize: 40, fontWeight: 600 }}>{current.front}</div>
+            <div className="text-2xl fw-bold">{current.front}</div>
             {revealed ? (
               <CardBack card={current} variant={variant} />
             ) : (
-              <p className="dim" style={{ marginTop: 16, marginBottom: 0, fontSize: 13 }}>
+              <p className="dim mt-4 mb-0 text-sm">
                 Tap to reveal
               </p>
             )}
@@ -343,7 +343,7 @@ export function CardStudy({
           {revealed ? (
             <GradeRow onGrade={grade} />
           ) : (
-            <div className="row" style={{ marginTop: 12 }}>
+            <div className="row mt-3">
               <button onClick={() => setRevealed(true)}>Show answer</button>
             </div>
           )}
@@ -392,7 +392,7 @@ export function CardStudy({
       {mode === "type" && quiz && quiz.kind === "type" && (
         <div>
           <div className="card" style={{ textAlign: "center", padding: "24px 18px" }}>
-            <div style={{ fontSize: 40, fontWeight: 600 }}>{current.front}</div>
+            <div className="text-2xl fw-bold">{current.front}</div>
             <p className="dim" style={{ margin: "6px 0 14px", fontSize: 13 }}>
               Type the reading — rōmaji or kana
             </p>
@@ -424,7 +424,7 @@ export function CardStudy({
               }}
             />
             {answered && (
-              <div style={{ marginTop: 12 }}>
+              <div className="mt-3">
                 <div
                   style={{
                     color: typedOk ? "var(--good)" : "var(--bad)",
@@ -437,7 +437,7 @@ export function CardStudy({
               </div>
             )}
           </div>
-          <div className="row" style={{ marginTop: 12 }}>
+          <div className="row mt-3">
             {!answered ? (
               <button onClick={submitTyped} disabled={!typed.trim()}>
                 Check
@@ -462,9 +462,9 @@ function CardBack({ card, variant = "japanese" }: { card: Card; variant?: StudyV
     // (meaning = textbook, example_en = plain English, example_ja = code.)
     return (
       <div style={{ marginTop: 14, width: "100%", maxWidth: 560, textAlign: "left" }}>
-        <div style={{ fontSize: 12, color: "var(--accent)", marginBottom: 2 }}>Textbook</div>
-        <div style={{ fontSize: 16, marginBottom: 12 }}>{card.meaning}</div>
-        <div style={{ fontSize: 12, color: "var(--accent)", marginBottom: 2 }}>In plain English</div>
+        <div className="text-xs c-accent mb-0">Textbook</div>
+        <div className="text-lg mb-3">{card.meaning}</div>
+        <div className="text-xs c-accent mb-0">In plain English</div>
         <div style={{ fontSize: 15, marginBottom: card.example_ja ? 12 : 0 }}>{card.example_en}</div>
         {card.example_ja && (
           <pre
@@ -485,11 +485,11 @@ function CardBack({ card, variant = "japanese" }: { card: Card; variant?: StudyV
   }
   return (
     <div style={{ marginTop: 14, width: "100%", maxWidth: 520 }}>
-      <div style={{ fontSize: 15, color: "var(--accent)", marginBottom: 4 }}>{card.reading}</div>
-      <div style={{ fontSize: 17, marginBottom: 12 }}>{card.meaning}</div>
+      <div className="text-lg c-accent mb-1">{card.reading}</div>
+      <div className="text-lg mb-3">{card.meaning}</div>
       <div style={{ borderTop: "1px solid var(--border)", paddingTop: 12, lineHeight: 1.7 }}>
-        <div style={{ fontSize: 15 }}>{card.example_ja}</div>
-        <div className="dim" style={{ fontStyle: "italic", fontSize: 13 }}>
+        <div className="text-lg">{card.example_ja}</div>
+        <div className="dim italic text-sm">
           {card.example_en}
         </div>
       </div>
@@ -499,7 +499,7 @@ function CardBack({ card, variant = "japanese" }: { card: Card; variant?: StudyV
 
 function GradeRow({ onGrade }: { onGrade: (q: number) => void }) {
   return (
-    <div className="row" style={{ marginTop: 12, gap: 8, flexWrap: "wrap" }}>
+    <div className="row mt-3 gap-2 flex-wrap">
       {GRADES.map((g) => (
         <button
           key={g.q}
@@ -509,7 +509,7 @@ function GradeRow({ onGrade }: { onGrade: (q: number) => void }) {
           title={`${g.label} — ${g.hint}`}
         >
           <div>{g.label}</div>
-          <div className="dim" style={{ fontSize: 11 }}>
+          <div className="dim text-xs">
             {g.hint}
           </div>
         </button>
@@ -548,7 +548,7 @@ function ChoiceQuiz({
           {prompt}
         </div>
       </div>
-      <div className="grid cols-2" style={{ marginTop: 10 }}>
+      <div className="grid cols-2 mt-2">
         {options.map((opt) => {
           let border: string | undefined;
           if (answered) {
@@ -570,10 +570,10 @@ function ChoiceQuiz({
       </div>
       {answered && (
         <>
-          <div className="card" style={{ marginTop: 12, textAlign: "center" }}>
+          <div className="card mt-3 text-center">
             <CardBack card={card} variant={variant} />
           </div>
-          <div className="row" style={{ marginTop: 12 }}>
+          <div className="row mt-3">
             <button onClick={onNext}>Next →</button>
           </div>
         </>

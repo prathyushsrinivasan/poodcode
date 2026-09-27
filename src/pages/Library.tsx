@@ -142,7 +142,7 @@ export default function Library() {
       </div>
 
       {fold.isOpen("intro") && (
-        <div className="cur-panel" style={{ marginBottom: 20 }}>
+        <div className="cur-panel mb-4">
           <div className="row">
             <span className="cur-eyebrow">How this curriculum works</span>
             <span className="spacer" />
@@ -151,7 +151,7 @@ export default function Library() {
             </button>
           </div>
           <Markdown>{data.intro}</Markdown>
-          <p className="dim" style={{ marginBottom: 0 }}>
+          <p className="dim mb-0">
             🎯 <strong>Already know some of this?</strong> The placement test asks one routing
             question and one problem per stage; clear both and that stage's units are marked
             known.
@@ -317,7 +317,7 @@ function ContinuePanel({
             {data.solved === 0 && onShowIntro && (
               <p className="faint" style={{ margin: "14px 0 0", fontSize: 12 }}>
                 New here?{" "}
-                <button className="cur-link-btn" style={{ fontSize: 12 }} onClick={onShowIntro}>
+                <button className="cur-link-btn text-xs" onClick={onShowIntro}>
                   Read how the curriculum works
                 </button>{" "}
                 — two minutes, and it explains what "done" means.
@@ -326,10 +326,10 @@ function ContinuePanel({
           </>
         ) : (
           <>
-            <div className="cur-eyebrow" style={{ color: "var(--good)" }}>
+            <div className="cur-eyebrow c-good">
               🎉 Curriculum complete
             </div>
-            <p style={{ marginBottom: 0 }}>
+            <p className="mb-0">
               Every unit in the curriculum is done, the optional stage included. The work from
               here is revision — the mixed sets, and re-solving the stretch rungs from memory
               rather than from notes.
@@ -340,10 +340,10 @@ function ContinuePanel({
 
       <div className="cur-hero-side">
         <div>
-          <div className="row" style={{ alignItems: "baseline" }}>
+          <div className="row items-baseline">
             <span className="cur-big-stat">{pct}%</span>
             <span className="spacer" />
-            <span className="dim" style={{ fontSize: 12 }}>
+            <span className="dim text-xs">
               {data.solved} / {data.total} problems · {cleared} / {all.length} units
             </span>
           </div>
@@ -400,7 +400,7 @@ function DueToday({
           Review →
         </button>
       </div>
-      <div className="cur-chips" style={{ marginTop: 10 }}>
+      <div className="cur-chips mt-2">
         {shown.map((r) => (
           <span
             key={r.unit.unit.key}
@@ -533,11 +533,11 @@ function StageRouter({
       </button>
       {open && (
         <div className="cur-router">
-          <p className="dim" style={{ marginTop: 0 }}>
+          <p className="dim mt-0">
             Every unit in this stage takes an array and returns a number, so telling them apart
             from the prompt is the real skill. Read this before the stage, and again after.
           </p>
-          <div className="card" style={{ padding: 0, overflowX: "auto" }}>
+          <div className="card p-0 overflow-x-auto">
             <table className="data">
               <thead>
                 <tr>
@@ -548,14 +548,13 @@ function StageRouter({
               </thead>
               <tbody>
                 {stage.router.map((r, i) => (
-                  <tr key={i} style={{ cursor: "default" }}>
+                  <tr className="cursor-default" key={i}>
                     <td>
                       <InlineMarkdown>{r.when}</InlineMarkdown>
                     </td>
                     <td>
                       <button
-                        className="cur-link-btn"
-                        style={{ whiteSpace: "nowrap" }}
+                        className="cur-link-btn ws-nowrap"
                         onClick={() => onOpenUnit(r.unit)}
                       >
                         {iconOf(r.unit)} {titleOf(r.unit)}
@@ -616,7 +615,7 @@ function StagePanel({
   const [sheetOpen, setSheetOpen] = useState(false);
 
   return (
-    <section aria-label={`Stage ${number}: ${stage.title}`} style={{ minWidth: 0 }}>
+    <section className="min-w-0" aria-label={`Stage ${number}: ${stage.title}`}>
       <div className="cur-eyebrow">
         {stage.optional ? "Optional stage" : `Stage ${number} of ${count}`} · {stage.units.length}{" "}
         units · {stage.solved}/{stage.total} problems · {formatMinutes(minutes)}
@@ -680,10 +679,10 @@ function StagePanel({
       </div>
 
       <div className="cur-stage-end" data-stage-end>
-        <span style={{ fontSize: 22 }}>🎲</span>
+        <span className="text-2xl">🎲</span>
         <div style={{ flex: 1, minWidth: 220 }}>
           <strong>Finished the stage? Try the mixed set.</strong>
-          <div className="dim" style={{ fontSize: 13 }}>
+          <div className="dim text-sm">
             Problems from this stage and every earlier one, unlabelled. It is the only way to
             test whether you can pick the technique from the prompt.
           </div>
@@ -732,7 +731,7 @@ function SearchResults({
 
   return (
     <div style={{ maxWidth: 900 }}>
-      <div className="row" style={{ marginBottom: 12 }}>
+      <div className="row mb-3">
         <span className="dim">
           {hits.length} unit{hits.length === 1 ? "" : "s"} match “{query}”
         </span>
@@ -823,7 +822,7 @@ function UnitCard({
       title={`Open ${u.unit.title}`}
     >
       {stageLabel && (
-        <div className="cur-eyebrow" style={{ marginBottom: 6 }}>
+        <div className="cur-eyebrow mb-1">
           {stageLabel}
         </div>
       )}
@@ -844,7 +843,7 @@ function UnitCard({
         </div>
       )}
       <div className="cur-unit-meta">
-        <span className="row" style={{ gap: 8 }}>
+        <span className="row gap-2">
           <span className="cur-minibar">
             <span
               style={{

@@ -115,12 +115,12 @@ function MixedSet({
 
   return (
     <div className="page page-wide">
-      <div className="row" style={{ marginBottom: 4 }}>
+      <div className="row mb-1">
         <button className="ghost" onClick={() => nav("/library")}>
           ← Curriculum
         </button>
       </div>
-      <h1 className="page-title" style={{ marginBottom: 0 }}>
+      <h1 className="page-title mb-0">
         🎲 Mixed set · {stage.title}
       </h1>
       <p className="page-sub">
@@ -128,7 +128,7 @@ function MixedSet({
         before you open the editor.
       </p>
 
-      <div className="card" style={{ marginBottom: 16 }}>
+      <div className="card mb-4">
         <Markdown>{`Everywhere else in the curriculum you are told which
 technique a problem wants — you are reading it on the page named after that
 technique. Here you are not, and that is the whole exercise: **reading a prompt
@@ -186,13 +186,13 @@ function RoutingCard({
   const right = picked === q.answerLabel;
 
   return (
-    <div className="card" style={{ marginBottom: 14 }}>
+    <div className="card mb-3">
       <div className="row">
         <strong>{q.problem.title}</strong>
         <DiffBadge d={q.problem.difficulty} />
         <span className="spacer" />
         {review && review.reps > 0 && (
-          <span className="faint" style={{ fontSize: 12 }}>
+          <span className="faint text-xs">
             routed right {review.reps}× in a row
             {review.lapses > 0 && ` · ${review.lapses} miss${review.lapses === 1 ? "" : "es"}`}
           </span>
@@ -203,7 +203,7 @@ function RoutingCard({
       </div>
 
       <div className="io-label">Which technique does this prompt want?</div>
-      <div className="grid cols-2" style={{ marginTop: 8 }}>
+      <div className="grid cols-2 mt-2">
         {q.options.map((opt) => {
           let border: string | undefined;
           if (picked !== null) {
@@ -229,7 +229,7 @@ function RoutingCard({
 
       {picked !== null && (
         <>
-          <div className="row" style={{ marginTop: 12, gap: 8 }}>
+          <div className="row mt-3 gap-2">
             <span style={{ color: right ? "var(--good)" : "var(--bad)", fontWeight: 600 }}>
               {right ? "Routed correctly." : "Not this one."}
             </span>
@@ -255,7 +255,7 @@ function RoutingCard({
               question should send you back to the wording you did not notice —
               scoring it without saying why would teach nothing. */}
           {q.signalHint && (
-            <div className="hint" style={{ marginTop: 10 }}>
+            <div className="hint mt-2">
               <div className="hint-label">The signal</div>
               <div>
                 When the prompt says <InlineMarkdown>{q.signalHint.when}</InlineMarkdown> → reach
@@ -269,7 +269,7 @@ function RoutingCard({
               sent them here in the first place, and `not` names the near miss
               they most likely confused it with. */}
           {q.routeHint && (
-            <div className="hint" style={{ marginTop: 10 }}>
+            <div className="hint mt-2">
               <div className="hint-label">The routing rule</div>
               <div>
                 <InlineMarkdown>{q.routeHint.when}</InlineMarkdown> →{" "}
@@ -277,7 +277,7 @@ function RoutingCard({
                 <span className="dim"><InlineMarkdown>{q.routeHint.why}</InlineMarkdown></span>
               </div>
               {q.routeHint.notWhen && (
-                <div className="cur-router-not" style={{ marginTop: 6 }}>
+                <div className="cur-router-not mt-1">
                   <span className="cur-router-not-tag">not</span>{" "}
                   <InlineMarkdown>{q.routeHint.notWhen}</InlineMarkdown>
                 </div>
@@ -312,17 +312,17 @@ function Placement({
 
   return (
     <div className="page page-wide">
-      <div className="row" style={{ marginBottom: 4 }}>
+      <div className="row mb-1">
         <button className="ghost" onClick={() => nav("/library")}>
           ← Curriculum
         </button>
       </div>
-      <h1 className="page-title" style={{ marginBottom: 0 }}>
+      <h1 className="page-title mb-0">
         🎯 Placement
       </h1>
       <p className="page-sub">Skip what you already know, honestly.</p>
 
-      <div className="card" style={{ marginBottom: 16 }}>
+      <div className="card mb-4">
         <Markdown>{`The course starts at \`System.out.println\` for everyone.
 That is the right default and a bad only-option: units open regardless of
 readiness, which is correct, but there was no honest way to **skip**.
@@ -371,24 +371,24 @@ function PlacementCard({
   const skipped = stage.unitKeys.every((k) => findUnit(data, k)?.skipped);
 
   return (
-    <div className="card" style={{ marginBottom: 14 }}>
+    <div className="card mb-3">
       <div className="row">
-        <span style={{ fontSize: 20 }}>{stage.stageIcon}</span>
+        <span className="text-xl">{stage.stageIcon}</span>
         <strong>{stage.stageTitle}</strong>
         <span className="spacer" />
         {skipped ? (
-          <span className="badge" style={{ color: "var(--medium)", borderColor: "var(--medium)" }}>
+          <span className="badge c-medium border-medium">
             ✓ Marked known
           </span>
         ) : stage.alreadyCleared ? (
-          <span className="badge" style={{ color: "var(--good)", borderColor: "var(--good)" }}>
+          <span className="badge c-good border-good">
             ● Already cleared
           </span>
         ) : null}
       </div>
 
       {skipped ? (
-        <div className="row" style={{ marginTop: 10 }}>
+        <div className="row mt-2">
           <span className="dim">
             {stage.unitKeys.length} unit{stage.unitKeys.length === 1 ? "" : "s"} marked known.
           </span>
@@ -398,7 +398,7 @@ function PlacementCard({
           </button>
         </div>
       ) : stage.alreadyCleared ? (
-        <p className="dim" style={{ marginTop: 8, marginBottom: 0 }}>
+        <p className="dim mt-2 mb-0">
           You have already cleared every unit here by solving. Nothing to place.
         </p>
       ) : (
@@ -409,7 +409,7 @@ function PlacementCard({
                 <Markdown>{promptOf(q.problem)}</Markdown>
               </div>
               <div className="io-label">Which technique does this prompt want?</div>
-              <div className="grid cols-2" style={{ marginTop: 8 }}>
+              <div className="grid cols-2 mt-2">
                 {q.options.map((opt) => {
                   let border: string | undefined;
                   if (picked !== null) {
@@ -436,16 +436,16 @@ function PlacementCard({
               </div>
             </>
           ) : (
-            <p className="faint" style={{ marginTop: 8 }}>
+            <p className="faint mt-2">
               Not enough sibling techniques to build a routing question for this stage.
             </p>
           )}
 
-          <div className="row" style={{ marginTop: 12, gap: 10, flexWrap: "wrap" }}>
-            <span className={routed ? "" : "dim"} style={{ fontSize: 13 }}>
+          <div className="row mt-3 gap-2 flex-wrap">
+            <span className={`${routed ? "" : "dim"} text-sm`}>
               {picked === null ? "○" : routed ? "✅" : "❌"} Recognition
             </span>
-            <span className={solved ? "" : "dim"} style={{ fontSize: 13 }}>
+            <span className={`${solved ? "" : "dim"} text-sm`}>
               {solved ? "✅" : "○"} Implementation
               {stage.problem && (
                 <>
@@ -468,7 +468,7 @@ function PlacementCard({
             </button>
           </div>
           {picked !== null && !routed && (
-            <p className="faint" style={{ fontSize: 12, marginTop: 8, marginBottom: 0 }}>
+            <p className="faint text-xs mt-2 mb-0">
               Missing the routing question is the signal this stage is worth working, not a
               reason to be locked out of it — every unit is still open from the curriculum.
             </p>

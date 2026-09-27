@@ -407,7 +407,7 @@ export default function TsPlayground() {
         <Link to="/ts-errors">Error glossary →</Link>
       </p>
 
-      <div className="row" style={{ gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
+      <div className="row gap-1 flex-wrap mb-2">
         <span className="dim quiz-note">Examples:</span>
         {EXAMPLES.map((ex) => (
           <button
@@ -435,7 +435,7 @@ export default function TsPlayground() {
               tsOptionsManaged={false}
             />
           </div>
-          <div className="row" style={{ gap: 8, marginTop: 8, alignItems: "flex-start" }}>
+          <div className="row gap-2 mt-2 items-start">
             <textarea
               value={stdin}
               onChange={(e) => setStdin(e.target.value)}
@@ -447,12 +447,12 @@ export default function TsPlayground() {
             </button>
           </div>
           {run && (
-            <div className="card" style={{ marginTop: 8 }}>
+            <div className="card mt-2">
               <div className="io-label">
                 Output {run.exit_code !== 0 && run.exit_code !== null && `· exit ${run.exit_code}`}{" "}
                 {run.timed_out && "· timed out"}
               </div>
-              <pre className="code-output" style={{ margin: 0 }}>
+              <pre className="code-output m-0">
                 {run.stdout || "(no output)"}
               </pre>
               {run.stderr && (
@@ -468,7 +468,7 @@ export default function TsPlayground() {
         </div>
 
         <div className="card playground-side">
-          <div className="row" style={{ gap: 4, flexWrap: "wrap" }} role="tablist">
+          <div className="row gap-1 flex-wrap" role="tablist">
             {(
               [
                 ["types", "Types"],
@@ -522,7 +522,7 @@ export default function TsPlayground() {
               {analysis.types.map((r) => (
                 <TypeRow key={"t" + r.label} row={r} />
               ))}
-              {analysis.values.length > 0 && <div className="io-label" style={{ marginTop: 10 }}>Values</div>}
+              {analysis.values.length > 0 && <div className="io-label mt-2">Values</div>}
               {analysis.values.map((r) => (
                 <TypeRow key={"v" + r.label} row={r} />
               ))}
@@ -564,7 +564,7 @@ export default function TsPlayground() {
                       </div>
                     )}
                     {unreachable.length > 0 && (
-                      <div className="quiz-note" style={{ color: "var(--bad)" }}>
+                      <div className="quiz-note c-bad">
                         Unreachable from <code>{m.states[0]}</code>: <code>{unreachable.join(", ")}</code>
                       </div>
                     )}
@@ -619,15 +619,15 @@ export default function TsPlayground() {
                     </div>
                   )}
                   {st.members.map((m, i) => (
-                    <div key={i} className="playground-row" style={{ flexWrap: "wrap" }}>
+                    <div key={i} className="playground-row flex-wrap">
                       <span className="playground-label">
                         <code>{m.member}</code>
                       </span>
                       <span className="quiz-note">
                         {m.branch === "true" ? (
-                          <span style={{ color: "var(--good)" }}>matches → true branch</span>
+                          <span className="c-good">matches → true branch</span>
                         ) : m.branch === "false" ? (
-                          <span style={{ color: "var(--bad)" }}>no match → false branch</span>
+                          <span className="c-bad">no match → false branch</span>
                         ) : (
                           <span>both branches ({m.branch})</span>
                         )}
@@ -641,7 +641,7 @@ export default function TsPlayground() {
                       </span>
                     </div>
                   ))}
-                  <div className="quiz-note" style={{ marginTop: 6 }}>
+                  <div className="quiz-note mt-1">
                     {st.arg !== null && st.members.length > 1 ? "2. The results, joined into one union" : "2. Result"}:{" "}
                     <code className="playground-type">{st.total}</code>
                   </div>
@@ -742,7 +742,7 @@ export default function TsPlayground() {
                   </span>
                 </label>
               ))}
-              <div className="io-label" style={{ marginTop: 10 }}>
+              <div className="io-label mt-2">
                 {analysis ? `${analysis.diags.length} error${analysis.diags.length === 1 ? "" : "s"}` : "Errors"}
               </div>
               {analysis?.diags.map((d, i) => (
@@ -751,7 +751,7 @@ export default function TsPlayground() {
                 </div>
               ))}
               {errorText && <TsErrorLinks text={errorText} />}
-              <div className="io-label" style={{ marginTop: 14 }}>
+              <div className="io-label mt-3">
                 tsconfig explorer — eight small programs under these flags
               </div>
               {samples.length === 0 && <p className="dim quiz-note">Checking…</p>}

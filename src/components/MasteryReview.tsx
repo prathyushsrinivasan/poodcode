@@ -91,7 +91,7 @@ export function MixedQuiz({
           </QuizCard>
         );
       })}
-      <div className="row" style={{ gap: 8, alignItems: "center" }}>
+      <div className="row gap-2 items-center">
         {!submitted ? (
           <>
             <button
@@ -157,7 +157,7 @@ export function ReviewSession({
   if (completed.length < 2) return null;
 
   return (
-    <details className="card mastery-practice" style={{ marginBottom: 18 }}>
+    <details className="card mastery-practice mb-4">
       <summary>
         <strong>🔁 Review the weeks behind you</strong>{" "}
         <span className="dim quiz-note">
@@ -167,7 +167,7 @@ export function ReviewSession({
       </summary>
 
       {revisit.length > 0 && (
-        <p className="quiz-note" style={{ marginBottom: 6 }}>
+        <p className="quiz-note mb-1">
           Worth revisiting:{" "}
           {revisit.map((x, i) => (
             <span key={x.w.week}>
@@ -182,7 +182,7 @@ export function ReviewSession({
       )}
 
       {weakChapters.length > 0 && (
-        <p className="quiz-note" style={{ marginBottom: 6 }}>
+        <p className="quiz-note mb-1">
           Chapters where most exercises needed more than one try:{" "}
           {weakChapters.slice(0, 5).map((c, i) => (
             <span key={c.key}>

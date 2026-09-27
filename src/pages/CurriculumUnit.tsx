@@ -346,7 +346,7 @@ function UnitView({
       count: String(u.signals.length),
       lead: "The routing table. Reading a prompt and landing on the technique without deriving it is most of what separates fast solvers from slow ones.",
       body: (
-        <div className="card" style={{ padding: 0, overflowX: "auto" }}>
+        <div className="card p-0 overflow-x-auto">
           <table className="data">
             <thead>
               <tr>
@@ -357,7 +357,7 @@ function UnitView({
             </thead>
             <tbody>
               {u.signals.map((s, i) => (
-                <tr key={i} style={{ cursor: "default" }}>
+                <tr className="cursor-default" key={i}>
                   <td><InlineMarkdown>{s.when}</InlineMarkdown></td>
                   <td><strong><InlineMarkdown>{s.reach_for}</InlineMarkdown></strong></td>
                   <td className="dim"><InlineMarkdown>{s.why}</InlineMarkdown></td>
@@ -379,7 +379,7 @@ function UnitView({
       count: String(u.stuck.length),
       lead: "Pitfalls are for after a failed run. This is for before any code exists — not answers, but the question that tends to produce one.",
       body: (
-        <div className="card" style={{ padding: 0, overflowX: "auto" }}>
+        <div className="card p-0 overflow-x-auto">
           <table className="data">
             <thead>
               <tr>
@@ -389,7 +389,7 @@ function UnitView({
             </thead>
             <tbody>
               {u.stuck.map((r, i) => (
-                <tr key={i} style={{ cursor: "default" }}>
+                <tr className="cursor-default" key={i}>
                   <td><InlineMarkdown>{r.when}</InlineMarkdown></td>
                   <td><InlineMarkdown>{r.ask}</InlineMarkdown></td>
                 </tr>
@@ -444,7 +444,7 @@ function UnitView({
       title: "What it costs",
       short: "Costs",
       body: (
-        <div className="card" style={{ padding: 0, overflowX: "auto" }}>
+        <div className="card p-0 overflow-x-auto">
           <table className="data">
             <thead>
               <tr>
@@ -456,7 +456,7 @@ function UnitView({
             </thead>
             <tbody>
               {u.costs.map((c, i) => (
-                <tr key={i} style={{ cursor: "default" }}>
+                <tr className="cursor-default" key={i}>
                   <td><InlineMarkdown>{c.op}</InlineMarkdown></td>
                   <td className="mono">{c.time}</td>
                   <td className="mono">{c.space}</td>
@@ -481,11 +481,11 @@ function UnitView({
       body: u.pitfalls.map((p, i) => (
         <div key={i} className="cu-pitfall">
           <div className="cu-pitfall-symptom">{p.symptom}</div>
-          <div className="dim" style={{ marginBottom: 6 }}>
+          <div className="dim mb-1">
             <InlineMarkdown>{p.cause}</InlineMarkdown>
           </div>
           <div>
-            <strong style={{ color: "var(--good)" }}>Fix: </strong>
+            <strong className="c-good">Fix: </strong>
             <InlineMarkdown>{p.fix}</InlineMarkdown>
           </div>
         </div>
@@ -890,8 +890,7 @@ function UnitView({
         <span className="spacer" />
         {prev && (
           <button
-            className="ghost"
-            style={{ fontSize: 12 }}
+            className="ghost text-xs"
             onClick={() => nav(`/library/unit/${prev.unit.key}`)}
             title="[ — previous unit"
           >
@@ -900,8 +899,7 @@ function UnitView({
         )}
         {next && (
           <button
-            className="ghost"
-            style={{ fontSize: 12 }}
+            className="ghost text-xs"
             onClick={() => nav(`/library/unit/${next.unit.key}`)}
             title="] — next unit"
           >
@@ -914,12 +912,12 @@ function UnitView({
         <div className="cu-hero-icon" aria-hidden>
           {u.icon}
         </div>
-        <div style={{ minWidth: 0 }}>
+        <div className="min-w-0">
           <h1>
             {u.title}
             <StatusBadge status={hydrated.status} stale={hydrated.stale} skipped={hydrated.skipped} />
           </h1>
-          <div className="dim" style={{ fontSize: 15 }}>
+          <div className="dim text-lg">
             {u.tagline}
           </div>
           <div className="cu-hero-progress">
@@ -1043,7 +1041,7 @@ function UnitView({
 
           {nextTab ? (
             <div className="cu-tab-end">
-              <span style={{ fontSize: 24 }} aria-hidden>
+              <span className="text-2xl" aria-hidden>
                 {nextTab.icon}
               </span>
               <div style={{ flex: 1, minWidth: 200 }}>
@@ -1130,7 +1128,7 @@ function UnitView({
             </div>
           )}
 
-          <div className="faint" style={{ fontSize: 12, display: "grid", gap: 6 }}>
+          <div className="faint text-xs d-grid gap-1">
             <div className="cur-eyebrow">Keys</div>
             <div>
               <span className="kbd">1</span>–<span className="kbd">{tabs.length}</span> switch tab
@@ -1170,13 +1168,13 @@ function RungBlock({
   return (
     <div className="cu-rung" style={rung.optional ? { borderStyle: "dashed" } : undefined}>
       <div className="cu-rung-head">
-        <div className="row" style={{ flexWrap: "wrap" }}>
+        <div className="row flex-wrap">
           <span className={`cur-num ${done ? "complete" : rung.solved > 0 ? "started" : ""}`}
             style={{ width: 26, height: 26, fontSize: 12 }}
           >
             {done ? "✓" : number}
           </span>
-          <strong className={rung.optional ? "dim" : ""} style={{ fontSize: 15 }}>
+          <strong className={`${rung.optional ? "dim" : ""} text-lg`}>
             {rung.title}
           </strong>
           {rung.optional && (
@@ -1192,7 +1190,7 @@ function RungBlock({
             </span>
           )}
           <span className="spacer" />
-          <span className="dim mono" style={{ fontSize: 12 }}>
+          <span className="dim mono text-xs">
             {rung.solved}/{rung.total}
           </span>
           {first && (
@@ -1217,7 +1215,7 @@ function RungBlock({
             const p = item.problem;
             if (!p) {
               return (
-                <tr key={item.slug} style={{ cursor: "default" }}>
+                <tr className="cursor-default" key={item.slug}>
                   <td colSpan={4} className="faint">
                     {item.slug} — not in your library
                   </td>
@@ -1243,15 +1241,14 @@ function RungBlock({
                   </Link>
                   {slow && (
                     <span
-                      className="faint"
-                      style={{ fontSize: 12, marginLeft: 6 }}
+                      className="faint text-xs ml-1"
                       title={`Solved, but it took ${Math.round(p.time_taken_seconds / 60)} minutes. Correct is not the same as fluent.`}
                     >
                       🐢 {Math.round(p.time_taken_seconds / 60)}m
                     </span>
                   )}
                   {item.note && (
-                    <div className="faint" style={{ fontSize: 12 }}>
+                    <div className="faint text-xs">
                       <InlineMarkdown>{item.note}</InlineMarkdown>
                     </div>
                   )}
@@ -1328,7 +1325,7 @@ function InvariantBlock({ inv }: { inv: Invariant }) {
  * skeleton, and the column says what to edit. */
 function VariantTable({ variants }: { variants: Variant[] }) {
   return (
-    <div className="card" style={{ padding: 0, overflowX: "auto" }}>
+    <div className="card p-0 overflow-x-auto">
       <table className="data">
         <thead>
           <tr>
@@ -1340,7 +1337,7 @@ function VariantTable({ variants }: { variants: Variant[] }) {
         </thead>
         <tbody>
           {variants.map((v, i) => (
-            <tr key={i} style={{ cursor: "default" }}>
+            <tr className="cursor-default" key={i}>
               <td>
                 <strong>{v.name}</strong>
               </td>
@@ -1376,7 +1373,7 @@ function RewriteBlock({ rewrite }: { rewrite: Rewrite }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="cu-rewrite">
-      <div className="row" style={{ marginBottom: 10 }}>
+      <div className="row mb-2">
         <strong>{rewrite.title}</strong>
       </div>
       <div className="cu-rewrite-pair">
@@ -1397,11 +1394,11 @@ function RewriteBlock({ rewrite }: { rewrite: Rewrite }) {
         <span className="cu-rewrite-edit-tag">the edit</span>{" "}
         <InlineMarkdown>{rewrite.edit}</InlineMarkdown>
       </p>
-      <button className="ghost" style={{ fontSize: 12 }} onClick={() => setOpen((o) => !o)}>
+      <button className="ghost text-xs" onClick={() => setOpen((o) => !o)}>
         {open ? "Hide why" : "Why the edit cannot lose an answer →"}
       </button>
       {open && (
-        <div style={{ marginTop: 10 }}>
+        <div className="mt-2">
           <Markdown>{rewrite.why}</Markdown>
         </div>
       )}
@@ -1425,7 +1422,7 @@ function TraceTable({ trace }: { trace: Trace }) {
   const done = stepping && shown! >= trace.rows.length;
 
   return (
-    <div style={{ marginBottom: 26 }}>
+    <div className="mb-5">
       <div className="row">
         <strong>{trace.title}</strong>
         <span className="spacer" />
@@ -1447,7 +1444,7 @@ function TraceTable({ trace }: { trace: Trace }) {
           <InlineMarkdown>{trace.intro}</InlineMarkdown>
         </p>
       )}
-      <div className="card" style={{ padding: 0, overflowX: "auto" }}>
+      <div className="card p-0 overflow-x-auto">
         <table className="data">
           <thead>
             <tr>
@@ -1458,17 +1455,17 @@ function TraceTable({ trace }: { trace: Trace }) {
           </thead>
           <tbody>
             {visible.map((row, i) => (
-              <tr key={i} style={{ cursor: "default" }}>
+              <tr className="cursor-default" key={i}>
                 {row.map((cell, j) => (
-                  <td key={j} className={j === 0 ? "" : "mono"} style={{ whiteSpace: "nowrap" }}>
+                  <td key={j} className={`${j === 0 ? "" : "mono"} ws-nowrap`}>
                     <InlineMarkdown>{cell}</InlineMarkdown>
                   </td>
                 ))}
               </tr>
             ))}
             {stepping && !done && (
-              <tr style={{ cursor: "default" }}>
-                <td colSpan={trace.headers.length} className="faint" style={{ textAlign: "center" }}>
+              <tr className="cursor-default">
+                <td colSpan={trace.headers.length} className="faint text-center">
                   … say the next row out loud, then reveal it
                 </td>
               </tr>
@@ -1477,7 +1474,7 @@ function TraceTable({ trace }: { trace: Trace }) {
         </table>
       </div>
       {stepping && (
-        <div className="row" style={{ marginTop: 8, gap: 8 }}>
+        <div className="row mt-2 gap-2">
           <button
             className="ghost"
             disabled={shown! <= 1}
@@ -1489,7 +1486,7 @@ function TraceTable({ trace }: { trace: Trace }) {
             Reveal the next row →
           </button>
           <span className="spacer" />
-          <span className="faint mono" style={{ fontSize: 12 }}>
+          <span className="faint mono text-xs">
             {Math.min(shown!, trace.rows.length)}/{trace.rows.length}
           </span>
         </div>
@@ -1498,7 +1495,7 @@ function TraceTable({ trace }: { trace: Trace }) {
           actually been walked — reading the conclusion first would give the
           prediction away. */}
       {trace.takeaway && (!stepping || done) && (
-        <p className="dim" style={{ marginTop: 8 }}>
+        <p className="dim mt-2">
           <InlineMarkdown>{trace.takeaway}</InlineMarkdown>
         </p>
       )}
@@ -1573,19 +1570,19 @@ function ChoiceCard({
   const graded = (review?.reps ?? 0) > 0 || (review?.lapses ?? 0) > 0;
 
   return (
-    <div className="card" style={{ marginBottom: 12 }}>
+    <div className="card mb-3">
       <div className="row">
-        <span className="dim" style={{ fontSize: 13 }}>
+        <span className="dim text-sm">
           {label}
         </span>
         <span className="spacer" />
         {graded && !due && (
-          <span className="faint mono" style={{ fontSize: 12 }} title="Next review">
+          <span className="faint mono text-xs" title="Next review">
             due {review!.due_date}
           </span>
         )}
         {graded && due && (
-          <span className="badge" style={{ color: "var(--accent)", borderColor: "var(--accent)" }}>
+          <span className="badge c-accent border-accent">
             due
           </span>
         )}
@@ -1622,16 +1619,16 @@ function ChoiceCard({
         })}
       </div>
       {picked !== null && (
-        <div style={{ marginTop: 10 }}>
+        <div className="mt-2">
           <strong style={{ color: right ? "var(--good)" : "var(--bad)" }}>
             {right ? "Correct." : mono ? `Not quite — it is ${answer}.` : "Not quite."}
           </strong>
           {!right && !mono && (
-            <div style={{ marginTop: 4 }}>
+            <div className="mt-1">
               The answer: <InlineMarkdown>{answer}</InlineMarkdown>
             </div>
           )}
-          <div className="dim" style={{ marginTop: 4 }}>
+          <div className="dim mt-1">
             <Markdown>{why}</Markdown>
           </div>
         </div>
@@ -1664,17 +1661,17 @@ function CalcCard({
     onGrade(right);
   };
   return (
-    <div className="card" style={{ marginBottom: 12 }}>
+    <div className="card mb-3">
       <div className="row">
-        <span className="dim" style={{ fontSize: 13 }}>Work it out</span>
+        <span className="dim text-sm">Work it out</span>
         <span className="spacer" />
         {graded && !due && (
-          <span className="faint mono" style={{ fontSize: 12 }} title="Next review">
+          <span className="faint mono text-xs" title="Next review">
             due {review!.due_date}
           </span>
         )}
         {graded && due && (
-          <span className="badge" style={{ color: "var(--accent)", borderColor: "var(--accent)" }}>
+          <span className="badge c-accent border-accent">
             due
           </span>
         )}
@@ -1683,7 +1680,7 @@ function CalcCard({
         <InlineMarkdown>{drill.prompt}</InlineMarkdown>
       </div>
       {drill.code && <Markdown>{"```java\n" + drill.code + "```"}</Markdown>}
-      <div className="row" style={{ gap: 8 }}>
+      <div className="row gap-2">
         <input
           className="mono"
           aria-label="Your answer"
@@ -1701,7 +1698,7 @@ function CalcCard({
         </button>
       </div>
       {result !== null && (
-        <div style={{ marginTop: 10 }}>
+        <div className="mt-2">
           <strong style={{ color: result ? "var(--good)" : "var(--bad)" }}>
             {result ? "Correct." : "Not quite."}
           </strong>{" "}
@@ -1710,7 +1707,7 @@ function CalcCard({
               The answer: <span className="mono">{drill.answer}</span>
             </span>
           )}
-          <div className="dim" style={{ marginTop: 4 }}>
+          <div className="dim mt-1">
             <Markdown>{drill.why}</Markdown>
           </div>
         </div>
@@ -1739,18 +1736,18 @@ function EdgeCaseRow({ edge }: { edge: EdgeCase }) {
           <InlineMarkdown>{edge.case}</InlineMarkdown>
         </div>
         <span className="spacer" />
-        <span className="faint mono" style={{ fontSize: 12 }} title="The problem this input is for">
+        <span className="faint mono text-xs" title="The problem this input is for">
           {edge.slug}
         </span>
         <button className="ghost" style={{ fontSize: 12, padding: "2px 8px" }} onClick={copy}>
           {copied ? "Copied" : "Copy input"}
         </button>
       </div>
-      <div className="dim" style={{ marginBottom: 6 }}>
+      <div className="dim mb-1">
         <strong>Catches: </strong>
         <InlineMarkdown>{edge.breaks}</InlineMarkdown>
       </div>
-      <pre className="mono" style={{ margin: 0, fontSize: 12, whiteSpace: "pre-wrap" }}>
+      <pre className="mono m-0 text-xs pre-wrap">
         {edge.input}
       </pre>
     </div>
@@ -1769,7 +1766,7 @@ function WalkthroughBlock({
 }) {
   return (
     <div className="card">
-      <div className="row" style={{ marginBottom: 8 }}>
+      <div className="row mb-2">
         <strong>{walk.title}</strong>
         <span className="spacer" />
         {problemId !== null && (
@@ -1784,7 +1781,7 @@ function WalkthroughBlock({
       </div>
       {walk.steps.map((st, i) => (
         <div key={i} style={{ marginTop: i ? 14 : 0 }}>
-          <div className="dim" style={{ fontSize: 13, fontWeight: 600 }}>
+          <div className="dim text-sm fw-bold">
             {i + 1}. {st.name}
           </div>
           <Markdown>{st.body}</Markdown>
@@ -1818,19 +1815,19 @@ function VariantCard({
   const graded = (review?.reps ?? 0) > 0 || (review?.lapses ?? 0) > 0;
 
   return (
-    <div className="card" style={{ marginBottom: 12 }}>
+    <div className="card mb-3">
       <div className="row">
-        <span className="dim" style={{ fontSize: 13 }}>
+        <span className="dim text-sm">
           The prompt asks for…
         </span>
         <span className="spacer" />
         {graded && !due && (
-          <span className="faint mono" style={{ fontSize: 12 }} title="Next review">
+          <span className="faint mono text-xs" title="Next review">
             due {review!.due_date}
           </span>
         )}
         {graded && due && (
-          <span className="badge" style={{ color: "var(--accent)", borderColor: "var(--accent)" }}>
+          <span className="badge c-accent border-accent">
             due
           </span>
         )}
@@ -1861,15 +1858,15 @@ function VariantCard({
         })}
       </div>
       {picked !== null && (
-        <div style={{ marginTop: 10 }}>
+        <div className="mt-2">
           <strong style={{ color: right ? "var(--good)" : "var(--bad)" }}>
             {right ? "Correct." : `Not quite — it is ${question.answerLabel}.`}
           </strong>
-          <div className="dim" style={{ marginTop: 4 }}>
+          <div className="dim mt-1">
             <InlineMarkdown>{question.change}</InlineMarkdown>
           </div>
           {question.gotcha && (
-            <div className="cu-var-gotcha" style={{ marginTop: 8 }}>
+            <div className="cu-var-gotcha mt-2">
               <span className="cu-var-gotcha-tag">watch</span>{" "}
               <InlineMarkdown>{question.gotcha}</InlineMarkdown>
             </div>
@@ -1908,8 +1905,8 @@ function Check({
   const graded = (review?.reps ?? 0) > 0 || (review?.lapses ?? 0) > 0;
 
   return (
-    <div className="card" style={{ marginBottom: 10 }}>
-      <div className="row" style={{ alignItems: "flex-start" }}>
+    <div className="card mb-2">
+      <div className="row items-start">
         <div style={{ flex: 1, paddingTop: 4 }}>
           <InlineMarkdown>{check.q}</InlineMarkdown>
         </div>
@@ -1919,7 +1916,7 @@ function Check({
           </span>
         )}
         {graded && due && (
-          <span className="badge" style={{ color: "var(--accent)", borderColor: "var(--accent)", marginTop: 5 }}>
+          <span className="badge c-accent border-accent mt-1">
             due
           </span>
         )}
@@ -1932,10 +1929,9 @@ function Check({
           <div className="dim" style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid var(--border)" }}>
             <InlineMarkdown>{check.a}</InlineMarkdown>
           </div>
-          <div className="row" style={{ marginTop: 10, gap: 8 }}>
+          <div className="row mt-2 gap-2">
             <button
-              className="ghost"
-              style={{ borderColor: "var(--bad)", color: "var(--bad)" }}
+              className="ghost border-bad c-bad"
               onClick={() => {
                 onGrade(false);
                 setShow(false);
@@ -1944,8 +1940,7 @@ function Check({
               Forgot
             </button>
             <button
-              className="ghost"
-              style={{ borderColor: "var(--good)", color: "var(--good)" }}
+              className="ghost border-good c-good"
               onClick={() => {
                 onGrade(true);
                 setShow(false);
@@ -1955,7 +1950,7 @@ function Check({
             </button>
             <span className="spacer" />
             {review && review.reps > 0 && (
-              <span className="faint" style={{ fontSize: 12 }}>
+              <span className="faint text-xs">
                 {review.reps} correct in a row
                 {review.lapses > 0 && ` · ${review.lapses} lapse${review.lapses === 1 ? "" : "s"}`}
               </span>

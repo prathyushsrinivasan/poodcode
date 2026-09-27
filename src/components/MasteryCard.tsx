@@ -89,8 +89,8 @@ export function MasteryCard() {
 
   return (
     <Link to="/mastery" className="card mastery-card-link">
-      <div className="row" style={{ justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
-        <div style={{ minWidth: 0 }}>
+      <div className="row justify-between items-start gap-3">
+        <div className="min-w-0">
           <strong>
             🎓 {track.title} · Week {week} of {track.weeks.length}
           </strong>
@@ -100,14 +100,14 @@ export function MasteryCard() {
               : `Still to do: ${outstanding.join(", ")}.`}
           </p>
         </div>
-        <span className="row" style={{ gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
+        <span className="row gap-1 flex-wrap justify-end">
           {behind !== null && behind > 0 && (
-            <span className="badge" style={{ borderColor: "var(--bad)", color: "var(--bad)" }}>
+            <span className="badge border-bad c-bad">
               {behind} week{behind > 1 ? "s" : ""} behind
             </span>
           )}
           {behind !== null && behind <= 0 && (
-            <span className="badge" style={{ borderColor: "var(--good)", color: "var(--good)" }}>
+            <span className="badge border-good c-good">
               on track
             </span>
           )}

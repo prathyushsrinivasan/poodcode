@@ -54,9 +54,9 @@ export function FailingCases({ failing, max = 3 }: { failing: CaseResult[]; max?
         const hidden = r.name.startsWith("Hidden test");
         if (hidden) {
           return (
-            <div key={i} style={{ marginTop: 6, fontSize: 12 }}>
+            <div className="mt-1 text-xs" key={i}>
               <div className="dim">{r.name}</div>
-              <div style={{ color: "var(--bad)" }}>
+              <div className="c-bad">
                 {r.timed_out ? "Timed out." : "Failed."} Its input stays hidden until you pass — think about the
                 cases the visible tests do not cover.
               </div>
@@ -64,17 +64,17 @@ export function FailingCases({ failing, max = 3 }: { failing: CaseResult[]; max?
           );
         }
         return (
-          <div key={i} style={{ marginTop: 8, fontSize: 12 }}>
+          <div className="mt-2 text-xs" key={i}>
             <div className="dim">{r.name}</div>
             {r.timed_out ? (
-              <div style={{ color: "var(--bad)" }}>
+              <div className="c-bad">
                 Timed out on input <code>{r.input.replace(/\n/g, " ⏎ ") || "(none)"}</code> — look for a loop that
                 never ends, or work that grows too fast.
               </div>
             ) : i === 0 ? (
               <OutputCompare input={r.input} expected={r.expected} actual={r.actual} />
             ) : (
-              <div style={{ fontFamily: "var(--font-mono)" }}>
+              <div className="ff-mono">
                 <div>
                   input: <code>{r.input.replace(/\n/g, " ⏎ ") || "(none)"}</code>
                 </div>

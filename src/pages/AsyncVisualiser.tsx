@@ -49,7 +49,7 @@ export default function AsyncVisualiser() {
         <code>setTimeout(f, 0)</code> run last? Step through it. Try your own snippets in the{" "}
         <Link to="/playground/ts">playground</Link>.
       </p>
-      <div className="row" style={{ gap: 6, marginBottom: 12, flexWrap: "wrap" }} role="tablist">
+      <div className="row gap-1 mb-3 flex-wrap" role="tablist">
         {TABS.map(([key, label]) => (
           <button
             key={key}
@@ -82,14 +82,14 @@ function CallStackView() {
 
   return (
     <>
-      <div className="row" style={{ gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+      <div className="row gap-1 flex-wrap mb-2">
         {STACK_SCENARIOS.map((s) => (
           <button key={s.key} className={s.key === key ? "" : "ghost"} onClick={() => setKey(s.key)}>
             {s.title}
           </button>
         ))}
       </div>
-      <p style={{ marginTop: 0 }}>{scenario.lesson}</p>
+      <p className="mt-0">{scenario.lesson}</p>
       <div className="loop-grid">
         <div>
           <div className="io-label">Code</div>
@@ -128,7 +128,7 @@ function CallStackView() {
             )}
           </div>
           {step.captured.length > 0 && (
-            <div className="card loop-box" style={{ marginTop: 8 }}>
+            <div className="card loop-box mt-2">
               <div className="io-label">Captured by closures</div>
               {step.captured.map(([name, value]) => (
                 <div key={name} className="loop-item mono">
@@ -143,7 +143,7 @@ function CallStackView() {
             </span>{" "}
             {step.note}
           </div>
-          <div className="row" style={{ gap: 6, marginTop: 8 }}>
+          <div className="row gap-1 mt-2">
             <button className="ghost" onClick={() => setI(0)} disabled={i === 0}>
               ⏮ Reset
             </button>
@@ -180,7 +180,7 @@ function PipelineView() {
 
   return (
     <>
-      <div className="row" style={{ gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+      <div className="row gap-1 flex-wrap mb-2">
         {PIPE_PRESETS.map((p) => (
           <button
             key={p.title}
@@ -195,21 +195,20 @@ function PipelineView() {
           </button>
         ))}
       </div>
-      <p style={{ marginTop: 0 }}>{lesson}</p>
+      <p className="mt-0">{lesson}</p>
       <div className="card">
         <div className="io-label">Input (JSON)</div>
-        <input
+        <input className="w-full ff-mono"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          style={{ width: "100%", fontFamily: "var(--font-mono)" }}
           aria-label="Input array as JSON"
         />
-        {parseError && <p className="quiz-note" style={{ color: "var(--bad)" }}>Not valid JSON: {parseError}</p>}
+        {parseError && <p className="quiz-note c-bad">Not valid JSON: {parseError}</p>}
         {steps.map((s, k) => {
           const r = results[k];
           return (
             <div key={k} className="pipe-step">
-              <div className="row" style={{ gap: 6, alignItems: "center" }}>
+              <div className="row gap-1 items-center">
                 <code>.</code>
                 <select value={s.method} onChange={(e) => update(k, { method: e.target.value as PipeMethod })}>
                   {PIPE_METHODS.map((m) => (
@@ -219,10 +218,9 @@ function PipelineView() {
                   ))}
                 </select>
                 <code>(</code>
-                <input
+                <input className="flex-1 ff-mono"
                   value={s.arg}
                   onChange={(e) => update(k, { arg: e.target.value })}
-                  style={{ flex: 1, fontFamily: "var(--font-mono)" }}
                   aria-label={`Argument of step ${k + 1}`}
                 />
                 <code>)</code>
@@ -233,11 +231,11 @@ function PipelineView() {
               {r && (
                 <div className="pipe-result">
                   {r.error ? (
-                    <span style={{ color: "var(--bad)" }}>{r.error}</span>
+                    <span className="c-bad">{r.error}</span>
                   ) : (
                     <>
                       → <code>{describe(r.value)}</code>
-                      {r.mutatedInput && <span className="badge" style={{ marginLeft: 6 }}>mutated its input</span>}
+                      {r.mutatedInput && <span className="badge ml-1">mutated its input</span>}
                     </>
                   )}
                 </div>
@@ -248,7 +246,7 @@ function PipelineView() {
         <button className="ghost" onClick={() => setSteps([...steps, { method: "map", arg: "(x) => x" }])}>
           + step
         </button>
-        <p className="dim quiz-note" style={{ marginBottom: 0 }}>
+        <p className="dim quiz-note mb-0">
           Each argument is plain JavaScript (no type annotations), run in this page on the result of the step above.
         </p>
       </div>
@@ -289,14 +287,14 @@ function EventLoop() {
 
   return (
     <>
-      <div className="row" style={{ gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+      <div className="row gap-1 flex-wrap mb-2">
         {SCENARIOS.map((s) => (
           <button key={s.key} className={s.key === key ? "" : "ghost"} onClick={() => setKey(s.key)}>
             {s.title}
           </button>
         ))}
       </div>
-      <p style={{ marginTop: 0 }}>{scenario.lesson}</p>
+      <p className="mt-0">{scenario.lesson}</p>
 
       <div className="loop-grid">
         <div>
@@ -309,7 +307,7 @@ function EventLoop() {
               </div>
             ))}
           </pre>
-          <div className="io-label" style={{ marginTop: 10 }}>
+          <div className="io-label mt-2">
             Predict first — what does it print, line by line?
           </div>
           <textarea
@@ -343,7 +341,7 @@ function EventLoop() {
             </span>{" "}
             {step.note}
           </div>
-          <div className="row" style={{ gap: 6, marginTop: 8 }}>
+          <div className="row gap-1 mt-2">
             <button className="ghost" onClick={() => setI(0)} disabled={i === 0}>
               ⏮ Reset
             </button>
@@ -426,18 +424,18 @@ function Combinators() {
 
   return (
     <>
-      <div className="row" style={{ gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+      <div className="row gap-1 flex-wrap mb-2">
         {COMBINATORS.map((c) => (
           <button key={c.key} className={c.key === comb ? "" : "ghost"} onClick={() => setComb(c.key)} title={c.note}>
             Promise.{c.key}
           </button>
         ))}
       </div>
-      <p className="dim quiz-note" style={{ marginTop: 0 }}>
+      <p className="dim quiz-note mt-0">
         <code>Promise.{comb}</code> — {COMBINATORS.find((c) => c.key === comb)!.note}.
       </p>
 
-      <div className="card" style={{ overflowX: "auto" }}>
+      <div className="card overflow-x-auto">
         <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={`Timeline for Promise.${comb}`}>
           {items.map((p, k) => (
             <g key={k}>

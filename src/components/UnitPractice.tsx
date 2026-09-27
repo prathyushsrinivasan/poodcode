@@ -71,7 +71,7 @@ export function SkeletonBlock({ skeleton }: { skeleton: Skeleton }) {
   const exact = diff !== null && diff.every((l) => l.op === "same");
 
   return (
-    <div style={{ marginBottom: 18 }}>
+    <div className="mb-4">
       <div className="row">
         <strong>{skeleton.name}</strong>
         {skeleton.when && <span className="dim"> — {skeleton.when}</span>}
@@ -97,15 +97,15 @@ export function SkeletonBlock({ skeleton }: { skeleton: Skeleton }) {
       {mode === "read" ? (
         <Markdown>{"```java\n" + skeleton.code + "```"}</Markdown>
       ) : (
-        <div className="card" style={{ marginTop: 8, padding: 10 }}>
-          <p className="faint" style={{ fontSize: 12, marginTop: 0 }}>
+        <div className="card mt-2 p-2">
+          <p className="faint text-xs mt-0">
             The original is hidden — that is the point. Write it, compile it, then
             check yourself against it.
           </p>
           <div style={{ height: 260, border: "1px solid var(--border)", borderRadius: 6 }}>
             <CodeEditor language="java" value={typed} onChange={setTyped} onRun={run} />
           </div>
-          <div className="row" style={{ marginTop: 8, gap: 8 }}>
+          <div className="row mt-2 gap-2">
             <button onClick={run} disabled={running || !typed.trim()}>
               {running ? "Compiling…" : "▶ Compile & run"}
             </button>
@@ -113,13 +113,13 @@ export function SkeletonBlock({ skeleton }: { skeleton: Skeleton }) {
               {checked ? "Hide the diff" : "Check against the original"}
             </button>
             <span className="spacer" />
-            <span className="faint" style={{ fontSize: 12 }}>
+            <span className="faint text-xs">
               Ctrl+Enter runs
             </span>
           </div>
 
           {out && (
-            <div style={{ marginTop: 10 }}>
+            <div className="mt-2">
               <div className="io-label">
                 {out.timed_out
                   ? "Timed out"
@@ -144,7 +144,7 @@ export function SkeletonBlock({ skeleton }: { skeleton: Skeleton }) {
           )}
 
           {diff && (
-            <div style={{ marginTop: 10 }}>
+            <div className="mt-2">
               <div className="io-label">
                 {exact ? "Identical to the original." : "Yours vs the original"}
               </div>

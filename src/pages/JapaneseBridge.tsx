@@ -70,7 +70,7 @@ export default function JapaneseBridge() {
         answers. This is where the vocabulary becomes real engineering practice.
       </p>
 
-      <div className="row" style={{ gap: 6, marginBottom: 16 }}>
+      <div className="row gap-1 mb-4">
         <button className={tab === "solve" ? "" : "ghost"} onClick={() => setTab("solve")}>
           🈁 Solve in Japanese ({bridge.problems.length})
         </button>
@@ -98,7 +98,7 @@ export default function JapaneseBridge() {
         <EmptyState icon="japanese" title="No interview questions yet." />
       ) : (
         <>
-          <div className="row" style={{ gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
+          <div className="row gap-1 flex-wrap mb-3">
             <button
               className={stage === "all" ? "" : "ghost"}
               style={{ padding: "2px 10px", fontSize: 12 }}
@@ -142,9 +142,9 @@ function BridgeCard({
   const [showHint, setShowHint] = useState(false);
 
   return (
-    <div className="card" style={{ display: "flex", flexDirection: "column" }}>
-      <div className="row" style={{ justifyContent: "space-between", alignItems: "flex-start" }}>
-        <strong style={{ fontSize: 16 }}>{problem.title_ja}</strong>
+    <div className="card d-flex flex-col">
+      <div className="row justify-between items-start">
+        <strong className="text-lg">{problem.title_ja}</strong>
         <span className="badge">{problem.slug}</span>
       </div>
 
@@ -167,15 +167,15 @@ function BridgeCard({
       )}
 
       {problem.vocab.length > 0 && (
-        <div style={{ marginBottom: 10 }}>
+        <div className="mb-2">
           <div className="io-label">語彙 · Vocabulary</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <div className="d-flex flex-col gap-0">
             {problem.vocab.map((v, i) => {
               // The same word is taught as a flashcard next door; when it is,
               // the chip becomes the way in rather than a dead repetition.
               const id = wordIds.get(v[0]);
               return (
-                <div key={i} style={{ fontSize: 13 }}>
+                <div className="text-sm" key={i}>
                   {id ? (
                     <Link to={`/japanese?word=${id}`} title={`${v[0]} を単語帳で開く`}>
                       <strong>{v[0]}</strong>
@@ -195,7 +195,7 @@ function BridgeCard({
         {problemId != null ? (
           <button onClick={() => nav(`/solve/${problemId}`)}>この問題を解く →</button>
         ) : (
-          <span className="dim" style={{ fontSize: 12 }}>
+          <span className="dim text-xs">
             (problem not available)
           </span>
         )}
@@ -208,13 +208,12 @@ function BridgeCard({
 
       {showHint && problem.hint_ja && (
         <div
-          className="card"
-          style={{ marginTop: 10, marginBottom: 0, background: "var(--accent-dim)" }}
+          className="card mt-2 mb-0 bg-accent-dim"
         >
-          <div className="io-label" style={{ color: "var(--accent)" }}>
+          <div className="io-label c-accent">
             ヒント
           </div>
-          <p style={{ margin: 0 }}>{problem.hint_ja}</p>
+          <p className="m-0">{problem.hint_ja}</p>
         </div>
       )}
     </div>
@@ -224,8 +223,8 @@ function BridgeCard({
 function InterviewCard({ qa, wordIds }: { qa: InterviewQA; wordIds: Map<string, string> }) {
   const [show, setShow] = useState(false);
   return (
-    <div className="card" style={{ display: "flex", flexDirection: "column" }}>
-      <div className="row" style={{ gap: 6, flexWrap: "wrap", marginBottom: 6 }}>
+    <div className="card d-flex flex-col">
+      <div className="row gap-1 flex-wrap mb-1">
         {qa.tags.map((t) => (
           <span key={t} className="badge">
             {t}
@@ -234,7 +233,7 @@ function InterviewCard({ qa, wordIds }: { qa: InterviewQA; wordIds: Map<string, 
       </div>
       <strong style={{ fontSize: 15, lineHeight: 1.7 }}>{qa.q_ja}</strong>
       {qa.q_en && (
-        <span className="dim" style={{ fontSize: 12.5, marginTop: 2 }}>
+        <span className="dim text-sm mt-0">
           {qa.q_en}
         </span>
       )}
@@ -248,9 +247,9 @@ function InterviewCard({ qa, wordIds }: { qa: InterviewQA; wordIds: Map<string, 
             lineHeight: 1.8,
           }}
         >
-          <div style={{ color: "var(--accent)" }}>{qa.a_ja}</div>
+          <div className="c-accent">{qa.a_ja}</div>
           {qa.a_en && (
-            <div className="dim" style={{ fontStyle: "italic", fontSize: 13, marginTop: 4 }}>
+            <div className="dim italic text-sm mt-1">
               {qa.a_en}
             </div>
           )}
@@ -266,7 +265,7 @@ function InterviewCard({ qa, wordIds }: { qa: InterviewQA; wordIds: Map<string, 
           className="row"
           style={{ gap: 5, flexWrap: "wrap", marginTop: "auto", paddingTop: 10, alignItems: "center" }}
         >
-          <span className="io-label" style={{ margin: 0 }}>
+          <span className="io-label m-0">
             語彙
           </span>
           {qa.terms.map((t) => {

@@ -44,7 +44,7 @@ export function TestResults({ report }: { report: JudgeReport | null }) {
   const [open, setOpen] = useState<number | null>(0);
   if (!report) {
     return (
-      <div className="dim" style={{ padding: 12 }}>
+      <div className="dim p-3">
         Run or submit your code to see results here.
       </div>
     );
@@ -52,9 +52,9 @@ export function TestResults({ report }: { report: JudgeReport | null }) {
 
   if (report.status === "not_installed") {
     return (
-      <div className="card" style={{ borderColor: "var(--medium)" }}>
+      <div className="card border-medium">
         <strong>Toolchain not installed.</strong>
-        <p className="dim" style={{ marginBottom: 0 }}>
+        <p className="dim mb-0">
           {report.not_installed_hint}
         </p>
       </div>
@@ -64,9 +64,9 @@ export function TestResults({ report }: { report: JudgeReport | null }) {
   const isError = report.status === "error" && report.results.length === 0;
   if (isError) {
     return (
-      <div className="card" style={{ borderColor: "var(--bad)" }}>
-        <strong style={{ color: "var(--bad)" }}>Compilation / build error</strong>
-        <pre className="io-block" style={{ marginTop: 8 }}>
+      <div className="card border-bad">
+        <strong className="c-bad">Compilation / build error</strong>
+        <pre className="io-block mt-2">
           {report.compile_error || "Unknown error"}
         </pre>
         <TsErrorLinks text={report.compile_error} />
@@ -95,7 +95,7 @@ export function TestResults({ report }: { report: JudgeReport | null }) {
 
   return (
     <div>
-      <div className="row" style={{ marginBottom: 12 }}>
+      <div className="row mb-3">
         <span
           style={{ color: banner.color, fontWeight: 700, fontSize: 15 }}
         >
@@ -123,7 +123,7 @@ export function TestResults({ report }: { report: JudgeReport | null }) {
             <strong>{r.name}</strong>
             <span className="badge">{r.kind}</span>
             {!r.passed && r.verdict && (
-              <span className="badge" style={{ color: "var(--bad)", borderColor: "var(--bad)" }}>
+              <span className="badge c-bad border-bad">
                 {verdictLabel[r.verdict] ?? r.verdict}
               </span>
             )}

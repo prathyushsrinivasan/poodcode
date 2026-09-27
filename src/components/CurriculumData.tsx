@@ -111,8 +111,7 @@ export function StatusBadge({
   if (skipped) {
     return (
       <span
-        className="badge"
-        style={{ color: "var(--medium)", borderColor: "var(--medium)", borderStyle: "dashed" }}
+        className="badge c-medium border-medium border-dashed"
         title="You marked this known. It counts as cleared, but the app is not claiming you solved it here."
       >
         ✓ Known
@@ -258,9 +257,8 @@ export function NextInRung({ slug }: { slug: string }) {
   return (
     <Link
       to={`/solve/${next.id}`}
-      className="badge"
+      className="badge border-accent c-accent"
       title={`The next unsolved problem on the "${next.rung}" rung`}
-      style={{ borderColor: "var(--accent)", color: "var(--accent)" }}
     >
       Next in {next.rung} → {next.title}
     </Link>

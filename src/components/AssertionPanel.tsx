@@ -63,7 +63,7 @@ export function AssertionPanel({ harness, message, code }: { harness: string; me
         The checks — {passed}/{claims.length} hold
       </div>
       {own && (
-        <p className="dim quiz-note" style={{ marginTop: 0 }}>
+        <p className="dim quiz-note mt-0">
           Your own code has errors too (the <code>main.ts</code> lines below) — fix those first; the claims depend on it.
         </p>
       )}

@@ -16,7 +16,7 @@ export function SkillRadar({ skills, size = 220 }: { skills: Skill[]; size?: num
   const share = (s: Skill) => (s.total === 0 ? 0 : s.done / s.total);
 
   return (
-    <figure className="skill-radar" style={{ margin: 0 }}>
+    <figure className="skill-radar m-0">
       <svg viewBox={`0 0 ${size} ${size}`} width={size} height={size} role="img" aria-label="Skill radar">
         {[0.25, 0.5, 0.75, 1].map((f) => (
           <polygon key={f} points={polygon(() => f)} fill="none" stroke="var(--border)" strokeWidth={1} />
