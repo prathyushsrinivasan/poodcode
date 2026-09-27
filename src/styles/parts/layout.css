@@ -118,3 +118,19 @@
   color: var(--text-dim);
   margin: 0 0 22px;
 }
+
+/* ---- A pop-out window (J4): one column, no chrome ---- */
+.popout {
+  height: 100vh;
+  overflow: auto;
+  padding: var(--space-5) var(--space-6) var(--space-7);
+}
+.popout-body {
+  max-width: 820px;
+  margin: 0 auto;
+}
+.popout-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}

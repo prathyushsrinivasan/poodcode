@@ -1,10 +1,12 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Core capabilities for the Poodcode desktop app.",
-  "windows": ["main"],
+  "description": "Core capabilities for the Poodcode desktop app. Pop-out windows (a lesson or an editorial beside the editor) read the same data, so they share them.",
+  "windows": ["main", "popout-*"],
   "permissions": [
     "core:default",
+    "core:webview:allow-create-webview-window",
+    "core:window:allow-set-focus",
     "dialog:default",
     "dialog:allow-open",
     "dialog:allow-save"

@@ -22,11 +22,12 @@ import { Section, useCollapse } from "../../components/Collapsible";
 import { TrackSkeleton } from "../../components/Skeleton";
 import { ExerciseCard, QuizSection } from "../../components/exercise";
 import { ReaderLayout, ReadStatus, useSeenBottom } from "../../components/reader/Reader";
-import { Badge, Button, EmptyState, ErrorState, Segmented } from "../../components/ui";
+import { Badge, Button, EmptyState, ErrorState, IconButton, Segmented } from "../../components/ui";
 import { loadSolvedExercises, markExerciseSolved, solvedExercises } from "../../lib/learnProgress";
-import { loadFailed } from "../../lib/failures";
+import { loadFailed, saveFailed } from "../../lib/failures";
 import { useNavigate } from "react-router-dom";
 import { conceptLang, langLabel, studyVariant, useLearnData } from "./learnData";
+import { openPopout } from "../../lib/popout";
 
 export default function ConceptPage() {
   const { key } = useParams();
@@ -168,6 +169,11 @@ function ConceptDetail({
             <p className="page-sub">{concept.what}</p>
           </div>
           <div className="page-header-actions">
+            <IconButton
+              icon="external"
+              label="Open the lesson in its own window"
+              onClick={() => void openPopout(`/popout/lesson/${concept.key}`, concept.name).catch(saveFailed("a new window"))}
+            />
             <Button variant="ghost" size="sm" icon="chevronDown" onClick={() => sec.setAll(secKeys, true)}>
               Expand all
             </Button>

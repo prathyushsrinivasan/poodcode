@@ -32,6 +32,7 @@ import Contest from "./pages/Contest";
 import JapaneseBridge from "./pages/JapaneseBridge";
 import Paths from "./pages/Paths";
 import Insights from "./pages/Insights";
+import Popout from "./pages/Popout";
 import Gallery from "./pages/Gallery";
 import { ignore } from "./lib/failures";
 // Dev-only: the component gallery is not part of the shipped app, and the
@@ -134,6 +135,7 @@ function Shell() {
 }
 
 export default function App() {
+  const { pathname } = useLocation();
   const init = useStore((s) => s.init);
   const loaded = useStore((s) => s.loaded);
   const [showWelcome, setShowWelcome] = useState(false);
@@ -171,6 +173,15 @@ export default function App() {
       <div className="boot" role="status">
         Loading Poodcode…
       </div>
+    );
+  }
+
+  // A second window (J4) shows one thing, without the app's chrome.
+  if (pathname.startsWith("/popout/")) {
+    return (
+      <ToastProvider>
+        <Popout />
+      </ToastProvider>
     );
   }
 

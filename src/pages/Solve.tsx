@@ -22,6 +22,7 @@ import { lineDiff, diffStats } from "../lib/diff";
 import type { Attempt, JudgeReport, Mistake, Note, Problem, Solution, TestCase } from "../types";
 import { Button, EmptyState, IconButton } from "../components/ui";
 import { ignore, saveFailed } from "../lib/failures";
+import { openPopout } from "../lib/popout";
 
 type LeftTab =
   | "description"
@@ -456,6 +457,12 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
             {problem.is_favorite ? "★" : "☆"}
           </button>
           <span className="spacer" />
+          <IconButton
+            icon="external"
+            size="sm"
+            label="Open the statement in its own window"
+            onClick={() => void openPopout(`/popout/problem/${problem.id}`, problem.title).catch(saveFailed("a new window"))}
+          />
           <span className="timer dim">⏱ {formatClock(elapsed)}</span>
           <button
             className="ghost"
@@ -1470,6 +1477,16 @@ function EditorialTab({
             </div>
           )}
           <Markdown>{problem.editorial || "_No editorial provided._"}</Markdown>
+          <p>
+            <Button
+              variant="ghost"
+              size="sm"
+              icon="external"
+              onClick={() => void openPopout(`/popout/editorial/${problem.id}`, `${problem.title} · editorial`).catch(saveFailed("a new window"))}
+            >
+              Open the editorial in its own window
+            </Button>
+          </p>
           {problem.follow_ups.length > 0 && (
             <>
               <div className="divider" />
