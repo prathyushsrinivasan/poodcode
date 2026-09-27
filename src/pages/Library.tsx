@@ -17,7 +17,7 @@ import {
   type UnitMatch,
 } from "../lib/curriculum";
 import { reviewLane, type ReviewLane } from "../lib/dsaReview";
-import { EmptyState, ErrorState, Icon, IconButton } from "../components/ui";
+import { EmptyState, ErrorState, Icon, IconButton, Button } from "../components/ui";
 import { loadFailed } from "../lib/failures";
 
 /**
@@ -135,9 +135,11 @@ export default function Library() {
             onClick={() => nav("/library/placement")}
             title="One routing question and one problem per stage. Clear both and its units are marked known."
           >
-            🎯 Placement test
+            Placement test
           </button>
-          <button onClick={() => nav("/library/browse")}>🔎 Browse all problems</button>
+          <Button icon="browse" onClick={() => nav("/library/browse")}>
+            Browse all problems
+          </Button>
         </div>
       </div>
 
@@ -152,7 +154,7 @@ export default function Library() {
           </div>
           <Markdown>{data.intro}</Markdown>
           <p className="dim mb-0">
-            🎯 <strong>Already know some of this?</strong> The placement test asks one routing
+            <strong>Already know some of this?</strong> The placement test asks one routing
             question and one problem per stage; clear both and that stage's units are marked
             known.
           </p>
@@ -170,7 +172,7 @@ export default function Library() {
 
       <input
         style={{ width: "100%", marginBottom: 24, padding: "10px 14px", fontSize: 14 }}
-        placeholder="🔍  Search every unit — a technique, a phrase from a prompt (“contiguous subarray”), or a symptom (“infinite loop”)"
+        placeholder="Search every unit — a technique, a phrase from a prompt (“contiguous subarray”), or a symptom (“infinite loop”)"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
@@ -287,7 +289,7 @@ function ContinuePanel({
         {next ? (
           <>
             <div className="cur-eyebrow" style={{ color: data.coreComplete ? "var(--good)" : "var(--accent)" }}>
-              {data.coreComplete ? "🎉 Core complete · optional next" : "▶ Up next"}
+              {data.coreComplete ? "🎉 Core complete · optional next" : "Up next"}
             </div>
             <div className="cur-hero-title">
               <span>{next.unit.unit.icon}</span>
@@ -429,7 +431,7 @@ function DueToday({
             {r.unit.unit.icon} {r.unit.unit.title}
             {r.checksDue > 0 && ` · ${r.checksDue}`}
             {r.stale && " · stale"}
-            {r.slow.length > 0 && " · 🐢"}
+            {r.slow.length > 0 && " · slow"}
           </span>
         ))}
         {lane.units.length > shown.length && (
@@ -858,7 +860,7 @@ function UnitCard({
         </span>
         <DifficultyMix mix={u.mix} />
         <span title="Rough time at fluent pace, not a first encounter">
-          ⏱ {formatMinutes(u.estimatedMinutes)}
+          <Icon name="clock" size={12} /> {formatMinutes(u.estimatedMinutes)}
         </span>
         {u.attempted > 0 && <span>{u.attempted} attempted</span>}
         {u.stale && <span>last practised {u.lastPractisedDays}d ago</span>}

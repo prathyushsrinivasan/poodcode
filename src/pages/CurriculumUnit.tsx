@@ -48,7 +48,7 @@ import {
   variantQuestions,
   type VariantQuestion,
 } from "../lib/dsaRecognition";
-import { EmptyState, ErrorState } from "../components/ui";
+import { EmptyState, ErrorState, Icon, type IconName } from "../components/ui";
 import { loadFailed } from "../lib/failures";
 
 /**
@@ -155,18 +155,18 @@ export default function CurriculumUnit() {
 
 type TabKey = "learn" | "toolkit" | "practice" | "review";
 
-const TABS: { key: TabKey; icon: string; label: string; hint: string }[] = [
-  { key: "learn", icon: "📖", label: "Learn", hint: "Why it exists and how it works" },
-  { key: "toolkit", icon: "🧰", label: "Toolkit", hint: "Signals, code shapes, the family, costs, pitfalls" },
-  { key: "practice", icon: "🧗", label: "Practice", hint: "The problem ladder" },
-  { key: "review", icon: "🔁", label: "Review", hint: "Self-checks and interview prep" },
+const TABS: { key: TabKey; icon: IconName; label: string; hint: string }[] = [
+  { key: "learn", icon: "learn", label: "Learn", hint: "Why it exists and how it works" },
+  { key: "toolkit", icon: "tools", label: "Toolkit", hint: "Signals, code shapes, the family, costs, pitfalls" },
+  { key: "practice", icon: "trendUp", label: "Practice", hint: "The problem ladder" },
+  { key: "review", icon: "refresh", label: "Review", hint: "Self-checks and interview prep" },
 ];
 
 interface SectionDef {
   /** DOM id, and the `#hash` that deep-links to it. */
   id: string;
   tab: TabKey;
-  icon: string;
+  icon: IconName;
   title: string;
   /** For the "on this tab" list, where the full title does not fit. */
   short: string;
@@ -249,7 +249,7 @@ function UnitView({
   add({
     id: "why",
     tab: "learn",
-    icon: "🎯",
+    icon: "target",
     title: "Why this exists",
     short: "Why this exists",
     body: <Markdown>{u.why}</Markdown>,
@@ -257,7 +257,7 @@ function UnitView({
   add({
     id: "model",
     tab: "learn",
-    icon: "🧠",
+    icon: "sparkles",
     title: "The model",
     short: "The model",
     body: <Markdown>{u.model}</Markdown>,
@@ -266,7 +266,7 @@ function UnitView({
     u.invariant && {
       id: "invariant",
       tab: "learn",
-      icon: "🔒",
+      icon: "locked",
       title: "Why it is allowed to skip the rest",
       short: "The invariant",
       lead: "Every technique here is a loop that refuses to re-read what it has already seen. This is the sentence that makes that legal — and the part people cannot produce under pressure is never the statement, it is why one iteration preserves it.",
@@ -277,7 +277,7 @@ function UnitView({
     u.lab && {
       id: "lab",
       tab: "learn",
-      icon: "🧪",
+      icon: "playground",
       title: "Try it: the lab",
       short: "The lab",
       lead: "Everything in this unit is a computation, and the fastest way to believe a rule is to poke it. Change the numbers; nothing here is graded.",
@@ -297,7 +297,7 @@ function UnitView({
     u.internals && {
       id: "internals",
       tab: "learn",
-      icon: "🔬",
+      icon: "search",
       title: "How it works underneath",
       short: "Underneath",
       lead: "The costs in the Toolkit are consequences of a layout. Quoting them without it is memorisation — this is where they stop being trivia.",
@@ -308,7 +308,7 @@ function UnitView({
     u.traces.length > 0 && {
       id: "traces",
       tab: "learn",
-      icon: "🎞️",
+      icon: "layers",
       title: "Worked traces",
       short: "Worked traces",
       count: String(u.traces.length),
@@ -320,7 +320,7 @@ function UnitView({
     u.walkthrough && {
       id: "walkthrough",
       tab: "learn",
-      icon: "🧭",
+      icon: "paths",
       title: "One problem, start to finish",
       short: "Worked solution",
       lead: "The model explains the technique and the ladder hands you problems. This is the road between them: one problem taken from the prompt to a tested, priced solution, in the same six steps every time.",
@@ -340,7 +340,7 @@ function UnitView({
     u.signals.length > 0 && {
       id: "signals",
       tab: "toolkit",
-      icon: "🔔",
+      icon: "hint",
       title: "Signals — when to reach for this",
       short: "Signals",
       count: String(u.signals.length),
@@ -373,7 +373,7 @@ function UnitView({
     u.stuck.length > 0 && {
       id: "stuck",
       tab: "toolkit",
-      icon: "🪜",
+      icon: "checklist",
       title: "Stuck before the first line?",
       short: "Stuck?",
       count: String(u.stuck.length),
@@ -404,7 +404,7 @@ function UnitView({
     u.skeletons.length > 0 && {
       id: "skeletons",
       tab: "toolkit",
-      icon: "⌨️",
+      icon: "keyboard",
       title: "The playbook",
       short: "Playbook",
       count: String(u.skeletons.length),
@@ -416,7 +416,7 @@ function UnitView({
     u.variants.length > 0 && {
       id: "variants",
       tab: "toolkit",
-      icon: "🌿",
+      icon: "map",
       title: "The family — one change each",
       short: "Family",
       count: String(u.variants.length),
@@ -428,7 +428,7 @@ function UnitView({
     u.rewrites.length > 0 && {
       id: "rewrites",
       tab: "toolkit",
-      icon: "⚡",
+      icon: "streak",
       title: "Slow beside fast",
       short: "Slow vs fast",
       count: String(u.rewrites.length),
@@ -440,7 +440,7 @@ function UnitView({
     u.costs.length > 0 && {
       id: "costs",
       tab: "toolkit",
-      icon: "⏱️",
+      icon: "timer",
       title: "What it costs",
       short: "Costs",
       body: (
@@ -473,7 +473,7 @@ function UnitView({
     u.pitfalls.length > 0 && {
       id: "pitfalls",
       tab: "toolkit",
-      icon: "⚠️",
+      icon: "warning",
       title: "Pitfalls, by symptom",
       short: "Pitfalls",
       count: String(u.pitfalls.length),
@@ -495,7 +495,7 @@ function UnitView({
   add({
     id: "ladder",
     tab: "practice",
-    icon: "🧗",
+    icon: "trendUp",
     title: "The problem ladder",
     short: "Problem ladder",
     count: `${hydrated.solved}/${hydrated.total}`,
@@ -508,7 +508,7 @@ function UnitView({
     u.edge_cases.length > 0 && {
       id: "edge-cases",
       tab: "practice",
-      icon: "🧪",
+      icon: "playground",
       title: "Test before you submit",
       short: "Edge cases",
       count: String(u.edge_cases.length),
@@ -520,7 +520,7 @@ function UnitView({
     u.build_it && {
       id: "build",
       tab: "practice",
-      icon: "🔨",
+      icon: "build",
       title: "Build it yourself",
       short: "Build it yourself",
       body: <Markdown>{u.build_it}</Markdown>,
@@ -530,7 +530,7 @@ function UnitView({
     u.checks.length > 0 && {
       id: "checks",
       tab: "review",
-      icon: "✅",
+      icon: "done",
       title: "Self-check",
       short: "Self-check",
       count: deckCount(checkStats),
@@ -561,7 +561,7 @@ function UnitView({
     u.followups.length > 0 && {
       id: "followups",
       tab: "review",
-      icon: "🔀",
+      icon: "shuffle",
       title: "What if…? The interviewer's twist",
       short: "What if…?",
       lead: "Solving it is where the interview starts. Each of these changes one assumption the solution rests on — say what breaks and what replaces it before you open the answer.",
@@ -581,7 +581,7 @@ function UnitView({
     u.bigo.length > 0 && {
       id: "bigo",
       tab: "review",
-      icon: "⏳",
+      icon: "clock",
       title: "Price the snippet",
       short: "Price the snippet",
       count: deckCount(bigoStats),
@@ -607,7 +607,7 @@ function UnitView({
     u.quizzes.length > 0 && {
       id: "quizzes",
       tab: "review",
-      icon: "🐞",
+      icon: "tools",
       title: "Spot the bug, predict the result",
       short: "Spot the bug",
       count: deckCount(quizStats),
@@ -641,7 +641,7 @@ function UnitView({
     u.drills.length > 0 && {
       id: "drills",
       tab: "review",
-      icon: "✍️",
+      icon: "edit",
       title: "Work it out by hand",
       short: "Work it out",
       count: deckCount(calcStats),
@@ -667,7 +667,7 @@ function UnitView({
     familyQuestions.length > 0 && {
       id: "family-drill",
       tab: "review",
-      icon: "🌿",
+      icon: "map",
       title: "Which variant is this?",
       short: "Family drill",
       count: deckCount(familyStats),
@@ -693,7 +693,7 @@ function UnitView({
     u.interview && {
       id: "interview",
       tab: "review",
-      icon: "💼",
+      icon: "mastery",
       title: "In an interview",
       short: "In an interview",
       body: <Markdown>{u.interview}</Markdown>,
@@ -867,7 +867,7 @@ function UnitView({
           }}
           title="g l"
         >
-          📚 DSA Curriculum
+          DSA Curriculum
         </a>
         {stage && (
           <>
@@ -1011,7 +1011,7 @@ function UnitView({
               title={`${t.hint} (${i + 1})`}
             >
               <span className="cu-tab-icon" aria-hidden>
-                {t.icon}
+                <Icon name={t.icon} size={16} />
               </span>
               <span>
                 <span className="cu-tab-label">{t.label}</span>
@@ -1029,7 +1029,7 @@ function UnitView({
             <section key={s.id} id={s.id} className="cu-section">
               <div className="cu-section-head">
                 <h2>
-                  {s.icon} {s.title}
+                  <Icon name={s.icon} size={18} className="cu-section-icon" /> {s.title}
                 </h2>
                 <span className="spacer" />
                 {s.meta}
@@ -1042,7 +1042,7 @@ function UnitView({
           {nextTab ? (
             <div className="cu-tab-end">
               <span className="text-2xl" aria-hidden>
-                {nextTab.icon}
+                <Icon name={nextTab.icon} size={22} />
               </span>
               <div style={{ flex: 1, minWidth: 200 }}>
                 <div className="cur-eyebrow">Next in this unit</div>
@@ -1095,7 +1095,7 @@ function UnitView({
                         aria-current={s.id === activeSection && t.key === tab ? "location" : undefined}
                         onClick={() => goToSection(s.id, s.tab)}
                       >
-                        <span aria-hidden>{s.icon}</span>
+                        <Icon name={s.icon} size={14} />
                         <span>{s.short}</span>
                         {s.count && <span className="cu-aside-count">{s.count}</span>}
                       </button>
@@ -1120,7 +1120,7 @@ function UnitView({
                     onClick={() => nav(`/learn/${k}`)}
                     title={concept(k)?.what || `Open the ${k} lesson`}
                   >
-                    <span aria-hidden>📘</span>
+                    <Icon name="learn" size={14} />
                     <span>{lessonName(k)}</span>
                   </button>
                 ))}
@@ -1227,7 +1227,7 @@ function RungBlock({
             return (
               <tr key={item.slug} onClick={() => onOpen(p.id)}>
                 <td style={{ width: 52, textAlign: "center" }}>
-                  {solved ? "✅" : p.solved_status === "attempted" ? "◐" : "○"}
+                  {solved ? <Icon name="done" size={15} label="Solved" className="is-good" /> : p.solved_status === "attempted" ? <Icon name="partial" size={15} label="Attempted" className="is-accent" /> : <Icon name="todo" size={15} label="Not started" className="faint" />}
                 </td>
                 <td>
                   {/* The row is clickable for the mouse; this link is the same
@@ -1244,7 +1244,7 @@ function RungBlock({
                       className="faint text-xs ml-1"
                       title={`Solved, but it took ${Math.round(p.time_taken_seconds / 60)} minutes. Correct is not the same as fluent.`}
                     >
-                      🐢 {Math.round(p.time_taken_seconds / 60)}m
+                      <Icon name="timer" size={12} /> {Math.round(p.time_taken_seconds / 60)}m
                     </span>
                   )}
                   {item.note && (

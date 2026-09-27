@@ -35,7 +35,7 @@ import {
   type DueGroup,
   type GoalSpec,
 } from "../lib/today";
-import { EmptyState, ErrorState } from "../components/ui";
+import { EmptyState, ErrorState, Icon } from "../components/ui";
 
 /* --------------------------------------------------------------- pieces */
 
@@ -102,7 +102,7 @@ function GoalRow({ goal }: { goal: GoalSpec }) {
     <div className="goal-row">
       <div className="row">
         <span>
-          <span aria-hidden>{complete ? "✅" : "⬜"}</span>{" "}
+          <Icon name={complete ? "done" : "todo"} size={14} className={complete ? "is-good" : "faint"} />{" "}
           <span className="sr-only">{complete ? "Met:" : "Not met:"}</span>
           {goal.label}
         </span>
@@ -468,7 +468,7 @@ export default function Today() {
                     {/* These were `span`s with onClick, unreachable by keyboard. */}
                     {r.concepts.map((c) => (
                       <Link key={c.key} className="badge tag chip-link" to={`/learn/${c.key}`}>
-                        📘 {c.name}
+                        {c.name}
                       </Link>
                     ))}
                   </div>
@@ -483,7 +483,7 @@ export default function Today() {
                         to={`/solve/${p.id}`}
                         title={`${p.difficulty} · ${p.solved_status}`}
                       >
-                        {p.solved_status === "solved" ? "✅" : "▶"} {p.title}
+                        <Icon name={p.solved_status === "solved" ? "done" : "run"} size={12} /> {p.title}
                       </Link>
                     ))}
                   </div>

@@ -5,6 +5,7 @@ import { lineDiff } from "../lib/diff";
 import { TsErrorLinks } from "./TsErrorLinks";
 import { OutputCompare } from "./OutputCompare";
 import { Icon } from "./ui/Icon";
+import { Badge } from "./ui";
 
 function IOBlock({ label, value }: { label: string; value: string }) {
   return (
@@ -106,9 +107,9 @@ export function TestResults({ report }: { report: JudgeReport | null }) {
         </span>
         <span className="spacer" />
         {report.memory_kb != null && report.memory_kb > 0 && (
-          <span className="badge">💾 {formatMemory(report.memory_kb)} peak</span>
+          <Badge icon="database">{formatMemory(report.memory_kb)} peak</Badge>
         )}
-        <span className="badge">⏱ {report.runtime_ms} ms total</span>
+        <Badge icon="timer">{report.runtime_ms} ms total</Badge>
       </div>
 
       {report.results.map((r, i) => (

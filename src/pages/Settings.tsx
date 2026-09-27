@@ -20,7 +20,7 @@ import { api } from "../api";
 import { useToast } from "../components/Toast";
 import { ConfirmDialog } from "../components/ui/Modal";
 import { SHORTCUTS, Keys } from "../components/shell/ShortcutSheet";
-import { EmptyState } from "../components/ui";
+import { EmptyState, Icon, type IconName } from "../components/ui";
 import { recentFailures } from "../lib/failures";
 
 /** One labelled control. `keywords` feed the section search. */
@@ -96,13 +96,13 @@ function Segmented<T extends string>({
 }
 
 const SECTIONS = [
-  { id: "appearance", label: "Appearance", icon: "🎨" },
-  { id: "editor", label: "Editor", icon: "⌨️" },
-  { id: "goals", label: "Goals", icon: "🎯" },
-  { id: "data", label: "Data", icon: "💾" },
-  { id: "toolchains", label: "Toolchains", icon: "🔧" },
-  { id: "shortcuts", label: "Shortcuts", icon: "⇧" },
-  { id: "about", label: "About", icon: "ℹ️" },
+  { id: "appearance", label: "Appearance", icon: "palette" as IconName },
+  { id: "editor", label: "Editor", icon: "code" as IconName },
+  { id: "goals", label: "Goals", icon: "target" as IconName },
+  { id: "data", label: "Data", icon: "disk" as IconName },
+  { id: "toolchains", label: "Toolchains", icon: "tools" as IconName },
+  { id: "shortcuts", label: "Shortcuts", icon: "keyboard" as IconName },
+  { id: "about", label: "About", icon: "info" as IconName },
 ] as const;
 
 type SectionId = (typeof SECTIONS)[number]["id"];
@@ -250,7 +250,7 @@ export default function Settings() {
                 bodyRef.current?.scrollTo({ top: 0 });
               }}
             >
-              <span aria-hidden>{s.icon}</span>
+              <Icon name={s.icon} size={15} />
               {s.label}
             </button>
           ))}
@@ -277,9 +277,9 @@ export default function Settings() {
                   value={prefs.theme}
                   onChange={(v) => setPref("theme", v)}
                   options={[
-                    { value: "dark", label: "🌙 Dark" },
-                    { value: "light", label: "☀️ Light" },
-                    { value: "system", label: "🖥 System" },
+                    { value: "dark", label: "Dark" },
+                    { value: "light", label: "Light" },
+                    { value: "system", label: "System" },
                   ]}
                 />
               </Field>

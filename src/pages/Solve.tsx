@@ -20,7 +20,7 @@ import { SaveIndicator, useSaveState } from "../components/SaveState";
 import { formatMemory } from "../lib/format";
 import { lineDiff, diffStats } from "../lib/diff";
 import type { Attempt, JudgeReport, Mistake, Note, Problem, Solution, TestCase } from "../types";
-import { Button, EmptyState, IconButton } from "../components/ui";
+import { Button, EmptyState, IconButton, Icon, Badge } from "../components/ui";
 import { ignore, saveFailed } from "../lib/failures";
 import { openPopout } from "../lib/popout";
 
@@ -399,13 +399,13 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
         api.recordContestResult(contestId, problem.id, rep.status === "accepted").catch(ignore("a contest scoreboard update"));
       }
       if (rep.status === "accepted") {
-        toast("✅ Accepted! Added to revision schedule.");
+        toast.success("Accepted! Added to the revision schedule.");
         const fresh = await api.getProblem(problem.id);
         setProblem(fresh);
       } else if (rep.status === "not_installed") {
         toast("Toolchain not installed for this language.");
       } else if (rep.status === "tle") {
-        toast(`⏰ Time limit exceeded — ${rep.passed}/${rep.total} passed. Log why in Reflect.`);
+        toast.warning(`Time limit exceeded — ${rep.passed}/${rep.total} passed. Log why in Reflect.`);
       } else {
         toast(`${rep.passed}/${rep.total} tests passed — tag the mistake in Reflect.`);
       }
@@ -463,7 +463,9 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
             label="Open the statement in its own window"
             onClick={() => void openPopout(`/popout/problem/${problem.id}`, problem.title).catch(saveFailed("a new window"))}
           />
-          <span className="timer dim">⏱ {formatClock(elapsed)}</span>
+          <span className="timer dim">
+            <Icon name="timer" size={13} /> {formatClock(elapsed)}
+          </span>
           <button
             className="ghost"
             onClick={() => setLayout({ collapsed: true })}
@@ -796,14 +798,14 @@ function DescriptionTab({
         ))}
         {problem.companies.map((c) => (
           <span key={c} className="badge">
-            🏢 {c}
+            {c}
           </span>
         ))}
       </div>
 
       {contestId && (
         <div className="card contest-banner">
-          ⏱ <strong>Checkpoint in progress.</strong>{" "}
+          <Icon name="timer" size={13} /> <strong>Checkpoint in progress.</strong>{" "}
           <span className="dim">Submitting here scores on the checkpoint.</span>{" "}
           <Link to={`/contest/${contestId}`}>Back to the scoreboard →</Link>
         </div>
@@ -870,7 +872,9 @@ function DescriptionTab({
             </div>
           ))}
           {revealed < problem.hints.length && (
-            <button onClick={onReveal}>💡 Reveal hint {revealed + 1}</button>
+            <Button icon="hint" onClick={onReveal}>
+              Reveal hint {revealed + 1}
+            </Button>
           )}
         </>
       )}
@@ -912,7 +916,7 @@ function PrerequisitesTab({
       </div>
       {ready && (
         <div className="card mb-3 border-good">
-          <strong className="c-good">You know all the prerequisites 🎯</strong>{" "}
+          <strong className="c-good">You know all the prerequisites.</strong>{" "}
           <span className="dim">Go get it.</span>
         </div>
       )}
@@ -974,7 +978,9 @@ function PrerequisitesTab({
                   <p className="m-0">{p.how || "—"}</p>
                 </div>
                 <div className="row">
-                  <button onClick={() => nav(`/learn/${p.key}`)}>📘 Open full lesson</button>
+                  <Button icon="learn" onClick={() => nav(`/learn/${p.key}`)}>
+                    Open full lesson
+                  </Button>
                   {!isKnown && (
                     <button className="success" onClick={() => onToggle(p.key)}>
                       ✓ Got it — mark as known
@@ -1137,8 +1143,8 @@ function SolutionsTab({
           <div className="row">
             <strong>{s.title}</strong>
             <span className="badge">{s.approach_kind}</span>
-            {s.time_complexity && <span className="badge">⏱ {s.time_complexity}</span>}
-            {s.space_complexity && <span className="badge">💾 {s.space_complexity}</span>}
+            {s.time_complexity && <Badge icon="timer">{s.time_complexity}</Badge>}
+            {s.space_complexity && <Badge icon="database">{s.space_complexity}</Badge>}
             <span className="badge">{s.language}</span>
             <span className="spacer" />
             <button className="ghost danger" onClick={() => del(s.id)}>Delete</button>
@@ -1438,8 +1444,8 @@ function EditorialTab({
       <div className="card mb-3">
         <div className="io-label">Optimal complexity</div>
         <div className="row mt-1">
-          <span className="badge">⏱ Time: {problem.optimal_time || "—"}</span>
-          <span className="badge">💾 Space: {problem.optimal_space || "—"}</span>
+          <Badge icon="timer">Time: {problem.optimal_time || "—"}</Badge>
+          <Badge icon="database">Space: {problem.optimal_space || "—"}</Badge>
         </div>
         {problem.optimal_explanation && <p className="dim mb-0 mt-2">{problem.optimal_explanation}</p>}
       </div>
@@ -1462,8 +1468,8 @@ function EditorialTab({
                   <div className="row">
                     <strong>{e.title}</strong>
                     <span className="spacer" />
-                    {e.time && <span className="badge">⏱ {e.time}</span>}
-                    {e.space && <span className="badge">💾 {e.space}</span>}
+                    {e.time && <Badge icon="timer">{e.time}</Badge>}
+                    {e.space && <Badge icon="database">{e.space}</Badge>}
                   </div>
                   {/* Markdown: editorial bodies quote code (`x`) and the
                       Idiomatic TypeScript one carries a whole answer. */}
@@ -1531,7 +1537,7 @@ function ComplexityTab({ code, problem }: { code: string; problem: Problem }) {
 
   const verdictText: Record<string, { t: string; c: string }> = {
     better: { t: "Better than the reference optimal (double-check correctness!)", c: "var(--good)" },
-    equal: { t: "Matches the optimal complexity 🎯", c: "var(--good)" },
+    equal: { t: "Matches the optimal complexity", c: "var(--good)" },
     worse: { t: "Slower than optimal — there's room to improve", c: "var(--medium)" },
     unknown: { t: "Couldn't compare against the stated optimal", c: "var(--text-dim)" },
   };
