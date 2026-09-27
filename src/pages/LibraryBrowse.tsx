@@ -1,3 +1,4 @@
+import { currentMasteryWeek, masteryWeekBySlug } from "../lib/mastery";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { open as openDialog, save as saveDialog } from "@tauri-apps/plugin-dialog";
@@ -56,6 +57,11 @@ export default function LibraryBrowse() {
   const [stages, setStages] = useState<{ key: string; title: string; icon: string }[]>([]);
   const [unitList, setUnitList] = useState<{ key: string; title: string; icon: string; stage: string }[]>([]);
   const [mineOnly, setMineOnly] = useState(false);
+  // X-25: the TypeScript Mastery week that first curates each problem, and the
+  // week the learner is on — "solvable now" is every problem at or before it.
+  const [tsWeek, setTsWeek] = useState<Map<string, number>>(new Map());
+  const [tsCurrent, setTsCurrent] = useState<number | null>(null);
+  const [solvableNow, setSolvableNow] = useState(false);
   // Filters survive leaving the page. Coming back from a problem to a table you
   // had narrowed to nine rows, only to find all 653 again, is the single most
   // annoying thing about a list view (UI_ROADMAP H1/J3).
@@ -79,6 +85,14 @@ export default function LibraryBrowse() {
         })
         .catch(() => {});
     });
+    Promise.all([api.mastery(), api.masteryProgress()])
+      .then(([tracks, rows]) => {
+        const ts = tracks.find((t) => t.key === "typescript");
+        if (!ts) return;
+        setTsWeek(masteryWeekBySlug(ts));
+        setTsCurrent(currentMasteryWeek(ts, rows));
+      })
+      .catch(() => {});
     api.distinctTags("topic").then(setTopics);
     api.distinctTags("company").then(setCompanies);
   };
@@ -101,9 +115,11 @@ export default function LibraryBrowse() {
   );
 
   const filtered = useMemo(() => {
-    const base = applyFilter(problems, f, lookup);
-    return mineOnly ? base.filter((p) => !unitBySlug.has(p.slug)) : base;
-  }, [problems, f, mineOnly, unitBySlug, lookup]);
+    let base = applyFilter(problems, f, lookup);
+    if (mineOnly) base = base.filter((p) => !unitBySlug.has(p.slug));
+    if (solvableNow && tsCurrent !== null) base = base.filter((p) => (tsWeek.get(p.slug) ?? Infinity) <= tsCurrent);
+    return base;
+  }, [problems, f, mineOnly, unitBySlug, lookup, solvableNow, tsWeek, tsCurrent]);
 
   // Narrow the unit pills to the chosen stages: 33 pills is a wall, and picking
   // a stage is the natural way to say which third of them you mean.
@@ -232,6 +248,15 @@ export default function LibraryBrowse() {
               <span className={`pill ${f.neverOptimal ? "on" : ""}`} onClick={() => setF({ ...f, neverOptimal: !f.neverOptimal })} title="Solved, but confidence below 4">
                 Never optimal
               </span>
+              {tsCurrent !== null && tsWeek.size > 0 && (
+                <span
+                  className={`pill ${solvableNow ? "on" : ""}`}
+                  onClick={() => setSolvableNow((v) => !v)}
+                  title={`Problems the TypeScript Mastery programme curates in weeks 1–${tsCurrent} — everything they need has been taught`}
+                >
+                  🎓 Solvable now (TS week {tsCurrent})
+                </span>
+              )}
               {unplacedCount > 0 && (
                 <span
                   className={`pill ${mineOnly ? "on" : ""}`}
@@ -369,6 +394,18 @@ export default function LibraryBrowse() {
                         </a>
                       ) : (
                         <span className="faint">yours</span>
+                      )}
+                      {tsWeek.has(p.slug) && (
+                        <span
+                          className="badge"
+                          style={{
+                            marginLeft: 6,
+                            borderColor: tsCurrent !== null && tsWeek.get(p.slug)! <= tsCurrent ? "var(--good)" : undefined,
+                          }}
+                          title="The TypeScript Mastery week that first sets this problem"
+                        >
+                          🎓 TS wk {tsWeek.get(p.slug)}
+                        </span>
                       )}
                     </td>
                     <td>

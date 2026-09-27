@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { MasteryProgress, MasteryTrack, MasteryWeek } from "../types";
 import {
+  masteryWeekBySlug,
+  currentMasteryWeek,
   coreWeeks,
   drawExamPaper,
   formatStudyTime,
@@ -492,5 +494,27 @@ describe("skillProfile", () => {
     expect(by["Reading errors"]).toBe("0/1");
     expect(by["Writing types"]).toBe("1/1");
     expect(by["Writing programs"]).toBe("0/1");
+  });
+});
+
+describe("masteryWeekBySlug / currentMasteryWeek", () => {
+  const track = {
+    key: "typescript",
+    weeks: [
+      { week: 2, problems: [{ slug: "b", note: "" }, { slug: "a", note: "Review" }] },
+      { week: 1, problems: [{ slug: "a", note: "" }] },
+    ],
+  };
+  it("maps each slug to the earliest week that curates it", () => {
+    const m = masteryWeekBySlug(track as never);
+    expect(m.get("a")).toBe(1);
+    expect(m.get("b")).toBe(2);
+    expect(m.has("c")).toBe(false);
+  });
+  it("puts an untouched learner on week 1", () => {
+    const t = { key: "typescript", weeks: [{ week: 1 }, { week: 2 }] };
+    expect(currentMasteryWeek(t as never, [])).toBe(1);
+    const rows = [{ track_key: "typescript", week: 1, completed_at: "2026-09-01" }];
+    expect(currentMasteryWeek(t as never, rows as never)).toBe(2);
   });
 });

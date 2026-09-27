@@ -665,3 +665,23 @@ export function skillProfile(
     { label: "Runtime & async", done: runDone, total: runTotal },
   ];
 }
+
+// ---------------------------------------------------------------------------
+// Library problems by Mastery week (X-25): the week that first curates a
+// problem is the week it becomes solvable with what the programme has taught.
+// ---------------------------------------------------------------------------
+
+/** slug -> the earliest week of `track` that lists it among its problems. */
+export function masteryWeekBySlug(track: Pick<MasteryTrack, "weeks">): Map<string, number> {
+  const out = new Map<string, number>();
+  for (const w of [...track.weeks].sort((a, b) => a.week - b.week)) {
+    for (const p of w.problems) if (!out.has(p.slug)) out.set(p.slug, w.week);
+  }
+  return out;
+}
+
+/** The week a learner is on: the first core week without a completion stamp
+ * (week 1 for a track not yet touched, the last week once finished). */
+export function currentMasteryWeek(track: MasteryTrack, rows: MasteryProgress[]): number {
+  return masteryResume(track, rows, "started")?.week.week ?? 1;
+}
