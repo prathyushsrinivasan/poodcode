@@ -42,7 +42,7 @@ J2 J3 · K1–K5 · L1–L6.
 | C4 / G8 | One exercise card, quiz card, hint ladder and verdict panel for every track (`components/exercise`). |
 | C6 | Lucide icons, bundled, named by meaning in one table. Emoji remain only as content (🎉, ✓/✗ in prose, 日本語). |
 | C12 | A drawn brand mark (a P that is also `>_`), themed in the UI; every app icon regenerated from `src-tauri/icons/source.svg`. **Not done, deliberately:** a custom title bar — the in-app top bar already holds history and the breadcrumb, and a frameless window loses Windows' native snap and caption behaviour. |
-| D3 | No `div`/`span` with `onClick` acting as a control; rows that navigate are links (stretched over their card where the whole card is the target). |
+| D3 | No `div`/`span` acting as a control; what navigates is a link (stretched over its card where the whole card is the target). Table rows stay clickable for the mouse, with the same destination as a real link inside. |
 | D9 | A heading-level context gives every page one h1 and no skipped levels; all 31 routes audited, including named controls. |
 | E2 | `lib/failures`: `ignore(reason)`, `loadFailed(what)`, `saveFailed(what)` — the last two toast; every failure is listed in Settings → About. |
 | E6 | Every empty state names the action that fills it; load failures are ErrorStates with Retry. |
@@ -62,7 +62,7 @@ J2 J3 · K1–K5 · L1–L6.
 |---|---|---|---|
 | Inline `style={{…}}` objects | ~1,500 | 1,071 | **246**, all dynamic or one-off (ratchet baseline) |
 | Token pairs failing WCAG AA | 21 of 42 | 0 of 84 | **0 of 84** |
-| Clickable non-controls (`div`/`span onClick`) | dozens | some | **0** (backdrops excepted) |
+| Clickable non-controls (`div`/`span onClick`) | dozens | some | **0** — the only `onClick`s left on non-controls are dialog backdrops and table rows whose target is also a real link inside the row |
 | `.catch(() => {})` in app code | 42 | — | **0** — every catch names a reason |
 | `window.confirm` | 4 | 0 | **0** |
 | Chrome emoji | ~500 | ~500 | **0**; 50 remain as content |
