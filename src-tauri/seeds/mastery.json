@@ -1805,6 +1805,34 @@
             "dataset": ""
           },
           {
+            "id": "tsm-ts_types-rp1",
+            "title": "Fix it: Primitive Types & Annotations #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    false\n\nIt should print:\n    true\n\nFix it — every test must pass.",
+            "hint": "`Number` is not `number`",
+            "hints": [
+              "`Number` is not `number`",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "const boxed: Number = new Number(5);\nconsole.log(boxed === 5);\n",
+            "solution": "const plain: number = 5;\nconsole.log(plain === 5);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "true"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**`Number` is not `number`.** `Number` (capital N) is the wrapper object type. A `new Number(5)` is an object, and objects are never `===` to a primitive. Always use the lower-case primitive types."
+          },
+          {
             "id": "tsm-ts_types-spot1",
             "title": "Spot the bug: Primitive Types & Annotations #1",
             "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    an object an object\n\nIt should print:\n    not an object an object\n\nClick the line that causes it.",
@@ -1831,6 +1859,34 @@
             "lines": [
               2
             ]
+          },
+          {
+            "id": "tsm-ts_types-rp2",
+            "title": "Fix it: Primitive Types & Annotations #2",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    51\n\nIt should print:\n    6\n\nFix it — every test must pass.",
+            "hint": "`any` switches checking off — everywhere it spreads",
+            "hints": [
+              "`any` switches checking off — everywhere it spreads",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "const data: any = JSON.parse('{\"n\":\"5\"}');\nconst next: number = data.n + 1;\nconsole.log(next);\n",
+            "solution": "const data: unknown = JSON.parse('{\"n\":\"5\"}');\nconst n = typeof data === \"object\" && data !== null && \"n\" in data ? Number(data.n) : 0;\nconsole.log(n + 1);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "6"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**`any` switches checking off — everywhere it spreads.** With `any`, `data.n + 1` compiled and produced the string `\"51\"` — typed as `number`. `unknown` forces the check that converts it."
           },
           {
             "id": "tsm-ts_types-predict1",
@@ -4206,6 +4262,34 @@
             "dataset": ""
           },
           {
+            "id": "tsm-ts_conditionals-rp1",
+            "title": "Fix it: Conditionals & Truthiness #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    9 9\n\nIt should print:\n    5 9\n\nFix it — every test must pass.",
+            "hint": "A `switch` that falls through",
+            "hints": [
+              "A `switch` that falls through",
+              "The change starts on line 6 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "function price(size: string): number {\n  let p = 0;\n  switch (size) {\n    case \"small\":\n      p = 5;\n    case \"large\":\n      p = 9;\n  }\n  return p;\n}\nconsole.log(price(\"small\"), price(\"large\"));\n",
+            "solution": "function price(size: string): number {\n  let p = 0;\n  switch (size) {\n    case \"small\":\n      p = 5;\n      break;\n    case \"large\":\n      p = 9;\n      break;\n  }\n  return p;\n}\nconsole.log(price(\"small\"), price(\"large\"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "5 9"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**A `switch` that falls through.** Without `break`, `small` ran on into the `large` case and was overwritten. (`noFallthroughCasesInSwitch` makes this an error.)"
+          },
+          {
             "id": "tsm-ts_conditionals-spot1",
             "title": "Spot the bug: Conditionals & Truthiness #1",
             "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    x was five?\n    x is 5\n\nIt should print:\n    x is 1\n\nClick the line that causes it.",
@@ -6369,6 +6453,34 @@
             ]
           },
           {
+            "id": "tsm-ts_loops-rp1",
+            "title": "Fix it: Loops #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    4,7\n\nIt should print:\n    7\n\nFix it — every test must pass.",
+            "hint": "Removing items while iterating",
+            "hints": [
+              "Removing items while iterating",
+              "The change starts on line 2 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "const xs = [2, 4, 6, 7];\nfor (const x of xs) {\n  if (x % 2 === 0) xs.splice(xs.indexOf(x), 1);\n}\nconsole.log(xs.join(\",\"));\n",
+            "solution": "const xs = [2, 4, 6, 7];\nconst odd = xs.filter((x) => x % 2 !== 0);\nconsole.log(odd.join(\",\"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "7"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Removing items while iterating.** Removing an element shifts the rest left, so the loop skips the next one. Build a new array instead."
+          },
+          {
             "id": "tsm-ts_loops-spot2",
             "title": "Spot the bug: Loops #2",
             "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    10 20 undefined\n\nIt should print:\n    10 20\n\nClick the line that causes it.",
@@ -6450,6 +6562,34 @@
             "lines": [
               2
             ]
+          },
+          {
+            "id": "tsm-ts_number_math-rp1",
+            "title": "Fix it: Numbers & Math #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    0.9999999999999999\n\nIt should print:\n    1.00\n\nFix it — every test must pass.",
+            "hint": "Money as floating-point dollars",
+            "hints": [
+              "Money as floating-point dollars",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "let total = 0;\nfor (let i = 0; i < 10; i++) total += 0.1;\nconsole.log(total);\n",
+            "solution": "let cents = 0;\nfor (let i = 0; i < 10; i++) cents += 10;\nconsole.log((cents / 100).toFixed(2));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "1.00"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Money as floating-point dollars.** Ten dimes added as floats come to 0.9999999999999999. Integer cents are exact; format only for display."
           },
           {
             "id": "tsm-ts_number_math-spot2",
@@ -6550,6 +6690,62 @@
             "dataset": ""
           },
           {
+            "id": "tsm-ts_number_format-rp1",
+            "title": "Fix it: Numbers in Practice — Precision, Money & Formatting #1",
+            "prompt": "This program runs, but prints the wrong thing for the input `0.1 0.2 0.3`.\n\nIt prints:\n    0.6000000000000001\n\nIt should print:\n    0.60\n\nFix it — every test must pass.",
+            "hint": "Summing decimal prices directly",
+            "hints": [
+              "Summing decimal prices directly",
+              "The change starts on line 3 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst prices = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/).map(Number);\nlet total = 0;\nfor (const p of prices) total += p;\nconsole.log(total);\n",
+            "solution": "import * as fs from \"fs\";\nconst prices = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/).map(Number);\nlet cents = 0;\nfor (const p of prices) cents += Math.round(p * 100);\nconsole.log((cents / 100).toFixed(2));\n",
+            "tests": [
+              {
+                "input": "0.1 0.2 0.3",
+                "output": "0.60"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Summing decimal prices directly.** Float errors accumulate with every addition and then get printed. Add integer cents instead, and format once."
+          },
+          {
+            "id": "tsm-ts_number_format-rp2",
+            "title": "Fix it: Numbers in Practice — Precision, Money & Formatting #2",
+            "prompt": "This program runs, but prints the wrong thing for the input `1.005`.\n\nIt prints:\n    1.00\n\nIt should print:\n    1.01\n\nFix it — every test must pass.",
+            "hint": "`toFixed` rounds the stored value",
+            "hints": [
+              "`toFixed` rounds the stored value",
+              "The change starts on line 2 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst price = Number(fs.readFileSync(0, \"utf8\").trim());\nconsole.log(price.toFixed(2));\n",
+            "solution": "import * as fs from \"fs\";\nconst text = fs.readFileSync(0, \"utf8\").trim();\nconst cents = Math.round(Number(text + \"e2\"));\nconsole.log((cents / 100).toFixed(2));\n",
+            "tests": [
+              {
+                "input": "1.005",
+                "output": "1.01"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**`toFixed` rounds the stored value.** `1.005` is stored as `1.00499999…`, so `toFixed(2)` rounds it down — and so does `Math.round(1.005 * 100)`, because the multiplication inherits the same error. Shifting the decimal point *in the text* (`\"1.005e2\"` is exactly `100.5`) rounds the number the person actually typed."
+          },
+          {
             "id": "tsm-ts_number_format-spot1",
             "title": "Spot the bug: Numbers in Practice — Precision, Money & Formatting #1",
             "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    3 -2 0\n\nIt should print:\n    3 -3 -1\n\nClick the line that causes it.",
@@ -6576,6 +6772,34 @@
             "lines": [
               2
             ]
+          },
+          {
+            "id": "tsm-ts_number_format-rp3",
+            "title": "Fix it: Numbers in Practice — Precision, Money & Formatting #3",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    1.5511210043330986e+25\n\nIt should print:\n    15511210043330985984000000\n\nFix it — every test must pass.",
+            "hint": "A count that outgrows `number`",
+            "hints": [
+              "A count that outgrows `number`",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "let ways = 1;\nfor (let i = 1; i <= 25; i++) ways *= i;\nconsole.log(ways);\n",
+            "solution": "let ways = 1n;\nfor (let i = 1n; i <= 25n; i++) ways *= i;\nconsole.log(ways.toString());\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "15511210043330985984000000"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**A count that outgrows `number`.** 25! is about 1.55·10^25 — far past 2^53 — so the `number` result is only an approximation printed in exponent form. `bigint` keeps every digit."
           }
         ],
         "optional": false,
@@ -8592,6 +8816,62 @@
             ]
           },
           {
+            "id": "tsm-ts_strings-rp1",
+            "title": "Fix it: Strings & Template Literals #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    a+b-c\n\nIt should print:\n    a+b+c\n\nFix it — every test must pass.",
+            "hint": "`replace` with a string changes only the first match",
+            "hints": [
+              "`replace` with a string changes only the first match",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "console.log(\"a-b-c\".replace(\"-\", \"+\"));\n",
+            "solution": "console.log(\"a-b-c\".replaceAll(\"-\", \"+\"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "a+b+c"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**`replace` with a string changes only the first match.** Use `replaceAll`, or a regex with the `g` flag."
+          },
+          {
+            "id": "tsm-ts_strings-rp2",
+            "title": "Fix it: Strings & Template Literals #2",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    Cherry,apple,banana\n\nIt should print:\n    apple,banana,Cherry\n\nFix it — every test must pass.",
+            "hint": "The default sort is by code unit",
+            "hints": [
+              "The default sort is by code unit",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "console.log([\"banana\", \"apple\", \"Cherry\"].sort().join(\",\"));\n",
+            "solution": "console.log([\"banana\", \"apple\", \"Cherry\"].sort((a, b) => a.localeCompare(b)).join(\",\"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "apple,banana,Cherry"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**The default sort is by code unit.** Upper-case letters sort before all lower-case ones in code-unit order. `localeCompare` sorts the way people expect."
+          },
+          {
             "id": "tsm-ts_strings-predict1",
             "title": "Read the inference: Template literals for output",
             "prompt": "What type does TypeScript already infer for `name`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “Template literals for output” from Strings & Template Literals.",
@@ -8724,6 +9004,34 @@
             "lines": [
               2
             ]
+          },
+          {
+            "id": "tsm-ts_string_methods-rp1",
+            "title": "Fix it: String Methods #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    abcdef\n\nIt should print:\n    ef\n\nFix it — every test must pass.",
+            "hint": "`substring` ignores negative indexes",
+            "hints": [
+              "`substring` ignores negative indexes",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "console.log(\"abcdef\".substring(-2));\n",
+            "solution": "console.log(\"abcdef\".slice(-2));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "ef"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**`substring` ignores negative indexes.** `substring` treats negatives as 0; `slice` counts them from the end. Prefer `slice`."
           },
           {
             "id": "tsm-ts_regex-order1",
@@ -10981,6 +11289,34 @@
             "dataset": ""
           },
           {
+            "id": "tsm-ts_functions-rp1",
+            "title": "Fix it: Functions & Arrow Functions #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    ,\n\nIt should print:\n    2,4\n\nFix it — every test must pass.",
+            "hint": "Braces without `return`",
+            "hints": [
+              "Braces without `return`",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "const double = (x: number) => {\n  x * 2;\n};\nconsole.log([1, 2].map(double).join(\",\"));\n",
+            "solution": "const double = (x: number) => x * 2;\nconsole.log([1, 2].map(double).join(\",\"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "2,4"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Braces without `return`.** An arrow with a block body needs `return`; without it the function returns `undefined`. Annotating the return type (`: number`) would have caught it."
+          },
+          {
             "id": "tsm-ts_functions-spot1",
             "title": "Spot the bug: Functions & Arrow Functions #1",
             "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    false\n\nIt should print:\n    true\n\nClick the line that causes it.",
@@ -11123,6 +11459,34 @@
             ]
           },
           {
+            "id": "tsm-ts_params-rp1",
+            "title": "Read the error: Optional, Default & Rest Parameters #1",
+            "prompt": "The compiler rejects this program:\n\n    error TS1016: A required parameter cannot follow an optional parameter.\n\nFix the cause so it compiles and every test passes.",
+            "hint": "Required after optional",
+            "hints": [
+              "Required after optional",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "diagnose",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "function between(lo?: number, hi: number): boolean {\n  return (lo ?? 0) <= hi;\n}\nconsole.log(between(undefined, 5));\n",
+            "solution": "function between(hi: number, lo = 0): boolean {\n  return lo <= hi;\n}\nconsole.log(between(5));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "true"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Required after optional.** Put required parameters first. Callers then write `between(5)` instead of passing `undefined` placeholders."
+          },
+          {
             "id": "tsm-ts_params-spot2",
             "title": "Spot the bug: Optional, Default & Rest Parameters #2",
             "prompt": "The compiler rejects this program:\n\n    error TS2345: Argument of type 'number[]' is not assignable to parameter of type 'number'.\n\nClick the line you would change so that it compiles and prints:\n    6",
@@ -11259,6 +11623,34 @@
             "lines": [
               2
             ]
+          },
+          {
+            "id": "tsm-ts_overloads-rp1",
+            "title": "Read the error: Overloads & Flexible Signatures #1",
+            "prompt": "The compiler rejects this program:\n\n    error TS2769: No overload matches this call.\n\nFix the cause so it compiles and every test passes.",
+            "hint": "A union variable can't reach an overload",
+            "hints": [
+              "A union variable can't reach an overload",
+              "The change starts on line 3 of the program."
+            ],
+            "language": "typescript",
+            "kind": "diagnose",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "function wrap(x: string): string[];\nfunction wrap(x: number): number[];\nfunction wrap(x: string | number): (string | number)[] {\n  return [x];\n}\nconst values: (string | number)[] = [\"a\", 1];\nfor (const v of values) console.log(wrap(v).length);\n",
+            "solution": "function wrap(x: string): string[];\nfunction wrap(x: number): number[];\nfunction wrap(x: string | number): (string | number)[];\nfunction wrap(x: string | number): (string | number)[] {\n  return [x];\n}\nconst values: (string | number)[] = [\"a\", 1];\nfor (const v of values) console.log(wrap(v).length);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "1\n1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**A union variable can't reach an overload.** Inside the loop `v` is `string | number`, and no overload takes that. A final overload for the union case — or no overloads at all — fixes it."
           },
           {
             "id": "tsm-ts_closures_scope-order1",
@@ -13030,6 +13422,62 @@
             "dataset": ""
           },
           {
+            "id": "tsm-ts_higher_order-rp1",
+            "title": "Fix it: Higher-Order Functions & Currying #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    failed: Cannot read properties of undefined (reading 'greeting')\n\nIt should print:\n    hi ana, hi bo\n\nFix it — every test must pass.",
+            "hint": "Passing a method loses `this`",
+            "hints": [
+              "Passing a method loses `this`",
+              "The change starts on line 8 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "class Greeter {\n  greeting = \"hi\";\n  greet(name: string): string {\n    return this.greeting + \" \" + name;\n  }\n}\nconst g = new Greeter();\ntry {\n  console.log([\"ana\", \"bo\"].map(g.greet).join(\", \"));\n} catch (e) {\n  console.log(\"failed: \" + (e instanceof Error ? e.message : String(e)));\n}\n",
+            "solution": "class Greeter {\n  greeting = \"hi\";\n  greet(name: string): string {\n    return this.greeting + \" \" + name;\n  }\n}\nconst g = new Greeter();\nconsole.log([\"ana\", \"bo\"].map((name) => g.greet(name)).join(\", \"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "hi ana, hi bo"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Passing a method loses `this`.** `g.greet` passed on its own is a plain function; `map` calls it with `this` undefined. Wrap it in an arrow."
+          },
+          {
+            "id": "tsm-ts_higher_order-rp2",
+            "title": "Fix it: Higher-Order Functions & Currying #2",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    failed: Reduce of empty array with no initial value\n\nIt should print:\n    0\n\nFix it — every test must pass.",
+            "hint": "`reduce` on an empty array",
+            "hints": [
+              "`reduce` on an empty array",
+              "The change starts on line 2 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "const empty: number[] = [];\ntry {\n  console.log(empty.reduce((a, b) => a + b));\n} catch (e) {\n  console.log(\"failed: \" + (e instanceof Error ? e.message : String(e)));\n}\n",
+            "solution": "const empty: number[] = [];\nconsole.log(empty.reduce((a, b) => a + b, 0));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**`reduce` on an empty array.** Without an initial value, `reduce` needs at least one element. Always pass one when the array might be empty."
+          },
+          {
             "id": "tsm-ts_higher_order-spot1",
             "title": "Spot the bug: Higher-Order Functions & Currying #1",
             "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    add one, then double: 7\n\nIt should print:\n    add one, then double: 8\n\nClick the line that causes it.",
@@ -13057,6 +13505,34 @@
               1,
               4
             ]
+          },
+          {
+            "id": "tsm-ts_recursion-rp1",
+            "title": "Fix it: Recursion #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    stack overflow\n\nIt should print:\n    10 0\n\nFix it — every test must pass.",
+            "hint": "A base case that negative input never reaches",
+            "hints": [
+              "A base case that negative input never reaches",
+              "The change starts on line 2 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "function sumTo(n: number): number {\n  if (n === 0) return 0;\n  return n + sumTo(n - 1);\n}\ntry {\n  console.log(sumTo(4), sumTo(-1));\n} catch (e) {\n  console.log(e instanceof RangeError ? \"stack overflow\" : \"other error\");\n}\n",
+            "solution": "function sumTo(n: number): number {\n  if (n <= 0) return 0;\n  return n + sumTo(n - 1);\n}\nconsole.log(sumTo(4), sumTo(-1));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "10 0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**A base case that negative input never reaches.** `n === 0` is never reached from `-1`, which only gets further away. Make the base case cover every input that can't shrink further — here, `n <= 0`."
           },
           {
             "id": "tsm-ts_recursion-spot1",
@@ -15232,6 +15708,34 @@
             "dataset": ""
           },
           {
+            "id": "tsm-ts_array_methods-rp1",
+            "title": "Fix it: Array Methods #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    undefined\n\nIt should print:\n    4,8\n\nFix it — every test must pass.",
+            "hint": "`forEach` returns nothing",
+            "hints": [
+              "`forEach` returns nothing",
+              "The change starts on line 2 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "const prices = [2, 4];\nconst doubled = prices.forEach((p) => p * 2);\nconsole.log(doubled);\n",
+            "solution": "const prices = [2, 4];\nconst doubled = prices.map((p) => p * 2);\nconsole.log(doubled.join(\",\"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "4,8"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**`forEach` returns nothing.** `forEach` is for side effects and always returns `undefined`. `map` returns the transformed array."
+          },
+          {
             "id": "tsm-ts_array_methods-spot1",
             "title": "Spot the bug: Array Methods #1",
             "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    -1\n\nIt should print:\n    0\n\nClick the line that causes it.",
@@ -15589,6 +16093,34 @@
             "lines": [
               1
             ]
+          },
+          {
+            "id": "tsm-ts_array_modern-rp1",
+            "title": "Fix it: Modern Array Methods #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    1 10 100 9\n\nIt should print:\n    1 9 10 100\n\nFix it — every test must pass.",
+            "hint": "Default `sort` compares as strings",
+            "hints": [
+              "Default `sort` compares as strings",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "console.log([10, 9, 1, 100].toSorted().join(\" \"));\n",
+            "solution": "console.log([10, 9, 1, 100].toSorted((a, b) => a - b).join(\" \"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "1 9 10 100"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Default `sort` compares as strings.** With no comparator, sorting converts every element to a string and compares those — so `100` comes before `9`. Numbers always need `(a, b) => a - b`."
           },
           {
             "id": "tsm-ts_array_modern-predict1",
@@ -17689,6 +18221,34 @@
             ]
           },
           {
+            "id": "tsm-ts_destructuring-rp1",
+            "title": "Fix it: Destructuring, Spread & Rest #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    NaN\n\nIt should print:\n    1\n\nFix it — every test must pass.",
+            "hint": "Destructuring a method loses `this`",
+            "hints": [
+              "Destructuring a method loses `this`",
+              "The change starts on line 8 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "const counter = {\n  count: 0,\n  increment() {\n    this.count++;\n    return this.count;\n  },\n};\nconst { increment } = counter;\ntry {\n  console.log(increment());\n} catch (e) {\n  console.log(\"failed: \" + (e instanceof Error ? e.message : String(e)));\n}\n",
+            "solution": "const counter = {\n  count: 0,\n  increment() {\n    this.count++;\n    return this.count;\n  },\n};\nconsole.log(counter.increment());\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Destructuring a method loses `this`.** A destructured method is detached from its object. Call it through the object."
+          },
+          {
             "id": "tsm-ts_destructuring-spot2",
             "title": "Spot the bug: Destructuring, Spread & Rest #2",
             "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    ana light\n\nIt should print:\n    ana dark\n\nClick the line that causes it.",
@@ -17800,6 +18360,34 @@
             ]
           },
           {
+            "id": "tsm-ts_objects-rp1",
+            "title": "Fix it: Objects #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    10,20,30,b\n\nIt should print:\n    30,10,b,20\n\nFix it — every test must pass.",
+            "hint": "Integer-like keys don't keep insertion order",
+            "hints": [
+              "Integer-like keys don't keep insertion order",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "const byId: Record<string, string> = {};\nfor (const id of [\"30\", \"10\", \"b\", \"20\"]) byId[id] = \"x\";\nconsole.log(Object.keys(byId).join(\",\"));\n",
+            "solution": "const byId = new Map<string, string>();\nfor (const id of [\"30\", \"10\", \"b\", \"20\"]) byId.set(id, \"x\");\nconsole.log([...byId.keys()].join(\",\"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "30,10,b,20"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Integer-like keys don't keep insertion order.** Objects list integer-like keys first, ascending. A `Map` keeps pure insertion order."
+          },
+          {
             "id": "tsm-ts_objects-predict1",
             "title": "Read the inference: Shorthand and computed keys",
             "prompt": "What type does TypeScript already infer for `name`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “Shorthand and computed keys” from Objects.",
@@ -17900,6 +18488,62 @@
             ],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-ts_json-rp1",
+            "title": "Fix it: JSON: parse & stringify #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    failed: loaded.when.getUTCFullYear is not a function\n\nIt should print:\n    2026\n\nFix it — every test must pass.",
+            "hint": "Dates come back as strings",
+            "hints": [
+              "Dates come back as strings",
+              "The change starts on line 2 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "const saved = JSON.stringify({ when: new Date(Date.UTC(2026, 0, 2)) });\nconst loaded = JSON.parse(saved) as { when: Date };\ntry {\n  console.log(loaded.when.getUTCFullYear());\n} catch (e) {\n  console.log(\"failed: \" + (e instanceof Error ? e.message : String(e)));\n}\n",
+            "solution": "const saved = JSON.stringify({ when: new Date(Date.UTC(2026, 0, 2)) });\nconst loaded = JSON.parse(saved) as { when: string };\nconsole.log(new Date(loaded.when).getUTCFullYear());\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "2026"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Dates come back as strings.** JSON has no date type: a `Date` is written as an ISO string, and the `as { when: Date }` lied about it. Convert explicitly."
+          },
+          {
+            "id": "tsm-ts_json-rp2",
+            "title": "Fix it: JSON: parse & stringify #2",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    {}\n\nIt should print:\n    {\"nickname\":null}\n\nFix it — every test must pass.",
+            "hint": "`undefined` and functions vanish",
+            "hints": [
+              "`undefined` and functions vanish",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "console.log(JSON.stringify({ nickname: undefined, greet() {} }));\n",
+            "solution": "console.log(JSON.stringify({ nickname: null }));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "{\"nickname\":null}"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**`undefined` and functions vanish.** `JSON.stringify` drops `undefined`-valued keys and functions. Use `null` for \"deliberately empty\"."
           },
           {
             "id": "tsm-ts_json-spot1",
@@ -18205,6 +18849,34 @@
             "lines": [
               1
             ]
+          },
+          {
+            "id": "tsm-ts_index_signatures-rp1",
+            "title": "Fix it: Index Signatures & Records #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    2 10 b a\n\nIt should print:\n    b 10 2 a\n\nFix it — every test must pass.",
+            "hint": "Integer-like keys don't keep insertion order",
+            "hints": [
+              "Integer-like keys don't keep insertion order",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "const byCode: Record<string, string> = {};\nbyCode[\"b\"] = \"second\";\nbyCode[\"10\"] = \"ten\";\nbyCode[\"2\"] = \"two\";\nbyCode[\"a\"] = \"first\";\nconsole.log(Object.keys(byCode).join(\" \"));\n",
+            "solution": "const byCode = new Map<string, string>();\nbyCode.set(\"b\", \"second\");\nbyCode.set(\"10\", \"ten\");\nbyCode.set(\"2\", \"two\");\nbyCode.set(\"a\", \"first\");\nconsole.log([...byCode.keys()].join(\" \"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "b 10 2 a"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Integer-like keys don't keep insertion order.** Object property order puts integer-like keys first, in numeric order, then the rest in insertion order. A `Map` keeps pure insertion order."
           },
           {
             "id": "tsm-ts_index_signatures-predict1",
@@ -19992,6 +20664,34 @@
             ]
           },
           {
+            "id": "tsm-ts_maps_sets-rp1",
+            "title": "Fix it: Map & Set #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    new\n\nIt should print:\n    seen\n\nFix it — every test must pass.",
+            "hint": "Equal-looking objects are different set members",
+            "hints": [
+              "Equal-looking objects are different set members",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "const seen = new Set<number[]>();\nseen.add([1, 2]);\nconsole.log(seen.has([1, 2]) ? \"seen\" : \"new\");\n",
+            "solution": "const seen = new Set<string>();\nseen.add([1, 2].join(\",\"));\nconsole.log(seen.has([1, 2].join(\",\")) ? \"seen\" : \"new\");\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "seen"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Equal-looking objects are different set members.** Arrays and objects compare by identity. Key sets by a canonical string when you mean \"equal contents\"."
+          },
+          {
             "id": "tsm-ts_maps_sets-spot2",
             "title": "Spot the bug: Map & Set #2",
             "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    ana,31,bo,25\n\nIt should print:\n    ana,bo\n\nClick the line that causes it.",
@@ -20100,6 +20800,34 @@
             ],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-ts_set_algebra-rp1",
+            "title": "Fix it: Set Algebra, Grouping & Weak Collections #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    3\n\nIt should print:\n    2\n\nFix it — every test must pass.",
+            "hint": "Objects are members by identity",
+            "hints": [
+              "Objects are members by identity",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "const visited = new Set<{ x: number; y: number }>();\nfor (const [x, y] of [[0, 0], [1, 0], [0, 0]]) visited.add({ x, y });\nconsole.log(visited.size);\n",
+            "solution": "const visited = new Set<string>();\nfor (const [x, y] of [[0, 0], [1, 0], [0, 0]]) visited.add(`${x},${y}`);\nconsole.log(visited.size);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "2"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Objects are members by identity.** Every `{ x, y }` literal is a new object, so the \"duplicate\" point is a third member. For value semantics, key the set by a string (or number) that encodes the value."
           },
           {
             "id": "tsm-ts_set_algebra-spot1",
@@ -21983,6 +22711,34 @@
             "dataset": ""
           },
           {
+            "id": "tsm-ts_unions-rp1",
+            "title": "Fix it: Union & Literal Types #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    found: undefined\n\nIt should print:\n    not found\n\nFix it — every test must pass.",
+            "hint": "A sentinel of the same type",
+            "hints": [
+              "A sentinel of the same type",
+              "The change starts on line 2 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "const words = [\"alpha\", \"beta\"];\nconst i = words.indexOf(\"gamma\");\nconsole.log(\"found: \" + words[i]);\n",
+            "solution": "const words = [\"alpha\", \"beta\"];\nconst found = words.find((w) => w === \"gamma\");\nconsole.log(found === undefined ? \"not found\" : \"found: \" + found);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "not found"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**A sentinel of the same type.** `-1` is a number like any valid index, so nothing forces the check. A `T | undefined` result makes \"not found\" part of the type."
+          },
+          {
             "id": "tsm-ts_unions-spot1",
             "title": "Spot the bug: Union & Literal Types #1",
             "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    10205\n\nIt should print:\n    35\n\nClick the line that causes it.",
@@ -22234,6 +22990,34 @@
               4,
               5
             ]
+          },
+          {
+            "id": "tsm-ts_literal_inference-rp1",
+            "title": "Read the error: Literal Types, Widening & `as const` #1",
+            "prompt": "The compiler rejects this program:\n\n    error TS2345: Argument of type 'readonly [\"a\", \"b\"]' is not assignable to parameter of type 'string[]'.\n\nFix the cause so it compiles and every test passes.",
+            "hint": "`as const` arrays can't go where mutable arrays are expected",
+            "hints": [
+              "`as const` arrays can't go where mutable arrays are expected",
+              "The change starts on line 2 of the program."
+            ],
+            "language": "typescript",
+            "kind": "diagnose",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "const DEFAULTS = [\"a\", \"b\"] as const;\nfunction addTag(tags: string[], tag: string): string[] {\n  tags.push(tag);\n  return tags;\n}\nconsole.log(addTag(DEFAULTS, \"c\").join(\",\"));\n",
+            "solution": "const DEFAULTS = [\"a\", \"b\"] as const;\nfunction addTag(tags: readonly string[], tag: string): string[] {\n  return [...tags, tag];\n}\nconsole.log(addTag(DEFAULTS, \"c\").join(\",\"), DEFAULTS.length);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "a,b,c 2"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**`as const` arrays can't go where mutable arrays are expected.** A `readonly` tuple can't be passed as `string[]`, because the function might mutate it — and this one does. Accept `readonly string[]` and return a new array; that function now works with both."
           },
           {
             "id": "tsm-ts_literal_inference-predict1",
@@ -24516,6 +25300,34 @@
             ]
           },
           {
+            "id": "tsm-ts_nullish-rp1",
+            "title": "Fix it: null, undefined & Strict Checks #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    failed: Cannot read properties of undefined (reading 'toUpperCase')\n\nIt should print:\n    UNKNOWN\n\nFix it — every test must pass.",
+            "hint": "`!` silences a real problem",
+            "hints": [
+              "`!` silences a real problem",
+              "The change starts on line 2 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "const labels = new Map([[\"a\", \"Alpha\"]]);\ntry {\n  console.log(labels.get(\"b\")!.toUpperCase());\n} catch (e) {\n  console.log(\"failed: \" + (e instanceof Error ? e.message : String(e)));\n}\n",
+            "solution": "const labels = new Map([[\"a\", \"Alpha\"]]);\nconsole.log((labels.get(\"b\") ?? \"unknown\").toUpperCase());\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "UNKNOWN"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**`!` silences a real problem.** The non-null assertion told the compiler \"trust me\" — and it was wrong. Prefer a default or a check."
+          },
+          {
             "id": "tsm-ts_nullish-spot2",
             "title": "Spot the bug: null, undefined & Strict Checks #2",
             "prompt": "The compiler rejects this program:\n\n    error TS5076: '??' and '||' operations cannot be mixed without parentheses.\n\nClick the line you would change so that it compiles and prints:\n    5",
@@ -26373,6 +27185,34 @@
             "lines": [
               2
             ]
+          },
+          {
+            "id": "tsm-ts_top_bottom-rp1",
+            "title": "Fix it: `unknown`, `never`, `void` & Exhaustiveness #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    crashed: TypeError\n\nIt should print:\n    1 0\n\nFix it — every test must pass.",
+            "hint": "`typeof v === \"object\"` includes `null`",
+            "hints": [
+              "`typeof v === \"object\"` includes `null`",
+              "The change starts on line 2 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "function keyCount(v: unknown): number {\n  if (typeof v === \"object\") return Object.keys(v as object).length;\n  return 0;\n}\ntry {\n  console.log([{ a: 1 }, null].map(keyCount).join(\" \"));\n} catch (e) {\n  console.log(\"crashed:\", e instanceof Error ? e.constructor.name : \"?\");\n}\n",
+            "solution": "function keyCount(v: unknown): number {\n  if (typeof v === \"object\" && v !== null) return Object.keys(v).length;\n  return 0;\n}\nconsole.log([{ a: 1 }, null].map(keyCount).join(\" \"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "1 0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**`typeof v === \"object\"` includes `null`.** The compiler was right to keep `v` as `object | null` — the `as object` cast silenced it, and `Object.keys(null)` throws. Narrow properly and no cast is needed."
           }
         ],
         "optional": false,
@@ -28155,6 +28995,62 @@
             "lines": [
               1
             ]
+          },
+          {
+            "id": "tsm-ts_function_types-rp1",
+            "title": "Fix it: Function Types in Depth #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    HI\n    crashed: value.toUpperCase is not a function\n\nIt should print:\n    HI\n    42\n\nFix it — every test must pass.",
+            "hint": "Method syntax is checked bivariantly",
+            "hints": [
+              "Method syntax is checked bivariantly",
+              "The change starts on line 2 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "interface Box {\n  accept(value: string | number): void;\n}\nconst shout: Box = {\n  accept(value: string) {\n    console.log(value.toUpperCase());\n  },\n};\ntry {\n  shout.accept(\"hi\");\n  shout.accept(42);\n} catch (e) {\n  console.log(\"crashed: \" + (e instanceof Error ? e.message : String(e)));\n}\n",
+            "solution": "interface Box {\n  accept: (value: string | number) => void;\n}\nconst shout: Box = {\n  accept: (value) => console.log(String(value).toUpperCase()),\n};\nshout.accept(\"hi\");\nshout.accept(42);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "HI\n42"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Method syntax is checked bivariantly.** Declared with *method* syntax, `accept(value: string)` is allowed to stand in for `accept(value: string | number)` — a known unsoundness kept for compatibility. Declared as a *property* with a function type, the same mismatch is a compile error, which forces the handler to cope with numbers."
+          },
+          {
+            "id": "tsm-ts_function_types-rp2",
+            "title": "Fix it: Function Types in Depth #2",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    crashed: Cannot read properties of undefined (reading 'count')\n    0\n\nIt should print:\n    1\n\nFix it — every test must pass.",
+            "hint": "A detached method loses `this`",
+            "hints": [
+              "A detached method loses `this`",
+              "The change starts on line 9 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "class Counter {\n  count = 0;\n  increment() {\n    this.count++;\n    return this.count;\n  }\n}\nconst counter = new Counter();\nconst step = counter.increment;\ntry {\n  step();\n} catch (e) {\n  console.log(\"crashed: \" + (e instanceof Error ? e.message : String(e)));\n}\nconsole.log(counter.count);\n",
+            "solution": "class Counter {\n  count = 0;\n  increment() {\n    this.count++;\n    return this.count;\n  }\n}\nconst counter = new Counter();\nconst step = () => counter.increment();\nstep();\nconsole.log(counter.count);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**A detached method loses `this`.** `counter.increment` is a plain function value; calling it on its own runs with `this` undefined. Wrap the call in an arrow (or `bind`), so `this` is fixed where it is created. Writing `increment(this: Counter)` would have made the compiler reject `step()` outright."
           },
           {
             "id": "tsm-ts_function_types-predict1",
@@ -30038,6 +30934,62 @@
             "dataset": ""
           },
           {
+            "id": "tsm-ts_tsconfig-rp1",
+            "title": "Fix it: Compiler Strictness & tsconfig #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    average with third: NaN\n\nIt should print:\n    average of present: 81\n\nFix it — every test must pass.",
+            "hint": "An index read assumed to exist",
+            "hints": [
+              "An index read assumed to exist",
+              "The change starts on line 2 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "const scores = [90, 72];\nconst third = scores[2] as number;\nconsole.log(\"average with third: \" + (scores[0]! + scores[1]! + third) / 3);\n",
+            "solution": "const scores = [90, 72];\nconst present = [0, 1, 2].map((i) => scores[i]).filter((s) => s !== undefined);\nconsole.log(\"average of present: \" + present.reduce((a, b) => a + b, 0) / present.length);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "average of present: 81"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**An index read assumed to exist.** The cast (and the `!`s) silenced exactly the check the flag exists for, and `undefined` turned the average into `NaN`."
+          },
+          {
+            "id": "tsm-ts_tsconfig-rp2",
+            "title": "Fix it: Compiler Strictness & tsconfig #2",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    51\n\nIt should print:\n    6\n\nFix it — every test must pass.",
+            "hint": "`@ts-ignore` hides a real error",
+            "hints": [
+              "`@ts-ignore` hides a real error",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "// @ts-ignore\nconst quantity: number = \"5\";\nconsole.log(quantity + 1);\n",
+            "solution": "const quantity: number = Number(\"5\");\nconsole.log(quantity + 1);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "6"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**`@ts-ignore` hides a real error.** `@ts-ignore` suppresses whatever error is on the next line, forever. Fix the cause — or use `@ts-expect-error`, which at least fails when the error goes away."
+          },
+          {
             "id": "tsm-ts_tsconfig-spot1",
             "title": "Spot the bug: Compiler Strictness & tsconfig #1",
             "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    theme is undefined\n\nIt should print:\n    default theme\n\nClick the line that causes it.",
@@ -30226,6 +31178,90 @@
             ],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-ts_declaration_files-rp1",
+            "title": "Fix it: Declaration Files & Ambient Types #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    failed: API_URL is not defined\n\nIt should print:\n    calling https://api.example.com\n\nFix it — every test must pass.",
+            "hint": "A declaration nothing provides",
+            "hints": [
+              "A declaration nothing provides",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "declare const API_URL: string;\ntry {\n  console.log(\"calling \" + API_URL);\n} catch (e) {\n  console.log(\"failed: \" + (e instanceof Error ? e.message : String(e)));\n}\n",
+            "solution": "const API_URL = \"https://api.example.com\";\nconsole.log(\"calling \" + API_URL);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "calling https://api.example.com"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**A declaration nothing provides.** `declare` promised a global the runtime never defined. The compiler can't know — the program fails when it gets there."
+          },
+          {
+            "id": "tsm-ts_declaration_files-rp2",
+            "title": "Fix it: Declaration Files & Ambient Types #2",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    failed: lib.add(...).toUpperCase is not a function\n\nIt should print:\n    3.0\n\nFix it — every test must pass.",
+            "hint": "A declaration that disagrees with the code",
+            "hints": [
+              "A declaration that disagrees with the code",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "const lib = { add: (a: number, b: number) => a + b } as unknown as { add(a: number, b: number): string };\ntry {\n  console.log(lib.add(1, 2).toUpperCase());\n} catch (e) {\n  console.log(\"failed: \" + (e instanceof Error ? e.message : String(e)));\n}\n",
+            "solution": "const lib: { add(a: number, b: number): number } = { add: (a, b) => a + b };\nconsole.log(lib.add(1, 2).toFixed(1));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "3.0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**A declaration that disagrees with the code.** Types written by hand for someone else's code are claims. Here the claimed `string` was really a number. Test declarations against the real library."
+          },
+          {
+            "id": "tsm-ts_declaration_files-rp3",
+            "title": "Fix it: Declaration Files & Ambient Types #3",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    failed: Cannot read properties of undefined (reading 'toFixed')\n\nIt should print:\n    empty\n\nFix it — every test must pass.",
+            "hint": "An augmentation that forgets `undefined`",
+            "hints": [
+              "An augmentation that forgets `undefined`",
+              "The change starts on line 3 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "declare global {\n  interface Array<T> {\n    last(): T;\n  }\n}\nArray.prototype.last = function () {\n  return this[this.length - 1];\n};\nconst empty: number[] = [];\ntry {\n  console.log(empty.last().toFixed(2));\n} catch (e) {\n  console.log(\"failed: \" + (e instanceof Error ? e.message : String(e)));\n}\n",
+            "solution": "declare global {\n  interface Array<T> {\n    last(): T | undefined;\n  }\n}\nArray.prototype.last = function () {\n  return this[this.length - 1];\n};\nconst empty: number[] = [];\nconsole.log(empty.last()?.toFixed(2) ?? \"empty\");\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "empty"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**An augmentation that forgets `undefined`.** Declared as returning `T`, `last()` let the empty case through. The declaration must describe every value the code can return."
           },
           {
             "id": "tsm-ts_declaration_files-predict1",
@@ -32272,6 +33308,62 @@
             ]
           },
           {
+            "id": "tsm-ts_assertions-rp1",
+            "title": "Fix it: Type Assertions (as) #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    failed: Cannot read properties of undefined (reading 'name')\n\nIt should print:\n    no such user\n\nFix it — every test must pass.",
+            "hint": "`!` on a search that can miss",
+            "hints": [
+              "`!` on a search that can miss",
+              "The change starts on line 2 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "const users = [{ id: 1, name: \"ana\" }];\ntry {\n  console.log(users.find((u) => u.id === 2)!.name);\n} catch (e) {\n  console.log(\"failed: \" + (e instanceof Error ? e.message : String(e)));\n}\n",
+            "solution": "const users = [{ id: 1, name: \"ana\" }];\nconsole.log(users.find((u) => u.id === 2)?.name ?? \"no such user\");\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "no such user"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**`!` on a search that can miss.** `!` removed `undefined` from the type, not from the runtime. Handle the miss."
+          },
+          {
+            "id": "tsm-ts_assertions-rp2",
+            "title": "Fix it: Type Assertions (as) #2",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    NaN\n\nIt should print:\n    not a number\n\nFix it — every test must pass.",
+            "hint": "A double assertion",
+            "hints": [
+              "A double assertion",
+              "The change starts on line 2 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "const input = \"twelve\";\nconst n = input as unknown as number;\nconsole.log(n * 2);\n",
+            "solution": "const input = \"twelve\";\nconst n = Number(input);\nconsole.log(Number.isNaN(n) ? \"not a number\" : n * 2);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "not a number"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**A double assertion.** `as unknown as T` forces any conversion past the compiler. It's occasionally necessary at a boundary; it's never a way to turn text into a number."
+          },
+          {
             "id": "tsm-ts_satisfies-order1",
             "title": "Put it in order: Checked, with the keys kept",
             "prompt": "The lines of the worked example “Checked, with the keys kept” from The satisfies Operator, shuffled. Put them back in an order that compiles and prints exactly:\n\n    settings,billing",
@@ -32460,6 +33552,34 @@
             "dataset": ""
           },
           {
+            "id": "tsm-ts_structural_typing-rp1",
+            "title": "Fix it: Structural Typing & Excess Properties #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    -6.1\n\nIt should print:\n    21.1\n\nFix it — every test must pass.",
+            "hint": "Two meanings, one shape",
+            "hints": [
+              "Two meanings, one shape",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "type Celsius = { value: number };\ntype Fahrenheit = { value: number };\nconst toCelsius = (f: Fahrenheit): Celsius => ({ value: ((f.value - 32) * 5) / 9 });\nconst indoor: Celsius = { value: 21 };\nconsole.log(toCelsius(indoor).value.toFixed(1));\n",
+            "solution": "type Celsius = { unit: \"C\"; value: number };\ntype Fahrenheit = { unit: \"F\"; value: number };\nconst toCelsius = (f: Fahrenheit): Celsius => ({ unit: \"C\", value: ((f.value - 32) * 5) / 9 });\nconst outdoor: Fahrenheit = { unit: \"F\", value: 70 };\nconsole.log(toCelsius(outdoor).value.toFixed(1));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "21.1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Two meanings, one shape.** Identical shapes are interchangeable, so a Celsius value was converted as if it were Fahrenheit. A literal `unit` tag (or a brand) makes them different types."
+          },
+          {
             "id": "tsm-ts_structural_typing-spot1",
             "title": "Spot the bug: Structural Typing & Excess Properties #1",
             "prompt": "The compiler rejects this program:\n\n    error TS2345: Argument of type '{ deposit: (n: number) => number; }' is not assignable to parameter of type 'Account'.\n      Property '#balance' is missing in type '{ deposit: (n: number) => number; }' but required in type 'Account'.\n\nClick the line you would change so that it compiles and prints:\n    10",
@@ -32564,6 +33684,34 @@
             ],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-ts_variance-rp1",
+            "title": "Fix it: Variance #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    woof\n    tom the cat cannot bark\n\nIt should print:\n    woof\n    2 animals in the shelter\n\nFix it — every test must pass.",
+            "hint": "A mutable array accepted as a wider one",
+            "hints": [
+              "A mutable array accepted as a wider one",
+              "The change starts on line 3 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "type Animal = { name: string };\ntype Dog = { name: string; bark: () => string };\nfunction adopt(animals: Animal[]): void {\n  animals.push({ name: \"tom the cat\" });\n}\nconst dogs: Dog[] = [{ name: \"rex\", bark: () => \"woof\" }];\nadopt(dogs);\nfor (const d of dogs) {\n  console.log(typeof d.bark === \"function\" ? d.bark() : d.name + \" cannot bark\");\n}\n",
+            "solution": "type Animal = { name: string };\ntype Dog = { name: string; bark: () => string };\nfunction adopt(animals: readonly Animal[]): Animal[] {\n  return [...animals, { name: \"tom the cat\" }];\n}\nconst dogs: Dog[] = [{ name: \"rex\", bark: () => \"woof\" }];\nconst shelter = adopt(dogs);\nfor (const d of dogs) console.log(d.bark());\nconsole.log(shelter.length + \" animals in the shelter\");\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "woof\n2 animals in the shelter"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**A mutable array accepted as a wider one.** Arrays are covariant for convenience, so `Dog[]` passed as `Animal[]` compiles — and `adopt` puts a cat in your list of dogs. A `readonly` parameter can't be written through; return a new array instead."
           },
           {
             "id": "tsm-ts_variance-spot1",
@@ -34259,6 +35407,34 @@
             "dataset": ""
           },
           {
+            "id": "tsm-ts_branded_types-rp1",
+            "title": "Fix it: Branded (Nominal) Types #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    total distance 6200\n\nIt should print:\n    total distance 5366\n\nFix it — every test must pass.",
+            "hint": "Plain numbers mix units silently",
+            "hints": [
+              "Plain numbers mix units silently",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "const runMeters = 5000;\nconst climbFeet = 1200;\nconsole.log(`total distance ${runMeters + climbFeet}`);\n",
+            "solution": "declare const unit: unique symbol;\ntype Meters = number & { readonly [unit]: \"m\" };\ntype Feet = number & { readonly [unit]: \"ft\" };\nconst runMeters = 5000 as Meters;\nconst climbFeet = 1200 as Feet;\nconst toMeters = (f: Feet) => (f * 0.3048) as Meters;\nconsole.log(`total distance ${Math.round(runMeters + toMeters(climbFeet))}`);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "total distance 5366"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Plain numbers mix units silently.** With plain numbers, adding feet to meters compiles and is wrong. With brands, the conversion has to be written — and so it's right."
+          },
+          {
             "id": "tsm-ts_branded_types-spot1",
             "title": "Spot the bug: Branded (Nominal) Types #1",
             "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    user u1, user DROP TABLE, user u3\n\nIt should print:\n    user u1, user u3\n\nClick the line that causes it.",
@@ -34285,6 +35461,34 @@
             "lines": [
               3
             ]
+          },
+          {
+            "id": "tsm-ts_branded_types-rp2",
+            "title": "Read the error: Branded (Nominal) Types #2",
+            "prompt": "The compiler rejects this program:\n\n    error TS2367: This comparison appears to be unintentional because the types 'UserId' and 'OrderId' have no overlap.\n\nFix the cause so it compiles and every test passes.",
+            "hint": "Comparing different brands",
+            "hints": [
+              "Comparing different brands",
+              "The change starts on line 3 of the program."
+            ],
+            "language": "typescript",
+            "kind": "diagnose",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "declare const brand: unique symbol;\ntype UserId = string & { readonly [brand]: \"UserId\" };\ntype OrderId = string & { readonly [brand]: \"OrderId\" };\ndeclare const u: UserId;\ndeclare const o: OrderId;\nconsole.log(u === o);\n",
+            "solution": "declare const brand: unique symbol;\ntype UserId = string & { readonly [brand]: \"UserId\" };\nconst a = \"u1\" as UserId;\nconst b = \"u1\" as UserId;\nconsole.log(a === b);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "true"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Comparing different brands.** Two brands of the same base type have no overlap, so comparing them is flagged — it's nearly always a mix-up."
           },
           {
             "id": "tsm-ts_immutability-order1",
@@ -34398,6 +35602,34 @@
             ]
           },
           {
+            "id": "tsm-ts_immutability-rp1",
+            "title": "Fix it: readonly & Immutability #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    prod-db\n\nIt should print:\n    localhost\n\nFix it — every test must pass.",
+            "hint": "`Object.freeze` is shallow",
+            "hints": [
+              "`Object.freeze` is shallow",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "const config = Object.freeze({ db: { host: \"localhost\" } });\nconfig.db.host = \"prod-db\";\nconsole.log(config.db.host);\n",
+            "solution": "function deepFreeze<T extends object>(o: T): T {\n  for (const v of Object.values(o)) if (typeof v === \"object\" && v !== null) deepFreeze(v);\n  return Object.freeze(o);\n}\nconst config = deepFreeze({ db: { host: \"localhost\" } });\ntry {\n  config.db.host = \"prod-db\";\n} catch {\n}\nconsole.log(config.db.host);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "localhost"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**`Object.freeze` is shallow.** Freezing the outer object left `db` writable. Freeze recursively when the whole structure must stay fixed."
+          },
+          {
             "id": "tsm-ts_immutability-predict1",
             "title": "Read the inference: `Object.freeze` at runtime, in strict code",
             "prompt": "What type does TypeScript already infer for `limits`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “`Object.freeze` at runtime, in strict code” from readonly & Immutability.",
@@ -34420,6 +35652,34 @@
             "tests": [],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-ts_parse_dont_validate-rp1",
+            "title": "Fix it: Parse, Don't Validate #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    welcome mail -> ana@x.io\n    welcome mail -> bob\n\nIt should print:\n    welcome mail -> ana@x.io\n    rejected bob\n\nFix it — every test must pass.",
+            "hint": "Validate, then forget",
+            "hints": [
+              "Validate, then forget",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "function isEmail(s: string): boolean {\n  return /^[^@\\s]+@[^@\\s]+$/.test(s);\n}\nfunction sendWelcome(to: string): string {\n  return \"welcome mail -> \" + to;\n}\nconst signups = [\"ana@x.io\", \"bob\"];\nconst first = signups[0] ?? \"\";\nif (isEmail(first)) console.log(sendWelcome(first));\nconsole.log(sendWelcome(signups[1] ?? \"\")); // this path forgot to check\n",
+            "solution": "declare const EmailBrand: unique symbol;\ntype Email = string & { readonly [EmailBrand]: true };\nfunction parseEmail(s: string): Email | undefined {\n  return /^[^@\\s]+@[^@\\s]+$/.test(s) ? (s as Email) : undefined;\n}\nfunction sendWelcome(to: Email): string {\n  return \"welcome mail -> \" + to;\n}\nfor (const raw of [\"ana@x.io\", \"bob\"]) {\n  const email = parseEmail(raw);\n  console.log(email === undefined ? \"rejected \" + raw : sendWelcome(email));\n}\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "welcome mail -> ana@x.io\nrejected bob"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Validate, then forget.** The boolean validator knew `\"bob\"` was bad, and threw that knowledge away. When `sendWelcome` demands an `Email`, the path that forgot to check doesn't compile."
           },
           {
             "id": "tsm-ts_parse_dont_validate-spot1",
@@ -36392,6 +37652,62 @@
             ]
           },
           {
+            "id": "tsm-ts_utility_types-rp1",
+            "title": "Fix it: Utility Types #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    retries: undefined\n\nIt should print:\n    retries: 3\n\nFix it — every test must pass.",
+            "hint": "`Required` at the type level isn't a default at runtime",
+            "hints": [
+              "`Required` at the type level isn't a default at runtime",
+              "The change starts on line 2 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "type Options = { retries?: number };\nconst fromUser = JSON.parse(\"{}\") as Required<Options>;\nconsole.log(\"retries: \" + fromUser.retries);\n",
+            "solution": "type Options = { retries?: number };\nconst fromUser = JSON.parse(\"{}\") as Options;\nconst resolved: Required<Options> = { retries: fromUser.retries ?? 3 };\nconsole.log(\"retries: \" + resolved.retries);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "retries: 3"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**`Required` at the type level isn't a default at runtime.** A type can't fill in a missing value. Produce a `Required<T>` by actually supplying defaults."
+          },
+          {
+            "id": "tsm-ts_runtime_validation-rp1",
+            "title": "Fix it: Runtime Validation with Schemas #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    ana turns 311\n\nIt should print:\n    invalid user\n\nFix it — every test must pass.",
+            "hint": "`JSON.parse(...) as User`",
+            "hints": [
+              "`JSON.parse(...) as User`",
+              "The change starts on line 2 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "type User = { name: string; age: number };\nconst user = JSON.parse('{\"name\":\"ana\",\"age\":\"31\"}') as User;\nconsole.log(`${user.name} turns ${user.age + 1}`);\n",
+            "solution": "type User = { name: string; age: number };\nfunction parseUser(value: unknown): User | undefined {\n  if (typeof value !== \"object\" || value === null) return undefined;\n  if (!(\"name\" in value) || typeof value.name !== \"string\") return undefined;\n  if (!(\"age\" in value) || typeof value.age !== \"number\") return undefined;\n  return { name: value.name, age: value.age };\n}\nconst user = parseUser(JSON.parse('{\"name\":\"ana\",\"age\":\"31\"}'));\nconsole.log(user === undefined ? \"invalid user\" : `${user.name} turns ${user.age + 1}`);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "invalid user"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**`JSON.parse(...) as User`.** The assertion believed the JSON, and `\"31\" + 1` is `\"311\"`. Any real check — hand-written here, or a schema — refuses the string."
+          },
+          {
             "id": "tsm-ts_runtime_validation-spot1",
             "title": "Spot the bug: Runtime Validation with Schemas #1",
             "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    bo is undefined years old\n\nIt should print:\n    invalid\n\nClick the line that causes it.",
@@ -36418,6 +37734,34 @@
             "lines": [
               3
             ]
+          },
+          {
+            "id": "tsm-ts_runtime_validation-rp2",
+            "title": "Fix it: Runtime Validation with Schemas #2",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    name: expected string\n\nIt should print:\n    name: expected string\n    age: expected number\n    email: expected string\n\nFix it — every test must pass.",
+            "hint": "Stopping at the first problem",
+            "hints": [
+              "Stopping at the first problem",
+              "The change starts on line 2 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "function check(v: { name?: unknown; age?: unknown; email?: unknown }): string {\n  if (typeof v.name !== \"string\") return \"name: expected string\";\n  if (typeof v.age !== \"number\") return \"age: expected number\";\n  if (typeof v.email !== \"string\") return \"email: expected string\";\n  return \"ok\";\n}\nconsole.log(check({ name: 1, age: \"x\" }));\n",
+            "solution": "function check(v: { name?: unknown; age?: unknown; email?: unknown }): string {\n  const issues: string[] = [];\n  if (typeof v.name !== \"string\") issues.push(\"name: expected string\");\n  if (typeof v.age !== \"number\") issues.push(\"age: expected number\");\n  if (typeof v.email !== \"string\") issues.push(\"email: expected string\");\n  return issues.length === 0 ? \"ok\" : issues.join(\"\\n\");\n}\nconsole.log(check({ name: 1, age: \"x\" }));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "name: expected string\nage: expected number\nemail: expected string"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Stopping at the first problem.** Reporting one problem at a time turns fixing bad data into a slow loop: fix, resubmit, get the next error. Collect them all."
           }
         ],
         "optional": false,
@@ -38508,6 +39852,34 @@
             "lines": [
               4
             ]
+          },
+          {
+            "id": "tsm-ts_generic_inference-rp1",
+            "title": "Fix it: How Generic Inference Works #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    first: undefined\n\nIt should print:\n    first: (none)\n\nFix it — every test must pass.",
+            "hint": "A bare `T` return that can be `undefined`",
+            "hints": [
+              "A bare `T` return that can be `undefined`",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "function first<T>(xs: T[]): T {\n  return xs[0] as T;\n}\nconst empty: string[] = [];\nconsole.log(\"first: \" + first(empty));\n",
+            "solution": "function first<T>(xs: T[]): T | undefined {\n  return xs[0];\n}\nconst empty: string[] = [];\nconsole.log(\"first: \" + (first(empty) ?? \"(none)\"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "first: (none)"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**A bare `T` return that can be `undefined`.** Promising `T` forced a cast, and the empty array returned `undefined` anyway. `T | undefined` is the honest signature, and it makes every caller decide what an empty list means."
           },
           {
             "id": "tsm-ts_generic_inference-predict1",
@@ -45552,6 +46924,34 @@
             "dataset": ""
           },
           {
+            "id": "tsm-ts_template_literal_types-rp1",
+            "title": "Fix it: Template Literal Types #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    width 12 (12pt)\n\nIt should print:\n    rejected 12pt\n\nFix it — every test must pass.",
+            "hint": "A cast is not a check",
+            "hints": [
+              "A cast is not a check",
+              "The change starts on line 2 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "type Size = `${number}px`;\nconst fromUser = \"12pt\" as Size;\nconsole.log(\"width \" + parseFloat(fromUser) + \" (\" + fromUser + \")\");\n",
+            "solution": "type Size = `${number}px`;\nconst isSize = (s: string): s is Size => /^\\d+(\\.\\d+)?px$/.test(s);\nconst raw = \"12pt\";\nconsole.log(isSize(raw) ? \"width \" + parseFloat(raw) : \"rejected \" + raw);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "rejected 12pt"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**A cast is not a check.** The pattern type only checks strings the compiler can see. Validate input at runtime before giving it the type."
+          },
+          {
             "id": "tsm-ts_template_literal_types-spot1",
             "title": "Spot the bug: Template Literal Types #1",
             "prompt": "The compiler rejects this program:\n\n    error TS2367: This comparison appears to be unintentional because the types 'number' and 'string' have no overlap.\n\nClick the line you would change so that it compiles and prints:\n    true",
@@ -45660,6 +47060,34 @@
             ],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-ts_type_level-rp1",
+            "title": "Fix it: Recursive Types & Type-Level Programming #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    failed: RangeError\n\nIt should print:\n    20000\n\nFix it — every test must pass.",
+            "hint": "Recursion too deep for the call stack",
+            "hints": [
+              "Recursion too deep for the call stack",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "function depth(v: unknown): number {\n  return Array.isArray(v) ? 1 + Math.max(0, ...v.map(depth)) : 0;\n}\nlet nested: unknown = 0;\nfor (let i = 0; i < 20000; i++) nested = [nested];\ntry {\n  console.log(depth(nested));\n} catch (e) {\n  console.log(\"failed: \" + (e instanceof Error ? e.name : String(e)));\n}\n",
+            "solution": "function depth(root: unknown): number {\n  let max = 0;\n  const stack: [unknown, number][] = [[root, 0]];\n  while (stack.length > 0) {\n    const [v, d] = stack.pop() ?? [null, 0];\n    if (Array.isArray(v)) {\n      max = Math.max(max, d + 1);\n      for (const x of v) stack.push([x, d + 1]);\n    }\n  }\n  return max;\n}\nlet nested: unknown = 0;\nfor (let i = 0; i < 20000; i++) nested = [nested];\nconsole.log(depth(nested));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "20000"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Recursion too deep for the call stack.** A recursive function uses a stack frame per level, and Node runs out after roughly ten thousand. An explicit stack handles any depth."
           },
           {
             "id": "tsm-ts_type_level-spot1",
@@ -45772,6 +47200,34 @@
             "dataset": ""
           },
           {
+            "id": "tsm-ts_type_performance-rp1",
+            "title": "Read the error: Type-Level Performance & Limits #1",
+            "prompt": "The compiler rejects this program:\n\n    error TS2589: Type instantiation is excessively deep and possibly infinite.\n\nFix the cause so it compiles and every test passes.",
+            "hint": "Recursion that isn't a tail call",
+            "hints": [
+              "Recursion that isn't a tail call",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "diagnose",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "type BuildWrapped<N extends number, T extends unknown[] = []> =\n  T[\"length\"] extends N ? [] : [0, ...BuildWrapped<N, [...T, 0]>];\nconst row: BuildWrapped<80>[\"length\"] = 80;\nconsole.log(row);\n",
+            "solution": "type Build<N extends number, Acc extends unknown[] = []> =\n  Acc[\"length\"] extends N ? Acc : Build<N, [...Acc, 0]>;\nconst row: Build<80>[\"length\"] = 80;\nconsole.log(row);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "80"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Recursion that isn't a tail call.** Same result, but the second form's recursive call is the entire branch, so the checker runs it as a loop."
+          },
+          {
             "id": "tsm-ts_type_performance-spot1",
             "title": "Spot the bug: Type-Level Performance & Limits #1",
             "prompt": "The compiler rejects this program:\n\n    error TS2493: Tuple type '[string]' of length '1' has no element at index '1'.\n\nClick the line you would change so that it compiles and prints:\n    a b",
@@ -45798,6 +47254,34 @@
             "lines": [
               1
             ]
+          },
+          {
+            "id": "tsm-ts_type_performance-rp2",
+            "title": "Read the error: Type-Level Performance & Limits #2",
+            "prompt": "The compiler rejects this program:\n\n    error TS2590: Expression produces a union type that is too complex to represent.\n\nFix the cause so it compiles and every test passes.",
+            "hint": "Enumerating what a pattern can describe",
+            "hints": [
+              "Enumerating what a pattern can describe",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "diagnose",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "type Digit = \"0\" | \"1\" | \"2\" | \"3\" | \"4\" | \"5\" | \"6\" | \"7\" | \"8\" | \"9\";\ntype Pin = `${Digit}${Digit}${Digit}${Digit}${Digit}${Digit}`;\nconst pin: Pin = \"004271\";\nconsole.log(pin.length);\n",
+            "solution": "declare const PinBrand: unique symbol;\ntype Pin = string & { readonly [PinBrand]: true };\nconst parsePin = (s: string): Pin | undefined => (/^\\d{6}$/.test(s) ? (s as Pin) : undefined);\nconst pin = parsePin(\"004271\");\nconsole.log(pin === undefined ? \"bad pin\" : pin.length);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "6"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Enumerating what a pattern can describe.** A million-member union is too big to check. A parser and a brand (week 16) give the same guarantee — only valid PINs reach code that takes `Pin` — at no type-level cost."
           },
           {
             "id": "tsm-ts_type_performance-predict1",
@@ -47513,6 +48997,62 @@
             "dataset": ""
           },
           {
+            "id": "tsm-ts_this_accessors-rp1",
+            "title": "Fix it: this, Getters & Setters #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    failed: Cannot read properties of undefined (reading 'total')\n    0\n\nIt should print:\n    6\n\nFix it — every test must pass.",
+            "hint": "Passing a method as a callback",
+            "hints": [
+              "Passing a method as a callback",
+              "The change starts on line 8 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "class Tally {\n  total = 0;\n  add(n: number): void {\n    this.total += n;\n  }\n}\nconst t = new Tally();\ntry {\n  [1, 2, 3].forEach(t.add);\n} catch (e) {\n  console.log(\"failed: \" + (e instanceof Error ? e.message : String(e)));\n}\nconsole.log(t.total);\n",
+            "solution": "class Tally {\n  total = 0;\n  add(n: number): void {\n    this.total += n;\n  }\n}\nconst t = new Tally();\n[1, 2, 3].forEach((n) => t.add(n));\nconsole.log(t.total);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "6"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Passing a method as a callback.** `forEach(t.add)` passes the function alone; it's called with `this` undefined. The compiler doesn't catch it unless the method declares a `this` parameter."
+          },
+          {
+            "id": "tsm-ts_this_accessors-rp2",
+            "title": "Fix it: this, Getters & Setters #2",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    failed: Maximum call stack size exceeded\n\nIt should print:\n    ana\n\nFix it — every test must pass.",
+            "hint": "A setter that assigns to itself",
+            "hints": [
+              "A setter that assigns to itself",
+              "The change starts on line 2 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "class User {\n  set name(value: string) {\n    this.name = value.trim();\n  }\n  get name(): string {\n    return this.name;\n  }\n}\ntry {\n  const u = new User();\n  u.name = \"  ana \";\n  console.log(u.name);\n} catch (e) {\n  console.log(\"failed: \" + (e instanceof Error ? e.message : String(e)));\n}\n",
+            "solution": "class User {\n  #name = \"\";\n  set name(value: string) {\n    this.#name = value.trim();\n  }\n  get name(): string {\n    return this.#name;\n  }\n}\nconst u = new User();\nu.name = \"  ana \";\nconsole.log(u.name);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "ana"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**A setter that assigns to itself.** Inside the setter, `this.name = …` calls the setter again, forever. An accessor needs a separate backing field."
+          },
+          {
             "id": "tsm-ts_this_accessors-spot1",
             "title": "Spot the bug: this, Getters & Setters #1",
             "prompt": "The compiler rejects this program:\n\n    error TS2532: Object is possibly 'undefined'.\n\nClick the line you would change so that it compiles and prints:\n    1",
@@ -47539,6 +49079,34 @@
             "lines": [
               3
             ]
+          },
+          {
+            "id": "tsm-ts_class_design-rp1",
+            "title": "Fix it: Designing with Classes #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    rendering label: undefined\n\nIt should print:\n    rendering label: hello\n\nFix it — every test must pass.",
+            "hint": "A base constructor calling an overridable method",
+            "hints": [
+              "A base constructor calling an overridable method",
+              "The change starts on line 2 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "class Widget {\n  constructor() {\n    console.log(\"rendering \" + this.render());\n  }\n  render(): string {\n    return \"widget\";\n  }\n}\nclass Label extends Widget {\n  text = \"hello\";\n  override render(): string {\n    return \"label: \" + this.text;\n  }\n}\nnew Label();\n",
+            "solution": "class Widget {\n  render(): string {\n    return \"widget\";\n  }\n  mount(): void {\n    console.log(\"rendering \" + this.render());\n  }\n}\nclass Label extends Widget {\n  text = \"hello\";\n  override render(): string {\n    return \"label: \" + this.text;\n  }\n}\nnew Label().mount();\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "rendering label: hello"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**A base constructor calling an overridable method.** The base constructor runs *before* the subclass's field initialisers, so `this.text` is still `undefined` when the overridden `render` runs. Don't call overridable methods from a constructor; do the work in a separate step."
           },
           {
             "id": "tsm-ts_class_design-spot1",
@@ -47625,6 +49193,90 @@
             ],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-ts_decorators-rp1",
+            "title": "Fix it: Decorators #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    call\n    crashed: Cannot read properties of undefined (reading 'count')\n\nIt should print:\n    call\n    1\n\nFix it — every test must pass.",
+            "hint": "A wrapper that loses `this`",
+            "hints": [
+              "A wrapper that loses `this`",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "function logged<Args extends unknown[], R>(target: (...args: Args) => R) {\n  return (...args: Args): R => {\n    console.log(\"call\");\n    return target(...args);\n  };\n}\nclass Counter {\n  count = 0;\n  inc(): number {\n    return ++this.count;\n  }\n}\nCounter.prototype.inc = logged(Counter.prototype.inc);\ntry {\n  console.log(new Counter().inc());\n} catch (e) {\n  console.log(\"crashed: \" + (e instanceof Error ? e.message : String(e)));\n}\n",
+            "solution": "function logged<This, Args extends unknown[], R>(target: (this: This, ...args: Args) => R) {\n  return function (this: This, ...args: Args): R {\n    console.log(\"call\");\n    return target.call(this, ...args);\n  };\n}\nclass Counter {\n  count = 0;\n  inc(): number {\n    return ++this.count;\n  }\n}\nCounter.prototype.inc = logged(Counter.prototype.inc);\nconsole.log(new Counter().inc());\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "call\n1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**A wrapper that loses `this`.** The wrapper called the original method as a plain function, so `this` was `undefined`. A method decorator must forward `this` — a `function` wrapper (not an arrow) and `target.call(this, …)`."
+          },
+          {
+            "id": "tsm-ts_decorators-rp2",
+            "title": "Read the error: Decorators #2",
+            "prompt": "The compiler rejects this program:\n\n    error TS1206: Decorators are not valid here.\n\nFix the cause so it compiles and every test passes.",
+            "hint": "Decorating a plain function",
+            "hints": [
+              "Decorating a plain function",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "diagnose",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "function logged(target: unknown, context: unknown) {\n  return target;\n}\n@logged\nfunction greet(): string {\n  return \"hi\";\n}\nconsole.log(greet());\n",
+            "solution": "function logged<R>(target: () => R, name: string): () => R {\n  return () => {\n    console.log(\"calling \" + name);\n    return target();\n  };\n}\nconst greet = logged(() => \"hi\", \"greet\");\nconsole.log(greet());\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "calling greet\nhi"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Decorating a plain function.** Only classes and class members take `@` decorators. For a function, apply the wrapper directly — it's the same idea without the syntax."
+          },
+          {
+            "id": "tsm-ts_decorators-rp3",
+            "title": "Read the error: Decorators #3",
+            "prompt": "The compiler rejects this program:\n\n    error TS1241: Unable to resolve signature of method decorator when called as an expression.\n\nFix the cause so it compiles and every test passes.",
+            "hint": "A legacy decorator signature",
+            "hints": [
+              "A legacy decorator signature",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "diagnose",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "function legacy(target: object, key: string, descriptor: PropertyDescriptor) {\n  return descriptor;\n}\nclass Calc {\n  @legacy\n  add(a: number, b: number) {\n    return a + b;\n  }\n}\nconsole.log(new Calc().add(1, 2));\n",
+            "solution": "class Calc {\n  add(a: number, b: number) {\n    return a + b;\n  }\n}\nfunction standard<This, Args extends unknown[], R>(target: (this: This, ...args: Args) => R, name: string) {\n  return function (this: This, ...args: Args): R {\n    console.log(\"standard decorator on \" + name);\n    return target.call(this, ...args);\n  };\n}\nCalc.prototype.add = standard(Calc.prototype.add, \"add\");\nconsole.log(new Calc().add(1, 2));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "standard decorator on add\n3"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**A legacy decorator signature.** Code copied from an older codebase often uses the experimental `(target, key, descriptor)` form. With standard decorators (TypeScript 5.0's default) the signature is `(value, context)`."
           }
         ],
         "optional": false,
@@ -49157,6 +50809,34 @@
             ]
           },
           {
+            "id": "tsm-ts_iterators-rp1",
+            "title": "Fix it: Iterators & Generators #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    4,5\n\nIt should print:\n    5\n\nFix it — every test must pass.",
+            "hint": "Removing items while iterating",
+            "hints": [
+              "Removing items while iterating",
+              "The change starts on line 2 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "const nums = [2, 4, 5, 6];\nfor (const n of nums) {\n  if (n % 2 === 0) nums.splice(nums.indexOf(n), 1);\n}\nconsole.log(nums.join(\",\"));\n",
+            "solution": "const nums = [2, 4, 5, 6];\nconst odd = nums.filter((n) => n % 2 !== 0);\nconsole.log(odd.join(\",\"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "5"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Removing items while iterating.** An array's iterator is just an index. Removing the current element shifts the next one into its slot, and the loop skips it. Build a new array instead."
+          },
+          {
             "id": "tsm-ts_iterators-spot2",
             "title": "Spot the bug: Iterators & Generators #2",
             "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    created without error: object\n\nIt should print:\n    caught at call\n\nClick the line that causes it.",
@@ -49324,6 +51004,34 @@
               3,
               6
             ]
+          },
+          {
+            "id": "tsm-ts_iterator_helpers-rp1",
+            "title": "Fix it: Iterator Helpers #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    max 90, total 0\n\nIt should print:\n    max 90, total 160\n\nFix it — every test must pass.",
+            "hint": "Reusing a consumed iterator",
+            "hints": [
+              "Reusing a consumed iterator",
+              "The change starts on line 2 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "const scores = new Map([[\"ana\", 90], [\"bo\", 70]]);\nconst values = scores.values();\nconst max = Math.max(...values);\nconst total = values.reduce((a, b) => a + b, 0);\nconsole.log(`max ${max}, total ${total}`);\n",
+            "solution": "const scores = new Map([[\"ana\", 90], [\"bo\", 70]]);\nconst max = Math.max(...scores.values());\nconst total = scores.values().reduce((a, b) => a + b, 0);\nconsole.log(`max ${max}, total ${total}`);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "max 90, total 160"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Reusing a consumed iterator.** The spread consumed `values`, so `reduce` saw nothing and returned its initial `0`. Ask the `Map` for a fresh iterator each time."
           },
           {
             "id": "tsm-ts_iterator_helpers-spot2",
@@ -51046,6 +52754,34 @@
             ]
           },
           {
+            "id": "tsm-ts_errors-rp1",
+            "title": "Fix it: Error Handling #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    5 0 0\n\nIt should print:\n    5\n    0\n    error: items.reduce is not a function\n\nFix it — every test must pass.",
+            "hint": "A `catch` that hides a bug",
+            "hints": [
+              "A `catch` that hides a bug",
+              "The change starts on line 2 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "function total(json: string): number {\n  try {\n    const items = JSON.parse(json) as { price: number }[];\n    return items.reduce((sum, i) => sum + i.price, 0);\n  } catch {\n    return 0;\n  }\n}\nconsole.log(total('[{\"price\": 2}, {\"price\": 3}]'), total(\"not json\"), total('{\"price\": 5}'));\n",
+            "solution": "function total(json: string): number {\n  let items: { price: number }[];\n  try {\n    items = JSON.parse(json) as { price: number }[];\n  } catch (e) {\n    if (e instanceof SyntaxError) return 0;\n    throw e;\n  }\n  return items.reduce((sum, i) => sum + i.price, 0);\n}\nfor (const input of ['[{\"price\": 2}, {\"price\": 3}]', \"not json\", '{\"price\": 5}']) {\n  try {\n    console.log(total(input));\n  } catch (e) {\n    console.log(\"error: \" + (e instanceof Error ? e.message : String(e)));\n  }\n}\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "5\n0\nerror: items.reduce is not a function"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**A `catch` that hides a bug.** The catch-all meant to handle bad JSON also swallowed a `TypeError` — the input was an object, not an array. Keep the `try` around the one call that can fail, and catch only the error you expect."
+          },
+          {
             "id": "tsm-ts_errors-spot2",
             "title": "Spot the bug: Error Handling #2",
             "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    false undefined\n\nIt should print:\n    true string\n\nClick the line that causes it.",
@@ -51072,6 +52808,34 @@
             "lines": [
               2
             ]
+          },
+          {
+            "id": "tsm-ts_error_types-rp1",
+            "title": "Fix it: Result Types & Typed Errors #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    Error: unexpected ','\n\nIt should print:\n    ParseError: unexpected ','\n\nFix it — every test must pass.",
+            "hint": "An error class without a `name`",
+            "hints": [
+              "An error class without a `name`",
+              "The change starts on line 5 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "class ParseError extends Error {\n  readonly line: number;\n  constructor(line: number, message: string) {\n    super(message);\n    this.line = line;\n  }\n}\nconsole.log(String(new ParseError(3, \"unexpected ','\")));\n",
+            "solution": "class ParseError extends Error {\n  readonly line: number;\n  constructor(line: number, message: string) {\n    super(message);\n    this.name = \"ParseError\";\n    this.line = line;\n  }\n}\nconsole.log(String(new ParseError(3, \"unexpected ','\")));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "ParseError: unexpected ','"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**An error class without a `name`.** `name` is inherited from `Error.prototype`, so logs and stack traces say plain `Error`. Set it in the constructor."
           },
           {
             "id": "tsm-ts_error_types-spot1",
@@ -51101,6 +52865,34 @@
               5,
               6
             ]
+          },
+          {
+            "id": "tsm-ts_error_types-rp2",
+            "title": "Fix it: Result Types & Typed Errors #2",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    port 80\n    error: port missing\n    escaped: SyntaxError\n\nIt should print:\n    port 80\n    error: port missing\n    error: not JSON\n\nFix it — every test must pass.",
+            "hint": "Mixing `throw` and `Result` at one boundary",
+            "hints": [
+              "Mixing `throw` and `Result` at one boundary",
+              "The change starts on line 3 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "type Result<T> = { ok: true; value: T } | { ok: false; error: string };\nfunction readConfig(json: string): Result<{ port: number }> {\n  const raw = JSON.parse(json) as { port?: unknown };\n  if (typeof raw.port !== \"number\") return { ok: false, error: \"port missing\" };\n  return { ok: true, value: { port: raw.port } };\n}\nfor (const text of ['{\"port\": 80}', \"{}\", \"{port\"]) {\n  try {\n    const r = readConfig(text);\n    console.log(r.ok ? \"port \" + r.value.port : \"error: \" + r.error);\n  } catch (e) {\n    console.log(\"escaped: \" + (e instanceof Error ? e.name : String(e)));\n  }\n}\n",
+            "solution": "type Result<T> = { ok: true; value: T } | { ok: false; error: string };\nfunction readConfig(json: string): Result<{ port: number }> {\n  let raw: { port?: unknown };\n  try {\n    raw = JSON.parse(json) as { port?: unknown };\n  } catch {\n    return { ok: false, error: \"not JSON\" };\n  }\n  if (typeof raw.port !== \"number\") return { ok: false, error: \"port missing\" };\n  return { ok: true, value: { port: raw.port } };\n}\nfor (const text of ['{\"port\": 80}', \"{}\", \"{port\"]) {\n  const r = readConfig(text);\n  console.log(r.ok ? \"port \" + r.value.port : \"error: \" + r.error);\n}\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "port 80\nerror: port missing\nerror: not JSON"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Mixing `throw` and `Result` at one boundary.** The signature promised a `Result`, but `JSON.parse` still threw through it. A function that returns `Result` must convert every expected failure inside, or callers need both a check and a `try`."
           },
           {
             "id": "tsm-ts_error_types-predict1",
@@ -51153,6 +52945,34 @@
             "lines": [
               5
             ]
+          },
+          {
+            "id": "tsm-ts_resource_management-rp1",
+            "title": "Fix it: Resource Management with `using` #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    (read after close)\n\nIt should print:\n    contents\n\nFix it — every test must pass.",
+            "hint": "Returning a resource you `using`-ed",
+            "hints": [
+              "Returning a resource you `using`-ed",
+              "The change starts on line 11 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "class File implements Disposable {\n  open = true;\n  read(): string {\n    return this.open ? \"contents\" : \"(read after close)\";\n  }\n  [Symbol.dispose](): void {\n    this.open = false;\n  }\n}\nfunction openFile(): File {\n  using f = new File();\n  return f;\n}\nconst f = openFile();\nconsole.log(f.read());\n",
+            "solution": "class File implements Disposable {\n  open = true;\n  read(): string {\n    return this.open ? \"contents\" : \"(read after close)\";\n  }\n  [Symbol.dispose](): void {\n    this.open = false;\n  }\n}\nfunction openFile(): File {\n  return new File();\n}\n{\n  using f = openFile();\n  console.log(f.read());\n}\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "contents"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Returning a resource you `using`-ed.** `using` ties the resource's lifetime to the block, so returning it hands back a closed file. The function that *creates* a resource returns it plainly; the caller that *uses* it declares `using`."
           },
           {
             "id": "tsm-ts_resource_management-spot2",
@@ -53082,6 +54902,34 @@
             ]
           },
           {
+            "id": "tsm-ts_async_patterns-rp1",
+            "title": "Fix it: Promise Combinators & Concurrency #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    success? 2 results\n\nIt should print:\n    1 of 2 failed\n\nFix it — every test must pass.",
+            "hint": "`allSettled` never rejects",
+            "hints": [
+              "`allSettled` never rejects",
+              "The change starts on line 1 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "try {\n  const results = await Promise.allSettled([Promise.reject(new Error(\"db down\")), Promise.resolve(1)]);\n  console.log(\"success? \" + results.length + \" results\");\n} catch {\n  console.log(\"caught a failure\");\n}\n",
+            "solution": "const results = await Promise.allSettled([Promise.reject(new Error(\"db down\")), Promise.resolve(1)]);\nconst failed = results.filter((r) => r.status === \"rejected\");\nconsole.log(failed.length > 0 ? failed.length + \" of \" + results.length + \" failed\" : \"all ok\");\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "1 of 2 failed"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**`allSettled` never rejects.** Every failure is folded into the result array, so a surrounding `catch` never fires. Inspect `status` yourself."
+          },
+          {
             "id": "tsm-ts_event_loop-order1",
             "title": "Put it in order: `await` hands over control",
             "prompt": "The lines of the worked example “`await` hands over control” from The Event Loop, shuffled. Put them back in an order that compiles and prints exactly:\n\n    a: start\n    b: start\n    both started\n    a: after first await\n    b: after first await\n    a: done\n    b: done\n    all finished",
@@ -53194,6 +55042,34 @@
             ]
           },
           {
+            "id": "tsm-ts_event_loop-rp1",
+            "title": "Fix it: The Event Loop #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    microtask 1, microtask 2, microtask 3, timer\n\nIt should print:\n    timer, step 1, step 2, step 3\n\nFix it — every test must pass.",
+            "hint": "A timer that waits for microtasks",
+            "hints": [
+              "A timer that waits for microtasks",
+              "The change starts on line 6 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "const log: string[] = [];\nsetTimeout(() => log.push(\"timer\"), 0);\nlet n = 0;\nconst spin = (): void => {\n  if (n++ < 3) {\n    log.push(`microtask ${n}`);\n    queueMicrotask(spin);\n  }\n};\nqueueMicrotask(spin);\nsetTimeout(() => console.log(log.join(\", \")), 5);\n",
+            "solution": "const log: string[] = [];\nsetTimeout(() => log.push(\"timer\"), 0);\nlet n = 0;\nconst spin = (): void => {\n  if (n++ < 3) {\n    log.push(`step ${n}`);\n    setTimeout(spin, 0);\n  } else {\n    console.log(log.join(\", \"));\n  }\n};\nsetTimeout(spin, 0);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "timer, step 1, step 2, step 3"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**A timer that waits for microtasks.** Microtasks that keep queueing microtasks all run before the timer — the timer is *starved* until the chain ends. Scheduling each step as a task lets other tasks take turns."
+          },
+          {
             "id": "tsm-ts_cancellation-order1",
             "title": "Put it in order: `Promise.try` turns a throw into a rejection",
             "prompt": "The lines of the worked example “`Promise.try` turns a throw into a rejection” from Cancellation: AbortController & Friends, shuffled. Put them back in an order that compiles and prints exactly:\n\n    ok 42\n    rejected: not a number: x",
@@ -53219,6 +55095,34 @@
             ],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-ts_cancellation-rp1",
+            "title": "Fix it: Cancellation: AbortController & Friends #1",
+            "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    parts downloaded after abort: 5\n\nIt should print:\n    parts downloaded after abort: 1\n\nFix it — every test must pass.",
+            "hint": "Work that ignores its signal",
+            "hints": [
+              "Work that ignores its signal",
+              "The change starts on line 4 of the program."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "async function download(parts: number, signal: AbortSignal): Promise<number> {\n  let got = 0;\n  for (let i = 1; i <= parts; i++) {\n    await null;\n    got++;\n  }\n  return got;\n}\nconst c = new AbortController();\nconst job = download(5, c.signal);\nc.abort();\nconst got = await job;\nconsole.log(`parts downloaded after abort: ${got}`);\n",
+            "solution": "async function download(parts: number, signal: AbortSignal): Promise<number> {\n  let got = 0;\n  for (let i = 1; i <= parts; i++) {\n    if (signal.aborted) break;\n    await null;\n    got++;\n  }\n  return got;\n}\nconst c = new AbortController();\nconst job = download(5, c.signal);\nc.abort();\nconst got = await job;\nconsole.log(`parts downloaded after abort: ${got}`);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "parts downloaded after abort: 1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Work that ignores its signal.** Accepting a signal isn't the same as honouring it: cancellation is cooperative. Check it at every step (the first `got++` ran before the check in the second version only because the loop body had already started)."
           },
           {
             "id": "tsm-ts_cancellation-spot1",

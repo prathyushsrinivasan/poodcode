@@ -134,6 +134,41 @@ def _tsd_spot(key, name, p, eid, strictness):
     }
 
 
+def _tsd_repair(key, name, p, eid):
+    """A pitfall too spread out to click on (the fix changes several lines, or
+    only adds some) becomes a repair instead (X-11): `fix` when the wrong
+    program runs and prints the wrong thing, `diagnose` when the compiler
+    rejects it. The learner edits the wrong program until the right program's
+    tests pass."""
+    if p["right_tests"] is None:
+        return None
+    wrong = "\n".join(_tsd_code_lines(p["wrong"])) + "\n"
+    right = "\n".join(_tsd_code_lines(p["right"])) + "\n"
+    single = len(p["inputs"]) == 1 and "\n" not in p["inputs"][0].strip()
+    if p["wrong_label"] == "Prints:":
+        kind = "fix"
+        if single:
+            inp = p["inputs"][0].strip()
+            prompt = ("This program runs, but prints the wrong thing" + (f" for the input `{inp}`" if inp else "")
+                      + ".\n\nIt prints:\n" + _tsd_indent(p["wrong_shows"])
+                      + "\n\nIt should print:\n" + _tsd_indent(p["right_tests"][0]["output"])
+                      + "\n\nFix it — every test must pass.")
+        else:
+            prompt = "This program runs, but prints the wrong thing for some of its inputs. Fix it — every test must pass."
+    else:
+        kind = "diagnose"
+        message = p["wrong_shows"].split(": ", 1)[1] if p["wrong_shows"].startswith("line ") else p["wrong_shows"]
+        prompt = f"The compiler rejects this program:\n\n    {message.split(chr(10))[0]}\n\nFix the cause so it compiles and every test passes."
+    return {
+        "id": eid, "title": f"{'Fix it' if kind == 'fix' else 'Read the error'}: {name} #{eid.rsplit('-', 1)[1][2:]}",
+        "prompt": prompt, "hint": p["title"], "hints": [p["title"]],
+        "language": "typescript", "kind": kind, "difficulty": "",
+        "strictness": "", "harness": "", "judge_mode": "", "forbid": [],
+        "starter": wrong, "solution": right, "tests": p["right_tests"], "source_slug": "", "dataset": "",
+        "explanation": f"**{p['title']}.** {p['note']}",
+    }
+
+
 def _tsd_cards(name, data):
     cards = []
     for ex in data["examples"]:
@@ -219,7 +254,7 @@ def _tsd_predicts(key, name, data):
     return out
 
 
-TS_DERIVED_COUNTS = {"order": 0, "spot": 0, "cards": 0, "output": 0, "predict": 0}
+TS_DERIVED_COUNTS = {"order": 0, "spot": 0, "cards": 0, "output": 0, "predict": 0, "repair": 0}
 _tsd_fronts = {c["front"] for w in TS_WEEKS for c in w["flashcards"]}
 _tsd_fronts |= {f for cs in TS_CARDS_MORE.values() for f, _ in cs}
 for _tsd_w in TS_WEEKS:
@@ -239,12 +274,20 @@ for _tsd_w in TS_WEEKS:
             _tsd_more.append(_tsd_order(_tsd_key, _tsd_name, _tsd_ex, f"tsm-{_tsd_key}-order{_tsd_i}", ""))
             TS_DERIVED_COUNTS["order"] += 1
         _tsd_j = 0
+        _tsd_r = 0
         for _tsd_p in _tsd_data["pitfalls"]:
             _tsd_ex = _tsd_spot(_tsd_key, _tsd_name, _tsd_p, f"tsm-{_tsd_key}-spot{_tsd_j + 1}", "")
             if _tsd_ex is not None:
                 _tsd_j += 1
                 _tsd_more.append(_tsd_ex)
                 TS_DERIVED_COUNTS["spot"] += 1
+                continue
+            # Too spread out to click on: repair it instead (X-11).
+            _tsd_ex = _tsd_repair(_tsd_key, _tsd_name, _tsd_p, f"tsm-{_tsd_key}-rp{_tsd_r + 1}")
+            if _tsd_ex is not None:
+                _tsd_r += 1
+                _tsd_more.append(_tsd_ex)
+                TS_DERIVED_COUNTS["repair"] += 1
         for _tsd_ex in _tsd_predicts(_tsd_key, _tsd_name, _tsd_data):
             _tsd_more.append(_tsd_ex)
             TS_DERIVED_COUNTS["predict"] += 1
@@ -266,7 +309,7 @@ for _tsd_w in TS_WEEKS:
             TS_DERIVED_COUNTS["cards"] += 1
 print(f"  derived from chapters: {TS_DERIVED_COUNTS['cards']} cards, "
       f"{TS_DERIVED_COUNTS['order']} order, {TS_DERIVED_COUNTS['spot']} spot exercises, "
-      f"{TS_DERIVED_COUNTS['output']} code-output questions, {TS_DERIVED_COUNTS['predict']} predict drills")
+      f"{TS_DERIVED_COUNTS['output']} code-output questions, {TS_DERIVED_COUNTS['predict']} predict drills, {TS_DERIVED_COUNTS['repair']} repairs")
 
 # X-07: every compiler error a chapter shows has a glossary entry, so its
 # TsErrorLinks badge leads somewhere. Add missing ones to ts_errors_more.py.
