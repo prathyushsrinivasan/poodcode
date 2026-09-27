@@ -1,0 +1,1676 @@
+{
+ "ts_assertions": [
+  {
+   "title": "An assertion after a check the compiler can't follow",
+   "code": "const stock = new Map([[\"pen\", 3], [\"cup\", 1]]);\nfunction take(item: string): string {\n  if (!stock.has(item)) return `no ${item}`;\n  const left = stock.get(item)! - 1;\n  stock.set(item, left);\n  return `${item}: ${left} left`;\n}\nconsole.log(take(\"pen\"), \"|\", take(\"ink\"));\n",
+   "fns": [
+    {
+     "name": "take",
+     "async": false,
+     "params": [
+      {
+       "start": 69,
+       "end": 75,
+       "text": "string"
+      }
+     ],
+     "ret": {
+      "start": 78,
+      "end": 84,
+      "text": "string"
+     }
+    }
+   ],
+   "starter": "const stock = new Map([[\"pen\", 3], [\"cup\", 1]]);\nfunction take(item: any): any {\n  if (!stock.has(item)) return `no ${item}`;\n  const left = stock.get(item)! - 1;\n  stock.set(item, left);\n  return `${item}: ${left} left`;\n}\nconsole.log(take(\"pen\"), \"|\", take(\"ink\"));\n"
+  },
+  {
+   "title": "A checked assertion helper",
+   "code": "type Point = { x: number; y: number };\nfunction asPoint(v: unknown): Point {\n  if (typeof v === \"object\" && v !== null && \"x\" in v && \"y\" in v && typeof v.x === \"number\" && typeof v.y === \"number\") {\n    return { x: v.x, y: v.y };\n  }\n  throw new TypeError(\"not a point: \" + JSON.stringify(v));\n}\nfor (const t of ['{\"x\":1,\"y\":2}', '{\"x\":1}']) {\n  try {\n    const p = asPoint(JSON.parse(t));\n    console.log(p.x + p.y);\n  } catch (e) {\n    console.log(e instanceof Error ? e.message : String(e));\n  }\n}\n",
+   "fns": [
+    {
+     "name": "asPoint",
+     "async": false,
+     "params": [
+      {
+       "start": 59,
+       "end": 66,
+       "text": "unknown"
+      }
+     ],
+     "ret": {
+      "start": 69,
+      "end": 74,
+      "text": "Point"
+     }
+    }
+   ],
+   "starter": "type Point = { x: number; y: number };\nfunction asPoint(v: any): any {\n  if (typeof v === \"object\" && v !== null && \"x\" in v && \"y\" in v && typeof v.x === \"number\" && typeof v.y === \"number\") {\n    return { x: v.x, y: v.y };\n  }\n  throw new TypeError(\"not a point: \" + JSON.stringify(v));\n}\nfor (const t of ['{\"x\":1,\"y\":2}', '{\"x\":1}']) {\n  try {\n    const p = asPoint(JSON.parse(t));\n    console.log(p.x + p.y);\n  } catch (e) {\n    console.log(e instanceof Error ? e.message : String(e));\n  }\n}\n"
+  }
+ ],
+ "ts_async": [
+  {
+   "title": "Sequential and concurrent, by their order",
+   "code": "const log: string[] = [];\nfunction task(name: string, ms: number): Promise<string> {\n  log.push(\"start \" + name);\n  return new Promise<string>((resolve) =>\n    setTimeout(() => {\n      log.push(\"end \" + name);\n      resolve(name);\n    }, ms));\n}\nasync function sequential(): Promise<void> {\n  await task(\"a\", 20);\n  await task(\"b\", 10);\n}\nasync function concurrent(): Promise<void> {\n  await Promise.all([task(\"c\", 20), task(\"d\", 10)]);\n}\nawait sequential();\nlog.push(\"|\");\nawait concurrent();\nconsole.log(log.join(\" \"));\n",
+   "fns": [
+    {
+     "name": "task",
+     "async": false,
+     "params": [
+      {
+       "start": 46,
+       "end": 52,
+       "text": "string"
+      },
+      {
+       "start": 58,
+       "end": 64,
+       "text": "number"
+      }
+     ],
+     "ret": {
+      "start": 67,
+      "end": 82,
+      "text": "Promise<string>"
+     }
+    }
+   ],
+   "starter": "const log: string[] = [];\nfunction task(name: any, ms: any): any {\n  log.push(\"start \" + name);\n  return new Promise<string>((resolve) =>\n    setTimeout(() => {\n      log.push(\"end \" + name);\n      resolve(name);\n    }, ms));\n}\nasync function sequential(): Promise<void> {\n  await task(\"a\", 20);\n  await task(\"b\", 10);\n}\nasync function concurrent(): Promise<void> {\n  await Promise.all([task(\"c\", 20), task(\"d\", 10)]);\n}\nawait sequential();\nlog.push(\"|\");\nawait concurrent();\nconsole.log(log.join(\" \"));\n"
+  },
+  {
+   "title": "An `async` function always returns a promise",
+   "code": "async function double(n: number): Promise<number> {\n  return n * 2;\n}\nconst p = double(21);\nconsole.log(p instanceof Promise, await p);\nasync function fails(): Promise<number> {\n  throw new Error(\"nope\");\n}\nconst outcome = await fails().then(\n  (v) => \"value \" + v,\n  (e: unknown) => \"rejected: \" + (e instanceof Error ? e.message : String(e)),\n);\nconsole.log(outcome);\n",
+   "fns": [
+    {
+     "name": "double",
+     "async": true,
+     "params": [
+      {
+       "start": 25,
+       "end": 31,
+       "text": "number"
+      }
+     ],
+     "ret": {
+      "start": 34,
+      "end": 49,
+      "text": "Promise<number>"
+     }
+    }
+   ],
+   "starter": "async function double(n: any): Promise<any> {\n  return n * 2;\n}\nconst p = double(21);\nconsole.log(p instanceof Promise, await p);\nasync function fails(): Promise<number> {\n  throw new Error(\"nope\");\n}\nconst outcome = await fails().then(\n  (v) => \"value \" + v,\n  (e: unknown) => \"rejected: \" + (e instanceof Error ? e.message : String(e)),\n);\nconsole.log(outcome);\n"
+  }
+ ],
+ "ts_async_iteration": [
+  {
+   "title": "Paginating a simulated API",
+   "code": "const DB = [\"ana\", \"bo\", \"cy\", \"dee\", \"eve\", \"fay\", \"gus\"];\nlet requests = 0;\nasync function fetchPage(page: number, size: number): Promise<string[]> {\n  requests++;\n  await null;\n  return DB.slice((page - 1) * size, page * size);\n}\nasync function* allUsers(size: number): AsyncGenerator<string> {\n  for (let page = 1; ; page++) {\n    const batch = await fetchPage(page, size);\n    if (batch.length === 0) return;\n    yield* batch;\n  }\n}\nfor await (const name of allUsers(3)) {\n  console.log(name);\n  if (name === \"dee\") break;\n}\nconsole.log(`requests made: ${requests}`);\n",
+   "fns": [
+    {
+     "name": "fetchPage",
+     "async": true,
+     "params": [
+      {
+       "start": 109,
+       "end": 115,
+       "text": "number"
+      },
+      {
+       "start": 123,
+       "end": 129,
+       "text": "number"
+      }
+     ],
+     "ret": {
+      "start": 132,
+      "end": 149,
+      "text": "Promise<string[]>"
+     }
+    }
+   ],
+   "starter": "const DB = [\"ana\", \"bo\", \"cy\", \"dee\", \"eve\", \"fay\", \"gus\"];\nlet requests = 0;\nasync function fetchPage(page: any, size: any): Promise<any> {\n  requests++;\n  await null;\n  return DB.slice((page - 1) * size, page * size);\n}\nasync function* allUsers(size: number): AsyncGenerator<string> {\n  for (let page = 1; ; page++) {\n    const batch = await fetchPage(page, size);\n    if (batch.length === 0) return;\n    yield* batch;\n  }\n}\nfor await (const name of allUsers(3)) {\n  console.log(name);\n  if (name === \"dee\") break;\n}\nconsole.log(`requests made: ${requests}`);\n"
+  }
+ ],
+ "ts_async_patterns": [
+  {
+   "title": "`allSettled` reports every outcome, `all` stops at the first failure",
+   "code": "function fetchPrice(sku: string): Promise<number> {\n  const prices: Record<string, number> = { pen: 2, cup: 5 };\n  return new Promise((resolve, reject) =>\n    setTimeout(() => (sku in prices ? resolve(prices[sku]) : reject(new Error(\"unknown sku \" + sku))), 5));\n}\nconst skus = [\"pen\", \"hat\", \"cup\"];\nconst settled = await Promise.allSettled(skus.map(fetchPrice));\nsettled.forEach((r, i) => {\n  const shown = r.status === \"fulfilled\" ? String(r.value) : \"failed (\" + (r.reason instanceof Error ? r.reason.message : String(r.reason)) + \")\";\n  console.log(skus[i] + \": \" + shown);\n});\ntry {\n  const all = await Promise.all(skus.map(fetchPrice));\n  console.log(\"all: \" + all.join(\",\"));\n} catch (e) {\n  console.log(\"all: \" + (e instanceof Error ? e.message : String(e)));\n}\n",
+   "fns": [
+    {
+     "name": "fetchPrice",
+     "async": false,
+     "params": [
+      {
+       "start": 25,
+       "end": 31,
+       "text": "string"
+      }
+     ],
+     "ret": {
+      "start": 34,
+      "end": 49,
+      "text": "Promise<number>"
+     }
+    }
+   ],
+   "starter": "function fetchPrice(sku: any): any {\n  const prices: Record<string, number> = { pen: 2, cup: 5 };\n  return new Promise((resolve, reject) =>\n    setTimeout(() => (sku in prices ? resolve(prices[sku]) : reject(new Error(\"unknown sku \" + sku))), 5));\n}\nconst skus = [\"pen\", \"hat\", \"cup\"];\nconst settled = await Promise.allSettled(skus.map(fetchPrice));\nsettled.forEach((r, i) => {\n  const shown = r.status === \"fulfilled\" ? String(r.value) : \"failed (\" + (r.reason instanceof Error ? r.reason.message : String(r.reason)) + \")\";\n  console.log(skus[i] + \": \" + shown);\n});\ntry {\n  const all = await Promise.all(skus.map(fetchPrice));\n  console.log(\"all: \" + all.join(\",\"));\n} catch (e) {\n  console.log(\"all: \" + (e instanceof Error ? e.message : String(e)));\n}\n"
+  },
+  {
+   "title": "A timeout with `race`",
+   "code": "function after<T>(ms: number, value: T): Promise<T> {\n  return new Promise((resolve) => setTimeout(() => resolve(value), ms));\n}\nfunction timeout(ms: number): Promise<never> {\n  return new Promise((_, reject) => setTimeout(() => reject(new Error(`timed out after ${ms} ms`)), ms));\n}\nfunction withTimeout<T>(work: Promise<T>, ms: number): Promise<T> {\n  return Promise.race([work, timeout(ms)]);\n}\nfor (const [label, ms] of [[\"fast\", 10], [\"slow\", 60]] as const) {\n  try {\n    console.log(await withTimeout(after(ms, label + \" reply\"), 30));\n  } catch (e) {\n    console.log(label + \": \" + (e instanceof Error ? e.message : String(e)));\n  }\n}\n",
+   "fns": [
+    {
+     "name": "timeout",
+     "async": false,
+     "params": [
+      {
+       "start": 150,
+       "end": 156,
+       "text": "number"
+      }
+     ],
+     "ret": {
+      "start": 159,
+      "end": 173,
+      "text": "Promise<never>"
+     }
+    }
+   ],
+   "starter": "function after<T>(ms: number, value: T): Promise<T> {\n  return new Promise((resolve) => setTimeout(() => resolve(value), ms));\n}\nfunction timeout(ms: any): any {\n  return new Promise((_, reject) => setTimeout(() => reject(new Error(`timed out after ${ms} ms`)), ms));\n}\nfunction withTimeout<T>(work: Promise<T>, ms: number): Promise<T> {\n  return Promise.race([work, timeout(ms)]);\n}\nfor (const [label, ms] of [[\"fast\", 10], [\"slow\", 60]] as const) {\n  try {\n    console.log(await withTimeout(after(ms, label + \" reply\"), 30));\n  } catch (e) {\n    console.log(label + \": \" + (e instanceof Error ? e.message : String(e)));\n  }\n}\n"
+  }
+ ],
+ "ts_branded_types": [
+  {
+   "title": "A validated non-empty string",
+   "code": "declare const brand: unique symbol;\ntype Title = string & { readonly [brand]: \"Title\" };\nfunction parseTitle(raw: string): Title | undefined {\n  const t = raw.trim().replace(/\\s+/g, \" \");\n  return t.length > 0 && t.length <= 40 ? (t as Title) : undefined;\n}\nconst publish = (t: Title) => `published \"${t}\"`;\nfor (const raw of [\"  Hello   world \", \"   \", \"x\".repeat(50)]) {\n  const t = parseTitle(raw);\n  console.log(t === undefined ? \"rejected\" : publish(t));\n}\n",
+   "fns": [
+    {
+     "name": "parseTitle",
+     "async": false,
+     "params": [
+      {
+       "start": 114,
+       "end": 120,
+       "text": "string"
+      }
+     ],
+     "ret": {
+      "start": 123,
+      "end": 140,
+      "text": "Title | undefined"
+     }
+    }
+   ],
+   "starter": "declare const brand: unique symbol;\ntype Title = string & { readonly [brand]: \"Title\" };\nfunction parseTitle(raw: any): any {\n  const t = raw.trim().replace(/\\s+/g, \" \");\n  return t.length > 0 && t.length <= 40 ? (t as Title) : undefined;\n}\nconst publish = (t: Title) => `published \"${t}\"`;\nfor (const raw of [\"  Hello   world \", \"   \", \"x\".repeat(50)]) {\n  const t = parseTitle(raw);\n  console.log(t === undefined ? \"rejected\" : publish(t));\n}\n"
+  }
+ ],
+ "ts_cancellation": [
+  {
+   "title": "Cooperative cancellation between steps",
+   "code": "async function process(items: string[], signal: AbortSignal): Promise<string[]> {\n  const done: string[] = [];\n  for (const item of items) {\n    signal.throwIfAborted();\n    await null;\n    done.push(item.toUpperCase());\n    console.log(\"processed \" + item);\n  }\n  return done;\n}\nconst controller = new AbortController();\nconst work = process([\"a\", \"b\", \"c\", \"d\"], controller.signal);\nqueueMicrotask(() => queueMicrotask(() => controller.abort(new Error(\"user cancelled\"))));\ntry {\n  console.log(\"result \" + (await work).join(\",\"));\n} catch (e) {\n  console.log(\"stopped: \" + (e instanceof Error ? e.message : String(e)));\n}\n",
+   "fns": [
+    {
+     "name": "process",
+     "async": true,
+     "params": [
+      {
+       "start": 30,
+       "end": 38,
+       "text": "string[]"
+      },
+      {
+       "start": 48,
+       "end": 59,
+       "text": "AbortSignal"
+      }
+     ],
+     "ret": {
+      "start": 62,
+      "end": 79,
+      "text": "Promise<string[]>"
+     }
+    }
+   ],
+   "starter": "async function process(items: any, signal: any): Promise<any> {\n  const done: string[] = [];\n  for (const item of items) {\n    signal.throwIfAborted();\n    await null;\n    done.push(item.toUpperCase());\n    console.log(\"processed \" + item);\n  }\n  return done;\n}\nconst controller = new AbortController();\nconst work = process([\"a\", \"b\", \"c\", \"d\"], controller.signal);\nqueueMicrotask(() => queueMicrotask(() => controller.abort(new Error(\"user cancelled\"))));\ntry {\n  console.log(\"result \" + (await work).join(\",\"));\n} catch (e) {\n  console.log(\"stopped: \" + (e instanceof Error ? e.message : String(e)));\n}\n"
+  },
+  {
+   "title": "A cancellable sleep with `Promise.withResolvers`",
+   "code": "function sleep(ms: number, signal: AbortSignal): Promise<void> {\n  const { promise, resolve, reject } = Promise.withResolvers<void>();\n  const onAbort = () => {\n    clearTimeout(timer);\n    reject(signal.reason);\n  };\n  const timer = setTimeout(() => {\n    signal.removeEventListener(\"abort\", onAbort);\n    resolve();\n  }, ms);\n  signal.addEventListener(\"abort\", onAbort, { once: true });\n  return promise;\n}\nconst c = new AbortController();\nsetTimeout(() => c.abort(new Error(\"gave up\")), 20);\nfor (const ms of [5, 100]) {\n  try {\n    await sleep(ms, c.signal);\n    console.log(`slept ${ms}ms`);\n  } catch (e) {\n    console.log(`sleep ${ms}ms interrupted: ${e instanceof Error ? e.message : String(e)}`);\n  }\n}\n",
+   "fns": [
+    {
+     "name": "sleep",
+     "async": false,
+     "params": [
+      {
+       "start": 19,
+       "end": 25,
+       "text": "number"
+      },
+      {
+       "start": 35,
+       "end": 46,
+       "text": "AbortSignal"
+      }
+     ],
+     "ret": {
+      "start": 49,
+      "end": 62,
+      "text": "Promise<void>"
+     }
+    }
+   ],
+   "starter": "function sleep(ms: any, signal: any): any {\n  const { promise, resolve, reject } = Promise.withResolvers<void>();\n  const onAbort = () => {\n    clearTimeout(timer);\n    reject(signal.reason);\n  };\n  const timer = setTimeout(() => {\n    signal.removeEventListener(\"abort\", onAbort);\n    resolve();\n  }, ms);\n  signal.addEventListener(\"abort\", onAbort, { once: true });\n  return promise;\n}\nconst c = new AbortController();\nsetTimeout(() => c.abort(new Error(\"gave up\")), 20);\nfor (const ms of [5, 100]) {\n  try {\n    await sleep(ms, c.signal);\n    console.log(`slept ${ms}ms`);\n  } catch (e) {\n    console.log(`sleep ${ms}ms interrupted: ${e instanceof Error ? e.message : String(e)}`);\n  }\n}\n"
+  }
+ ],
+ "ts_conditionals": [
+  {
+   "title": "Guard clauses keep the main path flat",
+   "code": "function grade(score: number): string {\n  if (!Number.isFinite(score)) return \"invalid\";\n  if (score < 0 || score > 100) return \"out of range\";\n  if (score >= 90) return \"A\";\n  if (score >= 75) return \"B\";\n  return \"C\";\n}\nconsole.log([95, 80, 42, 120, NaN].map(grade).join(\" \"));\n",
+   "fns": [
+    {
+     "name": "grade",
+     "async": false,
+     "params": [
+      {
+       "start": 22,
+       "end": 28,
+       "text": "number"
+      }
+     ],
+     "ret": {
+      "start": 31,
+      "end": 37,
+      "text": "string"
+     }
+    }
+   ],
+   "starter": "function grade(score: any): any {\n  if (!Number.isFinite(score)) return \"invalid\";\n  if (score < 0 || score > 100) return \"out of range\";\n  if (score >= 90) return \"A\";\n  if (score >= 75) return \"B\";\n  return \"C\";\n}\nconsole.log([95, 80, 42, 120, NaN].map(grade).join(\" \"));\n"
+  },
+  {
+   "title": "Grouped `switch` cases",
+   "code": "function kind(day: string): string {\n  switch (day) {\n    case \"sat\":\n    case \"sun\":\n      return \"weekend\";\n    case \"mon\":\n    case \"tue\":\n    case \"wed\":\n    case \"thu\":\n    case \"fri\":\n      return \"weekday\";\n    default:\n      return \"not a day\";\n  }\n}\nconsole.log([\"sat\", \"wed\", \"xyz\"].map(kind).join(\", \"));\n",
+   "fns": [
+    {
+     "name": "kind",
+     "async": false,
+     "params": [
+      {
+       "start": 19,
+       "end": 25,
+       "text": "string"
+      }
+     ],
+     "ret": {
+      "start": 28,
+      "end": 34,
+      "text": "string"
+     }
+    }
+   ],
+   "starter": "function kind(day: any): any {\n  switch (day) {\n    case \"sat\":\n    case \"sun\":\n      return \"weekend\";\n    case \"mon\":\n    case \"tue\":\n    case \"wed\":\n    case \"thu\":\n    case \"fri\":\n      return \"weekday\";\n    default:\n      return \"not a day\";\n  }\n}\nconsole.log([\"sat\", \"wed\", \"xyz\"].map(kind).join(\", \"));\n"
+  }
+ ],
+ "ts_control_flow": [
+  {
+   "title": "Early returns narrow the rest of the function",
+   "code": "import * as fs from \"fs\";\ntype User = { name: string; email?: string };\n\nfunction contact(user: User | undefined): string {\n  if (user === undefined) return \"no user\";\n  if (user.email === undefined) return `${user.name} (no email)`;\n  return `${user.name} <${user.email.toLowerCase()}>`;\n}\n\nconst users: (User | undefined)[] = JSON.parse(fs.readFileSync(0, \"utf8\").trim());\nfor (const u of users) console.log(contact(u ?? undefined));\n",
+   "fns": [
+    {
+     "name": "contact",
+     "async": false,
+     "params": [
+      {
+       "start": 96,
+       "end": 112,
+       "text": "User | undefined"
+      }
+     ],
+     "ret": {
+      "start": 115,
+      "end": 121,
+      "text": "string"
+     }
+    }
+   ],
+   "starter": "import * as fs from \"fs\";\ntype User = { name: string; email?: string };\n\nfunction contact(user: any): any {\n  if (user === undefined) return \"no user\";\n  if (user.email === undefined) return `${user.name} (no email)`;\n  return `${user.name} <${user.email.toLowerCase()}>`;\n}\n\nconst users: (User | undefined)[] = JSON.parse(fs.readFileSync(0, \"utf8\").trim());\nfor (const u of users) console.log(contact(u ?? undefined));\n"
+  }
+ ],
+ "ts_declaration_files": [
+  {
+   "title": "Types derived from a JavaScript value",
+   "code": "export const defaults = { retries: 3, timeoutMs: 500, verbose: false };\nexport type Defaults = typeof defaults;\nfunction describe(d: Defaults): string {\n  return Object.entries(d).map(([k, v]) => `${k}=${v}`).join(\" \");\n}\nconsole.log(describe(defaults));\n",
+   "fns": [
+    {
+     "name": "describe",
+     "async": false,
+     "params": [
+      {
+       "start": 133,
+       "end": 141,
+       "text": "Defaults"
+      }
+     ],
+     "ret": {
+      "start": 144,
+      "end": 150,
+      "text": "string"
+     }
+    }
+   ],
+   "starter": "export const defaults = { retries: 3, timeoutMs: 500, verbose: false };\nexport type Defaults = typeof defaults;\nfunction describe(d: any): any {\n  return Object.entries(d).map(([k, v]) => `${k}=${v}`).join(\" \");\n}\nconsole.log(describe(defaults));\n"
+  }
+ ],
+ "ts_decorators": [
+  {
+   "title": "A decorator factory with configuration",
+   "code": "function retry(times: number) {\n  return function <Args extends unknown[], R>(target: (...args: Args) => R, name: string) {\n    return (...args: Args): R => {\n      for (let attempt = 1; ; attempt++) {\n        try {\n          return target(...args);\n        } catch (e) {\n          console.log(`${name} attempt ${attempt} failed: ${e instanceof Error ? e.message : String(e)}`);\n          if (attempt >= times) throw e;\n        }\n      }\n    };\n  };\n}\n\nlet calls = 0;\nfunction flaky(x: number): number {\n  calls++;\n  if (calls < 3) throw new Error(\"busy\");\n  return x * 2;\n}\n// @retry(3) applied to `flaky`:\nconst safe = retry(3)(flaky, \"flaky\");\nconsole.log(\"result \" + safe(21));\n",
+   "fns": [
+    {
+     "name": "flaky",
+     "async": false,
+     "params": [
+      {
+       "start": 486,
+       "end": 492,
+       "text": "number"
+      }
+     ],
+     "ret": {
+      "start": 495,
+      "end": 501,
+      "text": "number"
+     }
+    }
+   ],
+   "starter": "function retry(times: number) {\n  return function <Args extends unknown[], R>(target: (...args: Args) => R, name: string) {\n    return (...args: Args): R => {\n      for (let attempt = 1; ; attempt++) {\n        try {\n          return target(...args);\n        } catch (e) {\n          console.log(`${name} attempt ${attempt} failed: ${e instanceof Error ? e.message : String(e)}`);\n          if (attempt >= times) throw e;\n        }\n      }\n    };\n  };\n}\n\nlet calls = 0;\nfunction flaky(x: any): any {\n  calls++;\n  if (calls < 3) throw new Error(\"busy\");\n  return x * 2;\n}\n// @retry(3) applied to `flaky`:\nconst safe = retry(3)(flaky, \"flaky\");\nconsole.log(\"result \" + safe(21));\n"
+  }
+ ],
+ "ts_destructuring": [
+  {
+   "title": "Returning several values",
+   "code": "function minMax(xs: readonly number[]): [min: number, max: number] {\n  return [Math.min(...xs), Math.max(...xs)];\n}\nlet [lo, hi] = minMax([4, 9, 1]);\n[lo, hi] = [hi, lo];\nconsole.log(lo, hi);\n",
+   "fns": [
+    {
+     "name": "minMax",
+     "async": false,
+     "params": [
+      {
+       "start": 20,
+       "end": 37,
+       "text": "readonly number[]"
+      }
+     ],
+     "ret": {
+      "start": 40,
+      "end": 66,
+      "text": "[min: number, max: number]"
+     }
+    }
+   ],
+   "starter": "function minMax(xs: any): any {\n  return [Math.min(...xs), Math.max(...xs)];\n}\nlet [lo, hi] = minMax([4, 9, 1]);\n[lo, hi] = [hi, lo];\nconsole.log(lo, hi);\n"
+  }
+ ],
+ "ts_discriminated_unions": [
+  {
+   "title": "A state machine",
+   "code": "type Light = { state: \"red\"; waited: number } | { state: \"green\" } | { state: \"amber\" };\nfunction next(l: Light): Light {\n  switch (l.state) {\n    case \"red\":\n      return l.waited >= 2 ? { state: \"green\" } : { state: \"red\", waited: l.waited + 1 };\n    case \"green\":\n      return { state: \"amber\" };\n    case \"amber\":\n      return { state: \"red\", waited: 0 };\n  }\n}\nlet light: Light = { state: \"red\", waited: 0 };\nconst seen: string[] = [];\nfor (let i = 0; i < 6; i++) {\n  light = next(light);\n  seen.push(light.state);\n}\nconsole.log(seen.join(\" \"));\n",
+   "fns": [
+    {
+     "name": "next",
+     "async": false,
+     "params": [
+      {
+       "start": 106,
+       "end": 111,
+       "text": "Light"
+      }
+     ],
+     "ret": {
+      "start": 114,
+      "end": 119,
+      "text": "Light"
+     }
+    }
+   ],
+   "starter": "type Light = { state: \"red\"; waited: number } | { state: \"green\" } | { state: \"amber\" };\nfunction next(l: any): any {\n  switch (l.state) {\n    case \"red\":\n      return l.waited >= 2 ? { state: \"green\" } : { state: \"red\", waited: l.waited + 1 };\n    case \"green\":\n      return { state: \"amber\" };\n    case \"amber\":\n      return { state: \"red\", waited: 0 };\n  }\n}\nlet light: Light = { state: \"red\", waited: 0 };\nconst seen: string[] = [];\nfor (let i = 0; i < 6; i++) {\n  light = next(light);\n  seen.push(light.state);\n}\nconsole.log(seen.join(\" \"));\n"
+  }
+ ],
+ "ts_enums": [
+  {
+   "title": "An `as const` object as an enum",
+   "code": "const Level = { Debug: 10, Info: 20, Warn: 30, Error: 40 } as const;\ntype Level = (typeof Level)[keyof typeof Level];\nfunction shouldLog(level: Level, threshold: Level): boolean {\n  return level >= threshold;\n}\nconsole.log(shouldLog(Level.Warn, Level.Info), shouldLog(Level.Debug, Level.Info));\nconsole.log(Object.entries(Level).map(([name, value]) => `${name}=${value}`).join(\" \"));\n",
+   "fns": [
+    {
+     "name": "shouldLog",
+     "async": false,
+     "params": [
+      {
+       "start": 144,
+       "end": 149,
+       "text": "Level"
+      },
+      {
+       "start": 162,
+       "end": 167,
+       "text": "Level"
+      }
+     ],
+     "ret": {
+      "start": 170,
+      "end": 177,
+      "text": "boolean"
+     }
+    }
+   ],
+   "starter": "const Level = { Debug: 10, Info: 20, Warn: 30, Error: 40 } as const;\ntype Level = (typeof Level)[keyof typeof Level];\nfunction shouldLog(level: any, threshold: any): any {\n  return level >= threshold;\n}\nconsole.log(shouldLog(Level.Warn, Level.Info), shouldLog(Level.Debug, Level.Info));\nconsole.log(Object.entries(Level).map(([name, value]) => `${name}=${value}`).join(\" \"));\n"
+  }
+ ],
+ "ts_erasable_syntax": [
+  {
+   "title": "An enum, rewritten as data",
+   "code": "const Direction = { Up: \"UP\", Down: \"DOWN\", Left: \"LEFT\", Right: \"RIGHT\" } as const;\ntype Direction = (typeof Direction)[keyof typeof Direction];\n\nfunction opposite(d: Direction): Direction {\n  switch (d) {\n    case Direction.Up:\n      return Direction.Down;\n    case Direction.Down:\n      return Direction.Up;\n    case Direction.Left:\n      return Direction.Right;\n    case Direction.Right:\n      return Direction.Left;\n  }\n}\n\nconsole.log(opposite(Direction.Up));\nconsole.log(Object.values(Direction).join(\",\"));\nconsole.log(Object.keys(Direction).length);\n",
+   "fns": [
+    {
+     "name": "opposite",
+     "async": false,
+     "params": [
+      {
+       "start": 168,
+       "end": 177,
+       "text": "Direction"
+      }
+     ],
+     "ret": {
+      "start": 180,
+      "end": 189,
+      "text": "Direction"
+     }
+    }
+   ],
+   "starter": "const Direction = { Up: \"UP\", Down: \"DOWN\", Left: \"LEFT\", Right: \"RIGHT\" } as const;\ntype Direction = (typeof Direction)[keyof typeof Direction];\n\nfunction opposite(d: any): any {\n  switch (d) {\n    case Direction.Up:\n      return Direction.Down;\n    case Direction.Down:\n      return Direction.Up;\n    case Direction.Left:\n      return Direction.Right;\n    case Direction.Right:\n      return Direction.Left;\n  }\n}\n\nconsole.log(opposite(Direction.Up));\nconsole.log(Object.values(Direction).join(\",\"));\nconsole.log(Object.keys(Direction).length);\n"
+  }
+ ],
+ "ts_error_cause": [
+  {
+   "title": "A subclass callers can recognise",
+   "code": "class ValidationError extends Error {\n  override readonly name = \"ValidationError\";\n  readonly field: string;\n  constructor(field: string, message: string) {\n    super(message);\n    this.field = field;\n  }\n}\nfunction parseAge(text: string): number {\n  const n = Number(text);\n  if (!Number.isInteger(n)) throw new ValidationError(\"age\", `not a whole number: ${text}`);\n  if (n < 0 || n > 150) throw new ValidationError(\"age\", `out of range: ${n}`);\n  return n;\n}\nfor (const t of [\"42\", \"4.5\", \"-3\", \"x\"]) {\n  try {\n    console.log(\"age \" + parseAge(t));\n  } catch (e) {\n    if (e instanceof ValidationError) console.log(`${e.name} on ${e.field}: ${e.message}`);\n    else throw e;\n  }\n}\n",
+   "fns": [
+    {
+     "name": "parseAge",
+     "async": false,
+     "params": [
+      {
+       "start": 232,
+       "end": 238,
+       "text": "string"
+      }
+     ],
+     "ret": {
+      "start": 241,
+      "end": 247,
+      "text": "number"
+     }
+    }
+   ],
+   "starter": "class ValidationError extends Error {\n  override readonly name = \"ValidationError\";\n  readonly field: string;\n  constructor(field: string, message: string) {\n    super(message);\n    this.field = field;\n  }\n}\nfunction parseAge(text: any): any {\n  const n = Number(text);\n  if (!Number.isInteger(n)) throw new ValidationError(\"age\", `not a whole number: ${text}`);\n  if (n < 0 || n > 150) throw new ValidationError(\"age\", `out of range: ${n}`);\n  return n;\n}\nfor (const t of [\"42\", \"4.5\", \"-3\", \"x\"]) {\n  try {\n    console.log(\"age \" + parseAge(t));\n  } catch (e) {\n    if (e instanceof ValidationError) console.log(`${e.name} on ${e.field}: ${e.message}`);\n    else throw e;\n  }\n}\n"
+  },
+  {
+   "title": "A chain of causes",
+   "code": "class ConfigError extends Error {\n  override readonly name = \"ConfigError\";\n}\nclass StartupError extends Error {\n  override readonly name = \"StartupError\";\n}\nfunction readConfig(text: string): { port: number } {\n  try {\n    return JSON.parse(text) as { port: number };\n  } catch (e) {\n    throw new ConfigError(\"config is not valid JSON\", { cause: e });\n  }\n}\nfunction start(text: string): string {\n  try {\n    return `listening on ${readConfig(text).port}`;\n  } catch (e) {\n    throw new StartupError(\"server could not start\", { cause: e });\n  }\n}\ntry {\n  console.log(start('{\"port\": 80'));\n} catch (e) {\n  let err: unknown = e;\n  for (let depth = 0; err instanceof Error; depth++) {\n    console.log(`${\"  \".repeat(depth)}${err.name}: ${err.message.split(\"\\n\")[0]?.split(\" (\")[0]}`);\n    err = err.cause;\n  }\n}\n",
+   "fns": [
+    {
+     "name": "readConfig",
+     "async": false,
+     "params": [
+      {
+       "start": 184,
+       "end": 190,
+       "text": "string"
+      }
+     ],
+     "ret": {
+      "start": 193,
+      "end": 209,
+      "text": "{ port: number }"
+     }
+    },
+    {
+     "name": "start",
+     "async": false,
+     "params": [
+      {
+       "start": 381,
+       "end": 387,
+       "text": "string"
+      }
+     ],
+     "ret": {
+      "start": 390,
+      "end": 396,
+      "text": "string"
+     }
+    }
+   ],
+   "starter": "class ConfigError extends Error {\n  override readonly name = \"ConfigError\";\n}\nclass StartupError extends Error {\n  override readonly name = \"StartupError\";\n}\nfunction readConfig(text: any): any {\n  try {\n    return JSON.parse(text) as { port: number };\n  } catch (e) {\n    throw new ConfigError(\"config is not valid JSON\", { cause: e });\n  }\n}\nfunction start(text: any): any {\n  try {\n    return `listening on ${readConfig(text).port}`;\n  } catch (e) {\n    throw new StartupError(\"server could not start\", { cause: e });\n  }\n}\ntry {\n  console.log(start('{\"port\": 80'));\n} catch (e) {\n  let err: unknown = e;\n  for (let depth = 0; err instanceof Error; depth++) {\n    console.log(`${\"  \".repeat(depth)}${err.name}: ${err.message.split(\"\\n\")[0]?.split(\" (\")[0]}`);\n    err = err.cause;\n  }\n}\n"
+  }
+ ],
+ "ts_error_types": [
+  {
+   "title": "Collecting every validation error with `Result`",
+   "code": "type Result<T, E = string> = { ok: true; value: T } | { ok: false; error: E };\ntype Person = { name: string; age: number };\nfunction parsePerson(line: string): Result<Person> {\n  const [name = \"\", ageText = \"\"] = line.split(\",\");\n  if (!name.trim()) return { ok: false, error: \"missing name\" };\n  const age = Number(ageText);\n  if (!Number.isInteger(age) || age < 0) return { ok: false, error: `bad age \"${ageText}\"` };\n  return { ok: true, value: { name: name.trim(), age } };\n}\nconst lines = [\"ana,31\", \",20\", \"ben,x\", \"cy,7\"];\nconst results = lines.map(parsePerson);\nconst people = results.flatMap((r) => (r.ok ? [r.value] : []));\nconst problems = results.flatMap((r, i) => (r.ok ? [] : [`line ${i + 1}: ${r.error}`]));\nconsole.log(people.map((p) => p.name).join(\",\"), \"|\", problems.join(\"; \"));\n",
+   "fns": [
+    {
+     "name": "parsePerson",
+     "async": false,
+     "params": [
+      {
+       "start": 151,
+       "end": 157,
+       "text": "string"
+      }
+     ],
+     "ret": {
+      "start": 160,
+      "end": 174,
+      "text": "Result<Person>"
+     }
+    }
+   ],
+   "starter": "type Result<T, E = string> = { ok: true; value: T } | { ok: false; error: E };\ntype Person = { name: string; age: number };\nfunction parsePerson(line: any): any {\n  const [name = \"\", ageText = \"\"] = line.split(\",\");\n  if (!name.trim()) return { ok: false, error: \"missing name\" };\n  const age = Number(ageText);\n  if (!Number.isInteger(age) || age < 0) return { ok: false, error: `bad age \"${ageText}\"` };\n  return { ok: true, value: { name: name.trim(), age } };\n}\nconst lines = [\"ana,31\", \",20\", \"ben,x\", \"cy,7\"];\nconst results = lines.map(parsePerson);\nconst people = results.flatMap((r) => (r.ok ? [r.value] : []));\nconst problems = results.flatMap((r, i) => (r.ok ? [] : [`line ${i + 1}: ${r.error}`]));\nconsole.log(people.map((p) => p.name).join(\",\"), \"|\", problems.join(\"; \"));\n"
+  },
+  {
+   "title": "A hierarchy of error classes",
+   "code": "class AppError extends Error {\n  constructor(message: string) {\n    super(message);\n    this.name = new.target.name;\n  }\n}\nclass NotFound extends AppError {\n  readonly id: string;\n  constructor(id: string) {\n    super(`no record ${id}`);\n    this.id = id;\n  }\n}\nclass Forbidden extends AppError {}\nfunction status(e: unknown): string {\n  if (e instanceof NotFound) return `404 (${e.id})`;\n  if (e instanceof Forbidden) return \"403\";\n  if (e instanceof AppError) return \"400\";\n  return \"500\";\n}\nconst failures: unknown[] = [new NotFound(\"u7\"), new Forbidden(\"admins only\"), new AppError(\"bad request\"), new RangeError(\"bug\")];\nfor (const e of failures) console.log(status(e), String(e));\n",
+   "fns": [
+    {
+     "name": "status",
+     "async": false,
+     "params": [
+      {
+       "start": 317,
+       "end": 324,
+       "text": "unknown"
+      }
+     ],
+     "ret": {
+      "start": 327,
+      "end": 333,
+      "text": "string"
+     }
+    }
+   ],
+   "starter": "class AppError extends Error {\n  constructor(message: string) {\n    super(message);\n    this.name = new.target.name;\n  }\n}\nclass NotFound extends AppError {\n  readonly id: string;\n  constructor(id: string) {\n    super(`no record ${id}`);\n    this.id = id;\n  }\n}\nclass Forbidden extends AppError {}\nfunction status(e: any): any {\n  if (e instanceof NotFound) return `404 (${e.id})`;\n  if (e instanceof Forbidden) return \"403\";\n  if (e instanceof AppError) return \"400\";\n  return \"500\";\n}\nconst failures: unknown[] = [new NotFound(\"u7\"), new Forbidden(\"admins only\"), new AppError(\"bad request\"), new RangeError(\"bug\")];\nfor (const e of failures) console.log(status(e), String(e));\n"
+  }
+ ],
+ "ts_errors": [
+  {
+   "title": "`finally` runs on every path",
+   "code": "const log: string[] = [];\nfunction load(raw: string): number {\n  log.push(\"open\");\n  try {\n    const n = JSON.parse(raw) as number;\n    log.push(\"parsed\");\n    return n;\n  } catch {\n    log.push(\"bad input\");\n    return -1;\n  } finally {\n    log.push(\"close\");\n  }\n}\nconsole.log(load(\"42\"), load(\"{\"), log.join(\" > \"));\n",
+   "fns": [
+    {
+     "name": "load",
+     "async": false,
+     "params": [
+      {
+       "start": 45,
+       "end": 51,
+       "text": "string"
+      }
+     ],
+     "ret": {
+      "start": 54,
+      "end": 60,
+      "text": "number"
+     }
+    }
+   ],
+   "starter": "const log: string[] = [];\nfunction load(raw: any): any {\n  log.push(\"open\");\n  try {\n    const n = JSON.parse(raw) as number;\n    log.push(\"parsed\");\n    return n;\n  } catch {\n    log.push(\"bad input\");\n    return -1;\n  } finally {\n    log.push(\"close\");\n  }\n}\nconsole.log(load(\"42\"), load(\"{\"), log.join(\" > \"));\n"
+  },
+  {
+   "title": "Anything can be thrown",
+   "code": "function describe(e: unknown): string {\n  if (e instanceof Error) return `${e.name}: ${e.message}`;\n  if (typeof e === \"string\") return \"a string: \" + e;\n  if (typeof e === \"object\" && e !== null && \"code\" in e) return \"an object with code \" + String(e.code);\n  return \"something else: \" + String(e);\n}\nconst throwers: (() => void)[] = [\n  () => { throw new TypeError(\"wrong type\"); },\n  () => { throw \"oops\"; },\n  () => { throw { code: 7 }; },\n  () => { throw 42; },\n];\nfor (const f of throwers) {\n  try {\n    f();\n  } catch (e) {\n    console.log(describe(e));\n  }\n}\n",
+   "fns": [
+    {
+     "name": "describe",
+     "async": false,
+     "params": [
+      {
+       "start": 21,
+       "end": 28,
+       "text": "unknown"
+      }
+     ],
+     "ret": {
+      "start": 31,
+      "end": 37,
+      "text": "string"
+     }
+    }
+   ],
+   "starter": "function describe(e: any): any {\n  if (e instanceof Error) return `${e.name}: ${e.message}`;\n  if (typeof e === \"string\") return \"a string: \" + e;\n  if (typeof e === \"object\" && e !== null && \"code\" in e) return \"an object with code \" + String(e.code);\n  return \"something else: \" + String(e);\n}\nconst throwers: (() => void)[] = [\n  () => { throw new TypeError(\"wrong type\"); },\n  () => { throw \"oops\"; },\n  () => { throw { code: 7 }; },\n  () => { throw 42; },\n];\nfor (const f of throwers) {\n  try {\n    f();\n  } catch (e) {\n    console.log(describe(e));\n  }\n}\n"
+  }
+ ],
+ "ts_event_loop": [
+  {
+   "title": "`await` hands over control",
+   "code": "async function task(name: string): Promise<void> {\n  console.log(`${name}: start`);\n  await null;\n  console.log(`${name}: after first await`);\n  await null;\n  console.log(`${name}: done`);\n}\nconst a = task(\"a\");\nconst b = task(\"b\");\nconsole.log(\"both started\");\nawait Promise.all([a, b]);\nconsole.log(\"all finished\");\n",
+   "fns": [
+    {
+     "name": "task",
+     "async": true,
+     "params": [
+      {
+       "start": 26,
+       "end": 32,
+       "text": "string"
+      }
+     ],
+     "ret": {
+      "start": 35,
+      "end": 48,
+      "text": "Promise<void>"
+     }
+    }
+   ],
+   "starter": "async function task(name: any): Promise<any> {\n  console.log(`${name}: start`);\n  await null;\n  console.log(`${name}: after first await`);\n  await null;\n  console.log(`${name}: done`);\n}\nconst a = task(\"a\");\nconst b = task(\"b\");\nconsole.log(\"both started\");\nawait Promise.all([a, b]);\nconsole.log(\"all finished\");\n"
+  }
+ ],
+ "ts_functions": [
+  {
+   "title": "A function declaration is hoisted",
+   "code": "console.log(shout(\"ready\"));\nfunction shout(text: string): string {\n  return text.toUpperCase() + \"!\";\n}\n",
+   "fns": [
+    {
+     "name": "shout",
+     "async": false,
+     "params": [
+      {
+       "start": 50,
+       "end": 56,
+       "text": "string"
+      }
+     ],
+     "ret": {
+      "start": 59,
+      "end": 65,
+      "text": "string"
+     }
+    }
+   ],
+   "starter": "console.log(shout(\"ready\"));\nfunction shout(text: any): any {\n  return text.toUpperCase() + \"!\";\n}\n"
+  },
+  {
+   "title": "`void` means \"don't use the result\"",
+   "code": "function logLine(text: string): void {\n  console.log(\"> \" + text);\n}\nconst result = logLine(\"saved\");\nconsole.log(result === undefined);\n",
+   "fns": [
+    {
+     "name": "logLine",
+     "async": false,
+     "params": [
+      {
+       "start": 23,
+       "end": 29,
+       "text": "string"
+      }
+     ],
+     "ret": {
+      "start": 32,
+      "end": 36,
+      "text": "void"
+     }
+    }
+   ],
+   "starter": "function logLine(text: any): any {\n  console.log(\"> \" + text);\n}\nconst result = logLine(\"saved\");\nconsole.log(result === undefined);\n"
+  }
+ ],
+ "ts_heap_pq": [
+  {
+   "title": "k smallest with a bounded max-heap",
+   "code": "class Heap<T> {\n  readonly #items: T[] = [];\n  readonly #compare: (a: T, b: T) => number;\n  constructor(compare: (a: T, b: T) => number) {\n    this.#compare = compare;\n  }\n  get size(): number {\n    return this.#items.length;\n  }\n  peek(): T | undefined {\n    return this.#items[0];\n  }\n  push(item: T): void {\n    const a = this.#items;\n    a.push(item);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      const child = a[i] as T;\n      const up = a[parent] as T;\n      if (this.#compare(child, up) >= 0) break;\n      a[i] = up;\n      a[parent] = child;\n      i = parent;\n    }\n  }\n  pop(): T | undefined {\n    const a = this.#items;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length > 0 && last !== undefined) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.#compare(a[l] as T, a[m] as T) < 0) m = l;\n        if (r < a.length && this.#compare(a[r] as T, a[m] as T) < 0) m = r;\n        if (m === i) break;\n        const tmp = a[i] as T;\n        a[i] = a[m] as T;\n        a[m] = tmp;\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\nfunction kSmallest(xs: readonly number[], k: number): number[] {\n  const worstFirst = new Heap<number>((a, b) => b - a);\n  for (const x of xs) {\n    worstFirst.push(x);\n    if (worstFirst.size > k) worstFirst.pop();\n  }\n  const out: number[] = [];\n  for (let x = worstFirst.pop(); x !== undefined; x = worstFirst.pop()) out.push(x);\n  return out.reverse();\n}\nconsole.log(kSmallest([9, 4, 7, 1, 8, 2, 6], 3).join(\" \"));\nconsole.log(kSmallest([5], 3).join(\" \"));\n",
+   "fns": [
+    {
+     "name": "kSmallest",
+     "async": false,
+     "params": [
+      {
+       "start": 1223,
+       "end": 1240,
+       "text": "readonly number[]"
+      },
+      {
+       "start": 1245,
+       "end": 1251,
+       "text": "number"
+      }
+     ],
+     "ret": {
+      "start": 1254,
+      "end": 1262,
+      "text": "number[]"
+     }
+    }
+   ],
+   "starter": "class Heap<T> {\n  readonly #items: T[] = [];\n  readonly #compare: (a: T, b: T) => number;\n  constructor(compare: (a: T, b: T) => number) {\n    this.#compare = compare;\n  }\n  get size(): number {\n    return this.#items.length;\n  }\n  peek(): T | undefined {\n    return this.#items[0];\n  }\n  push(item: T): void {\n    const a = this.#items;\n    a.push(item);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      const child = a[i] as T;\n      const up = a[parent] as T;\n      if (this.#compare(child, up) >= 0) break;\n      a[i] = up;\n      a[parent] = child;\n      i = parent;\n    }\n  }\n  pop(): T | undefined {\n    const a = this.#items;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length > 0 && last !== undefined) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.#compare(a[l] as T, a[m] as T) < 0) m = l;\n        if (r < a.length && this.#compare(a[r] as T, a[m] as T) < 0) m = r;\n        if (m === i) break;\n        const tmp = a[i] as T;\n        a[i] = a[m] as T;\n        a[m] = tmp;\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\nfunction kSmallest(xs: any, k: any): any {\n  const worstFirst = new Heap<number>((a, b) => b - a);\n  for (const x of xs) {\n    worstFirst.push(x);\n    if (worstFirst.size > k) worstFirst.pop();\n  }\n  const out: number[] = [];\n  for (let x = worstFirst.pop(); x !== undefined; x = worstFirst.pop()) out.push(x);\n  return out.reverse();\n}\nconsole.log(kSmallest([9, 4, 7, 1, 8, 2, 6], 3).join(\" \"));\nconsole.log(kSmallest([5], 3).join(\" \"));\n"
+  }
+ ],
+ "ts_interfaces_types": [
+  {
+   "title": "Extending, and what only a type can say",
+   "code": "interface Animal {\n  name: string;\n}\ninterface Dog extends Animal {\n  breed: string;\n}\ntype Pet = Dog | { kind: \"fish\"; name: string };\n\nfunction describe(pet: Pet): string {\n  return \"breed\" in pet ? `${pet.name} the ${pet.breed}` : `${pet.name} the fish`;\n}\n\nconsole.log(describe({ name: \"Rex\", breed: \"collie\" }));\nconsole.log(describe({ kind: \"fish\", name: \"Bubbles\" }));\n",
+   "fns": [
+    {
+     "name": "describe",
+     "async": false,
+     "params": [
+      {
+       "start": 160,
+       "end": 163,
+       "text": "Pet"
+      }
+     ],
+     "ret": {
+      "start": 166,
+      "end": 172,
+      "text": "string"
+     }
+    }
+   ],
+   "starter": "interface Animal {\n  name: string;\n}\ninterface Dog extends Animal {\n  breed: string;\n}\ntype Pet = Dog | { kind: \"fish\"; name: string };\n\nfunction describe(pet: any): any {\n  return \"breed\" in pet ? `${pet.name} the ${pet.breed}` : `${pet.name} the fish`;\n}\n\nconsole.log(describe({ name: \"Rex\", breed: \"collie\" }));\nconsole.log(describe({ kind: \"fish\", name: \"Bubbles\" }));\n"
+  }
+ ],
+ "ts_json": [
+  {
+   "title": "Parsing that can't crash",
+   "code": "function safeParse(text: string): unknown {\n  try {\n    return JSON.parse(text);\n  } catch {\n    return undefined;\n  }\n}\nfor (const t of ['{\"ok\":true}', \"{oops\", \"42\", \"null\"]) {\n  const v = safeParse(t);\n  console.log(v === undefined ? \"invalid JSON\" : `${typeof v}: ${JSON.stringify(v)}`);\n}\n",
+   "fns": [
+    {
+     "name": "safeParse",
+     "async": false,
+     "params": [
+      {
+       "start": 25,
+       "end": 31,
+       "text": "string"
+      }
+     ],
+     "ret": {
+      "start": 34,
+      "end": 41,
+      "text": "unknown"
+     }
+    }
+   ],
+   "starter": "function safeParse(text: any): any {\n  try {\n    return JSON.parse(text);\n  } catch {\n    return undefined;\n  }\n}\nfor (const t of ['{\"ok\":true}', \"{oops\", \"42\", \"null\"]) {\n  const v = safeParse(t);\n  console.log(v === undefined ? \"invalid JSON\" : `${typeof v}: ${JSON.stringify(v)}`);\n}\n"
+  }
+ ],
+ "ts_literal_inference": [
+  {
+   "title": "Where a literal widens",
+   "code": "type Method = \"GET\" | \"POST\";\nfunction send(method: Method, path: string): string {\n  return `${method} ${path}`;\n}\n\nconst fixed = \"GET\";\nconst request = { method: \"POST\", path: \"/items\" } as const;\nconst table = { method: \"GET\" as Method, path: \"/\" };\n\nconsole.log(send(fixed, \"/health\"));\nconsole.log(send(request.method, request.path));\nconsole.log(send(table.method, table.path));\n",
+   "fns": [
+    {
+     "name": "send",
+     "async": false,
+     "params": [
+      {
+       "start": 52,
+       "end": 58,
+       "text": "Method"
+      },
+      {
+       "start": 66,
+       "end": 72,
+       "text": "string"
+      }
+     ],
+     "ret": {
+      "start": 75,
+      "end": 81,
+      "text": "string"
+     }
+    }
+   ],
+   "starter": "type Method = \"GET\" | \"POST\";\nfunction send(method: any, path: any): any {\n  return `${method} ${path}`;\n}\n\nconst fixed = \"GET\";\nconst request = { method: \"POST\", path: \"/items\" } as const;\nconst table = { method: \"GET\" as Method, path: \"/\" };\n\nconsole.log(send(fixed, \"/health\"));\nconsole.log(send(request.method, request.path));\nconsole.log(send(table.method, table.path));\n"
+  }
+ ],
+ "ts_mapped_types": [
+  {
+   "title": "A validator for every field",
+   "code": "type Signup = { name: string; age: number; email: string };\ntype Validators<T> = { [K in keyof T]: (value: T[K]) => string | undefined };\nconst rules: Validators<Signup> = {\n  name: (v) => (v.trim().length < 2 ? \"too short\" : undefined),\n  age: (v) => (v < 13 ? \"too young\" : undefined),\n  email: (v) => (v.includes(\"@\") ? undefined : \"invalid\"),\n};\nfunction validate(form: Signup): string[] {\n  return (Object.keys(rules) as (keyof Signup)[]).flatMap((k) => {\n    const message = k === \"age\" ? rules.age(form.age) : rules[k](form[k]);\n    return message === undefined ? [] : [`${k}: ${message}`];\n  });\n}\nconsole.log(validate({ name: \"A\", age: 9, email: \"nope\" }).join(\"; \"));\nconsole.log(validate({ name: \"Ana\", age: 31, email: \"ana@x.io\" }).length);\n",
+   "fns": [
+    {
+     "name": "validate",
+     "async": false,
+     "params": [
+      {
+       "start": 374,
+       "end": 380,
+       "text": "Signup"
+      }
+     ],
+     "ret": {
+      "start": 383,
+      "end": 391,
+      "text": "string[]"
+     }
+    }
+   ],
+   "starter": "type Signup = { name: string; age: number; email: string };\ntype Validators<T> = { [K in keyof T]: (value: T[K]) => string | undefined };\nconst rules: Validators<Signup> = {\n  name: (v) => (v.trim().length < 2 ? \"too short\" : undefined),\n  age: (v) => (v < 13 ? \"too young\" : undefined),\n  email: (v) => (v.includes(\"@\") ? undefined : \"invalid\"),\n};\nfunction validate(form: any): any {\n  return (Object.keys(rules) as (keyof Signup)[]).flatMap((k) => {\n    const message = k === \"age\" ? rules.age(form.age) : rules[k](form[k]);\n    return message === undefined ? [] : [`${k}: ${message}`];\n  });\n}\nconsole.log(validate({ name: \"A\", age: 9, email: \"nope\" }).join(\"; \"));\nconsole.log(validate({ name: \"Ana\", age: 31, email: \"ana@x.io\" }).length);\n"
+  }
+ ],
+ "ts_narrowing": [
+  {
+   "title": "Normalising input of several shapes",
+   "code": "function toList(x: string | number | string[]): string[] {\n  if (Array.isArray(x)) return x;\n  if (typeof x === \"number\") return [String(x)];\n  return x.split(\",\");\n}\nconsole.log(toList(\"a,b\").length, toList(7)[0], toList([\"z\"]).join(\"\"));\n",
+   "fns": [
+    {
+     "name": "toList",
+     "async": false,
+     "params": [
+      {
+       "start": 19,
+       "end": 45,
+       "text": "string | number | string[]"
+      }
+     ],
+     "ret": {
+      "start": 48,
+      "end": 56,
+      "text": "string[]"
+     }
+    }
+   ],
+   "starter": "function toList(x: any): any {\n  if (Array.isArray(x)) return x;\n  if (typeof x === \"number\") return [String(x)];\n  return x.split(\",\");\n}\nconsole.log(toList(\"a,b\").length, toList(7)[0], toList([\"z\"]).join(\"\"));\n"
+  },
+  {
+   "title": "`instanceof` for classes",
+   "code": "function when(value: Date | string): string {\n  return value instanceof Date ? value.toISOString().slice(0, 10) : value;\n}\nconsole.log(when(new Date(Date.UTC(2026, 8, 26))), when(\"tomorrow\"));\n",
+   "fns": [
+    {
+     "name": "when",
+     "async": false,
+     "params": [
+      {
+       "start": 21,
+       "end": 34,
+       "text": "Date | string"
+      }
+     ],
+     "ret": {
+      "start": 37,
+      "end": 43,
+      "text": "string"
+     }
+    }
+   ],
+   "starter": "function when(value: any): any {\n  return value instanceof Date ? value.toISOString().slice(0, 10) : value;\n}\nconsole.log(when(new Date(Date.UTC(2026, 8, 26))), when(\"tomorrow\"));\n"
+  }
+ ],
+ "ts_nullish": [
+  {
+   "title": "A lazily filled cache with `??=`",
+   "code": "const cache = new Map<number, string>();\nlet computed = 0;\nfunction label(n: number): string {\n  let v = cache.get(n);\n  v ??= (computed++, `#${n.toString(2)}`);\n  cache.set(n, v);\n  return v;\n}\nconsole.log([5, 3, 5, 5].map(label).join(\" \"), `computed ${computed}`);\n",
+   "fns": [
+    {
+     "name": "label",
+     "async": false,
+     "params": [
+      {
+       "start": 77,
+       "end": 83,
+       "text": "number"
+      }
+     ],
+     "ret": {
+      "start": 86,
+      "end": 92,
+      "text": "string"
+     }
+    }
+   ],
+   "starter": "const cache = new Map<number, string>();\nlet computed = 0;\nfunction label(n: any): any {\n  let v = cache.get(n);\n  v ??= (computed++, `#${n.toString(2)}`);\n  cache.set(n, v);\n  return v;\n}\nconsole.log([5, 3, 5, 5].map(label).join(\" \"), `computed ${computed}`);\n"
+  }
+ ],
+ "ts_overloads": [
+  {
+   "title": "When a union is simply better",
+   "code": "function label(value: string | number | boolean): string {\n  return `${typeof value}: ${String(value)}`;\n}\n\nconst inputs: (string | number | boolean)[] = [\"hi\", 3, true];\nfor (const v of inputs) console.log(label(v));\n",
+   "fns": [
+    {
+     "name": "label",
+     "async": false,
+     "params": [
+      {
+       "start": 22,
+       "end": 47,
+       "text": "string | number | boolean"
+      }
+     ],
+     "ret": {
+      "start": 50,
+      "end": 56,
+      "text": "string"
+     }
+    }
+   ],
+   "starter": "function label(value: any): any {\n  return `${typeof value}: ${String(value)}`;\n}\n\nconst inputs: (string | number | boolean)[] = [\"hi\", 3, true];\nfor (const v of inputs) console.log(label(v));\n"
+  }
+ ],
+ "ts_parse_dont_validate": [
+  {
+   "title": "An `Email` only a parser can make",
+   "code": "declare const EmailBrand: unique symbol;\ntype Email = string & { readonly [EmailBrand]: true };\n\nfunction parseEmail(raw: string): Email | undefined {\n  const s = raw.trim().toLowerCase();\n  return /^[^@\\s]+@[^@\\s]+\\.[a-z]+$/.test(s) ? (s as Email) : undefined;\n}\n\nfunction sendWelcome(to: Email): string {\n  return \"welcome mail -> \" + to;\n}\n\nfor (const raw of [\"  Ana@Example.COM \", \"bob\", \"cy@x.io\"]) {\n  const email = parseEmail(raw);\n  console.log(email === undefined ? `rejected \"${raw.trim()}\"` : sendWelcome(email));\n}\n",
+   "fns": [
+    {
+     "name": "parseEmail",
+     "async": false,
+     "params": [
+      {
+       "start": 122,
+       "end": 128,
+       "text": "string"
+      }
+     ],
+     "ret": {
+      "start": 131,
+      "end": 148,
+      "text": "Email | undefined"
+     }
+    },
+    {
+     "name": "sendWelcome",
+     "async": false,
+     "params": [
+      {
+       "start": 290,
+       "end": 295,
+       "text": "Email"
+      }
+     ],
+     "ret": {
+      "start": 298,
+      "end": 304,
+      "text": "string"
+     }
+    }
+   ],
+   "starter": "declare const EmailBrand: unique symbol;\ntype Email = string & { readonly [EmailBrand]: true };\n\nfunction parseEmail(raw: any): any {\n  const s = raw.trim().toLowerCase();\n  return /^[^@\\s]+@[^@\\s]+\\.[a-z]+$/.test(s) ? (s as Email) : undefined;\n}\n\nfunction sendWelcome(to: any): any {\n  return \"welcome mail -> \" + to;\n}\n\nfor (const raw of [\"  Ana@Example.COM \", \"bob\", \"cy@x.io\"]) {\n  const email = parseEmail(raw);\n  console.log(email === undefined ? `rejected \"${raw.trim()}\"` : sendWelcome(email));\n}\n"
+  },
+  {
+   "title": "A list that cannot be empty",
+   "code": "type NonEmpty = readonly [number, ...number[]];\n\nfunction parseNonEmpty(xs: readonly number[]): NonEmpty | undefined {\n  const [head, ...rest] = xs;\n  return head === undefined ? undefined : [head, ...rest];\n}\n\nfunction range(xs: NonEmpty): string {\n  let lo = xs[0];\n  let hi = xs[0];\n  for (const x of xs) {\n    lo = Math.min(lo, x);\n    hi = Math.max(hi, x);\n  }\n  return `${lo}..${hi}`;\n}\n\nfor (const xs of [[4, 9, 1], [], [7]]) {\n  const checked = parseNonEmpty(xs);\n  console.log(checked === undefined ? \"no values\" : range(checked));\n}\n",
+   "fns": [
+    {
+     "name": "parseNonEmpty",
+     "async": false,
+     "params": [
+      {
+       "start": 76,
+       "end": 93,
+       "text": "readonly number[]"
+      }
+     ],
+     "ret": {
+      "start": 96,
+      "end": 116,
+      "text": "NonEmpty | undefined"
+     }
+    },
+    {
+     "name": "range",
+     "async": false,
+     "params": [
+      {
+       "start": 230,
+       "end": 238,
+       "text": "NonEmpty"
+      }
+     ],
+     "ret": {
+      "start": 241,
+      "end": 247,
+      "text": "string"
+     }
+    }
+   ],
+   "starter": "type NonEmpty = readonly [number, ...number[]];\n\nfunction parseNonEmpty(xs: any): any {\n  const [head, ...rest] = xs;\n  return head === undefined ? undefined : [head, ...rest];\n}\n\nfunction range(xs: any): any {\n  let lo = xs[0];\n  let hi = xs[0];\n  for (const x of xs) {\n    lo = Math.min(lo, x);\n    hi = Math.max(hi, x);\n  }\n  return `${lo}..${hi}`;\n}\n\nfor (const xs of [[4, 9, 1], [], [7]]) {\n  const checked = parseNonEmpty(xs);\n  console.log(checked === undefined ? \"no values\" : range(checked));\n}\n"
+  }
+ ],
+ "ts_recursion": [
+  {
+   "title": "Recursing on nested data",
+   "code": "import * as fs from \"fs\";\ntype Nested = number | Nested[];\n\nfunction total(value: Nested): number {\n  if (typeof value === \"number\") return value;\n  let sum = 0;\n  for (const item of value) sum += total(item);\n  return sum;\n}\n\nfunction depth(value: Nested): number {\n  if (typeof value === \"number\") return 0;\n  let deepest = 0;\n  for (const item of value) deepest = Math.max(deepest, depth(item));\n  return 1 + deepest;\n}\n\nconst data = JSON.parse(fs.readFileSync(0, \"utf8\").trim()) as Nested;\nconsole.log(`total ${total(data)}, depth ${depth(data)}`);\n",
+   "fns": [
+    {
+     "name": "total",
+     "async": false,
+     "params": [
+      {
+       "start": 82,
+       "end": 88,
+       "text": "Nested"
+      }
+     ],
+     "ret": {
+      "start": 91,
+      "end": 97,
+      "text": "number"
+     }
+    },
+    {
+     "name": "depth",
+     "async": false,
+     "params": [
+      {
+       "start": 249,
+       "end": 255,
+       "text": "Nested"
+      }
+     ],
+     "ret": {
+      "start": 258,
+      "end": 264,
+      "text": "number"
+     }
+    }
+   ],
+   "starter": "import * as fs from \"fs\";\ntype Nested = number | Nested[];\n\nfunction total(value: any): any {\n  if (typeof value === \"number\") return value;\n  let sum = 0;\n  for (const item of value) sum += total(item);\n  return sum;\n}\n\nfunction depth(value: any): any {\n  if (typeof value === \"number\") return 0;\n  let deepest = 0;\n  for (const item of value) deepest = Math.max(deepest, depth(item));\n  return 1 + deepest;\n}\n\nconst data = JSON.parse(fs.readFileSync(0, \"utf8\").trim()) as Nested;\nconsole.log(`total ${total(data)}, depth ${depth(data)}`);\n"
+  },
+  {
+   "title": "Memoisation turns exponential into linear",
+   "code": "let calls = 0;\nfunction slowFib(n: number): number {\n  calls++;\n  return n < 2 ? n : slowFib(n - 1) + slowFib(n - 2);\n}\n\nconst memo = new Map<number, number>();\nlet memoCalls = 0;\nfunction fastFib(n: number): number {\n  memoCalls++;\n  const known = memo.get(n);\n  if (known !== undefined) return known;\n  const value = n < 2 ? n : fastFib(n - 1) + fastFib(n - 2);\n  memo.set(n, value);\n  return value;\n}\n\nconsole.log(slowFib(25), `${calls} calls`);\nconsole.log(fastFib(25), `${memoCalls} calls`);\n",
+   "fns": [
+    {
+     "name": "slowFib",
+     "async": false,
+     "params": [
+      {
+       "start": 35,
+       "end": 41,
+       "text": "number"
+      }
+     ],
+     "ret": {
+      "start": 44,
+      "end": 50,
+      "text": "number"
+     }
+    },
+    {
+     "name": "fastFib",
+     "async": false,
+     "params": [
+      {
+       "start": 200,
+       "end": 206,
+       "text": "number"
+      }
+     ],
+     "ret": {
+      "start": 209,
+      "end": 215,
+      "text": "number"
+     }
+    }
+   ],
+   "starter": "let calls = 0;\nfunction slowFib(n: any): any {\n  calls++;\n  return n < 2 ? n : slowFib(n - 1) + slowFib(n - 2);\n}\n\nconst memo = new Map<number, number>();\nlet memoCalls = 0;\nfunction fastFib(n: any): any {\n  memoCalls++;\n  const known = memo.get(n);\n  if (known !== undefined) return known;\n  const value = n < 2 ? n : fastFib(n - 1) + fastFib(n - 2);\n  memo.set(n, value);\n  return value;\n}\n\nconsole.log(slowFib(25), `${calls} calls`);\nconsole.log(fastFib(25), `${memoCalls} calls`);\n"
+  }
+ ],
+ "ts_resource_management": [
+  {
+   "title": "Cleanup on every exit path",
+   "code": "class Lock implements Disposable {\n  static held = 0;\n  constructor() {\n    Lock.held++;\n  }\n  [Symbol.dispose](): void {\n    Lock.held--;\n  }\n}\nfunction transfer(amount: number): string {\n  using lock = new Lock();\n  if (amount <= 0) return \"rejected\";\n  if (amount > 100) throw new Error(\"limit exceeded\");\n  return `moved ${amount} while holding ${Lock.held} lock`;\n}\nfor (const amount of [50, -1, 500]) {\n  try {\n    console.log(transfer(amount));\n  } catch (e) {\n    console.log(\"error: \" + (e instanceof Error ? e.message : String(e)));\n  }\n  console.log(`locks held afterwards: ${Lock.held}`);\n}\n",
+   "fns": [
+    {
+     "name": "transfer",
+     "async": false,
+     "params": [
+      {
+       "start": 171,
+       "end": 177,
+       "text": "number"
+      }
+     ],
+     "ret": {
+      "start": 180,
+      "end": 186,
+      "text": "string"
+     }
+    }
+   ],
+   "starter": "class Lock implements Disposable {\n  static held = 0;\n  constructor() {\n    Lock.held++;\n  }\n  [Symbol.dispose](): void {\n    Lock.held--;\n  }\n}\nfunction transfer(amount: any): any {\n  using lock = new Lock();\n  if (amount <= 0) return \"rejected\";\n  if (amount > 100) throw new Error(\"limit exceeded\");\n  return `moved ${amount} while holding ${Lock.held} lock`;\n}\nfor (const amount of [50, -1, 500]) {\n  try {\n    console.log(transfer(amount));\n  } catch (e) {\n    console.log(\"error: \" + (e instanceof Error ? e.message : String(e)));\n  }\n  console.log(`locks held afterwards: ${Lock.held}`);\n}\n"
+  },
+  {
+   "title": "A stack of cleanups",
+   "code": "function setup(fail: boolean): DisposableStack {\n  using stack = new DisposableStack();\n  stack.defer(() => console.log(\"  undo: stop server\"));\n  console.log(\"  start server\");\n  stack.defer(() => console.log(\"  undo: close cache\"));\n  console.log(\"  open cache\");\n  if (fail) throw new Error(\"config missing\");\n  return stack.move();\n}\nfor (const fail of [true, false]) {\n  console.log(fail ? \"setup that fails:\" : \"setup that succeeds:\");\n  try {\n    using app = setup(fail);\n    console.log(\"  running\");\n  } catch (e) {\n    console.log(\"  failed: \" + (e instanceof Error ? e.message : String(e)));\n  }\n}\n",
+   "fns": [
+    {
+     "name": "setup",
+     "async": false,
+     "params": [
+      {
+       "start": 21,
+       "end": 28,
+       "text": "boolean"
+      }
+     ],
+     "ret": {
+      "start": 31,
+      "end": 46,
+      "text": "DisposableStack"
+     }
+    }
+   ],
+   "starter": "function setup(fail: any): any {\n  using stack = new DisposableStack();\n  stack.defer(() => console.log(\"  undo: stop server\"));\n  console.log(\"  start server\");\n  stack.defer(() => console.log(\"  undo: close cache\"));\n  console.log(\"  open cache\");\n  if (fail) throw new Error(\"config missing\");\n  return stack.move();\n}\nfor (const fail of [true, false]) {\n  console.log(fail ? \"setup that fails:\" : \"setup that succeeds:\");\n  try {\n    using app = setup(fail);\n    console.log(\"  running\");\n  } catch (e) {\n    console.log(\"  failed: \" + (e instanceof Error ? e.message : String(e)));\n  }\n}\n"
+  }
+ ],
+ "ts_runtime_validation": [
+  {
+   "title": "A schema, and the type computed from it",
+   "code": "type Parsed<T> = { ok: true; value: T } | { ok: false; issues: string[] };\ntype Schema<T> = { parse: (value: unknown, path: string) => Parsed<T> };\ntype Infer<S> = S extends Schema<infer T> ? T : never;\n\nconst fail = (path: string, expected: string): Parsed<never> => ({ ok: false, issues: [`${path}: expected ${expected}`] });\nconst str = (): Schema<string> => ({\n  parse: (v, path) => (typeof v === \"string\" ? { ok: true, value: v } : fail(path, \"string\")),\n});\nconst num = (): Schema<number> => ({\n  parse: (v, path) => (typeof v === \"number\" && Number.isFinite(v) ? { ok: true, value: v } : fail(path, \"number\")),\n});\nfunction opt<T>(inner: Schema<T>): Schema<T | undefined> {\n  return { parse: (v, path) => (v === undefined ? { ok: true, value: undefined } : inner.parse(v, path)) };\n}\nfunction arr<T>(item: Schema<T>): Schema<T[]> {\n  return {\n    parse(v, path) {\n      if (!Array.isArray(v)) return fail(path, \"array\");\n      const out: T[] = [];\n      const issues: string[] = [];\n      v.forEach((x: unknown, i) => {\n        const r = item.parse(x, `${path}[${i}]`);\n        if (r.ok) out.push(r.value);\n        else issues.push(...r.issues);\n      });\n      return issues.length > 0 ? { ok: false, issues } : { ok: true, value: out };\n    },\n  };\n}\nfunction obj<S extends Record<string, Schema<unknown>>>(shape: S): Schema<{ [K in keyof S]: Infer<S[K]> }> {\n  return {\n    parse(v, path) {\n      if (typeof v !== \"object\" || v === null || Array.isArray(v)) return fail(path, \"object\");\n      const record = v as Record<string, unknown>;\n      const out: Record<string, unknown> = {};\n      const issues: string[] = [];\n      for (const [key, schema] of Object.entries(shape)) {\n        const r = schema.parse(record[key], `${path}.${key}`);\n        if (r.ok) out[key] = r.value;\n        else issues.push(...r.issues);\n      }\n      return issues.length > 0 ? { ok: false, issues } : { ok: true, value: out as { [K in keyof S]: Infer<S[K]> } };\n    },\n  };\n}\n\nconst User = obj({ name: str(), age: num(), tags: arr(str()) });\ntype User = Infer<typeof User>;\n\nfunction greet(u: User): string {\n  return `${u.name} (${u.age}) ${u.tags.join(\"/\") || \"no tags\"}`;\n}\n\nfor (const text of ['{\"name\":\"ana\",\"age\":31,\"tags\":[\"admin\",\"ops\"]}', '{\"name\":\"bo\",\"age\":40,\"tags\":[]}']) {\n  const r = User.parse(JSON.parse(text), \"user\");\n  console.log(r.ok ? greet(r.value) : r.issues.join(\"; \"));\n}\n",
+   "fns": [
+    {
+     "name": "greet",
+     "async": false,
+     "params": [
+      {
+       "start": 2086,
+       "end": 2090,
+       "text": "User"
+      }
+     ],
+     "ret": {
+      "start": 2093,
+      "end": 2099,
+      "text": "string"
+     }
+    }
+   ],
+   "starter": "type Parsed<T> = { ok: true; value: T } | { ok: false; issues: string[] };\ntype Schema<T> = { parse: (value: unknown, path: string) => Parsed<T> };\ntype Infer<S> = S extends Schema<infer T> ? T : never;\n\nconst fail = (path: string, expected: string): Parsed<never> => ({ ok: false, issues: [`${path}: expected ${expected}`] });\nconst str = (): Schema<string> => ({\n  parse: (v, path) => (typeof v === \"string\" ? { ok: true, value: v } : fail(path, \"string\")),\n});\nconst num = (): Schema<number> => ({\n  parse: (v, path) => (typeof v === \"number\" && Number.isFinite(v) ? { ok: true, value: v } : fail(path, \"number\")),\n});\nfunction opt<T>(inner: Schema<T>): Schema<T | undefined> {\n  return { parse: (v, path) => (v === undefined ? { ok: true, value: undefined } : inner.parse(v, path)) };\n}\nfunction arr<T>(item: Schema<T>): Schema<T[]> {\n  return {\n    parse(v, path) {\n      if (!Array.isArray(v)) return fail(path, \"array\");\n      const out: T[] = [];\n      const issues: string[] = [];\n      v.forEach((x: unknown, i) => {\n        const r = item.parse(x, `${path}[${i}]`);\n        if (r.ok) out.push(r.value);\n        else issues.push(...r.issues);\n      });\n      return issues.length > 0 ? { ok: false, issues } : { ok: true, value: out };\n    },\n  };\n}\nfunction obj<S extends Record<string, Schema<unknown>>>(shape: S): Schema<{ [K in keyof S]: Infer<S[K]> }> {\n  return {\n    parse(v, path) {\n      if (typeof v !== \"object\" || v === null || Array.isArray(v)) return fail(path, \"object\");\n      const record = v as Record<string, unknown>;\n      const out: Record<string, unknown> = {};\n      const issues: string[] = [];\n      for (const [key, schema] of Object.entries(shape)) {\n        const r = schema.parse(record[key], `${path}.${key}`);\n        if (r.ok) out[key] = r.value;\n        else issues.push(...r.issues);\n      }\n      return issues.length > 0 ? { ok: false, issues } : { ok: true, value: out as { [K in keyof S]: Infer<S[K]> } };\n    },\n  };\n}\n\nconst User = obj({ name: str(), age: num(), tags: arr(str()) });\ntype User = Infer<typeof User>;\n\nfunction greet(u: any): any {\n  return `${u.name} (${u.age}) ${u.tags.join(\"/\") || \"no tags\"}`;\n}\n\nfor (const text of ['{\"name\":\"ana\",\"age\":31,\"tags\":[\"admin\",\"ops\"]}', '{\"name\":\"bo\",\"age\":40,\"tags\":[]}']) {\n  const r = User.parse(JSON.parse(text), \"user\");\n  console.log(r.ok ? greet(r.value) : r.issues.join(\"; \"));\n}\n"
+  },
+  {
+   "title": "Parse once, then trust",
+   "code": "type Parsed<T> = { ok: true; value: T } | { ok: false; issues: string[] };\ntype Schema<T> = { parse: (value: unknown, path: string) => Parsed<T> };\ntype Infer<S> = S extends Schema<infer T> ? T : never;\n\nconst fail = (path: string, expected: string): Parsed<never> => ({ ok: false, issues: [`${path}: expected ${expected}`] });\nconst str = (): Schema<string> => ({\n  parse: (v, path) => (typeof v === \"string\" ? { ok: true, value: v } : fail(path, \"string\")),\n});\nconst num = (): Schema<number> => ({\n  parse: (v, path) => (typeof v === \"number\" && Number.isFinite(v) ? { ok: true, value: v } : fail(path, \"number\")),\n});\nfunction opt<T>(inner: Schema<T>): Schema<T | undefined> {\n  return { parse: (v, path) => (v === undefined ? { ok: true, value: undefined } : inner.parse(v, path)) };\n}\nfunction arr<T>(item: Schema<T>): Schema<T[]> {\n  return {\n    parse(v, path) {\n      if (!Array.isArray(v)) return fail(path, \"array\");\n      const out: T[] = [];\n      const issues: string[] = [];\n      v.forEach((x: unknown, i) => {\n        const r = item.parse(x, `${path}[${i}]`);\n        if (r.ok) out.push(r.value);\n        else issues.push(...r.issues);\n      });\n      return issues.length > 0 ? { ok: false, issues } : { ok: true, value: out };\n    },\n  };\n}\nfunction obj<S extends Record<string, Schema<unknown>>>(shape: S): Schema<{ [K in keyof S]: Infer<S[K]> }> {\n  return {\n    parse(v, path) {\n      if (typeof v !== \"object\" || v === null || Array.isArray(v)) return fail(path, \"object\");\n      const record = v as Record<string, unknown>;\n      const out: Record<string, unknown> = {};\n      const issues: string[] = [];\n      for (const [key, schema] of Object.entries(shape)) {\n        const r = schema.parse(record[key], `${path}.${key}`);\n        if (r.ok) out[key] = r.value;\n        else issues.push(...r.issues);\n      }\n      return issues.length > 0 ? { ok: false, issues } : { ok: true, value: out as { [K in keyof S]: Infer<S[K]> } };\n    },\n  };\n}\n\nconst Config = obj({ host: str(), port: opt(num()), retries: opt(num()) });\ntype Config = Infer<typeof Config>;\n\nfunction describe(c: Config): string {\n  return `${c.host}:${c.port ?? 80}, ${c.retries ?? 3} retries`;\n}\n\nfor (const text of ['{\"host\":\"db.local\",\"port\":5432}', '{\"host\":\"api\",\"retries\":0}', '{\"port\":\"80\"}']) {\n  const r = Config.parse(JSON.parse(text), \"config\");\n  console.log(r.ok ? describe(r.value) : \"invalid: \" + r.issues.join(\", \"));\n}\n",
+   "fns": [
+    {
+     "name": "describe",
+     "async": false,
+     "params": [
+      {
+       "start": 2104,
+       "end": 2110,
+       "text": "Config"
+      }
+     ],
+     "ret": {
+      "start": 2113,
+      "end": 2119,
+      "text": "string"
+     }
+    }
+   ],
+   "starter": "type Parsed<T> = { ok: true; value: T } | { ok: false; issues: string[] };\ntype Schema<T> = { parse: (value: unknown, path: string) => Parsed<T> };\ntype Infer<S> = S extends Schema<infer T> ? T : never;\n\nconst fail = (path: string, expected: string): Parsed<never> => ({ ok: false, issues: [`${path}: expected ${expected}`] });\nconst str = (): Schema<string> => ({\n  parse: (v, path) => (typeof v === \"string\" ? { ok: true, value: v } : fail(path, \"string\")),\n});\nconst num = (): Schema<number> => ({\n  parse: (v, path) => (typeof v === \"number\" && Number.isFinite(v) ? { ok: true, value: v } : fail(path, \"number\")),\n});\nfunction opt<T>(inner: Schema<T>): Schema<T | undefined> {\n  return { parse: (v, path) => (v === undefined ? { ok: true, value: undefined } : inner.parse(v, path)) };\n}\nfunction arr<T>(item: Schema<T>): Schema<T[]> {\n  return {\n    parse(v, path) {\n      if (!Array.isArray(v)) return fail(path, \"array\");\n      const out: T[] = [];\n      const issues: string[] = [];\n      v.forEach((x: unknown, i) => {\n        const r = item.parse(x, `${path}[${i}]`);\n        if (r.ok) out.push(r.value);\n        else issues.push(...r.issues);\n      });\n      return issues.length > 0 ? { ok: false, issues } : { ok: true, value: out };\n    },\n  };\n}\nfunction obj<S extends Record<string, Schema<unknown>>>(shape: S): Schema<{ [K in keyof S]: Infer<S[K]> }> {\n  return {\n    parse(v, path) {\n      if (typeof v !== \"object\" || v === null || Array.isArray(v)) return fail(path, \"object\");\n      const record = v as Record<string, unknown>;\n      const out: Record<string, unknown> = {};\n      const issues: string[] = [];\n      for (const [key, schema] of Object.entries(shape)) {\n        const r = schema.parse(record[key], `${path}.${key}`);\n        if (r.ok) out[key] = r.value;\n        else issues.push(...r.issues);\n      }\n      return issues.length > 0 ? { ok: false, issues } : { ok: true, value: out as { [K in keyof S]: Infer<S[K]> } };\n    },\n  };\n}\n\nconst Config = obj({ host: str(), port: opt(num()), retries: opt(num()) });\ntype Config = Infer<typeof Config>;\n\nfunction describe(c: any): any {\n  return `${c.host}:${c.port ?? 80}, ${c.retries ?? 3} retries`;\n}\n\nfor (const text of ['{\"host\":\"db.local\",\"port\":5432}', '{\"host\":\"api\",\"retries\":0}', '{\"port\":\"80\"}']) {\n  const r = Config.parse(JSON.parse(text), \"config\");\n  console.log(r.ok ? describe(r.value) : \"invalid: \" + r.issues.join(\", \"));\n}\n"
+  }
+ ],
+ "ts_set_algebra": [
+  {
+   "title": "Remembering things about objects",
+   "code": "type Node = { id: string; children: Node[] };\nconst sizeCache = new WeakMap<Node, number>();\nlet computed = 0;\nfunction size(node: Node): number {\n  const cached = sizeCache.get(node);\n  if (cached !== undefined) return cached;\n  computed++;\n  let total = 1;\n  for (const child of node.children) total += size(child);\n  sizeCache.set(node, total);\n  return total;\n}\nconst leaf = { id: \"leaf\", children: [] };\nconst tree: Node = { id: \"root\", children: [{ id: \"a\", children: [leaf] }, leaf] };\nconsole.log(size(tree), size(tree), `computed ${computed}`);\n",
+   "fns": [
+    {
+     "name": "size",
+     "async": false,
+     "params": [
+      {
+       "start": 131,
+       "end": 135,
+       "text": "Node"
+      }
+     ],
+     "ret": {
+      "start": 138,
+      "end": 144,
+      "text": "number"
+     }
+    }
+   ],
+   "starter": "type Node = { id: string; children: Node[] };\nconst sizeCache = new WeakMap<Node, number>();\nlet computed = 0;\nfunction size(node: any): any {\n  const cached = sizeCache.get(node);\n  if (cached !== undefined) return cached;\n  computed++;\n  let total = 1;\n  for (const child of node.children) total += size(child);\n  sizeCache.set(node, total);\n  return total;\n}\nconst leaf = { id: \"leaf\", children: [] };\nconst tree: Node = { id: \"root\", children: [{ id: \"a\", children: [leaf] }, leaf] };\nconsole.log(size(tree), size(tree), `computed ${computed}`);\n"
+  }
+ ],
+ "ts_structural_typing": [
+  {
+   "title": "Ask only for what you use",
+   "code": "function describeLength(x: { length: number }): string {\n  return `length ${x.length}`;\n}\nconst rope = { length: 7, unit: \"m\" };\nconsole.log(describeLength(\"hello\"), \"|\", describeLength([1, 2, 3]), \"|\", describeLength(rope));\n",
+   "fns": [
+    {
+     "name": "describeLength",
+     "async": false,
+     "params": [
+      {
+       "start": 27,
+       "end": 45,
+       "text": "{ length: number }"
+      }
+     ],
+     "ret": {
+      "start": 48,
+      "end": 54,
+      "text": "string"
+     }
+    }
+   ],
+   "starter": "function describeLength(x: any): any {\n  return `length ${x.length}`;\n}\nconst rope = { length: 7, unit: \"m\" };\nconsole.log(describeLength(\"hello\"), \"|\", describeLength([1, 2, 3]), \"|\", describeLength(rope));\n"
+  }
+ ],
+ "ts_template_literal_types": [
+  {
+   "title": "CSS sizes, checked and parsed",
+   "code": "type Size = `${number}px` | `${number}%`;\nfunction toPixels(size: Size, container: number): number {\n  return size.endsWith(\"%\") ? (parseFloat(size) / 100) * container : parseFloat(size);\n}\nconst sizes: Size[] = [\"120px\", \"50%\", \"12.5px\"];\nconsole.log(sizes.map((s) => toPixels(s, 400)).join(\" \"));\n",
+   "fns": [
+    {
+     "name": "toPixels",
+     "async": false,
+     "params": [
+      {
+       "start": 66,
+       "end": 70,
+       "text": "Size"
+      },
+      {
+       "start": 83,
+       "end": 89,
+       "text": "number"
+      }
+     ],
+     "ret": {
+      "start": 92,
+      "end": 98,
+      "text": "number"
+     }
+    }
+   ],
+   "starter": "type Size = `${number}px` | `${number}%`;\nfunction toPixels(size: any, container: any): any {\n  return size.endsWith(\"%\") ? (parseFloat(size) / 100) * container : parseFloat(size);\n}\nconst sizes: Size[] = [\"120px\", \"50%\", \"12.5px\"];\nconsole.log(sizes.map((s) => toPixels(s, 400)).join(\" \"));\n"
+  },
+  {
+   "title": "A route prefix that narrows",
+   "code": "type ApiPath = `/api/${string}`;\nconst isApi = (p: string): p is ApiPath => p.startsWith(\"/api/\");\nfunction handle(path: string): string {\n  return isApi(path) ? `api call to ${path.slice(5)}` : `page ${path}`;\n}\nconsole.log(handle(\"/api/users\"), \"|\", handle(\"/about\"));\n",
+   "fns": [
+    {
+     "name": "handle",
+     "async": false,
+     "params": [
+      {
+       "start": 121,
+       "end": 127,
+       "text": "string"
+      }
+     ],
+     "ret": {
+      "start": 130,
+      "end": 136,
+      "text": "string"
+     }
+    }
+   ],
+   "starter": "type ApiPath = `/api/${string}`;\nconst isApi = (p: string): p is ApiPath => p.startsWith(\"/api/\");\nfunction handle(path: any): any {\n  return isApi(path) ? `api call to ${path.slice(5)}` : `page ${path}`;\n}\nconsole.log(handle(\"/api/users\"), \"|\", handle(\"/about\"));\n"
+  }
+ ],
+ "ts_top_bottom": [
+  {
+   "title": "`never` as a function that doesn't return",
+   "code": "import * as fs from \"fs\";\nfunction fail(message: string): never {\n  throw new Error(message);\n}\n\nfunction parsePort(text: string): number {\n  const n = Number(text);\n  return Number.isInteger(n) && n > 0 && n < 65536 ? n : fail(`bad port ${text}`);\n}\n\nfor (const t of fs.readFileSync(0, \"utf8\").trim().split(/\\s+/)) {\n  try {\n    console.log(parsePort(t));\n  } catch (e) {\n    console.log(e instanceof Error ? e.message : String(e));\n  }\n}\n",
+   "fns": [
+    {
+     "name": "parsePort",
+     "async": false,
+     "params": [
+      {
+       "start": 122,
+       "end": 128,
+       "text": "string"
+      }
+     ],
+     "ret": {
+      "start": 131,
+      "end": 137,
+      "text": "number"
+     }
+    }
+   ],
+   "starter": "import * as fs from \"fs\";\nfunction fail(message: string): never {\n  throw new Error(message);\n}\n\nfunction parsePort(text: any): any {\n  const n = Number(text);\n  return Number.isInteger(n) && n > 0 && n < 65536 ? n : fail(`bad port ${text}`);\n}\n\nfor (const t of fs.readFileSync(0, \"utf8\").trim().split(/\\s+/)) {\n  try {\n    console.log(parsePort(t));\n  } catch (e) {\n    console.log(e instanceof Error ? e.message : String(e));\n  }\n}\n"
+  },
+  {
+   "title": "`{}` versus `object`",
+   "code": "function describeLoose(v: {}): string {\n  return `${typeof v}`;\n}\nfunction describeObject(v: object): string {\n  return `${Array.isArray(v) ? \"array\" : \"object\"} with ${Object.keys(v).length} keys`;\n}\nconsole.log([describeLoose(5), describeLoose(\"x\"), describeLoose({ a: 1 })].join(\" \"));\nconsole.log(describeObject({ a: 1, b: 2 }), \"|\", describeObject([1, 2, 3]));\n",
+   "fns": [
+    {
+     "name": "describeLoose",
+     "async": false,
+     "params": [
+      {
+       "start": 26,
+       "end": 28,
+       "text": "{}"
+      }
+     ],
+     "ret": {
+      "start": 31,
+      "end": 37,
+      "text": "string"
+     }
+    },
+    {
+     "name": "describeObject",
+     "async": false,
+     "params": [
+      {
+       "start": 93,
+       "end": 99,
+       "text": "object"
+      }
+     ],
+     "ret": {
+      "start": 102,
+      "end": 108,
+      "text": "string"
+     }
+    }
+   ],
+   "starter": "function describeLoose(v: any): any {\n  return `${typeof v}`;\n}\nfunction describeObject(v: any): any {\n  return `${Array.isArray(v) ? \"array\" : \"object\"} with ${Object.keys(v).length} keys`;\n}\nconsole.log([describeLoose(5), describeLoose(\"x\"), describeLoose({ a: 1 })].join(\" \"));\nconsole.log(describeObject({ a: 1, b: 2 }), \"|\", describeObject([1, 2, 3]));\n"
+  }
+ ],
+ "ts_tsconfig": [
+  {
+   "title": "Every path returns",
+   "code": "function price(size: \"s\" | \"m\" | \"l\"): number {\n  switch (size) {\n    case \"s\":\n      return 2;\n    case \"m\":\n      return 3;\n    case \"l\":\n      return 4;\n  }\n}\nconsole.log(price(\"s\") + price(\"l\"));\n",
+   "fns": [
+    {
+     "name": "price",
+     "async": false,
+     "params": [
+      {
+       "start": 21,
+       "end": 36,
+       "text": "\"s\" | \"m\" | \"l\""
+      }
+     ],
+     "ret": {
+      "start": 39,
+      "end": 45,
+      "text": "number"
+     }
+    }
+   ],
+   "starter": "function price(size: any): any {\n  switch (size) {\n    case \"s\":\n      return 2;\n    case \"m\":\n      return 3;\n    case \"l\":\n      return 4;\n  }\n}\nconsole.log(price(\"s\") + price(\"l\"));\n"
+  }
+ ],
+ "ts_tuples": [
+  {
+   "title": "Returning two values",
+   "code": "import * as fs from \"fs\";\nfunction minMax(values: number[]): [min: number, max: number] {\n  let min = Infinity;\n  let max = -Infinity;\n  for (const v of values) {\n    if (v < min) min = v;\n    if (v > max) max = v;\n  }\n  return [min, max];\n}\n\nconst values = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/).map(Number);\nconst [low, high] = minMax(values);\nconsole.log(`low ${low}, high ${high}, spread ${high - low}`);\n",
+   "fns": [
+    {
+     "name": "minMax",
+     "async": false,
+     "params": [
+      {
+       "start": 50,
+       "end": 58,
+       "text": "number[]"
+      }
+     ],
+     "ret": {
+      "start": 61,
+      "end": 87,
+      "text": "[min: number, max: number]"
+     }
+    }
+   ],
+   "starter": "import * as fs from \"fs\";\nfunction minMax(values: any): any {\n  let min = Infinity;\n  let max = -Infinity;\n  for (const v of values) {\n    if (v < min) min = v;\n    if (v > max) max = v;\n  }\n  return [min, max];\n}\n\nconst values = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/).map(Number);\nconst [low, high] = minMax(values);\nconsole.log(`low ${low}, high ${high}, spread ${high - low}`);\n"
+  },
+  {
+   "title": "A fixed head and a rest",
+   "code": "import * as fs from \"fs\";\ntype Row = [name: string, ...scores: number[]];\n\nfunction parseRow(line: string): Row {\n  const [name = \"\", ...rest] = line.trim().split(/\\s+/);\n  return [name, ...rest.map(Number)];\n}\n\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const [name, ...scores] = parseRow(line);\n  const best = scores.length === 0 ? \"none\" : String(Math.max(...scores));\n  console.log(`${name}: ${scores.length} scores, best ${best}`);\n}\n",
+   "fns": [
+    {
+     "name": "parseRow",
+     "async": false,
+     "params": [
+      {
+       "start": 99,
+       "end": 105,
+       "text": "string"
+      }
+     ],
+     "ret": {
+      "start": 108,
+      "end": 111,
+      "text": "Row"
+     }
+    }
+   ],
+   "starter": "import * as fs from \"fs\";\ntype Row = [name: string, ...scores: number[]];\n\nfunction parseRow(line: any): any {\n  const [name = \"\", ...rest] = line.trim().split(/\\s+/);\n  return [name, ...rest.map(Number)];\n}\n\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const [name, ...scores] = parseRow(line);\n  const best = scores.length === 0 ? \"none\" : String(Math.max(...scores));\n  console.log(`${name}: ${scores.length} scores, best ${best}`);\n}\n"
+  }
+ ],
+ "ts_type_level": [
+  {
+   "title": "A recursive JSON type and a walker",
+   "code": "type Json = null | boolean | number | string | Json[] | { [key: string]: Json };\nfunction countLeaves(v: Json): number {\n  if (Array.isArray(v)) return v.reduce<number>((n, x) => n + countLeaves(x), 0);\n  if (v !== null && typeof v === \"object\") return Object.values(v).reduce<number>((n, x) => n + countLeaves(x), 0);\n  return 1;\n}\nconst doc: Json = { name: \"ana\", tags: [\"a\", \"b\"], address: { city: \"Oslo\", geo: [59.9, 10.7] }, active: true };\nconsole.log(countLeaves(doc));\n",
+   "fns": [
+    {
+     "name": "countLeaves",
+     "async": false,
+     "params": [
+      {
+       "start": 105,
+       "end": 109,
+       "text": "Json"
+      }
+     ],
+     "ret": {
+      "start": 112,
+      "end": 118,
+      "text": "number"
+     }
+    }
+   ],
+   "starter": "type Json = null | boolean | number | string | Json[] | { [key: string]: Json };\nfunction countLeaves(v: any): any {\n  if (Array.isArray(v)) return v.reduce<number>((n, x) => n + countLeaves(x), 0);\n  if (v !== null && typeof v === \"object\") return Object.values(v).reduce<number>((n, x) => n + countLeaves(x), 0);\n  return 1;\n}\nconst doc: Json = { name: \"ana\", tags: [\"a\", \"b\"], address: { city: \"Oslo\", geo: [59.9, 10.7] }, active: true };\nconsole.log(countLeaves(doc));\n"
+  },
+  {
+   "title": "A deeply read-only parameter",
+   "code": "type DeepReadonly<T> = { readonly [K in keyof T]: T[K] extends object ? DeepReadonly<T[K]> : T[K] };\ntype Config = { server: { host: string; ports: number[] }; debug: boolean };\nfunction describe(c: DeepReadonly<Config>): string {\n  return `${c.server.host}:${c.server.ports.join(\"/\")} debug=${c.debug}`;\n}\nconsole.log(describe({ server: { host: \"localhost\", ports: [80, 443] }, debug: false }));\n",
+   "fns": [
+    {
+     "name": "describe",
+     "async": false,
+     "params": [
+      {
+       "start": 199,
+       "end": 219,
+       "text": "DeepReadonly<Config>"
+      }
+     ],
+     "ret": {
+      "start": 222,
+      "end": 228,
+      "text": "string"
+     }
+    }
+   ],
+   "starter": "type DeepReadonly<T> = { readonly [K in keyof T]: T[K] extends object ? DeepReadonly<T[K]> : T[K] };\ntype Config = { server: { host: string; ports: number[] }; debug: boolean };\nfunction describe(c: any): any {\n  return `${c.server.host}:${c.server.ports.join(\"/\")} debug=${c.debug}`;\n}\nconsole.log(describe({ server: { host: \"localhost\", ports: [80, 443] }, debug: false }));\n"
+  }
+ ],
+ "ts_type_performance": [
+  {
+   "title": "A pattern instead of an enumeration",
+   "code": "type Hex = `#${string}`;\ntype Percent = `${number}%`;\n\nfunction parseColour(text: string): Hex | undefined {\n  return /^#[0-9a-f]{6}$/i.test(text) ? (text.toLowerCase() as Hex) : undefined;\n}\nfunction scale(p: Percent, of: number): number {\n  return (parseFloat(p) / 100) * of;\n}\nconsole.log(parseColour(\"#3355FF\"), parseColour(\"blue\"));\nconsole.log(scale(\"25%\", 80), scale(\"12.5%\", 8));\n",
+   "fns": [
+    {
+     "name": "parseColour",
+     "async": false,
+     "params": [
+      {
+       "start": 82,
+       "end": 88,
+       "text": "string"
+      }
+     ],
+     "ret": {
+      "start": 91,
+      "end": 106,
+      "text": "Hex | undefined"
+     }
+    },
+    {
+     "name": "scale",
+     "async": false,
+     "params": [
+      {
+       "start": 210,
+       "end": 217,
+       "text": "Percent"
+      },
+      {
+       "start": 223,
+       "end": 229,
+       "text": "number"
+      }
+     ],
+     "ret": {
+      "start": 232,
+      "end": 238,
+      "text": "number"
+     }
+    }
+   ],
+   "starter": "type Hex = `#${string}`;\ntype Percent = `${number}%`;\n\nfunction parseColour(text: any): any {\n  return /^#[0-9a-f]{6}$/i.test(text) ? (text.toLowerCase() as Hex) : undefined;\n}\nfunction scale(p: any, of: any): any {\n  return (parseFloat(p) / 100) * of;\n}\nconsole.log(parseColour(\"#3355FF\"), parseColour(\"blue\"));\nconsole.log(scale(\"25%\", 80), scale(\"12.5%\", 8));\n"
+  }
+ ],
+ "ts_types": [
+  {
+   "title": "A literal type as a promise",
+   "code": "function setMode(mode: \"light\" | \"dark\"): string {\n  return mode === \"dark\" ? \"white text on black\" : \"black text on white\";\n}\nconsole.log(setMode(\"dark\"));\nconsole.log(setMode(\"light\"));\n",
+   "fns": [
+    {
+     "name": "setMode",
+     "async": false,
+     "params": [
+      {
+       "start": 23,
+       "end": 39,
+       "text": "\"light\" | \"dark\""
+      }
+     ],
+     "ret": {
+      "start": 42,
+      "end": 48,
+      "text": "string"
+     }
+    }
+   ],
+   "starter": "function setMode(mode: any): any {\n  return mode === \"dark\" ? \"white text on black\" : \"black text on white\";\n}\nconsole.log(setMode(\"dark\"));\nconsole.log(setMode(\"light\"));\n"
+  }
+ ],
+ "ts_unions": [
+  {
+   "title": "A literal union of commands",
+   "code": "type Command = \"start\" | \"stop\" | \"pause\";\nfunction run(cmd: Command): string {\n  switch (cmd) {\n    case \"start\":\n      return \"running\";\n    case \"stop\":\n      return \"stopped\";\n    case \"pause\":\n      return \"paused\";\n  }\n}\nconsole.log(([\"start\", \"pause\", \"stop\"] as const).map(run).join(\" -> \"));\n",
+   "fns": [
+    {
+     "name": "run",
+     "async": false,
+     "params": [
+      {
+       "start": 61,
+       "end": 68,
+       "text": "Command"
+      }
+     ],
+     "ret": {
+      "start": 71,
+      "end": 77,
+      "text": "string"
+     }
+    }
+   ],
+   "starter": "type Command = \"start\" | \"stop\" | \"pause\";\nfunction run(cmd: any): any {\n  switch (cmd) {\n    case \"start\":\n      return \"running\";\n    case \"stop\":\n      return \"stopped\";\n    case \"pause\":\n      return \"paused\";\n  }\n}\nconsole.log(([\"start\", \"pause\", \"stop\"] as const).map(run).join(\" -> \"));\n"
+  },
+  {
+   "title": "A result or a reason",
+   "code": "function parseAge(text: string): number | \"invalid\" {\n  const n = Number(text);\n  return Number.isInteger(n) && n >= 0 ? n : \"invalid\";\n}\nfor (const t of [\"31\", \"-2\", \"x\"]) {\n  const r = parseAge(t);\n  console.log(r === \"invalid\" ? `${t}: rejected` : `${t}: next year ${r + 1}`);\n}\n",
+   "fns": [
+    {
+     "name": "parseAge",
+     "async": false,
+     "params": [
+      {
+       "start": 24,
+       "end": 30,
+       "text": "string"
+      }
+     ],
+     "ret": {
+      "start": 33,
+      "end": 51,
+      "text": "number | \"invalid\""
+     }
+    }
+   ],
+   "starter": "function parseAge(text: any): any {\n  const n = Number(text);\n  return Number.isInteger(n) && n >= 0 ? n : \"invalid\";\n}\nfor (const t of [\"31\", \"-2\", \"x\"]) {\n  const r = parseAge(t);\n  console.log(r === \"invalid\" ? `${t}: rejected` : `${t}: next year ${r + 1}`);\n}\n"
+  }
+ ],
+ "ts_utility_types": [
+  {
+   "title": "A patch, applied",
+   "code": "type Task = { id: number; title: string; done: boolean; priority: \"low\" | \"high\" };\ntype TaskPatch = Partial<Omit<Task, \"id\">>;\nfunction update(task: Task, patch: TaskPatch): Task {\n  return { ...task, ...patch };\n}\nconst t: Task = { id: 1, title: \"write\", done: false, priority: \"low\" };\nconsole.log(JSON.stringify(update(t, { done: true, priority: \"high\" })));\n",
+   "fns": [
+    {
+     "name": "update",
+     "async": false,
+     "params": [
+      {
+       "start": 150,
+       "end": 154,
+       "text": "Task"
+      },
+      {
+       "start": 163,
+       "end": 172,
+       "text": "TaskPatch"
+      }
+     ],
+     "ret": {
+      "start": 175,
+      "end": 179,
+      "text": "Task"
+     }
+    }
+   ],
+   "starter": "type Task = { id: number; title: string; done: boolean; priority: \"low\" | \"high\" };\ntype TaskPatch = Partial<Omit<Task, \"id\">>;\nfunction update(task: any, patch: any): any {\n  return { ...task, ...patch };\n}\nconst t: Task = { id: 1, title: \"write\", done: false, priority: \"low\" };\nconsole.log(JSON.stringify(update(t, { done: true, priority: \"high\" })));\n"
+  }
+ ],
+ "ts_versions": [
+  {
+   "title": "`catch` gives you `unknown` — narrow it",
+   "code": "function parsePort(text: string): number {\n  const n = Number(text);\n  if (!Number.isInteger(n) || n < 1 || n > 65535) throw new RangeError(`not a port: ${text}`);\n  return n;\n}\n\nfor (const t of [\"8080\", \"http\", \"70000\"]) {\n  try {\n    console.log(parsePort(t));\n  } catch (e) {\n    console.log(e instanceof Error ? `${e.name}: ${e.message}` : String(e));\n  }\n}\n",
+   "fns": [
+    {
+     "name": "parsePort",
+     "async": false,
+     "params": [
+      {
+       "start": 25,
+       "end": 31,
+       "text": "string"
+      }
+     ],
+     "ret": {
+      "start": 34,
+      "end": 40,
+      "text": "number"
+     }
+    }
+   ],
+   "starter": "function parsePort(text: any): any {\n  const n = Number(text);\n  if (!Number.isInteger(n) || n < 1 || n > 65535) throw new RangeError(`not a port: ${text}`);\n  return n;\n}\n\nfor (const t of [\"8080\", \"http\", \"70000\"]) {\n  try {\n    console.log(parsePort(t));\n  } catch (e) {\n    console.log(e instanceof Error ? `${e.name}: ${e.message}` : String(e));\n  }\n}\n"
+  }
+ ]
+}

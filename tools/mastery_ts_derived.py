@@ -202,6 +202,48 @@ def _tsd_diagnoses(key, name, data):
     return out
 
 
+try:
+    with open(os.path.join(HERE, "ts_retypes.json"), encoding="utf-8") as _tsd_rf:
+        _TSD_RETYPES = json.load(_tsd_rf)
+except FileNotFoundError:
+    _TSD_RETYPES = {}
+
+
+def _tsd_retypes(key, name, data):
+    """Retype drills (X-10) from the signature spans tools/gen_ts_retypes.py
+    found: the example with its functions' annotations replaced by `any`,
+    judged on the example's output and on hidden `Equal` claims against the
+    original annotations. A cached entry whose example changed is skipped."""
+    examples = {ex["code"]: ex for ex in data["examples"]}
+    out = []
+    for i, p in enumerate(_TSD_RETYPES.get(key, []), start=1):
+        ex = examples.get(p["code"])
+        if ex is None:
+            continue
+        code = p["code"]
+        starter = p["starter"]  # built and proven to compile by gen_ts_retypes.py
+        claims = []
+        for f in p["fns"]:
+            for j, prm in enumerate(f["params"]):
+                claims.append(f"Expect<Equal<Parameters<typeof {f['name']}>[{j}], {prm['text']}>>")
+            claims.append(f"Expect<Equal<ReturnType<typeof {f['name']}>, {f['ret']['text']}>>")
+        names = ", ".join(f"`{f['name']}`" for f in p["fns"])
+        out.append({
+            "id": f"tsm-{key}-rt{i}", "title": f"Retype: {p['title']}",
+            "prompt": (f"This is the worked example “{p['title']}” from {name}, with every type on the signatures of "
+                       f"{names} replaced by `any`. It still runs and prints the right thing — and the compiler checks "
+                       "none of it. Give every parameter and return type its real type again."),
+            "hint": "Read how each function is called and what it returns.", "hints": [
+                "Read how each function is called and what it returns.",
+                "The hidden checks compare each parameter and return type exactly — `any` never passes."],
+            "language": "typescript", "kind": "retype", "difficulty": "",
+            "strictness": "", "judge_mode": "", "forbid": [],
+            "harness": _KM_PRELUDE + "\n" + "\n".join(f"type _r{n} = {c};" for n, c in enumerate(claims, 1)) + "\n",
+            "starter": starter, "solution": code, "tests": ex["tests"], "source_slug": "", "dataset": "",
+        })
+    return out
+
+
 def _tsd_cards(name, data):
     cards = []
     for ex in data["examples"]:
@@ -291,7 +333,7 @@ def _tsd_predicts(key, name, data):
     return out
 
 
-TS_DERIVED_COUNTS = {"order": 0, "spot": 0, "cards": 0, "output": 0, "predict": 0, "repair": 0, "diagnose": 0}
+TS_DERIVED_COUNTS = {"order": 0, "spot": 0, "cards": 0, "output": 0, "predict": 0, "repair": 0, "diagnose": 0, "retype": 0}
 _tsd_fronts = {c["front"] for w in TS_WEEKS for c in w["flashcards"]}
 _tsd_fronts |= {f for cs in TS_CARDS_MORE.values() for f, _ in cs}
 for _tsd_w in TS_WEEKS:
@@ -325,6 +367,9 @@ for _tsd_w in TS_WEEKS:
                 _tsd_r += 1
                 _tsd_more.append(_tsd_ex)
                 TS_DERIVED_COUNTS["repair"] += 1
+        for _tsd_ex in _tsd_retypes(_tsd_key, _tsd_name, _tsd_data):
+            _tsd_more.append(_tsd_ex)
+            TS_DERIVED_COUNTS["retype"] += 1
         for _tsd_ex in _tsd_diagnoses(_tsd_key, _tsd_name, _tsd_data):
             _tsd_more.append(_tsd_ex)
             TS_DERIVED_COUNTS["diagnose"] += 1
@@ -349,7 +394,7 @@ for _tsd_w in TS_WEEKS:
             TS_DERIVED_COUNTS["cards"] += 1
 print(f"  derived from chapters: {TS_DERIVED_COUNTS['cards']} cards, "
       f"{TS_DERIVED_COUNTS['order']} order, {TS_DERIVED_COUNTS['spot']} spot exercises, "
-      f"{TS_DERIVED_COUNTS['output']} code-output questions, {TS_DERIVED_COUNTS['predict']} predict drills, {TS_DERIVED_COUNTS['repair']} repairs, {TS_DERIVED_COUNTS['diagnose']} read-the-error")
+      f"{TS_DERIVED_COUNTS['output']} code-output questions, {TS_DERIVED_COUNTS['predict']} predict drills, {TS_DERIVED_COUNTS['repair']} repairs, {TS_DERIVED_COUNTS['diagnose']} read-the-error, {TS_DERIVED_COUNTS['retype']} retype")
 
 # X-07: every compiler error a chapter shows has a glossary entry, so its
 # TsErrorLinks badge leads somewhere. Add missing ones to ts_errors_more.py.
