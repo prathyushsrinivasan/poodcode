@@ -28,6 +28,7 @@ import {
   type Combinator,
   type TimedPromise,
 } from "../lib/eventLoop";
+import { Icon } from "../components/ui";
 
 const TABS = [
   ["stack", "Call stack"],
@@ -43,7 +44,7 @@ export default function AsyncVisualiser() {
   const tab: Tab = TABS.some(([k]) => k === requested) ? (requested as Tab) : "stack";
   return (
     <div className="page">
-      <h1 className="page-title">🔁 Step by step</h1>
+      <h1 className="page-title">Step by step</h1>
       <p className="page-sub">
         What is on the call stack right now? What does each array method hand to the next? Why does{" "}
         <code>setTimeout(f, 0)</code> run last? Step through it. Try your own snippets in the{" "}
@@ -145,7 +146,7 @@ function CallStackView() {
           </div>
           <div className="row gap-1 mt-2">
             <button className="ghost" onClick={() => setI(0)} disabled={i === 0}>
-              ⏮ Reset
+              <Icon name="reset" size={14} /> Reset
             </button>
             <button className="ghost" onClick={() => setI((n) => Math.max(0, n - 1))} disabled={i === 0}>
               ◀ Back
@@ -154,7 +155,7 @@ function CallStackView() {
               Step ▶
             </button>
             <button className="ghost" onClick={() => setI(steps.length - 1)} disabled={done}>
-              ⏭ End
+              <Icon name="forward" size={14} /> End
             </button>
           </div>
         </div>
@@ -343,7 +344,7 @@ function EventLoop() {
           </div>
           <div className="row gap-1 mt-2">
             <button className="ghost" onClick={() => setI(0)} disabled={i === 0}>
-              ⏮ Reset
+              <Icon name="reset" size={14} /> Reset
             </button>
             <button className="ghost" onClick={() => setI((n) => Math.max(0, n - 1))} disabled={i === 0}>
               ◀ Back
@@ -352,10 +353,10 @@ function EventLoop() {
               Step ▶
             </button>
             <button className="ghost" onClick={() => (done ? (setI(0), setPlaying(true)) : setPlaying((p) => !p))}>
-              {playing ? "⏸ Pause" : "▶ Play"}
+              <Icon name={playing ? "timer" : "run"} size={14} /> {playing ? "Pause" : "Play"}
             </button>
             <button className="ghost" onClick={() => setI(steps.length - 1)} disabled={done}>
-              ⏭ End
+              <Icon name="forward" size={14} /> End
             </button>
           </div>
         </div>

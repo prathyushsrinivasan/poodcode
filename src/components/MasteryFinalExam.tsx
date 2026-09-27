@@ -25,6 +25,7 @@ import {
 } from "../lib/finalExam";
 import { useToast } from "./Toast";
 import { saveFailed } from "../lib/failures";
+import { Icon } from "./ui";
 
 function clock(seconds: number): string {
   const s = Math.max(0, Math.round(seconds));
@@ -89,7 +90,9 @@ export function FinalExamPanel({
     return (
       <div className="card week-card locked mb-4">
         <div className="row items-center gap-2">
-          <span className="week-num">🔒</span>
+          <span className="week-num">
+          <Icon name="locked" size={14} label="Locked" />
+        </span>
           <div>
             <strong className="dim">{exam.title}</strong>
             <p className="dim" style={{ margin: "4px 0 0", fontSize: 13 }}>
@@ -137,7 +140,8 @@ export function FinalExamPanel({
     };
     setResult(attempt);
     onChange({ sitting: null, attempts: [...state.attempts, attempt] });
-    toast(attempt.passed ? "Final exam passed 🎓" : "Final exam recorded — not a pass yet");
+    if (attempt.passed) toast.success("Final exam passed 🎉");
+    else toast("Final exam recorded — not a pass yet");
   }
 
   function abandon() {
@@ -148,7 +152,7 @@ export function FinalExamPanel({
     return (
       <div className="card" style={{ marginBottom: 18, borderColor: passedBefore ? "var(--good)" : "var(--accent)" }}>
         <div className="io-label" style={{ color: passedBefore ? "var(--good)" : "var(--accent)" }}>
-          🎓 {exam.title} {passedBefore && "— passed"}
+          <Icon name="mastery" size={15} /> {exam.title} {passedBefore && "— passed"}
         </div>
         <p className="mt-0">{inlineCode(exam.intro)}</p>
         {result && <AttemptLine attempt={result} exam={exam} label="This sitting" />}
@@ -173,14 +177,14 @@ export function FinalExamPanel({
     <div className="card mb-4 border-accent">
       <div className="row items-center gap-2 flex-wrap">
         <div className="io-label m-0 c-accent">
-          🎓 {exam.title} — in progress
+          <Icon name="mastery" size={15} /> {exam.title} — in progress
         </div>
         <span className="spacer" />
         <span
           className="badge"
           style={{ fontFamily: "var(--font-mono)", color: left < 0 ? "var(--bad)" : undefined }}
         >
-          {left >= 0 ? `⏱ ${clock(left)} left` : `⏱ ${clock(-left)} over time`}
+          <Icon name="timer" size={12} /> {left >= 0 ? `${clock(left)} left` : `${clock(-left)} over time`}
         </span>
       </div>
 
@@ -201,7 +205,7 @@ export function FinalExamPanel({
       <ExerciseSections
         exercises={exam.problems}
         onSolved={solved}
-        overrides={{ challenge: { heading: "🎯 Problems" } }}
+        overrides={{ challenge: { heading: "Problems" } }}
       />
 
       <H className="unit-subtitle">
@@ -309,11 +313,11 @@ export function ProgrammeSummary({
     <div className="card mb-4 border-good">
       <div className="row items-center">
         <div className="io-label c-good m-0">
-          🏁 Programme complete
+          🎉 Programme complete
         </div>
         <span className="spacer" />
         <button className="ghost" onClick={() => setPrinting(true)}>
-          🖨 Print a certificate
+          <Icon name="document" size={14} /> Print a certificate
         </button>
       </div>
       <p>

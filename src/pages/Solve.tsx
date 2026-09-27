@@ -448,14 +448,14 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
           {/* The page's one h1 (D9) — styled as the toolbar title it always was. */}
           <h1 className="solve-title">{problem.title}</h1>
           <DiffBadge d={problem.difficulty} />
-          <button
-            className={`ghost star ${problem.is_favorite ? "on" : ""}`}
-            onClick={toggleFav}
+          <IconButton
+            icon="star"
+            size="sm"
+            className={`star ${problem.is_favorite ? "on" : ""}`}
             aria-pressed={problem.is_favorite}
-            aria-label={problem.is_favorite ? "Remove from favorites" : "Add to favorites"}
-          >
-            {problem.is_favorite ? "★" : "☆"}
-          </button>
+            label={problem.is_favorite ? "Remove from favorites" : "Add to favorites"}
+            onClick={toggleFav}
+          />
           <span className="spacer" />
           <IconButton
             icon="external"
@@ -466,17 +466,10 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
           <span className="timer dim">
             <Icon name="timer" size={13} /> {formatClock(elapsed)}
           </span>
-          <button
-            className="ghost"
-            onClick={() => setLayout({ collapsed: true })}
-            title="Hide the description (Ctrl+.)"
-            aria-label="Hide the description"
-          >
-            ‹
-          </button>
-          <button className="ghost" onClick={() => nav(`/problem/${problem.id}/edit`)}>
-            ✎ Edit
-          </button>
+          <IconButton icon="chevronLeft" size="sm" label="Hide the description" shortcut="Ctrl+." onClick={() => setLayout({ collapsed: true })} />
+          <Button variant="ghost" size="sm" icon="edit" onClick={() => nav(`/problem/${problem.id}/edit`)}>
+            Edit
+          </Button>
         </div>
 
         <RungPager pos={rung} />
@@ -1266,9 +1259,9 @@ function AttemptsTab({ problemId }: { problemId: number }) {
             </span>
             <span className="badge">{a.language}</span>
             {best && a.id === best.id && (
-              <span className="badge c-good border-good">
-                ★ best
-              </span>
+              <Badge tone="good" icon="star">
+                best
+              </Badge>
             )}
             <span className="dim">{a.passed}/{a.total}</span>
             <span className="spacer" />

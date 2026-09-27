@@ -529,3 +529,12 @@ button.result-head:hover:not(:disabled) {
 .path-row.is-next {
   background: color-mix(in srgb, var(--accent) 12%, transparent);
 }
+
+/* A favourite star is outlined when off and filled when on, so the state
+   does not rest on colour alone. */
+.star.on svg {
+  fill: currentColor;
+}
+.star.on {
+  color: var(--medium);
+}

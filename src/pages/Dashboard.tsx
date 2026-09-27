@@ -276,7 +276,7 @@ export default function Today() {
             value={formatDuration(dash.study_seconds_today)}
             label="Study time today"
           />
-          <StatTile value={`${dash.current_streak}🔥`} label="Current streak" />
+          <StatTile value={`${dash.current_streak}`} label="Current streak — days" />
         </div>
       )}
 
@@ -313,7 +313,7 @@ export default function Today() {
             <div className="today-card">
               <div className="today-card-head">
                 <span className="today-card-icon" aria-hidden>
-                  📚
+                  <Icon name="curriculum" size={16} />
                 </span>
                 <span className="today-card-track">DSA Curriculum</span>
               </div>

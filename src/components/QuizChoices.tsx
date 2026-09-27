@@ -8,6 +8,7 @@ import type { QuizQuestion } from "../types";
 import { Markdown } from "./Markdown";
 import { inlineCode } from "./common";
 import { QuizOption, type OptionState } from "./exercise/Quiz";
+import { Icon } from "./ui/Icon";
 import {
   isSelected,
   quizKind,
@@ -63,7 +64,7 @@ export function QuizChoices({
                 onClick={() => onPick(kind === "multi" ? toggleMulti(picked, oi) : oi)}
                 disabled={revealed}
               >
-                {kind === "multi" && !revealed && (chosen ? "☑ " : "☐ ")}
+                {kind === "multi" && !revealed && <Icon name={chosen ? "done" : "todo"} size={14} />}
                 {kind === "output" ? opt : inlineCode(opt)}
               </QuizOption>
             );

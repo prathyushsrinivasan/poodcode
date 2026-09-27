@@ -31,24 +31,24 @@ type Mode = "flip" | "choice" | "cloze" | "type";
 export type StudyVariant = "japanese" | "vocab" | "loanword";
 
 const JP_MODES: { id: Mode; label: string }[] = [
-  { id: "flip", label: "🔄 Flip" },
-  { id: "choice", label: "🔘 Choice" },
-  { id: "cloze", label: "✍️ Cloze" },
+  { id: "flip", label: "Flip" },
+  { id: "choice", label: "Choice" },
+  { id: "cloze", label: "Cloze" },
   { id: "type", label: "⌨️ Type reading" },
 ];
 
 const VOCAB_MODES: { id: Mode; label: string }[] = [
-  { id: "flip", label: "🔄 Flip" },
-  { id: "choice", label: "🔘 Choice" },
-  { id: "cloze", label: "✍️ Code cloze" },
+  { id: "flip", label: "Flip" },
+  { id: "choice", label: "Choice" },
+  { id: "cloze", label: "Code cloze" },
 ];
 
 // A katakana word IS its own reading, so Type-the-reading would be asking you
 // to transliterate クラス into "kurasu" — a spelling test, not a Japanese one.
 const LOANWORD_MODES: { id: Mode; label: string }[] = [
-  { id: "flip", label: "🔄 Flip" },
-  { id: "choice", label: "🔘 Choice" },
-  { id: "cloze", label: "✍️ Cloze" },
+  { id: "flip", label: "Flip" },
+  { id: "choice", label: "Choice" },
+  { id: "cloze", label: "Cloze" },
 ];
 
 const GRADES: { q: number; label: string; hint: string; color?: string }[] = [
@@ -239,7 +239,7 @@ export function CardStudy({
   if (!current) {
     return (
       <div className="card" style={{ textAlign: "center", padding: "26px 18px" }}>
-        <div className="text-2xl mb-1">{graded > 0 ? "🎉" : "🌸"}</div>
+        <div className="text-2xl mb-1">{graded > 0 ? "🎉" : "✨"}</div>
         <h3 style={{ margin: "0 0 4px" }}>
           {graded > 0 ? "Session complete!" : "You're all caught up."}
         </h3>

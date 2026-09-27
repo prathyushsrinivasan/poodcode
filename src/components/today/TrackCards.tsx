@@ -17,10 +17,11 @@ import { loadDoneChapters } from "../../lib/learnProgress";
 import { masteryResume, pacing, effectiveStart, parsePause, pauseKey, startDateKey } from "../../lib/mastery";
 import type { MasteryProgress, MasteryTrack, WeeklyCourse } from "../../types";
 import { loadFailed } from "../../lib/failures";
+import { Icon, type IconName } from "../ui/Icon";
 
 export interface TrackCard {
   key: string;
-  icon: string;
+  icon: IconName;
   track: string;
   /** Where they are: "Module 7 · Collections". */
   position: string;
@@ -43,7 +44,7 @@ function courseCard(
   course: WeeklyCourse,
   trackKey: string,
   done: Set<string>,
-  icon: string,
+  icon: IconName,
   base: string
 ): TrackCard | null {
   const authored = course.weeks.filter((w) => w.authored);
@@ -91,7 +92,7 @@ function masteryCard(
   }
   return {
     key: `mastery-${track.key}`,
-    icon: "🎓",
+    icon: "mastery",
     track: track.title,
     position: `Week ${r.week.week} · ${r.week.title}`,
     action: r.finished ? "Programme complete — review" : `Continue week ${r.week.week}`,
@@ -119,11 +120,11 @@ export function useTrackCards() {
       if (cancelled) return;
       const list: TrackCard[] = [];
       if (ts) {
-        const c = courseCard(ts, "ts", done, "📗", "/course");
+        const c = courseCard(ts, "ts", done, "typescript", "/course");
         if (c) list.push(c);
       }
       if (java) {
-        const c = courseCard(java, "java", done, "☕", "/java-course");
+        const c = courseCard(java, "java", done, "java", "/java-course");
         if (c) list.push(c);
       }
       for (const t of mastery) {
@@ -145,7 +146,7 @@ export function TrackCardView({ card }: { card: TrackCard }) {
     <div className="today-card">
       <div className="today-card-head">
         <span className="today-card-icon" aria-hidden>
-          {card.icon}
+          <Icon name={card.icon} size={16} />
         </span>
         <span className="today-card-track">{card.track}</span>
       </div>

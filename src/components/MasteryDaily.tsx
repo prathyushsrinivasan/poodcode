@@ -54,10 +54,10 @@ export function DailyTypePuzzle({
   return (
     <details className="card mastery-practice mb-4" open={!done}>
       <summary>
-        <strong>🧬 Today&rsquo;s type puzzle</strong>{" "}
+        <strong>Today&rsquo;s type puzzle</strong>{" "}
         <span className="dim quiz-note">
           {done ? "✓ done today" : "one a day"} · rung {index + 1} of {ladder.length}, from week {rung.week}
-          {run > 0 && ` · 🔥 ${run}-day streak`}
+          {run > 0 && ` · ${run}-day streak`}
         </span>
       </summary>
       <p className="dim quiz-note">
@@ -88,7 +88,7 @@ export function WeekZero({
   return (
     <details className="card mastery-practice mastery-today mb-4" open>
       <summary>
-        <strong>👋 Week 0 — how this programme works</strong>{" "}
+        <strong>Week 0 — how this programme works</strong>{" "}
         <span className="dim quiz-note">thirty minutes, before Week 1 · not part of any gate</span>
       </summary>
       <ol className="week0-steps">

@@ -46,7 +46,7 @@ function masteryCmds(tracks: MasteryTrack[] | null, navigate: (to: string) => vo
   const weeks = (tracks ?? []).flatMap((t) =>
     t.weeks.map((w) => ({
       id: `mastery-${t.key}-${w.week}`,
-      label: `🎓 ${t.title} · Week ${w.week}. ${w.title}`,
+      label: `${t.title} · Week ${w.week}. ${w.title}`,
       hint: `${w.phase} · ${w.goal}`,
       run: () => navigate(`/mastery?group=${encodeURIComponent(w.phase)}`),
     }))
@@ -88,14 +88,14 @@ function dsaCmds(c: DsaCurriculum | null, navigate: (to: string) => void): Cmd[]
     }
     out.push({
       id: `dsa-mixed-${stage.key}`,
-      label: `🎲 Mixed set — ${stage.title}`,
+      label: `Mixed set — ${stage.title}`,
       hint: "Unlabelled problems from this stage and earlier: name the technique",
       run: () => navigate(`/library/mixed/${stage.key}`),
     });
   });
   out.push({
     id: "dsa-placement",
-    label: "🎯 DSA placement — skip what you already know",
+    label: "DSA placement — skip what you already know",
     hint: "One routing question and one problem per stage",
     run: () => navigate("/library/placement"),
   });
@@ -135,7 +135,7 @@ function japaneseCmds(concepts: Concept[], navigate: (to: string) => void): Cmd[
   return [
     {
       id: "jp-vocab",
-      label: "📝 日本語 Vocabulary — 語彙",
+      label: "日本語 Vocabulary — 語彙",
       hint: "Tagged words with readings and example sentences, on spaced repetition",
       run: () => navigate("/learn"),
     },

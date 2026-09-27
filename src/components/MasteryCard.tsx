@@ -6,6 +6,7 @@ import { loadDoneChapters } from "../lib/learnProgress";
 import { pacing, effectiveStart, parsePause, pauseKey, progressByWeek, startDateKey, unlockedWeeks, weekProgress } from "../lib/mastery";
 import { loadFailed } from "../lib/failures";
 import { ProgressBar } from "./ui/Card";
+import { Icon } from "./ui";
 
 /** Dashboard summary of whichever mastery track is furthest along: where you
  * are, what is still outstanding this week, and whether you are behind pace.
@@ -92,7 +93,7 @@ export function MasteryCard() {
       <div className="row justify-between items-start gap-3">
         <div className="min-w-0">
           <strong>
-            🎓 {track.title} · Week {week} of {track.weeks.length}
+            <Icon name="mastery" size={15} /> {track.title} · Week {week} of {track.weeks.length}
           </strong>
           <p className="dim" style={{ margin: "4px 0 0", fontSize: 13 }}>
             {outstanding.length === 0

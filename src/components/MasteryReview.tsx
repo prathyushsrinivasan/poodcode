@@ -159,7 +159,7 @@ export function ReviewSession({
   return (
     <details className="card mastery-practice mb-4">
       <summary>
-        <strong>🔁 Review the weeks behind you</strong>{" "}
+        <strong>Review the weeks behind you</strong>{" "}
         <span className="dim quiz-note">
           a 10-question mixed sitting from {completed.length} finished weeks
           {revisit.length + weakChapters.length > 0 && ` · ${revisit.length + weakChapters.length} worth revisiting`}

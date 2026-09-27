@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { cheatSheet, cheatSheetMarkdown } from "../lib/cheatSheet";
 import { TS_ERRORS } from "../lib/tsErrors";
 import { Markdown } from "./Markdown";
+import { Icon } from "./ui";
 
 const GLOSSARY = new Map(TS_ERRORS.map((e) => [e.code, e.title]));
 
@@ -24,7 +25,7 @@ export function ChapterCheatSheet({ name, what, lesson }: { name: string; what: 
     <div>
       <div className="row justify-end mb-1">
         <button className="ghost" onClick={print}>
-          🖨 Print
+          <Icon name="document" size={14} /> Print
         </button>
       </div>
       <div className="cheat-sheet">

@@ -35,6 +35,7 @@ import Insights from "./pages/Insights";
 import Popout from "./pages/Popout";
 import Gallery from "./pages/Gallery";
 import { ignore } from "./lib/failures";
+import { Icon } from "./components/ui";
 // Dev-only: the component gallery is not part of the shipped app, and the
 // literal check lets the bundler drop it from a production build.
 const DEV_UI = import.meta.env.VITE_MOCK === "1";
@@ -214,7 +215,7 @@ function NotFound() {
   return (
     <div className="page notfound">
       <div className="big" aria-hidden>
-        🤔
+        <Icon name="map" size={40} strokeWidth={1.5} />
       </div>
       <h1 className="page-title">Nothing at that address</h1>
       <p className="page-sub">
@@ -222,7 +223,7 @@ function NotFound() {
       </p>
       <div className="row notfound-actions">
         <button className="primary" onClick={() => setPalette(true)}>
-          🔎 Search for it
+          <Icon name="search" size={14} /> Search for it
         </button>
         <button onClick={() => nav(-1)}>← Go back</button>
         <Link className="ghost-link" to="/">

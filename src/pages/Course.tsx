@@ -22,7 +22,7 @@ import {
 } from "../lib/learnProgress";
 import { collectExerciseIds, solvedLabel, studyTime } from "../lib/trackProgress";
 import { TrackSkeleton } from "../components/Skeleton";
-import { Badge, Card, CardHeader, EmptyState, Icon, PageHeader } from "../components/ui";
+import { Badge, Card, CardHeader, EmptyState, Icon, PageHeader, type IconName } from "../components/ui";
 import { Glossary, Milestone, SubHeading, UnitContents, UnitGoal, UnitList, UnitPart, scrollToPart } from "../components/track/UnitParts";
 import { ReaderLayout, ReadStatus, useSeenBottom } from "../components/reader/Reader";
 import { useCrumb } from "../store";
@@ -39,7 +39,7 @@ type Track = {
   load: () => Promise<WeeklyCourse>;
   /** Route base; detail pages live at `${base}/${unitNumber}`. */
   base: string;
-  icon: string;
+  icon: IconName;
   emptyText: string;
 };
 
@@ -47,7 +47,7 @@ const TS_TRACK: Track = {
   key: "ts",
   load: () => api.tsCourse(),
   base: "/course",
-  icon: "📗",
+  icon: "typescript",
   emptyText: "The TypeScript course isn't built yet.",
 };
 
@@ -55,7 +55,7 @@ const JAVA_TRACK: Track = {
   key: "java",
   load: () => api.javaCourse(),
   base: "/java-course",
-  icon: "☕",
+  icon: "java",
   emptyText: "The Java course isn't built yet.",
 };
 
@@ -214,12 +214,12 @@ function Overview({
               {nEx > 0 && <span className="badge">{nEx} exercises</span>}
               {nPractice > 0 && (
                 <span className="badge" title="Extra variation drilling — optional">
-                  🏋️ +{nPractice} practice
+                  +{nPractice} practice
                 </span>
               )}
               {w.capstone && (
                 <span className="badge accent" title={w.capstone.title}>
-                  🏆 project
+                  <Icon name="trophy" size={12} /> project
                 </span>
               )}
             </>

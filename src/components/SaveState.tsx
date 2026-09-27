@@ -8,6 +8,7 @@
  */
 
 import { useEffect, useState } from "react";
+import { Icon } from "./ui";
 
 export type SaveStatus = "idle" | "saving" | "saved" | "error";
 
@@ -69,7 +70,7 @@ export function SaveIndicator({
   if (status === "error") {
     return (
       <span className="save-state error" role="status">
-        <span aria-hidden>⚠</span> Not saved
+        <Icon name="warning" size={12} /> Not saved
         {error && <span className="faint save-state-detail">{error}</span>}
         {onRetry && (
           <button className="ghost link-button" onClick={onRetry}>

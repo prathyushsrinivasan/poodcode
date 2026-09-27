@@ -14,7 +14,7 @@ import {
   type PlacementStage,
   type RoutingQuestion,
 } from "../lib/dsaRecognition";
-import { EmptyState, ErrorState } from "../components/ui";
+import { EmptyState, ErrorState, Icon } from "../components/ui";
 import { loadFailed } from "../lib/failures";
 
 /**
@@ -121,7 +121,7 @@ function MixedSet({
         </button>
       </div>
       <h1 className="page-title mb-0">
-        🎲 Mixed set · {stage.title}
+        Mixed set · {stage.title}
       </h1>
       <p className="page-sub">
         Unlabelled problems from this stage and every earlier one. Name the technique
@@ -318,7 +318,7 @@ function Placement({
         </button>
       </div>
       <h1 className="page-title mb-0">
-        🎯 Placement
+        Placement
       </h1>
       <p className="page-sub">Skip what you already know, honestly.</p>
 
@@ -443,10 +443,10 @@ function PlacementCard({
 
           <div className="row mt-3 gap-2 flex-wrap">
             <span className={`${routed ? "" : "dim"} text-sm`}>
-              {picked === null ? "○" : routed ? "✅" : "❌"} Recognition
+              <Icon name={picked === null ? "todo" : routed ? "done" : "failed"} size={14} /> Recognition
             </span>
             <span className={`${solved ? "" : "dim"} text-sm`}>
-              {solved ? "✅" : "○"} Implementation
+              <Icon name={solved ? "done" : "todo"} size={14} /> Implementation
               {stage.problem && (
                 <>
                   {" — "}

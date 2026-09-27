@@ -6,7 +6,7 @@ import { DiffBadge } from "../components/common";
 import { formatClock } from "../lib/format";
 import { contestScore, secondsLeft } from "../lib/contest";
 import { useToast } from "../components/Toast";
-import { ErrorState } from "../components/ui";
+import { ErrorState, Icon } from "../components/ui";
 
 /**
  * A timed checkpoint — the scoreboard for one contest.
@@ -79,7 +79,7 @@ export default function Contest() {
         <span className="spacer" />
         {running ? (
           <span className={`contest-clock${left < 300 ? " warn" : ""}`} aria-live="polite">
-            ⏱ {formatClock(left)}
+            <Icon name="timer" size={16} /> {formatClock(left)}
           </span>
         ) : (
           <span className="badge contest-final">
@@ -96,7 +96,7 @@ export default function Contest() {
       <div className="card contest-table">
         {contest.results.map((r) => (
           <div key={r.problem_id} className="row contest-row">
-            <span aria-label={r.solved ? "solved" : "not solved"}>{r.solved ? "✅" : "⬜"}</span>
+            <Icon name={r.solved ? "done" : "todo"} size={15} label={r.solved ? "solved" : "not solved"} className={r.solved ? "is-good" : "faint"} />
             <strong>{r.title}</strong>
             <DiffBadge d={r.difficulty} />
             <span className="spacer" />

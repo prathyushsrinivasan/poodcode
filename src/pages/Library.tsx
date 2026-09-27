@@ -681,7 +681,7 @@ function StagePanel({
       </div>
 
       <div className="cur-stage-end" data-stage-end>
-        <span className="text-2xl">🎲</span>
+        <Icon name="shuffle" size={24} />
         <div style={{ flex: 1, minWidth: 220 }}>
           <strong>Finished the stage? Try the mixed set.</strong>
           <div className="dim text-sm">

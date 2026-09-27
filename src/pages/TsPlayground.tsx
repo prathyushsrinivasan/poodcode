@@ -400,7 +400,7 @@ export default function TsPlayground() {
 
   return (
     <div className="page">
-      <h1 className="page-title">🧪 TypeScript playground</h1>
+      <h1 className="page-title">TypeScript playground</h1>
       <p className="page-sub">
         A scratch file, and what the compiler thinks of it — types expanded, narrowing line by line, the
         JavaScript that actually runs, and the strictness flags that change the verdict.{" "}

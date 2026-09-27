@@ -56,7 +56,7 @@ export function CapstonePractice({ week, trackKey }: { week: MasteryWeek; trackK
       {mocks.length > 0 && (
         <details className="card mastery-practice" open>
           <summary>
-            <strong>🎙 Mock interviews</strong>{" "}
+            <strong>Mock interviews</strong>{" "}
             <span className="dim quiz-note">
               {mocks.length} timed sessions · idiom questions, a problem and a type puzzle ·
               self-scored
@@ -80,7 +80,7 @@ export function CapstonePractice({ week, trackKey }: { week: MasteryWeek; trackK
       {reviews.length > 0 && (
         <details className="card mastery-practice">
           <summary>
-            <strong>🔍 Code review</strong>{" "}
+            <strong>Code review</strong>{" "}
             <span className="dim quiz-note">
               {reviews.filter((r) => parseReviewState(settings[reviewKey(trackKey, r.id)]).compared).length}/
               {reviews.length} reviewed · write the comments, then compare with the model review
@@ -132,7 +132,7 @@ function InterviewBank({ bank }: { bank: MasteryInterviewQ[] }) {
   return (
     <details className="card mastery-practice">
       <summary>
-        <strong>🎤 Interview question bank</strong>{" "}
+        <strong>Interview question bank</strong>{" "}
         <span className="dim quiz-note">
           {bank.length} questions across {topics.length} topics, each with a model answer
         </span>
@@ -152,7 +152,7 @@ function InterviewBank({ bank }: { bank: MasteryInterviewQ[] }) {
         ))}
         <span className="spacer" />
         <button className="ghost" onClick={randomQuestion}>
-          🎲 Ask me one
+          <Icon name="shuffle" size={14} /> Ask me one
         </button>
       </div>
 
@@ -269,7 +269,7 @@ function MockSessionCard({
             style={{ fontFamily: "var(--font-mono)", color: left < 0 ? "var(--bad)" : undefined }}
             title="Time left in the session"
           >
-            {left >= 0 ? `⏱ ${formatClock(left)} left` : `⏱ ${formatClock(-left)} over`}
+            <Icon name="timer" size={12} /> {left >= 0 ? `${formatClock(left)} left` : `${formatClock(-left)} over`}
           </span>
         ) : (
           <button onClick={start}>Start the clock</button>

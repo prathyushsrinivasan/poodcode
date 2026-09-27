@@ -1503,7 +1503,7 @@ function ProjectPanel({
     >
       <div className="row justify-between items-start">
         <div className="io-label" style={{ color: shipped ? "var(--good)" : "var(--accent)" }}>
-          🔨 {spec ? `Build it: ${spec.title}` : "Build it yourself"} {shipped && "— shipped"}
+          <Icon name="build" size={14} /> {spec ? `Build it: ${spec.title}` : "Build it yourself"} {shipped && "— shipped"}
         </div>
         <button
           className="ghost"
@@ -1756,7 +1756,7 @@ function QuizPanel({
     <div className="card mb-3">
       <div className="row justify-between items-center">
         <div className="io-label m-0">
-          📝 End-of-week quiz
+          <Icon name="checklist" size={14} /> End-of-week quiz
         </div>
         <span className="dim text-xs">
           {paper.length} of {week.quiz.length} in the bank · {track.pass_mark}% to pass
@@ -1995,7 +1995,7 @@ function ExamPanel({
     >
       <div className="row justify-between items-center">
         <div className="io-label" style={{ margin: 0, color: passed ? "var(--good)" : "var(--accent)" }}>
-          🧪 Coding final — {exam.title} {passed && "✓"}
+          <Icon name="playground" size={14} /> Coding final — {exam.title} {passed && "✓"}
         </div>
         <span className="row gap-1">
           {versions.length > 1 && (
@@ -2069,8 +2069,8 @@ function ExamPanel({
           title="Hide the sidebar and top bar, and time yourself. Nothing is gated on the time."
         >
           {focusStart === null
-            ? "🎯 Focus mode"
-            : `⏱ ${Math.floor(focusSeconds / 60)}:${String(focusSeconds % 60).padStart(2, "0")} · leave focus`}
+            ? "Focus mode"
+            : `${Math.floor(focusSeconds / 60)}:${String(focusSeconds % 60).padStart(2, "0")} · leave focus`}
         </button>
         {focusResult && <span className="dim quiz-note">Passed in focus mode in {focusResult}.</span>}
         {versions.length > 1 && !passed && failedOnce && (

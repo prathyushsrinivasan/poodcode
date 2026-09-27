@@ -5,6 +5,7 @@ import { useToast } from "./Toast";
 import { mulberry32, mutateInput, hasMutablePayload, type GenMode } from "../lib/testgen";
 import { EmptyState } from "./ui/States";
 import { loadFailed } from "../lib/failures";
+import { Icon } from "./ui";
 
 interface Props {
   problemId: number;
@@ -157,7 +158,7 @@ export function TestCaseManager({ problemId, cases, onChange }: Props) {
       <div className="row wrap mb-2">
         <button onClick={() => setEditing(blank())}>+ Add case</button>
         <button className={showGen ? "primary" : ""} onClick={() => setShowGen((v) => !v)}>
-          ✨ Generate cases
+          <Icon name="sparkles" size={14} /> Generate cases
         </button>
       </div>
 

@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { splitPitfalls } from "../lib/lessonSections";
 import { InlineMarkdown, Markdown } from "./Markdown";
+import { Icon } from "./ui";
 
 export function LessonMarkdown({ children }: { children: string }) {
   const parts = useMemo(() => splitPitfalls(children), [children]);
@@ -18,7 +19,7 @@ export function LessonMarkdown({ children }: { children: string }) {
         <details key={i} className="card pitfall-card">
           <summary>
             <span className="pitfall-mark" aria-hidden>
-              ⚠
+              <Icon name="warning" size={14} />
             </span>{" "}
             <InlineMarkdown>{p.title}</InlineMarkdown>
           </summary>

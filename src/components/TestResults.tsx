@@ -91,8 +91,17 @@ export function TestResults({ report }: { report: JudgeReport | null }) {
     re: "Runtime error",
     trunc: "Output too long",
   };
+  // Colour is never the only signal: each verdict has its own glyph and a label.
   const verdictIcon = (r: { passed: boolean; timed_out: boolean; verdict: string }) =>
-    r.passed ? "✅" : r.verdict === "tle" || r.timed_out ? "⏰" : r.verdict === "re" ? "💥" : "❌";
+    r.passed ? (
+      <Icon name="done" size={15} label="Passed" className="is-good" />
+    ) : r.verdict === "tle" || r.timed_out ? (
+      <Icon name="timer" size={15} label="Time limit exceeded" className="is-bad" />
+    ) : r.verdict === "re" ? (
+      <Icon name="warning" size={15} label="Runtime error" className="is-bad" />
+    ) : (
+      <Icon name="failed" size={15} label="Wrong answer" className="is-bad" />
+    );
 
   return (
     <div>
