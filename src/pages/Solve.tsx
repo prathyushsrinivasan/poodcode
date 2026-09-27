@@ -1451,7 +1451,13 @@ function EditorialTab({
                     {e.time && <span className="badge">⏱ {e.time}</span>}
                     {e.space && <span className="badge">💾 {e.space}</span>}
                   </div>
-                  {e.body && <p className="dim" style={{ marginBottom: 0 }}>{e.body}</p>}
+                  {/* Markdown: editorial bodies quote code (`x`) and the
+                      Idiomatic TypeScript one carries a whole answer. */}
+                  {e.body && (
+                    <div className="dim" style={{ marginBottom: 0 }}>
+                      <Markdown>{e.body}</Markdown>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
