@@ -65,11 +65,12 @@
 .card-header {
   display: flex;
   align-items: flex-start;
-  gap: var(--space-3);
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
   margin-bottom: var(--space-3);
 }
 .card-header-text {
-  flex: 1;
+  flex: 1 1 240px;
   min-width: 0;
 }
 .card-title {
@@ -95,6 +96,7 @@ h4.card-title {
 .card-header-actions {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: var(--space-2);
   flex: none;
 }
@@ -103,11 +105,12 @@ h4.card-title {
 .page-header {
   display: flex;
   align-items: flex-start;
-  gap: var(--space-4);
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-4);
   margin-bottom: var(--space-5);
 }
 .page-header-text {
-  flex: 1;
+  flex: 1 1 320px;
   min-width: 0;
 }
 .page-header .page-sub {

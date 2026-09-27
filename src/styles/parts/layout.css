@@ -90,9 +90,20 @@
   position: relative;
 }
 .page {
-  padding: 26px 32px 60px;
+  /* Page gutters are variables so anything that bleeds to the page edge (the
+     reading bar) bleeds by exactly the gutter at every layout class (J1). */
+  --page-pad-top: 26px;
+  --page-pad-x: 32px;
+  padding: var(--page-pad-top) var(--page-pad-x) 60px;
   max-width: 1180px;
   margin: 0 auto;
+}
+[data-layout="compact"] .page {
+  --page-pad-top: 20px;
+  --page-pad-x: 20px;
+}
+[data-layout="wide"] .page:not(.page-wide) {
+  max-width: 1280px;
 }
 .page-wide {
   max-width: none;

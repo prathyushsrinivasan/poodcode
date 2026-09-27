@@ -9,6 +9,7 @@ import { Sidebar } from "./components/shell/Sidebar";
 import { TopBar } from "./components/shell/TopBar";
 import { ShortcutSheet } from "./components/shell/ShortcutSheet";
 import { ScrollRestore } from "./components/shell/ScrollRestore";
+import { layoutClass, shouldAutoCollapse, type LayoutClass } from "./lib/layout";
 
 import Today from "./pages/Dashboard";
 import Library from "./pages/Library";
@@ -42,25 +43,45 @@ const DEV_UI = import.meta.env.VITE_MOCK === "1";
  * the preference is borrowed rather than overwritten. */
 const EDITOR_ROUTES = [/^\/solve\//, /^\/projects\/[^/]+\/workbench/];
 
-function useAutoCollapse() {
+/** The window's layout class (see lib/layout), kept current on resize. */
+function useLayoutClass(): LayoutClass {
+  const [layout, setLayout] = useState<LayoutClass>(() => layoutClass(window.innerWidth));
+  useEffect(() => {
+    // Observing the root element rather than listening for `resize` also
+    // catches viewport changes that fire no resize event (zoom, emulation).
+    const update = () => setLayout(layoutClass(document.documentElement.clientWidth || window.innerWidth));
+    const ro = new ResizeObserver(update);
+    ro.observe(document.documentElement);
+    window.addEventListener("resize", update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+  return layout;
+}
+
+function useAutoCollapse(layout: LayoutClass) {
   const { pathname } = useLocation();
   const setSidebarAuto = useStore((s) => s.setSidebarAuto);
 
   useEffect(() => {
     const isEditor = EDITOR_ROUTES.some((r) => r.test(pathname));
     // `null` hands control back to the saved preference rather than forcing the
-    // sidebar open — leaving an editor page should restore what you chose, not
-    // override it in the other direction.
-    setSidebarAuto(isEditor ? true : null);
-  }, [pathname, setSidebarAuto]);
+    // sidebar open — leaving an editor page (or widening the window) should
+    // restore what you chose, not override it in the other direction. Runs on
+    // navigation and on crossing a layout line, not on your own toggles.
+    setSidebarAuto(shouldAutoCollapse(layout, isEditor) ? true : null);
+  }, [pathname, layout, setSidebarAuto]);
 }
 
 function Shell() {
-  useAutoCollapse();
+  const layout = useLayoutClass();
+  useAutoCollapse(layout);
   const collapsed = useStore((s) => s.sidebarAuto ?? s.prefs.sidebarCollapsed);
 
   return (
-    <div className={`app ${collapsed ? "sidebar-collapsed" : ""}`}>
+    <div className={`app ${collapsed ? "sidebar-collapsed" : ""}`} data-layout={layout}>
       <Sidebar />
       <TopBar />
       <ScrollRestore />

@@ -20,7 +20,7 @@ import { SaveIndicator, useSaveState } from "../components/SaveState";
 import { formatMemory } from "../lib/format";
 import { lineDiff, diffStats } from "../lib/diff";
 import type { Attempt, JudgeReport, Mistake, Note, Problem, Solution, TestCase } from "../types";
-import { EmptyState } from "../components/ui";
+import { Button, EmptyState, IconButton } from "../components/ui";
 import { ignore, saveFailed } from "../lib/failures";
 
 type LeftTab =
@@ -574,60 +574,47 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
             error={draftSave.error}
             onRetry={() => void draftSave.track(() => api.saveDraft(pid, langId, code))}
           />
-          <button
-            onClick={() => leftEditor.current?.format()}
-            title="Format document (Alt+Shift+F)"
-            aria-label="Format document"
-          >
-            ⌗
-          </button>
-          <button
-            className={split ? "primary" : ""}
-            onClick={() => setSplit((s) => !s)}
-            title="Split editor — edit two language buffers side by side"
-            aria-label="Split editor"
+          <IconButton icon="braces" label="Format document" shortcut="Alt+Shift+F" onClick={() => leftEditor.current?.format()} />
+          <IconButton
+            icon="columns"
+            variant={split ? "primary" : "ghost"}
+            label="Split editor — edit two language buffers side by side"
             aria-pressed={split}
-          >
-            ⊟
-          </button>
-          <button
-            onClick={() => setCode(starterFor(problem.starter_code, langId))}
-            title="Reset to the starter code"
-            aria-label="Reset to the starter code"
-          >
-            ↺
-          </button>
-          {/* "Custom stdin (for Run)" used to live at the bottom of the
-              results tabs, which is the last place anyone looks for it. */}
-          <div className="split-button">
-            <button onClick={run} disabled={running}>
-              ▶ Run
-            </button>
-            <button
-              className={customStdin ? "primary" : ""}
-              onClick={() => {
-                setRightTab("results");
-                setShowStdin((v) => !v);
-              }}
-              title="Run with your own input"
-              aria-label="Run with my own input"
-              aria-pressed={showStdin}
-            >
-              ⌨
-            </button>
+            onClick={() => setSplit((s) => !s)}
+          />
+          <IconButton icon="reset" label="Reset to the starter code" onClick={() => setCode(starterFor(problem.starter_code, langId))} />
+          {/* Run and Submit stay pinned to the right edge: at the window's
+              minimum width the toolbar scrolls, and the actions are the one
+              part of it that must never scroll out of reach (J1). */}
+          <div className="solve-primary">
+            {/* "Custom stdin (for Run)" used to live at the bottom of the
+                results tabs, which is the last place anyone looks for it. */}
+            <div className="split-button">
+              <Button icon="run" onClick={run} disabled={running} shortcut="Ctrl+Enter">
+                Run
+              </Button>
+              <IconButton
+                icon="keyboard"
+                variant={customStdin ? "primary" : "secondary"}
+                label="Run with my own input"
+                aria-pressed={showStdin}
+                onClick={() => {
+                  setRightTab("results");
+                  setShowStdin((v) => !v);
+                }}
+              />
+            </div>
+            <Button variant="primary" icon="submit" onClick={submit} disabled={running} shortcut="Ctrl+Shift+Enter">
+              Submit
+            </Button>
+            <IconButton
+              icon={layout.focus ? "shrink" : "expand"}
+              label="Focus mode — hide everything but the editor"
+              shortcut="F11"
+              aria-pressed={layout.focus}
+              onClick={() => setLayout({ focus: !layout.focus })}
+            />
           </div>
-          <button className="primary" onClick={submit} disabled={running}>
-            ⏎ Submit
-          </button>
-          <button
-            className="ghost"
-            onClick={() => setLayout({ focus: !layout.focus })}
-            title="Focus mode — hide everything but the editor (F11)"
-            aria-label="Toggle focus mode"
-            aria-pressed={layout.focus}
-          >
-            {layout.focus ? "⤢" : "⛶"}
-          </button>
         </div>
 
         {langInfo && !langInfo.installed && (

@@ -269,6 +269,11 @@ export function ReaderLayout({
         <aside className="reader-rail" aria-label="Page navigation">
           {aside}
           <PageOutline rootRef={bodyRef} title={outlineTitle} />
+          {/* The same outline, folded, for a compact window (CSS picks one). */}
+          <details className="reader-outline-fold">
+            <summary>{outlineTitle ?? "On this page"}</summary>
+            <PageOutline rootRef={bodyRef} title={outlineTitle} />
+          </details>
         </aside>
       </div>
     </div>

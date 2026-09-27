@@ -16,7 +16,8 @@
     "test:watch": "vitest",
     "typecheck": "tsc -b --noEmit",
     "check:contrast": "node tools/contrast.mjs",
-    "check:styles": "node tools/inline-styles.mjs"
+    "check:styles": "node tools/inline-styles.mjs",
+    "check:layout": "node tools/layout-check.mjs"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.6.0",

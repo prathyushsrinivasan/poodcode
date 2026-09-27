@@ -12,7 +12,7 @@
   top: 0;
   z-index: var(--z-sticky);
   height: 3px;
-  margin: calc(-1 * var(--space-5)) calc(-1 * var(--space-6)) var(--space-5);
+  margin: calc(-1 * var(--page-pad-top, 24px)) calc(-1 * var(--page-pad-x, 32px)) var(--space-5);
   background: transparent;
 }
 .reading-bar > span {
@@ -46,40 +46,46 @@
   padding-bottom: var(--space-4);
 }
 
-/* The rail needs room: under ~1100px of page it goes above the content. */
-@media (max-width: 1280px) {
-  .sidebar-collapsed .reader-layout {
-    grid-template-columns: minmax(0, 1fr) 190px;
-  }
+/* The layout contract (lib/layout.ts, J1): the rail narrows in a regular
+   window, and in a compact one it moves above the content, where the outline
+   becomes a disclosure rather than a column the body cannot spare. */
+[data-layout="regular"] .reader-layout {
+  grid-template-columns: minmax(0, 1fr) 190px;
+  gap: var(--space-5);
 }
-@media (max-width: 1180px) {
-  .app:not(.sidebar-collapsed) .reader-layout {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .app:not(.sidebar-collapsed) .reader-rail {
-    position: static;
-    max-height: none;
-    order: -1;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: flex-start;
-  }
-  .app:not(.sidebar-collapsed) .reader-rail .outline {
-    display: none;
-  }
+[data-layout="compact"] .reader-layout {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
 }
-@media (max-width: 1000px) {
-  .reader-layout {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .reader-rail {
-    position: static;
-    max-height: none;
-    order: -1;
-  }
-  .reader-rail .outline {
-    display: none;
-  }
+[data-layout="compact"] .reader-rail {
+  position: static;
+  max-height: none;
+  order: -1;
+  padding-bottom: 0;
+}
+[data-layout="compact"] .reader-rail > .outline {
+  display: none;
+}
+.reader-outline-fold {
+  display: none;
+}
+[data-layout="compact"] .reader-outline-fold {
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-elev);
+}
+.reader-outline-fold > summary {
+  cursor: pointer;
+  font-size: var(--text-sm);
+  color: var(--text-dim);
+}
+.reader-outline-fold[open] > summary {
+  margin-bottom: var(--space-2);
+}
+.reader-outline-fold .outline-title {
+  display: none;
 }
 
 /* ---- Outline ---- */
