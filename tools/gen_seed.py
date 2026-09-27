@@ -6090,6 +6090,10 @@ _tsc_path = os.path.join(HERE, "typescript_course.py")
 if os.path.exists(_tsc_path):
     with open(_tsc_path, encoding="utf-8") as _tcf:
         exec(compile(_tcf.read(), _tsc_path, "exec"))
+# Key terms for every TypeScript chapter (X-08), from the course's glossary.
+_tsgl_path = os.path.join(HERE, "ts_chapter_glossary.py")
+with open(_tsgl_path, encoding="utf-8") as _tsglf:
+    exec(compile(_tsglf.read(), _tsgl_path, "exec"))
 
 
 # ---------------------------------------------------------------------------

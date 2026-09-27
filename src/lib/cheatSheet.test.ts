@@ -53,3 +53,14 @@ describe("cheatSheet", () => {
     expect(md).toContain("- **`||` swallows zero** — `0` is falsy");
   });
 });
+
+describe("cheatSheet key terms", () => {
+  it("reads the Key terms section", () => {
+    const s = cheatSheet("### Key terms\n- **narrowing** — Proving a value's type.\n- **guard** — A check.", new Map());
+    expect(s.terms).toEqual([
+      { term: "narrowing", def: "Proving a value's type." },
+      { term: "guard", def: "A check." },
+    ]);
+    expect(cheatSheetMarkdown("N", "w", s)).toContain("**Key terms**\n\n- **narrowing** — Proving a value's type.");
+  });
+});

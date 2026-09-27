@@ -11,6 +11,8 @@ export type CheatSheet = {
   errors: { code: number; title: string }[];
   pitfalls: { title: string; gist: string }[];
   questions: string[];
+  /** X-08: the chapter's "Key terms" section, `- **term** — definition`. */
+  terms: { term: string; def: string }[];
 };
 
 /** The lines of `md` outside fenced code blocks. */
@@ -73,7 +75,12 @@ export function cheatSheet(lesson: string, glossary: Map<number, string>): Cheat
     .map((ln) => /^\*\*(.+)\*\*$/.exec(ln.trim())?.[1])
     .filter((q): q is string => !!q);
 
-  return { examples, errors, pitfalls, questions };
+  const terms = prose(section(lesson, /^Key terms$/))
+    .map((ln) => /^- \*\*(.+?)\*\* — (.+)$/.exec(ln.trim()))
+    .filter((m): m is RegExpExecArray => m !== null)
+    .map((m) => ({ term: m[1]!, def: m[2]! }));
+
+  return { examples, errors, pitfalls, questions, terms };
 }
 
 /** The sheet as Markdown, for display and printing. */
@@ -84,6 +91,7 @@ export function cheatSheetMarkdown(name: string, what: string, s: CheatSheet): s
     parts.push("**Errors you will meet**\n\n" + s.errors.map((e) => `- \`TS${e.code}\`${e.title ? " — " + e.title : ""}`).join("\n"));
   if (s.pitfalls.length)
     parts.push("**Pitfalls**\n\n" + s.pitfalls.map((p) => `- **${p.title}**${p.gist ? " — " + p.gist : ""}`).join("\n"));
+  if (s.terms.length) parts.push("**Key terms**\n\n" + s.terms.map((t) => `- **${t.term}** — ${t.def}`).join("\n"));
   if (s.questions.length) parts.push("**Can you answer?**\n\n" + s.questions.map((q) => `- ${q}`).join("\n"));
   return parts.join("\n\n");
 }
