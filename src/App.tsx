@@ -18,7 +18,7 @@ import CurriculumDrill from "./pages/CurriculumDrill";
 import Solve from "./pages/Solve";
 import Settings from "./pages/Settings";
 import ProblemForm from "./pages/ProblemForm";
-import Learn from "./pages/Learn";
+import Learn, { JapanesePage } from "./pages/Learn";
 import Course, { JavaCourse } from "./pages/Course";
 import Backend from "./pages/Backend";
 import Projects from "./pages/Projects";
@@ -74,6 +74,7 @@ function Shell() {
           <Route path="/library/mixed/:stage" element={<CurriculumDrill view="mixed" />} />
           <Route path="/learn" element={<Learn />} />
           <Route path="/learn/:key" element={<Learn />} />
+          <Route path="/japanese" element={<JapanesePage />} />
           <Route path="/course" element={<Course />} />
           <Route path="/course/:week" element={<Course />} />
           <Route path="/java-course" element={<JavaCourse />} />

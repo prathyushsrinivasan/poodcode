@@ -1,4 +1,5 @@
-import { useCallback, useState } from "react";
+import { useCallback, useId, useState } from "react";
+import { Icon } from "./ui/Icon";
 
 // Collapse state for Learn-tab sections. This is pure UI convenience, so it
 // lives in localStorage next to the chapter-done checkmarks and exercise
@@ -87,10 +88,22 @@ export function useCollapse(namespace: string, defaultOpen = true) {
   return { isOpen, toggle, setAll, open };
 }
 
-/** A section with a clickable header that shows/hides its body.
+/** Leading emoji or symbols in a title, which the outline does not want. */
+function plainTitle(title: React.ReactNode): string | undefined {
+  if (typeof title !== "string") return undefined;
+  return title.replace(/^[^\p{L}\p{N}]+/u, "").trim() || title;
+}
+
+/** A section with a disclosure header that shows/hides its body.
  *
  * `meta` renders on the right of the header (counts, progress) and stays
- * visible when collapsed, so a folded section still tells you what's inside. */
+ * visible when collapsed, so a folded section still tells you what's inside.
+ *
+ * The header is a real `<button aria-expanded>` inside the heading — the
+ * disclosure pattern — rather than a `div role="button"` wrapping the heading,
+ * which hid the heading from anyone navigating by headings (UI_ROADMAP D9).
+ * The section also names itself for the page outline (G4): `outline` if
+ * given, else a string title without its leading emoji. */
 export function Section({
   title,
   open,
@@ -99,6 +112,7 @@ export function Section({
   level = "h3",
   accent,
   id,
+  outline,
   children,
 }: {
   title: React.ReactNode;
@@ -107,7 +121,7 @@ export function Section({
   meta?: React.ReactNode;
   /** Visual weight of the header — "h3" for page sections, "h4" for nested. */
   level?: "h3" | "h4";
-  /** Tint the header text (e.g. "var(--accent)" for the challenge section). */
+  /** Tint the header with the accent (the challenge section). */
   accent?: string;
   /**
    * DOM id, so the section can be linked to (`#pitfalls`) and scrolled to.
@@ -115,35 +129,35 @@ export function Section({
    * the app, in one click — which needs an anchor to aim at.
    */
   id?: string;
+  /** Its name in the page outline; `false` leaves it out. */
+  outline?: string | false;
   children: React.ReactNode;
 }) {
+  const Heading = level;
+  const bodyId = useId();
+  const outlineText = outline === false ? undefined : outline ?? plainTitle(title);
   return (
-    <div className="collapsible" id={id}>
-      <div
-        className="collapsible-head"
-        role="button"
-        tabIndex={0}
-        aria-expanded={open}
-        onClick={onToggle}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            onToggle();
-          }
-        }}
-      >
-        <span className={`caret ${open ? "open" : ""}`} aria-hidden>
-          ▸
-        </span>
-        {level === "h3" ? (
-          <h3 style={{ margin: 0, color: accent }}>{title}</h3>
-        ) : (
-          <h4 style={{ margin: 0, color: accent }}>{title}</h4>
-        )}
-        <span className="spacer" />
-        {meta}
+    <section className="collapsible" id={id} data-outline={outlineText}>
+      <div className="collapsible-row">
+        <Heading className={`collapsible-heading ${accent ? "accent" : ""}`}>
+          <button
+            type="button"
+            className="collapsible-head"
+            aria-expanded={open}
+            aria-controls={bodyId}
+            onClick={onToggle}
+          >
+            <Icon name="chevronRight" size={14} className={`caret ${open ? "open" : ""}`} />
+            <span className="collapsible-title">{title}</span>
+          </button>
+        </Heading>
+        {meta && <div className="collapsible-meta">{meta}</div>}
       </div>
-      {open && <div className="collapsible-body">{children}</div>}
-    </div>
+      {open && (
+        <div className="collapsible-body" id={bodyId}>
+          {children}
+        </div>
+      )}
+    </section>
   );
 }

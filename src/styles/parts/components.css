@@ -906,3 +906,25 @@ table.data thead th {
 .gallery-card {
   width: 280px;
 }
+
+/* A table that is reference, not a list of things to open. */
+.table-card {
+  padding: 0;
+  overflow-x: auto;
+}
+table.data.static th,
+table.data.static tbody tr {
+  cursor: default;
+}
+table.data.static tbody tr:hover {
+  background: none;
+}
+.nowrap {
+  white-space: nowrap;
+}
+.cell-small {
+  font-size: var(--text-xs);
+}
+.endpoint-method {
+  color: var(--accent);
+}

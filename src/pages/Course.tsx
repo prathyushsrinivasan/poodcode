@@ -22,7 +22,11 @@ import {
 } from "../lib/learnProgress";
 import { collectExerciseIds, solvedLabel, studyTime } from "../lib/trackProgress";
 import { TrackSkeleton } from "../components/Skeleton";
-import { EmptyState } from "../components/ui";
+import { Badge, Card, CardHeader, EmptyState, Icon, PageHeader } from "../components/ui";
+import { Glossary, Milestone, SubHeading, UnitContents, UnitGoal, UnitList, UnitPart, scrollToPart } from "../components/track/UnitParts";
+import { ReaderLayout, ReadStatus, useSeenBottom } from "../components/reader/Reader";
+import { useCrumb } from "../store";
+import { inlineCode } from "../components/common";
 import { loadFailed } from "../lib/failures";
 
 // This page renders both structured courses. They share a data model, a judge
@@ -245,25 +249,22 @@ function UnitDetail({
   prev: CourseWeek | null;
   next: CourseWeek | null;
 }) {
-  const nav = useNavigate();
   const toast = useToast();
+  useCrumb(week.theme, `${labels.unit} ${week.number}`);
   const [solvedEx, setSolvedEx] = useState<Set<string>>(() => solvedExercises());
-  const [scrolledToBottom, setScrolledToBottom] = useState(false);
-  const bottomRef = useRef<HTMLDivElement | null>(null);
+  const [bottomRef, seenBottom] = useSeenBottom(week.number);
   const celebrated = useRef(false);
   // Lessons start collapsed: a unit now runs to forty-odd exercises, and each
-  // open lesson mounts a Monaco editor per exercise. The contents card below is
-  // how you navigate them.
+  // open lesson mounts a Monaco editor per exercise. The contents list below
+  // and the outline rail are how you navigate them.
   const sec = useCollapse(`course-sec:${track.key}:w${week.number}`, false);
   const lessons = week.lessons ?? [];
   const lessonKeys = useMemo(() => lessons.map((l) => l.key), [lessons]);
+  const unit = labels.unit.toLowerCase();
 
   function openLesson(key: string) {
     if (!sec.isOpen(key)) sec.toggle(key);
-    // Let the body mount before scrolling to it.
-    requestAnimationFrame(() =>
-      document.getElementById(`lesson-${key}`)?.scrollIntoView({ behavior: "smooth", block: "start" })
-    );
+    scrollToPart(`lesson-${key}`);
   }
 
   const gradableIds = useMemo(() => requiredExerciseIds(week), [week]);
@@ -274,10 +275,7 @@ function UnitDetail({
   // module completes on its lessons and capstone, so adding 25 more problems
   // never moves the finish line further away.
   const practice = week.practice ?? [];
-  const practiceIds = useMemo(
-    () => practice.flatMap((f) => (f.exercises ?? []).map((e) => e.id)),
-    [practice]
-  );
+  const practiceIds = useMemo(() => practice.flatMap((f) => (f.exercises ?? []).map((e) => e.id)), [practice]);
   const practiceCount = practiceIds.length;
   const practiceSolved = practiceIds.filter((id) => solvedEx.has(id)).length;
 
@@ -293,366 +291,227 @@ function UnitDetail({
   }, []);
 
   useEffect(() => {
-    const el = bottomRef.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) setScrolledToBottom(true);
-      },
-      { threshold: 0.01 }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [week.number]);
-
-  useEffect(() => {
-    if (!isDone && scrolledToBottom && allSolved && !celebrated.current) {
+    if (!isDone && seenBottom && allSolved && !celebrated.current) {
       celebrated.current = true;
       onSetDone(true);
-      const head = `🎉 ${labels.unit} ${week.number} complete!`;
-      toast(week.milestone ? `${head} ${week.milestone}` : head);
+      const head = `${labels.unit} ${week.number} complete!`;
+      toast.success(week.milestone ? `${head} ${week.milestone}` : head);
     }
-  }, [isDone, scrolledToBottom, allSolved, onSetDone, toast, week.milestone, week.number, labels.unit]);
+  }, [isDone, seenBottom, allSolved, onSetDone, toast, week.milestone, week.number, labels.unit]);
+
+  const steps = [
+    { label: "Read to the end", met: seenBottom || isDone },
+    ...(gradableIds.length > 0
+      ? [{ label: `Solve the exercises (${solvedCount}/${gradableIds.length})`, met: allSolved }]
+      : []),
+  ];
 
   const cap = week.capstone;
 
   return (
-    <div className="page">
-      <div className="row" style={{ marginBottom: 4, justifyContent: "space-between" }}>
-        <div className="row">
-          <button className="ghost" onClick={() => nav(track.base)}>
-            ← Course
-          </button>
-          <span className="badge">
-            {labels.unit} {week.number} · {labels.group} {week.month}
-          </span>
-          {week.est_minutes > 0 && <span className="badge">⏱️ {studyTime(week.est_minutes)}</span>}
-        </div>
-        <button
-          className="ghost"
-          style={isDone ? { borderColor: "var(--good)", color: "var(--good)" } : undefined}
-          onClick={() => onSetDone(!isDone)}
-          title={isDone ? "Marked complete — click to undo" : `Mark this ${labels.unit.toLowerCase()} complete`}
-        >
-          {isDone ? "✓ Done" : "Mark done"}
-        </button>
-      </div>
+    <div className="page course-unit">
+      <ReaderLayout aside={<ReadStatus steps={steps} complete={isDone} onToggle={() => onSetDone(!isDone)} />}>
+        <PageHeader
+          eyebrow={
+            <>
+              {labels.unit} {week.number} · {labels.group} {week.month}
+              {week.est_minutes > 0 && (
+                <>
+                  {" "}
+                  · <Icon name="clock" size={12} /> {studyTime(week.est_minutes)}
+                </>
+              )}
+            </>
+          }
+          title={week.theme}
+        />
 
-      <h1 className="page-title" style={{ marginTop: 6 }}>
-        {week.theme}
-      </h1>
+        <UnitGoal label={`This ${unit}'s goal`} goal={week.goal} why={week.why} />
+        <UnitList label={`By the end of this ${unit} you can…`} items={week.objectives} />
+        {week.summary && <Markdown>{week.summary}</Markdown>}
 
-      <div className="card" style={{ marginBottom: 14, borderColor: "var(--accent)" }}>
-        <div className="io-label" style={{ color: "var(--accent)" }}>
-          🎯 This {labels.unit.toLowerCase()}'s goal
-        </div>
-        <p style={{ marginBottom: week.why ? 8 : 0 }}>{week.goal}</p>
-        {week.why && (
-          <p className="dim" style={{ margin: 0, fontSize: 13 }}>
-            💡 Why it matters: {week.why}
-          </p>
-        )}
-      </div>
-
-      {week.objectives.length > 0 && (
-        <div className="card" style={{ marginBottom: 14 }}>
-          <div className="io-label">By the end of this {labels.unit.toLowerCase()} you can…</div>
-          <ul style={{ margin: "6px 0 0", paddingLeft: 20 }}>
-            {week.objectives.map((o, i) => (
-              <li key={i} style={{ marginBottom: 2 }}>{o}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {week.summary && <Markdown>{week.summary}</Markdown>}
-
-      {lessons.length > 0 && (
-        <div className="card" style={{ marginBottom: 14 }}>
-          <div className="row" style={{ marginBottom: 8 }}>
-            <div className="io-label" style={{ margin: 0 }}>
-              📚 Lessons in this {labels.unit.toLowerCase()}
-            </div>
-            <span className="spacer" />
-            <button
-              className="ghost"
-              style={{ padding: "2px 8px", fontSize: 12 }}
-              onClick={() => sec.setAll(lessonKeys, true)}
-            >
-              Expand all
-            </button>
-            <button
-              className="ghost"
-              style={{ padding: "2px 8px", fontSize: 12 }}
-              onClick={() => sec.setAll(lessonKeys, false)}
-            >
-              Collapse all
-            </button>
-          </div>
-          {lessons.map((lesson, li) => {
-            const ids = (lesson.exercises ?? []).map((e) => e.id);
-            const n = ids.filter((id) => solvedEx.has(id)).length;
-            const complete = ids.length > 0 && n === ids.length;
-            return (
-              <div
-                key={lesson.key}
-                className="row"
-                style={{
-                  cursor: "pointer",
-                  gap: 8,
-                  padding: "5px 0",
-                  borderBottom: li < lessons.length - 1 ? "1px solid var(--border)" : undefined,
-                }}
-                onClick={() => openLesson(lesson.key)}
-              >
-                <span style={{ color: complete ? "var(--good)" : "var(--accent)", width: 18 }}>
-                  {complete ? "✓" : li + 1}
-                </span>
-                <span style={{ flex: 1 }}>
-                  {lesson.title}
-                  {lesson.what && (
-                    <span className="faint" style={{ fontSize: 12 }}>
-                      {" "}
-                      — {lesson.what}
-                    </span>
-                  )}
-                </span>
-                {ids.length > 0 && (
-                  <span className="dim mono" style={{ fontSize: 12 }}>
-                    {n}/{ids.length}
-                  </span>
-                )}
-              </div>
-            );
+        <UnitContents
+          title={`Lessons in this ${unit}`}
+          rows={lessons.map((l) => {
+            const ids = (l.exercises ?? []).map((e) => e.id);
+            return { key: l.key, title: l.title, what: l.what, solved: ids.filter((id) => solvedEx.has(id)).length, total: ids.length };
           })}
-        </div>
-      )}
+          onOpen={openLesson}
+          onExpandAll={() => sec.setAll(lessonKeys, true)}
+          onCollapseAll={() => sec.setAll(lessonKeys, false)}
+        />
 
-      {lessons.map((lesson, li) => (
-        <div key={lesson.key} id={`lesson-${lesson.key}`}>
-          <Section
-            title={`${li + 1}. ${lesson.title}`}
-            open={sec.isOpen(lesson.key)}
-            onToggle={() => sec.toggle(lesson.key)}
-            meta={
-              <span className="dim" style={{ fontSize: 12 }}>
-                {solvedLabel(lesson.exercises, solvedEx)}
-              </span>
+        {lessons.map((lesson, li) => (
+          <div key={lesson.key} id={`lesson-${lesson.key}`}>
+            <Section
+              title={`${li + 1}. ${lesson.title}`}
+              outline={lesson.title}
+              open={sec.isOpen(lesson.key)}
+              onToggle={() => sec.toggle(lesson.key)}
+              meta={<span className="learn-cat-count">{solvedLabel(lesson.exercises, solvedEx)}</span>}
+            >
+              <LessonBody lesson={lesson} onSolved={handleSolved} />
+            </Section>
+          </div>
+        ))}
+
+        {practice.length > 0 && (
+          <UnitPart
+            title="Practice"
+            icon="target"
+            lead={
+              <>
+                {practiceCount} extra problems in {practice.length} {practice.length === 1 ? "family" : "families"}.
+                Each family drills one pattern and twists a single thing at a time, so no variant is a cold start. They
+                are <strong>not required</strong> to finish the {unit} — come back for the reps whenever you want them.
+                {practiceSolved > 0 && ` You've solved ${practiceSolved} of ${practiceCount}.`}
+              </>
             }
           >
-            <LessonBody lesson={lesson} onSolved={handleSolved} />
-          </Section>
-        </div>
-      ))}
+            {practice.map((fam) => {
+              const ids = (fam.exercises ?? []).map((e) => e.id);
+              const n = ids.filter((id) => solvedEx.has(id)).length;
+              return (
+                <div key={fam.key} id={`practice-${fam.key}`}>
+                  <Section
+                    title={fam.title}
+                    outline={false}
+                    level="h4"
+                    open={sec.isOpen(`practice:${fam.key}`)}
+                    onToggle={() => sec.toggle(`practice:${fam.key}`)}
+                    meta={
+                      <span className="learn-cat-count">
+                        {n}/{ids.length} solved
+                      </span>
+                    }
+                  >
+                    {fam.pattern && <p className="section-lead">{fam.pattern}</p>}
+                    {fam.intro && <Markdown>{fam.intro}</Markdown>}
+                    {(fam.exercises ?? []).map((ex, i) => (
+                      <ExerciseCard key={ex.id} index={i + 1} exercise={ex} challenge onSolved={handleSolved} />
+                    ))}
+                  </Section>
+                </div>
+              );
+            })}
+          </UnitPart>
+        )}
 
-      {practice.length > 0 && (
-        <>
-          <div className="divider" />
-          <h2 style={{ marginBottom: 4 }}>🏋️ Practice</h2>
-          <p className="dim" style={{ marginTop: -2 }}>
-            {practiceCount} extra problems in {practice.length}{" "}
-            {practice.length === 1 ? "family" : "families"}. Each family drills one pattern and
-            twists a single thing at a time, so no variant is a cold start. These are{" "}
-            <strong>not required</strong> to finish the {labels.unit.toLowerCase()} — come back and
-            grind them whenever you want the reps.
-            {practiceSolved > 0 && ` You've solved ${practiceSolved} of ${practiceCount}.`}
-          </p>
-          {practice.map((fam) => {
-            const ids = (fam.exercises ?? []).map((e) => e.id);
-            const n = ids.filter((id) => solvedEx.has(id)).length;
-            return (
-              <div key={fam.key} id={`practice-${fam.key}`}>
-                <Section
-                  title={`🏋️ ${fam.title}`}
-                  open={sec.isOpen(`practice:${fam.key}`)}
-                  onToggle={() => sec.toggle(`practice:${fam.key}`)}
-                  meta={
-                    <span className="dim" style={{ fontSize: 12 }}>
-                      {n}/{ids.length} solved
-                    </span>
-                  }
-                >
-                  {fam.pattern && (
-                    <p className="dim" style={{ margin: "0 0 8px", fontSize: 13 }}>
-                      {fam.pattern}
-                    </p>
-                  )}
-                  {fam.intro && <Markdown>{fam.intro}</Markdown>}
-                  {(fam.exercises ?? []).map((ex, i) => (
-                    <ExerciseCard
-                      key={ex.id}
-                      index={i + 1}
-                      exercise={ex}
-                      challenge
-                      onSolved={handleSolved}
-                    />
-                  ))}
-                </Section>
-              </div>
-            );
-          })}
-        </>
-      )}
-
-      {cap && (
-        <>
-          <div className="divider" />
-          <h2 style={{ marginBottom: 4 }}>🏆 Capstone project</h2>
-          <div className="card" style={{ marginBottom: 14, borderColor: "var(--accent)" }}>
-            <strong style={{ fontSize: 16 }}>{cap.title}</strong>
-            <div style={{ marginTop: 8 }}>
+        {cap && (
+          <UnitPart title="Capstone project" icon="trophy">
+            <Card tone="accent" className="unit-block">
+              <CardHeader level={3} title={cap.title} />
               <Markdown>{cap.brief}</Markdown>
-            </div>
-            {cap.example_io && (
+              {cap.example_io && (
+                <>
+                  <div className="io-label">Expected output</div>
+                  <Markdown>{"```\n" + cap.example_io + "\n```"}</Markdown>
+                </>
+              )}
+              {cap.rubric.length > 0 && (
+                <>
+                  <div className="io-label">Checklist</div>
+                  <ul className="unit-list">
+                    {cap.rubric.map((r, i) => (
+                      <li key={i}>{inlineCode(r)}</li>
+                    ))}
+                  </ul>
+                </>
+              )}
+              {cap.kind === "brief" && (
+                <p className="exercise-note">
+                  A free-build project — write it in the editor of your choice, then mark the {unit} done yourself when
+                  you're happy with it.
+                </p>
+              )}
+            </Card>
+            {cap.exercise && <ExerciseCard index={1} exercise={cap.exercise} challenge onSolved={handleSolved} />}
+            {/* note="" keeps this reveal as it was before the component was
+                shared — the course capstone never carried the caveat. */}
+            {cap.reference && <ReferenceReveal reference={cap.reference} note="" />}
+            {cap.stretch && (
               <>
-                <div className="io-label" style={{ marginTop: 6 }}>Expected output</div>
-                <Markdown>{"```\n" + cap.example_io + "\n```"}</Markdown>
+                <SubHeading icon="sparkles">Stretch goal (optional)</SubHeading>
+                <ExerciseCard index={1} exercise={cap.stretch} challenge onSolved={handleSolved} />
               </>
             )}
-            {cap.rubric.length > 0 && (
-              <>
-                <div className="io-label" style={{ marginTop: 6 }}>Checklist</div>
-                <ul style={{ margin: "4px 0 0", paddingLeft: 20 }}>
-                  {cap.rubric.map((r, i) => (
-                    <li key={i} style={{ marginBottom: 2 }}>{r}</li>
-                  ))}
-                </ul>
-              </>
-            )}
-            {cap.kind === "brief" && (
-              <p className="faint" style={{ fontSize: 12, margin: "8px 0 0" }}>
-                This is a free-build project — write it in the editor of your choice, then mark the{" "}
-                {labels.unit.toLowerCase()} done yourself when you're happy with it.
-              </p>
-            )}
-          </div>
-          {cap.exercise && (
-            <ExerciseCard index={1} exercise={cap.exercise} challenge onSolved={handleSolved} />
-          )}
-          {/* note="" keeps this reveal exactly as it was before the component
-              was shared — the course capstone has never carried the caveat the
-              other two tracks show. */}
-          {cap.reference && <ReferenceReveal reference={cap.reference} note="" />}
-          {cap.stretch && (
-            <>
-              <h4 style={{ margin: "14px 0 4px" }}>🚀 Stretch goal (optional)</h4>
-              <ExerciseCard index={1} exercise={cap.stretch} challenge onSolved={handleSolved} />
-            </>
-          )}
-        </>
-      )}
+          </UnitPart>
+        )}
 
-      {week.self_check.length > 0 && (
-        <>
-          <div className="divider" />
-          <h3>✅ Self-check</h3>
-          <p className="dim" style={{ marginTop: -4 }}>
-            Before you move on, make sure you can honestly say yes to each of these:
-          </p>
-          <div className="card">
-            <ul style={{ margin: 0, paddingLeft: 20 }}>
-              {week.self_check.map((s, i) => (
-                <li key={i} style={{ marginBottom: 4 }}>{s}</li>
-              ))}
-            </ul>
-          </div>
-        </>
-      )}
+        {week.self_check.length > 0 && (
+          <UnitPart
+            title="Self-check"
+            icon="checklist"
+            lead="Before you move on, make sure you can honestly say yes to each of these:"
+          >
+            <UnitList items={week.self_check} />
+          </UnitPart>
+        )}
 
-      {week.review.length > 0 && (
-        <>
-          <div className="divider" />
-          <h3>🔁 End-of-{labels.unit.toLowerCase()} review</h3>
-          <p className="dim" style={{ marginTop: -4 }}>
-            A quick mixed quiz — some of these reach back to earlier {labels.units}.
-          </p>
-          <QuizSection questions={week.review} />
-        </>
-      )}
+        {week.review.length > 0 && (
+          <UnitPart
+            title={`End-of-${unit} review`}
+            outline="Review"
+            icon="refresh"
+            lead={`A quick mixed quiz — some of these reach back to earlier ${labels.units}.`}
+          >
+            <QuizSection questions={week.review} />
+          </UnitPart>
+        )}
 
-      {week.glossary.length > 0 && (
-        <Section
-          title="📖 Glossary"
-          open={sec.isOpen("glossary")}
-          onToggle={() => sec.toggle("glossary")}
-          meta={<span className="badge">{week.glossary.length} terms</span>}
-        >
-          <div className="card" style={{ marginTop: 0 }}>
-            {week.glossary.map((g, i) => (
-              <div key={i} style={{ padding: "5px 0", borderBottom: i < week.glossary.length - 1 ? "1px solid var(--border)" : undefined }}>
-                <code style={{ color: "var(--accent)" }}>{g.term}</code> — {g.def}
-              </div>
-            ))}
-          </div>
-        </Section>
-      )}
+        {week.glossary.length > 0 && (
+          <Section
+            title="Glossary"
+            open={sec.isOpen("glossary")}
+            onToggle={() => sec.toggle("glossary")}
+            meta={<Badge>{week.glossary.length} terms</Badge>}
+          >
+            <Glossary terms={week.glossary} />
+          </Section>
+        )}
 
-      {week.cheatsheet && (
-        <Section
-          title="🧾 Cheat sheet"
-          open={sec.isOpen("cheatsheet")}
-          onToggle={() => sec.toggle("cheatsheet")}
-        >
-          <Markdown>{week.cheatsheet}</Markdown>
-        </Section>
-      )}
+        {week.cheatsheet && (
+          <Section title="Cheat sheet" open={sec.isOpen("cheatsheet")} onToggle={() => sec.toggle("cheatsheet")}>
+            <Markdown>{week.cheatsheet}</Markdown>
+          </Section>
+        )}
 
-      {week.milestone && (
-        <div className="card" style={{ marginTop: 16, borderColor: "var(--good)" }}>
-          <div className="io-label" style={{ color: "var(--good)" }}>🎉 Milestone</div>
-          <p style={{ margin: 0 }}>{week.milestone}</p>
+        {week.milestone && <Milestone text={week.milestone} />}
+
+        <div className="concept-end">
+          <ReadStatus steps={steps} complete={isDone} compact />
         </div>
-      )}
 
-      {!isDone && (
-        <p className="faint" style={{ fontSize: 12, marginTop: 24, textAlign: "center" }}>
-          {gradableIds.length > 0
-            ? `This ${labels.unit.toLowerCase()} marks itself ✓ Done once you've read to here and solved its ${gradableIds.length} exercise${gradableIds.length === 1 ? "" : "s"}${allSolved ? " — all solved!" : ` (${solvedCount}/${gradableIds.length} solved)`}.`
-            : `This ${labels.unit.toLowerCase()} marks itself ✓ Done once you've read to here.`}
-        </p>
-      )}
+        <UnitPager
+          base={track.base}
+          unitLabel={labels.unit}
+          prev={prev ? { slug: String(prev.number), number: prev.number, title: prev.theme } : null}
+          next={next ? { slug: String(next.number), number: next.number, title: next.theme } : null}
+          backTo={track.base}
+          backLabel={`All ${labels.group.toLowerCase()}s`}
+        />
 
-      <UnitPager
-        base={track.base}
-        unitLabel={labels.unit}
-        prev={prev ? { slug: String(prev.number), number: prev.number, title: prev.theme } : null}
-        next={next ? { slug: String(next.number), number: next.number, title: next.theme } : null}
-        backTo={track.base}
-        backLabel={`All ${labels.group.toLowerCase()}s`}
-      />
-
-      {/* Sentinel: intersecting means the unit has been read to the bottom. */}
-      <div ref={bottomRef} style={{ height: 1 }} />
+        {/* Sentinel: intersecting means the unit has been read to the bottom. */}
+        <div ref={bottomRef} className="read-sentinel" />
+      </ReaderLayout>
     </div>
   );
 }
 
-function LessonBody({
-  lesson,
-  onSolved,
-}: {
-  lesson: CourseLesson;
-  onSolved: (id: string) => void;
-}) {
+function LessonBody({ lesson, onSolved }: { lesson: CourseLesson; onSolved: (id: string) => void }) {
   const exercises = lesson.exercises ?? [];
   const warmup = lesson.warmup ?? [];
   const quiz = lesson.quiz ?? [];
 
   return (
-    <div>
-      {lesson.what && (
-        <p className="dim" style={{ marginTop: 0 }}>
-          {lesson.what}
-        </p>
-      )}
+    <div className="lesson-body">
+      {lesson.what && <p className="section-lead">{lesson.what}</p>}
       <Markdown>{lesson.lesson}</Markdown>
 
       {warmup.length > 0 && (
         <>
-          <h4>🔮 Predict the output</h4>
-          <p className="dim" style={{ marginTop: -4 }}>
-            Read the code and guess what it prints — then check.
-          </p>
+          <SubHeading icon="sparkles">Predict the output</SubHeading>
+          <p className="section-lead">Read the code and guess what it prints — then check.</p>
           <QuizSection questions={warmup} />
         </>
       )}
@@ -661,7 +520,7 @@ function LessonBody({
 
       {quiz.length > 0 && (
         <>
-          <h4>❓ Check yourself</h4>
+          <SubHeading icon="help">Check yourself</SubHeading>
           <QuizSection questions={quiz} />
         </>
       )}

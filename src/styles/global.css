@@ -25,3 +25,5 @@
 @import "./parts/solve.css"; /* Solve workspace (194 lines) */
 @import "./parts/syntax.css"; /* Syntax highlighting (109 lines) */
 @import "./parts/exercise.css"; /* Exercise cards, quizzes, verdicts (C4) */
+@import "./parts/reader.css"; /* Lesson outline, reading progress (G4) */
+@import "./parts/learn.css"; /* Learn library, chapters, 日本語 (G6) */

@@ -65,7 +65,10 @@ const GROUPS: { section: string; items: NavItem[] }[] = [
   },
   {
     section: "Languages",
-    items: [{ to: "/jp-bridge", label: "日本語 → Java", icon: "japanese", badge: "vocab" }],
+    items: [
+      { to: "/japanese", label: "日本語 vocabulary", icon: "japanese", badge: "vocab" },
+      { to: "/jp-bridge", label: "日本語 → Java", icon: "code" },
+    ],
   },
   {
     section: "App",

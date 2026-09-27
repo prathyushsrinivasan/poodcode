@@ -1,0 +1,190 @@
+/* ========================================================================
+   Lesson reading: outline rail, reading progress, completion (UI_ROADMAP G4)
+   ======================================================================== */
+
+.reader {
+  position: relative;
+}
+
+/* Pinned to the top of the scrolling `.main`, under the top bar. */
+.reading-bar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  height: 3px;
+  margin: calc(-1 * var(--space-5)) calc(-1 * var(--space-6)) var(--space-5);
+  background: transparent;
+}
+.reading-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transition: width var(--dur-1) linear;
+}
+.reading-bar.done > span {
+  background: var(--good);
+}
+
+.reader-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 210px;
+  gap: var(--space-6);
+  align-items: start;
+}
+.reader-body {
+  min-width: 0;
+}
+.reader-rail {
+  position: sticky;
+  top: var(--space-4);
+  max-height: calc(100vh - var(--topbar-h) - var(--space-7));
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  font-size: var(--text-sm);
+  padding-bottom: var(--space-4);
+}
+
+/* The rail needs room: under ~1100px of page it goes above the content. */
+@media (max-width: 1280px) {
+  .sidebar-collapsed .reader-layout {
+    grid-template-columns: minmax(0, 1fr) 190px;
+  }
+}
+@media (max-width: 1180px) {
+  .app:not(.sidebar-collapsed) .reader-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .app:not(.sidebar-collapsed) .reader-rail {
+    position: static;
+    max-height: none;
+    order: -1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  .app:not(.sidebar-collapsed) .reader-rail .outline {
+    display: none;
+  }
+}
+@media (max-width: 1000px) {
+  .reader-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .reader-rail {
+    position: static;
+    max-height: none;
+    order: -1;
+  }
+  .reader-rail .outline {
+    display: none;
+  }
+}
+
+/* ---- Outline ---- */
+.outline-title {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+  margin-bottom: var(--space-2);
+}
+.outline ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-left: 1px solid var(--border);
+}
+.outline a {
+  display: block;
+  padding: 3px var(--space-3);
+  margin-left: -1px;
+  border-left: 2px solid transparent;
+  color: var(--text-dim);
+  line-height: var(--leading-tight);
+  font-size: var(--text-sm);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.outline .outline-l2 a {
+  padding-left: var(--space-5);
+  font-size: var(--text-xs);
+}
+.outline a:hover {
+  color: var(--text);
+  text-decoration: none;
+}
+.outline a.active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  font-weight: var(--weight-medium);
+}
+
+/* ---- Completion checklist ---- */
+.read-status {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+  background: var(--bg-elev);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.read-status.complete {
+  border-color: var(--good);
+}
+.read-status-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+}
+.read-status-head .icon {
+  color: var(--text-faint);
+}
+.read-status.complete .read-status-head .icon {
+  color: var(--good);
+}
+.read-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--text-dim);
+}
+.read-steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+.read-steps li .icon {
+  margin-top: 1px;
+}
+.read-steps li.met {
+  color: var(--good);
+}
+.read-status-toggle {
+  align-self: flex-start;
+  font-size: var(--text-xs);
+}
+.read-status.compact {
+  padding: var(--space-2) var(--space-3);
+}
+
+/* The in-page target of an outline link: no focus ring on programmatic focus. */
+[data-outline]:focus,
+.lesson-body h2:focus,
+.lesson-body h3:focus {
+  outline: none;
+}
+[data-outline] {
+  scroll-margin-top: var(--space-4);
+}
+.lesson-body h2,
+.lesson-body h3 {
+  scroll-margin-top: var(--space-4);
+}

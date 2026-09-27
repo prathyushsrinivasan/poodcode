@@ -177,7 +177,7 @@ function BridgeCard({
               return (
                 <div key={i} style={{ fontSize: 13 }}>
                   {id ? (
-                    <Link to={`/learn?word=${id}`} title={`${v[0]} を単語帳で開く`}>
+                    <Link to={`/japanese?word=${id}`} title={`${v[0]} を単語帳で開く`}>
                       <strong>{v[0]}</strong>
                     </Link>
                   ) : (
@@ -272,7 +272,7 @@ function InterviewCard({ qa, wordIds }: { qa: InterviewQA; wordIds: Map<string, 
           {qa.terms.map((t) => {
             const id = wordIds.get(t);
             return id ? (
-              <Link key={t} to={`/learn?word=${id}`} className="badge" title={`${t} を単語帳で開く`}>
+              <Link key={t} to={`/japanese?word=${id}`} className="badge" title={`${t} を単語帳で開く`}>
                 {t}
               </Link>
             ) : (
