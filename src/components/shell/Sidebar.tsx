@@ -24,11 +24,12 @@ import { useCurriculumData } from "../CurriculumData";
 import { reviewLane } from "../../lib/dsaReview";
 import { loadDoneChapters } from "../../lib/learnProgress";
 import type { CardReview } from "../../types";
+import { Icon, type IconName } from "../ui/Icon";
 
 interface NavItem {
   to: string;
   label: string;
-  icon: string;
+  icon: IconName;
   end?: boolean;
   /** Key into the badge map below. */
   badge?: "curriculum" | "vocab";
@@ -39,35 +40,35 @@ interface NavItem {
 const GROUPS: { section: string; items: NavItem[] }[] = [
   {
     section: "Today",
-    items: [{ to: "/", label: "Today", icon: "🏠", end: true }],
+    items: [{ to: "/", label: "Today", icon: "today", end: true }],
   },
   {
     section: "Learn",
     items: [
-      { to: "/library", label: "DSA Curriculum", icon: "📚", badge: "curriculum" },
-      { to: "/learn", label: "Learn", icon: "📘" },
-      { to: "/paths", label: "Learning Paths", icon: "🧭" },
-      { to: "/playground/ts", label: "TS Playground", icon: "🧪" },
-      { to: "/visualise/async", label: "Step by step", icon: "🔁" },
+      { to: "/library", label: "DSA Curriculum", icon: "curriculum", badge: "curriculum" },
+      { to: "/learn", label: "Learn", icon: "learn" },
+      { to: "/paths", label: "Learning Paths", icon: "paths" },
+      { to: "/playground/ts", label: "TS Playground", icon: "playground" },
+      { to: "/visualise/async", label: "Step by step", icon: "stepper" },
     ],
   },
   {
     section: "Courses",
     items: [
-      { to: "/course", label: "TypeScript Course", icon: "📗", progressKey: "ts" },
-      { to: "/java-course", label: "Java Course", icon: "☕", progressKey: "java" },
-      { to: "/backend", label: "Backend Lab", icon: "🛠️" },
-      { to: "/projects", label: "Projects", icon: "🧱" },
-      { to: "/mastery", label: "6-Month Mastery", icon: "🎓" },
+      { to: "/course", label: "TypeScript Course", icon: "typescript", progressKey: "ts" },
+      { to: "/java-course", label: "Java Course", icon: "java", progressKey: "java" },
+      { to: "/backend", label: "Backend Lab", icon: "backend" },
+      { to: "/projects", label: "Projects", icon: "projects" },
+      { to: "/mastery", label: "6-Month Mastery", icon: "mastery" },
     ],
   },
   {
     section: "Languages",
-    items: [{ to: "/jp-bridge", label: "日本語 → Java", icon: "🈁", badge: "vocab" }],
+    items: [{ to: "/jp-bridge", label: "日本語 → Java", icon: "japanese", badge: "vocab" }],
   },
   {
     section: "App",
-    items: [{ to: "/settings", label: "Settings", icon: "⚙️" }],
+    items: [{ to: "/settings", label: "Settings", icon: "settings" }],
   },
 ];
 
@@ -152,8 +153,8 @@ export function Sidebar() {
                   className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
                   title={collapsed ? item.label : undefined}
                 >
-                  <span className="ico" aria-hidden>
-                    {item.icon}
+                  <span className="ico">
+                    <Icon name={item.icon} size={17} />
                   </span>
                   {!collapsed && <span className="nav-label">{item.label}</span>}
                   {count > 0 && (

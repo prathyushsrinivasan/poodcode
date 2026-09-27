@@ -10,9 +10,8 @@ import type {
   SyntaxItem,
 } from "../types";
 import { InlineMarkdown, Markdown } from "../components/Markdown";
-import { ExerciseCard, QuizSection } from "../components/LearnExercise";
+import { ExerciseCard, QuizSection, ReferenceReveal } from "../components/exercise";
 import { ExerciseSections } from "../components/ExerciseSections";
-import { ReferenceReveal } from "../components/ReferenceReveal";
 import { DiffStatBadge, DiffView } from "../components/DiffView";
 import { Section, useCollapse } from "../components/Collapsible";
 import ProjectHistory from "./ProjectHistory";

@@ -8,7 +8,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Project } from "../types";
-import { QuizItem } from "../components/LearnExercise";
+import { QuizItem } from "../components/exercise";
 import { Empty } from "../components/common";
 import {
   collectQuestions,

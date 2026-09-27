@@ -7,6 +7,7 @@ import { api } from "../api";
 import type { QuizQuestion } from "../types";
 import { Markdown } from "./Markdown";
 import { inlineCode } from "./common";
+import { QuizOption, type OptionState } from "./exercise/Quiz";
 import {
   isSelected,
   quizKind,
@@ -35,50 +36,36 @@ export function QuizChoices({
       {kind === "type" ? (
         <TypeAnswer question={question} picked={picked} revealed={revealed} onPick={onPick} />
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 10 }}>
+        <div className="quiz-options">
           {kind === "multi" && !revealed && (
             <div className="dim quiz-note">Select every answer that is right — there is more than one.</div>
           )}
           {question.options.map((opt, oi) => {
             const chosen = kind === "multi" ? isSelected(picked, oi) : picked === oi;
             const right = kind === "multi" ? (question.answers ?? []).includes(oi) : oi === question.answer;
-            let border: string | undefined;
-            let color: string | undefined;
-            if (revealed) {
-              if (right) {
-                border = "var(--good)";
-                color = "var(--good)";
-              } else if (chosen) {
-                border = "var(--bad)";
-                color = "var(--bad)";
-              }
-            } else if (chosen) {
-              border = "var(--accent)";
-              color = "var(--accent)";
-            }
+            const state: OptionState = revealed
+              ? right
+                ? chosen || kind !== "multi"
+                  ? "right"
+                  : "missed"
+                : chosen
+                  ? "wrong"
+                  : "idle"
+              : chosen
+                ? "chosen"
+                : "idle";
             return (
-              <button
+              <QuizOption
                 key={oi}
-                className="ghost"
-                aria-pressed={kind === "multi" ? chosen : undefined}
-                style={{
-                  textAlign: "left",
-                  borderColor: border,
-                  borderStyle: revealed && right && !chosen && kind === "multi" ? "dashed" : undefined,
-                  color,
-                  padding: "8px 12px",
-                  whiteSpace: "pre-wrap",
-                  fontFamily: kind === "output" ? "var(--font-mono)" : undefined,
-                  fontSize: kind === "output" ? 12.5 : undefined,
-                }}
+                state={state}
+                mono={kind === "output"}
+                pressed={kind === "multi" ? chosen : undefined}
                 onClick={() => onPick(kind === "multi" ? toggleMulti(picked, oi) : oi)}
                 disabled={revealed}
               >
                 {kind === "multi" && !revealed && (chosen ? "☑ " : "☐ ")}
-                {revealed && right && "✓ "}
-                {revealed && chosen && !right && "✗ "}
                 {kind === "output" ? opt : inlineCode(opt)}
-              </button>
+              </QuizOption>
             );
           })}
           {revealed && <WhyNot question={question} picked={picked} />}
@@ -153,9 +140,9 @@ function TypeAnswer({
   }
 
   return (
-    <div style={{ marginTop: 10 }}>
-      <div className="row" style={{ gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-        <code style={{ whiteSpace: "nowrap" }}>type Answer =</code>
+    <div className="type-answer">
+      <div className="type-answer-row">
+        <code className="type-answer-lead">type Answer =</code>
         <input
           value={typed}
           onChange={(e) => {
@@ -168,12 +155,11 @@ function TypeAnswer({
           disabled={revealed}
           placeholder="write the type out in full"
           spellCheck={false}
-          style={{ flex: "1 1 180px", minWidth: 0, fontFamily: "var(--font-mono)" }}
+          className="type-answer-input"
           aria-label="Your answer, as a type"
         />
         <button
           className="ghost"
-          style={{ whiteSpace: "nowrap" }}
           onClick={check}
           disabled={revealed || checking || !typed.trim()}
         >
@@ -181,18 +167,18 @@ function TypeAnswer({
         </button>
       </div>
       {picked === 0 && !revealed && (
-        <p className="quiz-note" style={{ margin: "6px 0 0", color: "var(--good)" }}>
+        <p className="quiz-note is-good">
           ✓ The checker agrees.
         </p>
       )}
       {picked === 1 && !revealed && (
-        <p className="quiz-note" style={{ margin: "6px 0 0", color: "var(--bad)" }}>
+        <p className="quiz-note is-bad">
           ✗ Not that type — you can change it and check again before you submit.
           {error && <span className="dim"> ({error.split("\n")[0]})</span>}
         </p>
       )}
       {revealed && (
-        <p className="quiz-note" style={{ margin: "6px 0 0" }}>
+        <p className="quiz-note">
           Model answer: <code>{question.type_answer}</code>
         </p>
       )}

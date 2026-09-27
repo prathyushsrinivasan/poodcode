@@ -8,6 +8,7 @@ import { api } from "../api";
 import type { MasteryWeek } from "../types";
 import { inlineCode } from "./common";
 import { QuizChoices } from "./QuizChoices";
+import { QuizCard } from "./exercise/Quiz";
 import { answerText, questionText } from "../lib/quizKinds";
 import { drawFinalPaper } from "../lib/finalExam";
 import { WEEK_BUDGET_HOURS, type ChapterStat, type WeekProgress } from "../lib/mastery";
@@ -73,29 +74,21 @@ export function MixedQuiz({
       {paper.map((q, i) => {
         const right = picked[i] === q.answer;
         return (
-          <div
+          <QuizCard
             key={i}
-            className="card"
-            style={{
-              marginBottom: 8,
-              borderColor: submitted ? (right ? "var(--good)" : "var(--bad)") : undefined,
-            }}
+            index={i + 1}
+            question={inlineCode(q.question)}
+            revealed={submitted}
+            right={right}
+            explanation={q.explanation}
           >
-            <strong>
-              {i + 1}. {inlineCode(q.question)}
-            </strong>
             <QuizChoices
               question={q}
               picked={picked[i] ?? -1}
               revealed={submitted}
               onPick={(v) => setPicked((prev) => prev.map((p, k) => (k === i ? v : p)))}
             />
-            {submitted && (
-              <p className="dim quiz-note" style={{ marginBottom: 0 }}>
-                {q.explanation}
-              </p>
-            )}
-          </div>
+          </QuizCard>
         );
       })}
       <div className="row" style={{ gap: 8, alignItems: "center" }}>

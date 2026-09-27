@@ -834,10 +834,9 @@ body.focus-mode .topbar {
 }
 
 .predict-box {
-  margin-top: 8px;
-  padding: 8px 10px;
+  padding: var(--space-2) var(--space-3);
   border: 1px dashed var(--accent);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
 }
 
 /* What a snippet prints — computed output shown under the code. */

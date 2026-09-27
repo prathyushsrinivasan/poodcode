@@ -15,6 +15,7 @@
 @import "./parts/base.css"; /* Reset, elements and focus (126 lines) */
 @import "./parts/layout.css"; /* App frame, sidebar and page (103 lines) */
 @import "./parts/components.css"; /* Shared components (744 lines) */
+@import "./parts/ui.css"; /* Design-system components, components/ui (C3) */
 @import "./parts/features.css"; /* Heatmap, collapsibles, SQL grid, skeletons, 日本語 tiles (309 lines) */
 @import "./parts/curriculum.css"; /* DSA curriculum pages (672 lines) */
 @import "./parts/today.css"; /* Today (262 lines) */
@@ -23,3 +24,4 @@
 @import "./parts/settings.css"; /* Settings sections */
 @import "./parts/solve.css"; /* Solve workspace (194 lines) */
 @import "./parts/syntax.css"; /* Syntax highlighting (109 lines) */
+@import "./parts/exercise.css"; /* Exercise cards, quizzes, verdicts (C4) */

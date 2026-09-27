@@ -22,7 +22,7 @@ import { ConfirmDialog } from "../components/ui/Modal";
 import { api } from "../api";
 import type { Exercise, JudgeReport, ProcOut, Project, ProjectModule, TestCase } from "../types";
 import { CodeEditor } from "../components/CodeEditor";
-import { Feedback } from "../components/LearnExercise";
+import { JudgeFeedback as Feedback } from "../components/exercise";
 import { Empty } from "../components/common";
 import { pairExchanges, sampleRequests } from "../lib/workbench";
 

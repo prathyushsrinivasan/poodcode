@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import type { Exercise } from "../types";
-import { ExerciseCard } from "./LearnExercise";
+import { ExerciseCard } from "./exercise";
 import { inlineCode } from "./common";
 import { groupByKind, type KindSection } from "../lib/exerciseKinds";
 

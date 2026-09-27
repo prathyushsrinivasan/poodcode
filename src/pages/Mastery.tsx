@@ -20,6 +20,7 @@ import { FailingCases } from "../components/OutputCompare";
 import { TsErrorLinks } from "../components/TsErrorLinks";
 import { DiffBadge, Empty, inlineCode } from "../components/common";
 import { QuizChoices } from "../components/QuizChoices";
+import { QuizCard } from "../components/exercise";
 import { answerText, questionText } from "../lib/quizKinds";
 import {
   loadDoneChapters,
@@ -1870,37 +1871,16 @@ function QuizQuestionCard({
   revealed: boolean;
   onPick: (optionIndex: number) => void;
 }) {
-  const isRight = picked === question.answer;
   return (
-    <div
-      className="card"
-      style={{
-        marginTop: 12,
-        marginBottom: 0,
-        borderColor: revealed ? (isRight ? "var(--good)" : "var(--bad)") : undefined,
-      }}
+    <QuizCard
+      index={index}
+      question={inlineCode(question.question)}
+      revealed={revealed}
+      right={picked === question.answer}
+      explanation={question.explanation}
     >
-      <strong>
-        {index}. {inlineCode(question.question)}
-      </strong>
       <QuizChoices question={question} picked={picked} revealed={revealed} onPick={onPick} />
-      {revealed && (
-        <div
-          className="card"
-          style={{
-            marginTop: 10,
-            marginBottom: 0,
-            background: "var(--accent-dim)",
-            borderColor: isRight ? "var(--good)" : "var(--bad)",
-          }}
-        >
-          <div className="io-label" style={{ color: isRight ? "var(--good)" : "var(--bad)" }}>
-            {isRight ? "Correct" : "Not quite"}
-          </div>
-          <p style={{ margin: 0 }}>{question.explanation}</p>
-        </div>
-      )}
-    </div>
+    </QuizCard>
   );
 }
 

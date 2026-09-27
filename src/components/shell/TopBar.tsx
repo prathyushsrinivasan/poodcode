@@ -15,6 +15,8 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useStore } from "../../store";
 import { breadcrumb, withLeafLabel } from "../../lib/breadcrumb";
+import { Icon } from "../ui/Icon";
+import { IconButton } from "../ui/Button";
 
 export function TopBar() {
   const nav = useNavigate();
@@ -71,32 +73,22 @@ export function TopBar() {
 
   return (
     <header className="topbar">
-      <button
-        className="ghost topbar-icon"
+      <IconButton
+        className="topbar-icon"
+        icon={collapsed ? "sidebarOpen" : "sidebarClose"}
         onClick={toggleSidebar}
-        aria-label={collapsed ? "Expand the sidebar" : "Collapse the sidebar"}
-        title={`${collapsed ? "Expand" : "Collapse"} sidebar (Ctrl+B)`}
-      >
-        ☰
-      </button>
-      <button
-        className="ghost topbar-icon"
-        onClick={() => nav(-1)}
-        disabled={!canBack}
-        aria-label="Back"
-        title="Back (Alt+←)"
-      >
-        ←
-      </button>
-      <button
-        className="ghost topbar-icon"
+        label={collapsed ? "Expand the sidebar" : "Collapse the sidebar"}
+        shortcut="Ctrl+B"
+      />
+      <IconButton className="topbar-icon" icon="back" onClick={() => nav(-1)} disabled={!canBack} label="Back" shortcut="Alt+←" />
+      <IconButton
+        className="topbar-icon"
+        icon="forward"
         onClick={() => nav(1)}
         disabled={!canForward}
-        aria-label="Forward"
-        title="Forward (Alt+→)"
-      >
-        →
-      </button>
+        label="Forward"
+        shortcut="Alt+→"
+      />
 
       <nav className="crumbs" aria-label="Breadcrumb">
         <ol>
@@ -122,7 +114,7 @@ export function TopBar() {
       <span className="spacer" />
 
       <button className="ghost topbar-search" onClick={() => setPalette(true)}>
-        <span aria-hidden>🔎</span> Search…
+        <Icon name="search" size={14} /> Search…
         <span className="kbd">Ctrl</span>
         <span className="kbd">K</span>
       </button>

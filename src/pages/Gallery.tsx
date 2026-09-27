@@ -19,6 +19,28 @@ import { Markdown } from "../components/Markdown";
 import { TrackSkeleton } from "../components/Skeleton";
 import { VerdictBar } from "../components/solve/VerdictBar";
 import { useStore } from "../store";
+import {
+  Badge,
+  Button,
+  Card,
+  CardHeader,
+  Chip,
+  EmptyState,
+  ErrorState,
+  Field,
+  Icon,
+  IconButton,
+  ICON_NAMES,
+  Kbd,
+  NumberInput,
+  PageHeader,
+  ProgressBar,
+  Segmented,
+  StatTile,
+  Toggle,
+  Tooltip,
+} from "../components/ui";
+import { QuizCard, QuizOption, VerdictPanel } from "../components/exercise";
 import type { Difficulty, JudgeReport } from "../types";
 
 function Row({ title, note, children }: { title: string; note?: string; children: React.ReactNode }) {
@@ -86,16 +108,25 @@ export default function Gallery() {
   const [confirm, setConfirm] = useState(false);
   const [tab, setTab] = useState<"one" | "two" | "three">("one");
   const [conf, setConf] = useState(3);
+  const [chip, setChip] = useState(true);
+  const [toggle, setToggle] = useState(true);
+  const [seg, setSeg] = useState<"a" | "b" | "c">("a");
+  const [num, setNum] = useState(3);
 
   const difficulties: Difficulty[] = ["Intro", "Easy", "Medium", "Hard"];
 
   return (
     <div className="page gallery">
-      <h1 className="page-title">Component gallery</h1>
-      <p className="page-sub">
-        Every component in the design system, in every state. Dev-only — this route exists when the
-        app runs on fixtures.
-      </p>
+      <PageHeader
+        eyebrow="Dev only"
+        title="Component gallery"
+        subtitle="Every component in the design system, in every state. This route exists when the app runs on fixtures."
+        actions={
+          <Button icon="palette" onClick={toggleTheme}>
+            Theme: {prefs.theme}
+          </Button>
+        }
+      />
 
       <div className="card gallery-controls">
         <strong>View as:</strong>
@@ -123,6 +154,161 @@ export default function Gallery() {
         <button className="primary" disabled>
           Primary disabled
         </button>
+      </Row>
+
+      <Row title="Button component" note="components/ui/Button — icon slot, sizes, loading keeps the width (C3).">
+        <Button variant="primary" icon="run" shortcut="Ctrl+Enter">
+          Run
+        </Button>
+        <Button icon="submit">Submit</Button>
+        <Button variant="ghost" icon="reset">
+          Reset
+        </Button>
+        <Button variant="primary" loading>
+          Checking…
+        </Button>
+        <Button size="sm" icon="add">
+          Small
+        </Button>
+        <Button variant="danger-filled" icon="delete">
+          Delete
+        </Button>
+        <IconButton icon="close" label="Close" />
+        <IconButton icon="refresh" label="Re-detect" size="sm" />
+        <Tooltip content="Run the examples" shortcut="Ctrl+Enter">
+          <Button icon="run">With a tooltip</Button>
+        </Tooltip>
+      </Row>
+
+      <Row title="Icons" note="Named by meaning, not by glyph (C6). Hover for the name.">
+        <div className="gallery-icons">
+          {ICON_NAMES.map((n) => (
+            <span key={n} className="gallery-icon" title={n}>
+              <Icon name={n} size={18} />
+              <span>{n}</span>
+            </span>
+          ))}
+        </div>
+      </Row>
+
+      <Row title="Badge tones and chips" note="Chips are buttons — Tab reaches them (B4).">
+        <Badge>neutral</Badge>
+        <Badge tone="accent" icon="sparkles">
+          accent
+        </Badge>
+        <Badge tone="good" icon="done">
+          good
+        </Badge>
+        <Badge tone="bad" icon="failed">
+          bad
+        </Badge>
+        <Badge tone="warn" icon="warning">
+          warn
+        </Badge>
+        <Chip pressed={chip} onClick={() => setChip((c) => !c)} count={12}>
+          Toggle chip
+        </Chip>
+        <Chip onClick={() => toast("Chip")} icon="filter">
+          Action chip
+        </Chip>
+      </Row>
+
+      <Row title="ProgressBar" note="role=progressbar with a label and a value.">
+        <div className="gallery-wide gallery-stack">
+          <ProgressBar value={12} max={40} label="Weeks done" showValue />
+          <ProgressBar value={40} max={40} tone="good" label="Done" showValue />
+          <ProgressBar value={3} max={10} tone="warn" size="sm" label="Small" />
+        </div>
+      </Row>
+
+      <Row title="Cards" note="Card, CardHeader and tones.">
+        <Card className="gallery-card">
+          <CardHeader title="A card" subtitle="With a subtitle" icon="notes" actions={<IconButton icon="more" label="More" />} />
+          <p className="dim gallery-tight">Body.</p>
+        </Card>
+        <Card className="gallery-card" tone="good">
+          <CardHeader title="A good card" level={3} />
+        </Card>
+      </Row>
+
+      <Row title="Verdicts" note="One panel for every track's results (C4, G8).">
+        <div className="gallery-wide gallery-stack">
+          <VerdictPanel tone="good" title="All 5 tests passed" />
+          <VerdictPanel tone="bad" title="2 / 5 tests passed">
+            <p className="verdict-para">The failing cases go here.</p>
+          </VerdictPanel>
+          <VerdictPanel tone="warn" title="Toolchain not available">
+            <p className="verdict-para">Install a JDK.</p>
+          </VerdictPanel>
+          <VerdictPanel tone="info" icon="hint" title="Hint">
+            <p className="verdict-para">Start from the end.</p>
+          </VerdictPanel>
+        </div>
+      </Row>
+
+      <Row title="Quiz" note="QuizCard + QuizOption, every state.">
+        <div className="gallery-wide">
+          <QuizCard index={1} question="Which is right?" revealed right={false} explanation="Because.">
+            <div className="quiz-options">
+              <QuizOption state="wrong" onClick={() => {}} disabled>
+                chosen and wrong
+              </QuizOption>
+              <QuizOption state="right" onClick={() => {}} disabled>
+                right
+              </QuizOption>
+              <QuizOption state="missed" onClick={() => {}} disabled>
+                right, not chosen (multi)
+              </QuizOption>
+              <QuizOption state="idle" onClick={() => {}} disabled>
+                neither
+              </QuizOption>
+            </div>
+          </QuizCard>
+        </div>
+      </Row>
+
+      <Row title="Stat tiles" note="StatTile with an icon and a hint.">
+        <StatTile value={42} label="Solved" icon="done" hint="12% up on last week" />
+        <StatTile value="1h 12m" label="Study time" icon="clock" />
+      </Row>
+
+      <Row title="Fields" note="Label, hint, inline error (H3).">
+        <div className="gallery-wide">
+          <Field label="A switch" hint="Toggle is role=switch.">
+            <Toggle checked={toggle} onChange={setToggle} label="A switch" />
+          </Field>
+          <Field label="Segmented">
+            <Segmented
+              label="Segmented"
+              value={seg}
+              onChange={setSeg}
+              options={[
+                { value: "a", label: "One" },
+                { value: "b", label: "Two" },
+                { value: "c", label: "Three" },
+              ]}
+            />
+          </Field>
+          <Field label="A number" hint="Clamped to 1-10.">
+            {(id, d) => <NumberInput id={id} describedBy={d} value={num} onChange={setNum} min={1} max={10} />}
+          </Field>
+          <Field label="With an error" error="That slug is already taken." layout="stack">
+            {(id, d) => <input id={id} aria-describedby={d} defaultValue="two-sum" />}
+          </Field>
+          <p className="dim gallery-tight">
+            Keys: <Kbd keys="Ctrl+Shift+Enter" />
+          </p>
+        </div>
+      </Row>
+
+      <Row title="EmptyState and ErrorState" note="Every empty state names the action that fills it (E6).">
+        <div className="gallery-wide gallery-stack">
+          <EmptyState icon="notes" title="No notes yet" action={{ label: "Write one", icon: "edit", onClick: () => toast("Write") }}>
+            Notes you write while solving are kept per problem.
+          </EmptyState>
+          <EmptyState compact icon="history" title="No attempts" />
+          <ErrorState title="Could not load the curriculum." error="TypeError: failed to fetch" onRetry={() => toast("Retry")} />
+        </div>
       </Row>
 
       <Row title="Badges and difficulty" note="Difficulty colours are per theme (C9).">

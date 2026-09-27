@@ -232,21 +232,6 @@
   color: var(--accent);
 }
 
-/* ---- Shared states ---- */
-.error-state {
-  border-color: var(--bad);
-}
-.error-state-detail {
-  font-size: var(--text-xs);
-  margin: var(--space-2) 0 var(--space-3);
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-.empty-state {
-  text-align: center;
-  padding: var(--space-5);
-}
-
 /* Visually hidden, still announced. */
 .sr-only {
   position: absolute;

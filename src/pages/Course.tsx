@@ -3,9 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
 import type { CourseLesson, CourseWeek, WeeklyCourse } from "../types";
 import { Markdown } from "../components/Markdown";
-import { ExerciseCard, QuizSection } from "../components/LearnExercise";
+import { ExerciseCard, QuizSection, ReferenceReveal } from "../components/exercise";
 import { ExerciseSections } from "../components/ExerciseSections";
-import { ReferenceReveal } from "../components/ReferenceReveal";
 import { Section, useCollapse } from "../components/Collapsible";
 import { Empty } from "../components/common";
 import {

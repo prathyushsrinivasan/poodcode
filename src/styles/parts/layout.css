@@ -63,8 +63,12 @@
 }
 .nav-item .ico {
   width: 18px;
-  text-align: center;
-  opacity: 0.9;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+}
+.nav-item.active .ico {
+  color: var(--accent);
 }
 .nav-badge {
   margin-left: auto;

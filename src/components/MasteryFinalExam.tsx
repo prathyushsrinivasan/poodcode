@@ -10,6 +10,7 @@ import type { MasteryFinalExam, MasteryTrack, MasteryWeek } from "../types";
 import { ExerciseSections } from "./ExerciseSections";
 import { inlineCode } from "./common";
 import { QuizChoices } from "./QuizChoices";
+import { QuizCard } from "./exercise/Quiz";
 import { markMasterySolved } from "../lib/learnProgress";
 import { formatStudyTime, type WeekProgress } from "../lib/mastery";
 import {
@@ -186,12 +187,9 @@ export function FinalExamPanel({
         {answered}/{paper.length} answered · {exam.pass_mark}% to pass this part. Answers are saved as you go.
       </p>
       {paper.map((q, i) => (
-        <div key={i} className="card" style={{ marginBottom: 8 }}>
-          <strong>
-            {i + 1}. {inlineCode(q.question)}
-          </strong>
+        <QuizCard key={i} index={i + 1} question={inlineCode(q.question)} revealed={false} right={false}>
           <QuizChoices question={q} picked={sitting.picked[i] ?? -1} revealed={false} onPick={(v) => pick(i, v)} />
-        </div>
+        </QuizCard>
       ))}
 
       <h4>
