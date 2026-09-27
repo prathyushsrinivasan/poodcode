@@ -22,16 +22,16 @@
   padding: 6px 8px 14px;
   letter-spacing: -0.02em;
 }
-.brand .logo {
-  width: 26px;
-  height: 26px;
-  border-radius: 7px;
-  background: linear-gradient(135deg, var(--accent), #7b5cff);
-  display: grid;
-  place-items: center;
-  color: #fff;
-  font-weight: 800;
-  font-size: 15px;
+/* The mark follows the theme: accent square, on-accent glyph (C12). */
+.brand-mark {
+  flex: none;
+  display: block;
+}
+.brand-mark-bg {
+  fill: var(--accent);
+}
+.brand-mark-glyph {
+  stroke: var(--on-accent);
 }
 .nav-section {
   font-size: 10px;

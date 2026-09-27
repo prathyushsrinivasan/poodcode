@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 64 64">
+  <!-- The Poodcode mark: a P whose bowl is a prompt chevron, over a cursor.
+       Source for every generated app icon: npx tauri icon src-tauri/icons/source.svg
+       The UI draws the same shape themed, in src/components/shell/BrandMark.tsx. -->
+  <rect width="64" height="64" rx="15" fill="#286aec"/>
+  <g fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 14 V50" stroke-width="7"/>
+    <path d="M20 14 H29 L41 24 L29 34 H20" stroke-width="7"/>
+    <path d="M35 48 H45" stroke-width="5"/>
+  </g>
+</svg>

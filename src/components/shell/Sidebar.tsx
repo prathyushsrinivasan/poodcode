@@ -25,6 +25,7 @@ import { reviewLane } from "../../lib/dsaReview";
 import { loadDoneChapters } from "../../lib/learnProgress";
 import type { CardReview } from "../../types";
 import { Icon, type IconName } from "../ui/Icon";
+import { BrandMark } from "./BrandMark";
 import { ignore } from "../../lib/failures";
 
 interface NavItem {
@@ -132,9 +133,7 @@ export function Sidebar() {
   return (
     <aside className={`sidebar ${collapsed ? "collapsed" : ""}`} aria-label="Sections">
       <div className="brand">
-        <span className="logo" aria-hidden>
-          P
-        </span>
+        <BrandMark size={26} />
         {!collapsed && <span className="brand-name">Poodcode</span>}
       </div>
 
