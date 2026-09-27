@@ -3,7 +3,8 @@
    ======================================================================== */
 
 /* Links styled as buttons (a workbench link, "Build history →"). */
-a.btn {
+a.btn,
+summary.btn {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
@@ -15,16 +16,19 @@ a.btn {
   font-size: var(--text-sm);
   text-decoration: none;
 }
-a.btn.ghost {
+a.btn.ghost,
+summary.btn.ghost {
   background: transparent;
   border-color: transparent;
 }
-a.btn:hover {
+a.btn:hover,
+summary.btn:hover {
   background: var(--bg-elev-2);
   border-color: var(--accent);
   text-decoration: none;
 }
-a.btn.btn-sm {
+a.btn.btn-sm,
+summary.btn.btn-sm {
   padding: var(--space-1) var(--space-2);
   font-size: var(--text-xs);
 }

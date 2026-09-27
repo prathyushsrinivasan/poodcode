@@ -20,23 +20,30 @@ export function Confidence({
   size?: number;
 }) {
   return (
-    <span className="conf" title={`Confidence: ${value}/${size}`}>
-      {Array.from({ length: size }).map((_, i) => (
-        <span
-          key={i}
-          className={`dot ${i < value ? "on" : ""}`}
-          onClick={
-            onChange
-              ? (e) => {
-                  e.stopPropagation();
-                  // Clicking the active last dot clears it.
-                  onChange(value === i + 1 ? i : i + 1);
-                }
-              : undefined
-          }
-          style={{ cursor: onChange ? "pointer" : "default" }}
-        />
-      ))}
+    <span
+      className="conf"
+      title={`Confidence: ${value}/${size}`}
+      role={onChange ? "group" : "img"}
+      aria-label={`Confidence: ${value} of ${size}`}
+    >
+      {Array.from({ length: size }).map((_, i) =>
+        onChange ? (
+          <button
+            key={i}
+            type="button"
+            className={`dot ${i < value ? "on" : ""}`}
+            aria-label={value === i + 1 ? `Clear confidence (now ${i + 1})` : `Set confidence to ${i + 1}`}
+            aria-pressed={i < value}
+            onClick={(e) => {
+              e.stopPropagation();
+              // Clicking the active last dot clears it.
+              onChange(value === i + 1 ? i : i + 1);
+            }}
+          />
+        ) : (
+          <span key={i} className={`dot ${i < value ? "on" : ""}`} aria-hidden />
+        )
+      )}
     </span>
   );
 }

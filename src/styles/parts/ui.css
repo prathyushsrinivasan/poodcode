@@ -430,3 +430,99 @@ button.pill.on:hover:not(:disabled) {
   text-align: center;
   margin-top: var(--space-3);
 }
+
+/* ---- Former clickable divs, now buttons (D3) ----
+   Each undoes the button defaults so the element looks as it did. */
+button.result-head {
+  width: 100%;
+  border: 0;
+  border-radius: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+}
+button.result-head:hover:not(:disabled) {
+  background: var(--bg-elev-2);
+  border: 0;
+}
+.result.pass button.result-head {
+  border-left: 3px solid var(--good);
+}
+.result.fail button.result-head {
+  border-left: 3px solid var(--bad);
+}
+.result button.result-head:active:not(:disabled) {
+  transform: none;
+}
+.disclosure-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+.disclosure-row:hover:not(:disabled) {
+  background: none;
+  border: 0;
+  color: var(--accent);
+}
+.disclosure-row .caret {
+  flex: none;
+  color: var(--text-faint);
+  transition: transform var(--dur-1) var(--ease-out);
+}
+.disclosure-row .caret.open {
+  transform: rotate(90deg);
+}
+.disclosure-row-text {
+  flex: 1;
+  min-width: 0;
+}
+.prereq-name {
+  font-weight: var(--weight-bold);
+  color: var(--text);
+  text-decoration: none;
+}
+.conf button.dot {
+  padding: 0;
+  border: 0;
+}
+.conf button.dot:hover:not(:disabled) {
+  background: var(--accent-dim);
+}
+.conf button.dot.on:hover:not(:disabled) {
+  background: var(--accent);
+}
+.mastery-card-link {
+  display: block;
+  color: var(--text);
+  border-color: var(--accent);
+  margin-bottom: var(--space-4);
+}
+.mastery-card-link:hover {
+  text-decoration: none;
+  background: var(--bg-elev-2);
+}
+.mastery-card-progress {
+  margin-top: var(--space-3);
+}
+.path-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 6px var(--space-2);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+}
+.path-row:hover {
+  background: var(--bg-elev-2);
+  text-decoration: none;
+}
+.path-row.is-next {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}

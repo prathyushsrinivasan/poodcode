@@ -554,14 +554,16 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
           {openBuffers.length > 1 && (
             <div className="pill-toggle" style={{ marginLeft: 4 }}>
               {openBuffers.map((l) => (
-                <span
+                <button
+                  type="button"
                   key={l}
                   className={`pill ${l === langId ? "on" : ""}`}
+                  aria-pressed={l === langId}
                   onClick={() => setLangId(l)}
                   title={`Switch to your ${labelFor(l)} buffer`}
                 >
                   {labelFor(l)}
-                </span>
+                </button>
               ))}
             </div>
           )}
@@ -936,12 +938,14 @@ function PrerequisitesTab({
                 title={isKnown ? "I know this" : "Mark as known"}
                 style={{ width: 16, height: 16, cursor: "pointer" }}
               />
-              <strong
-                style={{ textDecoration: isKnown ? "none" : "none", cursor: "pointer" }}
+              <button
+                type="button"
+                className="link-button prereq-name"
+                aria-expanded={isOpen}
                 onClick={() => setOpen(isOpen ? null : p.key)}
               >
                 {p.name}
-              </strong>
+              </button>
               {isKnown ? (
                 <span className="badge" style={{ color: "var(--good)", borderColor: "var(--good)" }}>known</span>
               ) : (
@@ -1252,7 +1256,12 @@ function AttemptsTab({ problemId }: { problemId: number }) {
 
       {list.map((a, i) => (
         <div key={a.id} className="result">
-          <div className="result-head" onClick={() => setOpen(open === i ? null : i)}>
+          <button
+            type="button"
+            className="result-head"
+            aria-expanded={open === i}
+            onClick={() => setOpen(open === i ? null : i)}
+          >
             <span style={{ color: statusColor(a.status), fontWeight: 700 }}>
               {a.status === "accepted" ? "Accepted" : a.status === "wrong" ? "Wrong" : "Error"}
             </span>
@@ -1269,7 +1278,7 @@ function AttemptsTab({ problemId }: { problemId: number }) {
             )}
             <span className="dim">{a.runtime_ms ?? 0} ms</span>
             <span className="dim">{new Date(a.created_at.replace(" ", "T")).toLocaleString()}</span>
-          </div>
+          </button>
           {open === i && (
             <div className="result-body">
               {a.error_text && <div className="io-block" style={{ color: "var(--bad)" }}>{a.error_text}</div>}

@@ -27,6 +27,7 @@ import {
   type ReviewState,
 } from "../lib/capstone";
 import { saveFailed } from "../lib/failures";
+import { Icon } from "./ui/Icon";
 
 const mockKey = (track: string, week: number, i: number) => `mastery-mock:${track}:${week}:${i}`;
 const reviewKey = (track: string, id: string) => `mastery-review:${track}:${id}`;
@@ -180,17 +181,11 @@ function InterviewBank({ bank }: { bank: MasteryInterviewQ[] }) {
       {bank.map((q, i) =>
         topic && q.topic !== topic ? null : (
           <div key={i} className="card" style={{ marginBottom: 8 }}>
-            <div
-              className="row"
-              style={{ cursor: "pointer", gap: 8, alignItems: "baseline" }}
-              onClick={() => toggle(i)}
-            >
-              <span className={`caret ${open.has(i) ? "open" : ""}`} aria-hidden>
-                ▸
-              </span>
-              <span style={{ flex: 1 }}>{inlineCode(q.question)}</span>
+            <button type="button" className="disclosure-row" aria-expanded={open.has(i)} onClick={() => toggle(i)}>
+              <Icon name="chevronRight" size={14} className={`caret ${open.has(i) ? "open" : ""}`} />
+              <span className="disclosure-row-text">{inlineCode(q.question)}</span>
               {!topic && <span className="badge">{q.topic}</span>}
-            </div>
+            </button>
             {open.has(i) && (
               <div style={{ marginTop: 8 }}>
                 <Markdown>{q.answer}</Markdown>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { api } from "../api";
 import type { Path } from "../types";
 import { DiffBadge } from "../components/common";
@@ -48,22 +48,16 @@ export default function Paths() {
                   const done = it.solved_status === "solved";
                   const isNext = next && it.problem_id === next.problem_id;
                   return (
-                    <div
+                    <Link
                       key={it.problem_id}
-                      className="row"
-                      style={{
-                        padding: "6px 8px",
-                        borderRadius: 6,
-                        cursor: "pointer",
-                        background: isNext ? "color-mix(in srgb, var(--accent) 12%, transparent)" : "transparent",
-                      }}
-                      onClick={() => nav(`/solve/${it.problem_id}`)}
+                      to={`/solve/${it.problem_id}`}
+                      className={`path-row ${isNext ? "is-next" : ""}`}
                     >
                       <span style={{ width: 22 }}>{done ? "✅" : isNext ? "▶" : `${idx + 1}.`}</span>
                       <span className={done ? "dim" : ""}>{it.title}</span>
                       <span className="spacer" />
                       <DiffBadge d={it.difficulty} />
-                    </div>
+                    </Link>
                   );
                 })}
               </div>

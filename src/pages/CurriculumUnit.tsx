@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
 import { useCrumb } from "../store";
 import type {
@@ -1175,7 +1175,15 @@ function RungBlock({
                   {solved ? "✅" : p.solved_status === "attempted" ? "◐" : "○"}
                 </td>
                 <td>
-                  <strong className={solved ? "dim" : ""}>{p.title}</strong>
+                  {/* The row is clickable for the mouse; this link is the same
+                      target for Tab and Ctrl-click (D3). */}
+                  <Link
+                    to={`/solve/${p.id}`}
+                    className={`row-link ${solved ? "dim" : ""}`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <strong>{p.title}</strong>
+                  </Link>
                   {slow && (
                     <span
                       className="faint"

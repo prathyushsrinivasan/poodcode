@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { api } from "../api";
 import type { MasteryTrack } from "../types";
 import { loadDoneChapters } from "../lib/learnProgress";
 import { pacing, effectiveStart, parsePause, pauseKey, progressByWeek, startDateKey, unlockedWeeks, weekProgress } from "../lib/mastery";
 import { loadFailed } from "../lib/failures";
+import { ProgressBar } from "./ui/Card";
 
 /** Dashboard summary of whichever mastery track is furthest along: where you
  * are, what is still outstanding this week, and whether you are behind pace.
@@ -19,7 +20,6 @@ export function MasteryCard() {
     percent: number;
     behind: number | null;
   } | null>(null);
-  const nav = useNavigate();
 
   useEffect(() => {
     (async () => {
@@ -88,11 +88,7 @@ export function MasteryCard() {
   const { track, week, outstanding, percent, behind } = state;
 
   return (
-    <div
-      className="card"
-      style={{ cursor: "pointer", borderColor: "var(--accent)", marginBottom: 18 }}
-      onClick={() => nav("/mastery")}
-    >
+    <Link to="/mastery" className="card mastery-card-link">
       <div className="row" style={{ justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
         <div style={{ minWidth: 0 }}>
           <strong>
@@ -118,15 +114,14 @@ export function MasteryCard() {
           <span className="badge">Open →</span>
         </span>
       </div>
-      <div className="progress-track">
-        <div
-          className="progress-fill"
-          style={{
-            width: `${percent}%`,
-            background: percent === 100 ? "var(--good)" : "var(--accent)",
-          }}
-        />
-      </div>
-    </div>
+      <ProgressBar
+        className="mastery-card-progress"
+        value={percent}
+        max={100}
+        tone={percent === 100 ? "good" : "accent"}
+        label={`${track.title}, week ${week}`}
+        size="sm"
+      />
+    </Link>
   );
 }

@@ -310,6 +310,15 @@ export function CardStudy({
         <>
           <div
             className="card"
+            role={revealed ? undefined : "button"}
+            tabIndex={revealed ? undefined : 0}
+            aria-label={revealed ? undefined : "Show the answer"}
+            onKeyDown={(e) => {
+              if (!revealed && (e.key === "Enter" || e.key === " ")) {
+                e.preventDefault();
+                setRevealed(true);
+              }
+            }}
             onClick={() => !revealed && setRevealed(true)}
             style={{
               minHeight: 190,

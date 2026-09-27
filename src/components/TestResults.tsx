@@ -4,6 +4,7 @@ import { formatMemory } from "../lib/format";
 import { lineDiff } from "../lib/diff";
 import { TsErrorLinks } from "./TsErrorLinks";
 import { OutputCompare } from "./OutputCompare";
+import { Icon } from "./ui/Icon";
 
 function IOBlock({ label, value }: { label: string; value: string }) {
   return (
@@ -112,7 +113,12 @@ export function TestResults({ report }: { report: JudgeReport | null }) {
 
       {report.results.map((r, i) => (
         <div key={i} className={`result ${r.passed ? "pass" : "fail"}`}>
-          <div className="result-head" onClick={() => setOpen(open === i ? null : i)}>
+          <button
+            type="button"
+            className="result-head"
+            aria-expanded={open === i}
+            onClick={() => setOpen(open === i ? null : i)}
+          >
             <span>{verdictIcon(r)}</span>
             <strong>{r.name}</strong>
             <span className="badge">{r.kind}</span>
@@ -126,8 +132,8 @@ export function TestResults({ report }: { report: JudgeReport | null }) {
               <span className="dim">{formatMemory(r.memory_kb)}</span>
             )}
             <span className="dim">{r.runtime_ms} ms</span>
-            <span className="dim">{open === i ? "▲" : "▼"}</span>
-          </div>
+            <Icon name={open === i ? "chevronUp" : "chevronDown"} size={14} />
+          </button>
           {open === i && (
             <div className="result-body">
               {r.kind === "hidden" && !r.passed ? (
