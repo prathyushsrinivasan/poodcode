@@ -782,8 +782,9 @@ shape, which module 15 inherits.
 ## The second project
 
 It landed early — see [`CALC_ROADMAP.md`](CALC_ROADMAP.md). **Calc**, an
-expression language: scanner, parser, evaluator, error messages. Modules 1-4
-ship — phase 1 is complete — and 5-18 are planned.
+expression language: scanner, parser, evaluator, error messages. **All 18
+modules ship** — 165 judged exercises — and the roadmap document records what
+each module decided.
 
 It is not a queue-jump so much as a hedge: the Todo API teaches the shape of a
 service and barely touches the type system, because HTTP hands you strings and

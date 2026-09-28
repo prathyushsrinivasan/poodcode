@@ -99,10 +99,19 @@ _CALC_SCOPE_RULES = [
     ("try {", 17),
     ("catch ", 17),
     ("throw ", 17),
+    ("instanceof ", 17),       # reading the message off whatever was caught
     (".repeat(", 17),
+    # Where an error goes and what the process says about it are one decision,
+    # made once for every kind of error — module 17's.
+    ("console.error(", 17),
+    ("process.exitCode", 17),
     (".split(", 18),
     ("=>", 18),
     (".map(", 18),
+    # The REPL reads stdin a line at a time — the first callback in the project,
+    # which is why `=>` waited until here.
+    ("createInterface(", 18),
+    (".on(", 18),
     # --- Never. Type-stripping cannot run these (design rule 4). -----------
     ("enum ", 999),
     ("namespace ", 999),
@@ -132,84 +141,43 @@ _CALC_PHASES = [
            "can use is entirely in what it says when they get it wrong."),
 ]
 
-# Authored modules live one per file in tools/calc_mNN_*.py, each appending to
-# `_CALC_MODULES`; the rest are skeletons below. Order matters —
+# Every module lives in its own file, tools/calc_mNN_*.py, appending one module
+# to `_CALC_MODULES`. All eighteen are authored. Order matters —
 # `_lint_structure` checks it positionally.
 _CALC_MODULE_FILES = (
     "calc_m01_token.py",
     "calc_m02_scan.py",
     "calc_m03_numbers.py",
     "calc_m04_errors.py",
+    "calc_m05_tree.py",
+    "calc_m06_cursor.py",
+    "calc_m07_precedence.py",
+    "calc_m08_parens.py",
+    "calc_m09_walk.py",
+    "calc_m10_never.py",
+    "calc_m11_arithmetic.py",
+    "calc_m12_vars.py",
+    "calc_m13_statements.py",
+    "calc_m14_booleans.py",
+    "calc_m15_if.py",
+    "calc_m16_positions.py",
+    "calc_m17_messages.py",
+    "calc_m18_repl.py",
 )
 
 _CALC_MODULES = []
+
+# The Python reference implementation every expected output from module 6 on is
+# computed with — see the header of calc_oracle.py for why it exists.
+_coracle = os.path.join(HERE, "calc_oracle.py")
+with open(_coracle, encoding="utf-8") as _cf:
+    exec(compile(_cf.read(), _coracle, "exec"))
 
 for _cfname in _CALC_MODULE_FILES:
     _cpath = os.path.join(HERE, _cfname)
     assert os.path.exists(_cpath), f"missing calc module file: {_cfname}"
     with open(_cpath, encoding="utf-8") as _cf:
         exec(compile(_cf.read(), _cpath, "exec"))
-
-# --- Planned modules -------------------------------------------------------
-# Delete a line here as its file lands in `_CALC_MODULE_FILES` above.
-_CALC_MODULES += [
-    _pskel("calc-tree", 5, "parse", "What a tree is",
-           "a type that refers to itself, and the shape `1 + 2 * 3` really has",
-           "Define `Expr` and build one by hand.",
-           "The tree the parser is going to produce, written down as a type."),
-    _pskel("calc-cursor", 6, "parse", "A parser with a cursor",
-           "peek, advance and expect — reading a list of tokens in order",
-           "Parse a single number token into an `Expr`.",
-           "The parser can consume tokens and say when it did not get what it wanted."),
-    _pskel("calc-precedence", 7, "parse", "Precedence, and why `1 + 2 * 3` is 7",
-           "two functions calling each other is the entire trick",
-           "Parse `+ - * /` into a tree that binds them in the right order.",
-           "The tree is correct for any mix of the four operators."),
-    _pskel("calc-parens", 8, "parse", "Parentheses and unary minus",
-           "recursion back to the top of the grammar, which closes the loop",
-           "Parse `(1 + 2) * -3`.",
-           "The grammar is complete: any arithmetic expression parses."),
-    _pskel("calc-walk", 9, "eval", "Walking the tree",
-           "switch on the kind, recurse into the children, return a number",
-           "Turn an `Expr` into the number it means.",
-           "`echo '1 + 2 * 3' | node calc.ts` prints 7."),
-    _pskel("calc-never", 10, "eval", "Exhaustiveness with `never`",
-           "the compiler proving you handled every node, forever",
-           "Make a new node kind a compile error everywhere it is not handled.",
-           "Growing the language can no longer silently break the evaluator."),
-    _pskel("calc-arithmetic", 11, "eval", "Division, and the arithmetic that can fail",
-           "what your language says about `1 / 0`, decided rather than inherited",
-           "Give division a defined answer for every input.",
-           "No expression evaluates to `Infinity` or `NaN` by accident."),
-    _pskel("calc-vars", 12, "lang", "Variables and an environment",
-           "`let x = 4` — a Map, and the name that is not in it",
-           "Bind a name to a value and read it back.",
-           "The language has memory."),
-    _pskel("calc-statements", 13, "lang", "Statements, and a program",
-           "many expressions separated by `;`, and what a program's value is",
-           "Run `let x = 4; x * x` as one program.",
-           "A program is a sequence, not a single expression."),
-    _pskel("calc-booleans", 14, "lang", "Booleans and comparison",
-           "the value type stops being `number`, and every layer notices",
-           "Evaluate `2 < 3` without letting `true * 2` sneak through.",
-           "Values are `number | boolean`, and the type errors that implies are handled."),
-    _pskel("calc-if", 15, "lang", "`if` as an expression",
-           "a conditional that has a value, and the type rule that forces",
-           "Evaluate `if 2 < 3 then 10 else 20`.",
-           "The language can make a decision."),
-    _pskel("calc-positions", 16, "usable", "Line and column on every token",
-           "carry the position from the scanner, or you can never report it",
-           "Attach a position to every token and every node.",
-           "Every token knows where it came from."),
-    _pskel("calc-messages", 17, "usable", "Error messages that point at the problem",
-           "a caret under the offending character, and try/catch at the edge",
-           "Turn every failure into a message a stranger could act on.",
-           "One error format, one place that prints it, no stack traces."),
-    _pskel("calc-repl", 18, "usable", "A REPL, and a test suite you wrote",
-           "read stdin line by line, and prove the whole thing with no framework",
-           "Leave the language in a shape you would be happy to add a feature to.",
-           "The finished language — interactive, tested, and yours."),
-]
 
 _lint_scope(_CALC_MODULES, _CALC_SCOPE_RULES)
 _lint_syntax_taught(_CALC_MODULES, _CALC_SCOPE_RULES)

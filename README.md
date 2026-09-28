@@ -378,10 +378,14 @@ exercises** between them:
 - **Calc** — an expression language: scanner, parser, evaluator, error messages.
   Eighteen modules in five phases, where the Todo API's hard part is contracts
   and this one's is structure — discriminated unions, recursive types, `never`.
-  **Modules 1-4 ship — phase 1 complete, 16 steps and 42 judged exercises** — the
-  token type, then a scanner reading source from stdin that handles numbers of
-  any length and answers a character it cannot read with
-  `error: unexpected '$' at 1:3`, returned as a value no caller can ignore.
+  **All 18 modules ship — 72 steps and 165 judged exercises** — from the token
+  type to a finished language: a scanner, a recursive-descent parser with
+  precedence and brackets, an evaluator over a discriminated-union tree made
+  exhaustive with `never`, variables, statements, booleans and `if` as an
+  expression, errors with a line, column and caret (`error: unexpected ')' at
+  1:5`), exit codes, a REPL and a test suite written without a framework. Every
+  expected output is computed by an independent Python implementation of the
+  language (`tools/calc_oracle.py`).
 
 Where the Backend Lab's unit is a *project* you finish in an evening, this
 track's unit is a **module** — one 30-60 minute slice that adds exactly one
@@ -466,7 +470,8 @@ the authored data puts the right answer first, which in the Projects track and
 the Java course is every single question.
 
 The remaining plans live in [`PROJECTS_ROADMAP.md`](PROJECTS_ROADMAP.md) (Todo
-API, modules 14-20) and [`CALC_ROADMAP.md`](CALC_ROADMAP.md) (Calc, 5-18).
+API, modules 14-20). [`CALC_ROADMAP.md`](CALC_ROADMAP.md) is now the record of
+how Calc was built, and the decisions each module made.
 
 ### TypeScript course
 

@@ -20,6 +20,10 @@
 // `node:http`, `URL` and `fetch`, which are what a judged HTTP server and the
 // request replayer that drives it need. Same rule applies — each member is
 // declared because a shipped program uses it, not because Node has it.
+//
+// Calc, the track's second project, added the last group: a narrow `process`
+// (exit code, argv, isTTY) and `node:readline`, for its module 17 exit codes and
+// module 18 REPL. They are the first — and only — uses of `process` anywhere.
 
 declare module "fs" {
   /** The form every program uses: `readFileSync(0, "utf8")` — fd 0 is stdin. */
@@ -187,4 +191,38 @@ declare var AbortSignal: {
 declare class AbortController {
   readonly signal: AbortSignal;
   abort(reason?: unknown): void;
+}
+
+// ---------------------------------------------------------------------------
+// Process and line input — the Projects track's Calc, modules 17-18. Module 17
+// sets an exit code (`process.exitCode`); module 18 reads stdin a line at a time
+// for its REPL (`node:readline`), and picks REPL or whole-program mode with
+// `process.stdin.isTTY` and a `--test` flag from `process.argv`. Narrowed to
+// exactly those members, like everything else in this file.
+// ---------------------------------------------------------------------------
+
+declare var process: {
+  exitCode: number | undefined;
+  readonly argv: string[];
+  readonly stdin: { readonly isTTY: boolean | undefined };
+  readonly stdout: { readonly isTTY: boolean | undefined };
+};
+
+declare module "readline" {
+  export interface Interface {
+    on(event: "line", listener: (line: string) => void): this;
+    on(event: "close", listener: () => void): this;
+    setPrompt(prompt: string): void;
+    prompt(): void;
+    close(): void;
+  }
+  export function createInterface(options: {
+    input: unknown;
+    output?: unknown;
+    terminal?: boolean;
+  }): Interface;
+}
+
+declare module "node:readline" {
+  export * from "readline";
 }
