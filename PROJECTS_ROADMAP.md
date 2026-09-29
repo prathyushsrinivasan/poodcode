@@ -1,9 +1,8 @@
-# Projects Roadmap — the Todo API, modules 14-20
+# Projects Roadmap — the Todo API
 
-The plan for finishing **Todo API**, the first project in the **Projects** track
-(`tools/projects_track.py`). Modules 1-13 ship — phases 1, 2 and 3 are complete
-and phase 4 is under way — and 14-20 are one-line skeletons waiting to be
-authored.
+The plan for **Todo API**, the first project in the **Projects** track
+(`tools/projects_track.py`) — and now the record of how it was built. **All 20
+modules ship**: every phase is complete, and there are no skeletons left.
 
 Where [`TS_ROADMAP.md`](TS_ROADMAP.md) plans a *time* ladder (32 weeks) and
 [`JAVA_ROADMAP.md`](JAVA_ROADMAP.md) plans a *topic* ladder (31 modules), this
@@ -17,12 +16,31 @@ arrive in.
 
 ## Where it stands
 
-**Built:** modules 1-13 — **52 steps, 124 judged exercises**, thirteen revealable
-reference implementations (all type-checked by the verifier since module 12
-landed), and the full infrastructure the other eight modules will drop into.
-Both program shapes are proven end to end: `_plain` (modules 1-3, and the
-function-level steps of 10-12) and `_server` (module 4 on, booting a real server
-on port 0).
+**Built:** modules 1-20 — **80 steps, 207 judged exercises**, twenty revealable
+reference implementations (every one type-checked by the verifier), 316 review
+questions and 363 pitfalls. The plan's estimate was "roughly 170", revised to 190
+at module 13; the last seven modules averaged 11.9.
+
+The replayer ended up in three shapes, each introduced by the module that needed
+it and each announced in that module and in the track's harness note:
+
+| Shape | Modules | What it adds |
+|---|---|---|
+| `_server` | 4-15 | boots on port 0, replays stdin, and turns an escaping throw into a 500 |
+| `_server_bare` | 16-18 | the same, with **no** safety net — the learner's boundary is graded by the run surviving |
+| `_server_disk` | 19-20 | also a `FILE <text>` line before boot and after the run, and `boot refused: …` for a `loadStore` that throws |
+
+Plus `_plain` (pure logic, used right through to module 20, whose tests run the
+whole application below the http layer as a plain program).
+
+**The project closed with module 20.** Phase 5 made the list queryable and
+paginated, made the store survive a restart, and ended by splitting the file
+into layers behind a table router — with a hand-written test runner proving
+every promise the earlier nineteen modules made in prose.
+
+**Phase 4 closed with module 16.** Bad input gets a specific 400 naming the
+problem, `not json` included; a bug in a route is a logged, plain 500; and the
+safety net the replayer lent the learner since module 4 is the learner's own.
 
 **Phase 3 closed with module 12.** Every verb on the resource works — list,
 create, fetch, patch, delete — and the phase ended by paying off two debts from
@@ -44,7 +62,7 @@ rather than assertion.
 
 | | |
 |---|---|
-| Content generator | `tools/projects_track.py` (~700 lines) + one `todo_mNN_*.py` per module |
+| Content generator | `tools/projects_track.py` (~950 lines, three replayer shapes) + one `todo_mNN_*.py` per module |
 | Generated seed | `src-tauri/seeds/projects.json` |
 | Rust model | `ProjectTrack` → `Project` → `ProjectModule` → `BackendStep` in `models.rs` |
 | Command | `projects_track` (`commands.rs`), registered in `lib.rs` |
@@ -157,7 +175,7 @@ of a module the Handbook never touched — and like it, none needed a model chan
 |---|---|---|
 | 🕰️ **Build history** | every module's `reference` | the ladder as a sequence of diffs — "what did module 9 do?" answered in code |
 | 🧪 **Workbench** | every module's `final_build` | run a build against requests of your own, through the real judge |
-| 🔁 **Review** | every `warmup`, step `quiz` and module `review` | ~170 questions asked again, mixed, misses first |
+| 🔁 **Review** | every `warmup`, step `quiz` and module `review` | 316 questions asked again, mixed, misses first |
 
 Details worth keeping:
 
@@ -248,6 +266,13 @@ Two choices inside that worth knowing:
 solutions still type-check clean against the extended file (`python
 tools/verify_ts_course.py --types-only --starters`). Re-run that after any
 further change here — a global added to this file is visible to every track.
+
+**Module 19 added two more `fs` members**, by the same rule: **`existsSync`**,
+which the learner writes to tell a first boot from a restart, and **`rmSync`**,
+which only the disk replayer uses, to delete `todos.json` before a case that has
+no `FILE` line. (`renameSync` — for an atomic write-then-rename — was left out
+on purpose: nothing shipped uses it, and the module's stretch list is where the
+idea lives.)
 
 ### 4. `strict+indexed` everywhere, and it is content ✅
 
@@ -528,7 +553,7 @@ in prose and in the manual test, where `curl -i` shows the stray
 **A second response helper**, `sendEmpty(res, status)`: module 5's rule — every
 response leaves through a helper — still holds, with one helper per kind.
 
-### Phase 4 — Make it trustworthy (13-16)
+### Phase 4 — Make it trustworthy (13-16) — ✅ **done**
 
 Ends with: bad input gets a specific 400 naming the field — never a 500.
 
@@ -563,59 +588,178 @@ shape is not only about quiet wrong answers.
 **Scope table:** `'" in '` added at 13 — written with the closing quote so it
 matches `"title" in obj` and never a `for … in` loop.
 
-**14. Validation and a field-level 400** ⬜ · a validator returning collected
-errors
-*Introduces `.map(`.* Output shape:
-`{"error":"validation","fields":[{"field":"title","message":"must not be empty"}]}`
-*What module 13 left it:* `titleFrom` and `changesFrom` already answer "right
-shape, or `undefined`". Module 14 needs them to say *what* was wrong instead, so
-their return types change again — to a list of field errors, or to module 15's
-union early. Every `{"error":"invalid_body"}` becomes this shape. The empty title
-is the one value rule the project has promised; decide the others (a maximum
-length?) before starting. `updateTodo` already builds before it stores, so a
-patch whose *result* is invalid can be refused with the store untouched — module
-11 set that up for this module.
+**14. Validation and a field-level 400** ✅ · `todo_m14_validate.py` · 4 steps, 12 exercises
+`FieldError` · `.trim()` · value rules and their boundaries · *required* versus
+*wrong* · collecting every error · codes for programs, messages for people.
+**The error shape was decided with 15 in mind, as asked:** `{ field, message }`,
+always in a **list** — even from create, which can only find one problem — so
+both write routes fail in one shape and module 15's union carries
+`fields: FieldError[]` untouched. A body that is not an object is itself a field
+error (`"field":"body"`), not a second 400 shape.
+**The rules decided before starting:** a title must not be empty *or blank*
+(`"   "` counts — the check trims, the store does not) and must be **at most 100
+characters**. Both boundary bugs are graded: an untrimmed check, and `>= 100`.
+**The return types changed again, and the module owns it:** a validator answers
+*the value or the reason* — `titleFrom(value): string | FieldError`,
+`changesFrom(data): Partial<Todo> | FieldError[]` — told apart with `typeof` and
+`Array.isArray`, both from module 13. That this works only because the halves
+*happen* to differ in shape is exactly the opening line of module 15.
+**`titleFrom` now takes the field, not the body** — and because its parameter is
+`unknown`, `titleFrom(obj)` still compiles and refuses every title. Graded:
+`unknown` in a parameter accepts the wrong thing too.
+**Collected, not first-fail** is the module's payoff and its two best fixes:
+returning at the first bad field, and `errors.length > 1`, which applies half a
+patch.
+**`.map(` did not arrive here.** The scope table had it at 14, "collecting one
+error per bad field"; in practice each field is checked by different code and
+collected with `push`. It moved to 17, where it has an honest first use.
 
-**15. One error shape, everywhere** ⬜ · a discriminated union, one place that
-renders it
-*The natural home for the track's second union*, and the module that makes
-modules 9-12 shorter in retrospect. Consider having the learner refactor an
-earlier handler as the build.
+**15. One error shape, everywhere** ✅ · `todo_m15_errors.py` · 4 steps, 10 exercises
+Literal types · the discriminated union `ApiError` · `switch` and narrowing by
+tag · `never` and exhaustiveness · `errorReply` (pure) and `sendError`.
+**Three kinds, and one the app does not send yet:** `not_found`, `validation`,
+and `server_error` — which the *replayer* has sent since module 4 and which is
+part of the contract, so it is in the union from the start. Module 16 has the
+app send it, and adds `invalid_json`; the `never` line then fails the build,
+naming it. The payoff the module promises is cashed one module later, on
+purpose.
+**Decide, then do.** `errorReply(err)` returns `{ status, body }` and sends
+nothing, so steps 1-2 run it as a plain program printing exactly what the
+replayer would; `sendError` is two lines. Module 20's tests lean on the split.
+**Compile-time on purpose:** the module's claim *is* that a forgotten case and a
+misspelt kind are compile errors, so `todo-m15-never-fix1` is a deliberate
+compile-time fix. The runtime fixes are what the union cannot see: a route
+missed in the refactor (`"notfound"`), and a hand-written status and body that
+disagree (`send(res, 400, { error: "not_found" })`).
+**The roadmap's "shorter in retrospect" did not happen**, and step 4 says so: the
+handler is the same length, byte-for-byte the same on the wire. What moved is
+knowledge — six places that knew "not found means 404" became one — and the step
+measures the refactor by that, not by lines.
 
-**16. The error boundary** ⬜ · `try`/`catch`, `headersSent`, no leaked traces
-*Note:* the given replayer has always had this boundary in it (that is where its
-500 comes from). This module is where the learner reads the code that has been
-quietly protecting them since module 4 — a nice payoff if the step names it.
-*It also owns `not json`:* the first module with `catch` is the only one that can
-turn `JSON.parse`'s throw into a 400. Modules 9, 11 and 13 all promise that it
-does.
+**16. The error boundary** ✅ · `todo_m16_boundary.py` · 4 steps, 12 exercises
+`throw` · `try`/`catch` · `catch` variables are `unknown` · `instanceof`, specific
+before general · `parseJson` and the `{ ok }` union · the boundary · `headersSent`
+· what a 500 must not say.
+**The plan's payoff went one step further than planned.** The roadmap asked that
+this be where the learner *reads* the replayer's boundary. It is — and then,
+from this module on, the replayer **has none** (`_server_bare`): it starts the
+server as `createServer(handler)`, exactly as the learner's own `server.ts` has
+since module 4. Which is the real lesson: their own server has had no boundary
+since module 8 made the handler async, and one exception would have killed it.
+Removing the net is also what makes the boundary *gradable* — without it the
+run dies — including the subtle one, a `try` around `route(req, res)` with no
+`await`.
+**`not json` is a 400 at last**, caught where it happens: `parseJson` turns the
+throw back into `{ ok: true, data } | { ok: false }`, and the only `JSON.parse`
+in the file is inside it. A wide `catch` around a route was rejected in prose:
+it would report the server's own bugs as the client's `invalid_json`.
+**Something had to throw.** Nothing in the API throws on ordinary input any
+more, so `GET /boom` exists to — module 8's `/echo` precedent — and module 17
+retires it in the contract data.
+**Never print Node's messages.** `JSON.parse`'s wording differs between Node
+versions, so no expected output contains one; the step-1 program catches a
+`SyntaxError` and prints its *own* words. (The graded ordering bug — `instanceof
+Error` first — prints Node's text, which is fine for a starter: it only has to
+fail.)
+**`headersSent` is taught and drilled, not graded as a fix.** Nothing in the API
+answers and then throws; a second scaffolding route to prove it was not worth
+it. Module 19's write-after-change is where it would matter, and step 4 says so.
 
-### Phase 5 — Make it real (17-20)
+### Phase 5 — Make it real (17-20) — ✅ **done**
 
 Ends with: a queryable, paginated, restart-proof API behind a router worth
 extending.
 
-**17. Filtering with query strings** ⬜ · `searchParams`, `.filter(`, and a
-default for `?done=banana`
+**17. Filtering with query strings** ✅ · `todo_m17_filter.py` · 4 steps, 13 exercises
+`searchParams.get` and its `null` · `filter` and `map` · `toLowerCase`/`includes`
+· `else if` · `listQueryFrom` · `?done=` and `?q=` together.
+**The plan's `?done=banana` default was reversed**, and the step argues it: a
+default turns `?done=flase` into a 200 with the wrong list, module 9's quiet
+wrong answer in a new place. It is a 400 naming `done`, in module 14's shape. The
+default survived where it is right — an *absent* parameter — and *unknown*
+parameters (`?colour=red`) are ignored, for forward compatibility: a different
+question with a different answer.
+**Module 7's promise paid out exactly:** routes match `url.pathname`, so one
+route changed and nothing else did. The graded counterpart is a route written as
+`req.url === "/todos"`, which 404s every filtered request.
+**Graded, all on ordinary input:** the string `"false"` is truthy, `""` is falsy,
+a `filter` whose result is discarded, a case-sensitive search, and `?done=banana`
+silently read as false.
+**`.map(` arrives here**, next to its sibling, printing a list as its titles in
+the plain programs — the use module 20's tests build on.
 
-**18. Sorting and pagination** ⬜ · `.sort(`, `.slice(`, the `{items, total}`
-envelope
-*Contract change:* `GET /todos` stops returning a bare array. Say so loudly —
-it is the project's one breaking change, and that is worth a paragraph about
-why envelopes exist.
+**18. Sorting and pagination** ✅ · `todo_m18_page.py` · 4 steps, 11 exercises
+Comparators · `localeCompare` · `sort` sorts in place · `slice(start, end)` ·
+`offset`/`limit` · the `{items, total}` envelope · a literal-union `Sort`.
+**The breaking change is said loudly,** as asked: step 3 is the paragraph — why
+an array has no room for a total, why an object is the *last* breaking change a
+collection needs, and why this project's list started as a bare array anyway
+(module 7 had one route and no reason to plan). The route line did not change at
+all — `listTodos` returns a `Page` now — which is the point about how easy these
+are to make by accident.
+**`?sort=oldest|newest|title`**, default `oldest`. The project brief said "newest
+first", but changing the list's order *and* its shape in one module would be two
+breaking changes; the project-level endpoint text was corrected instead.
+`oldest` sorts nothing — the store is kept in id order, an invariant stated here
+and relied on in 19.
+**The best graded bug in phase 5:** `items.sort(…)` without `.slice()`. With no
+filter, `items` *is* the store, so one client's `?sort=title` reorders every
+later plain `GET /todos`. Also graded: `slice(offset, limit)`, `total` counted
+after the cut, and a `limit` with no ceiling.
+**`localeCompare` is locale-aware,** so every title in the expected output
+starts with a capital letter — no two are ordered differently by any locale
+Node ships.
 
-**19. Persistence on disk** ⬜ · `readFileSync`/`writeFileSync`, and validating
-what you load
-*Two things to get right:* the file is untrusted input too (module 13 applies to
-your own disk), and the judged exercises must write to the scratch directory the
-runner already provides. *Risk:* medium — check that a file written by one test
-case does not leak into the next, since the judge reuses the compile artifact
-across cases.
+**19. Persistence on disk** ✅ · `todo_m19_persist.py` · 4 steps, 13 exercises
+`writeFileSync` · `readFileSync` on a path · `existsSync` · write-through ·
+saving before answering · the counter is state · the file is input · refusing to
+boot.
+**The flagged risk was real, and was resolved in the replayer.** The judge runs
+every case of a submission in one scratch directory, so a file written by case 1
+*would* be there for case 2. `_server_disk` sets `todos.json` up from an optional
+first line `FILE <text>` — and deletes it when there is none — before every
+boot, and prints what it holds after the run. That also made persistence
+gradable at all: a restart is two cases, *what a script leaves on disk* and *what
+a server booted from that disk answers*.
+**The file holds the counter:** `{"nextId":4,"todos":[…]}`. Working it out —
+`length + 1`, or largest id + 1 — reissues the id of the last todo deleted before
+the restart. Module 2's collision, and module 12's "never reused", broken by a
+reboot; both derivations are graded.
+**The file is loaded through the request rules** (`objectFrom`, module 14's
+`titleFrom`) plus two a request never needed: ids strictly increasing (unique,
+and module 18's order invariant) and all below `nextId`.
+**Refuse to boot, and the reason is graded:** a `loadStore` that logs a bad file
+and starts empty lets the first create overwrite the only copy of the user's
+data. The replayer prints `boot refused: <message>` so a refusal is an answer
+the judge can check, and the `FILE` line shows the file untouched.
+**Ungradable, and taught:** saving before answering prints the same lines either
+way, and a crash mid-write is prevented by write-then-rename, which is a stretch
+goal because `renameSync` is not declared.
 
-**20. A router, layers and a smoke test** ⬜ · split store/service/routes, then
-prove it
-*Closes the project.* The test runner is written by hand — zero dependencies —
-which doubles as the argument for what a test framework actually does.
+**20. A router, layers and a smoke test** ✅ · `todo_m20_structure.py` · 4 steps, 12 exercises
+The service layer · layers that only call downward · function types ·
+`Record<string, Route>` · `Object.keys` · 405 and `Allow` · a test runner by
+hand · isolation · testing the assertion.
+**Layers, proved by the compiler.** The file is four sections — rules, store,
+service, http — and the new one, the service, answers values
+(`createTodo(body): Todo | ApiError`) with no reference to HTTP. Steps 1, 3 and 4
+run everything below http as a *plain* program with no `node:http` import; that
+it compiles is the proof. `patchTodo` takes the body as a string, so lookup still
+comes first — `patchTodo(9, "not json")` is `not_found`, graded.
+**The router is two tables keyed by method**, and `noUncheckedIndexedAccess`
+makes a lookup `Route | undefined` — whose `undefined` branch is exactly 405,
+with `Object.keys` of the table as the `allow` list and the `Allow` header.
+Module 7's "405 needs a routing table, which is module 20" is cashed;
+`DELETE /todos` is declared as changing from 404.
+**The test runner is thirty lines** — `test`, `expectEqual`, `runTests` — and its
+graded bugs are the two ways a home-made runner lies: shared state between tests
+(no `resetStore()`), and an assertion that logs instead of throwing, caught by
+the suite's own test of `expectEqual`. Step 4 then uses the suite as the grader
+for an application bug: module 18's sort-in-place, reintroduced.
+**The HTTP smoke test is in the manual test** — a zero-dependency `smoke.ts` that
+fetches the running server — because a judged program cannot start a second
+process. The module points out that the replayer has been a smoke-test runner,
+minus the expectations, since module 4.
 
 ---
 
@@ -629,12 +773,40 @@ Each batch ends green and committable.
 | **B** ✅ | 1-3 | Phase 1 — the data model, with no HTTP in the way |
 | **C** ✅ | 4-7 | Phase 2 — first server, deliberate responses, routing |
 | **D** ✅ | 8-12 | Phase 3 — CRUD, one verb per module |
-| **E** 🚧 | 13 ✅ · **14-16** ← next | Phase 4 — the trust story |
-| **F** | 17-20 | Phase 5 — polish, persistence, structure |
+| **E** ✅ | 13-16 | Phase 4 — the trust story |
+| **F** ✅ | 17-20 | Phase 5 — polish, persistence, structure |
 
-**Module 14 is the one to think about next**: the error *shape* it introduces is
-contract, and module 15 is supposed to turn it into one union for every error the
-API has. Decide the field-error shape with 15 in mind, or 15 rewrites 14.
+**Module 14's error shape held.** It was decided with 15 in mind, as this section
+used to ask, and 15 carried `fields: FieldError[]` into its union without
+changing a byte of what clients see.
+
+### What phases 4 and 5 changed about the scope table
+
+The syllabus moved in six places, each recorded next to its row in
+`_TODO_SCOPE_RULES`:
+
+| Token | Planned | Shipped | Why |
+|---|---|---|---|
+| `.map(` | 14 | **17** | module 14 collects errors with `push`; `map`'s first honest use is next to `filter` |
+| `.trim(` | — | 14 | a blank title is an empty one |
+| `switch (` · `case ` · `: never` | — | 15 | the union; `never` gated *with* its colon, because the word is in teaching comments from module 2 |
+| `.toLowerCase(` · `.includes(` | — | 17 | the case-blind search |
+| `localeCompare(` | — | 18 | the title sort |
+| `Record<` · `Object.keys(` · `.join(` · `setHeader(` | — | 20 | the route tables and the `Allow` header — all but `setHeader` used by the replayer since module 4 |
+
+### What phase 4 established that phase 5 relied on
+
+* **Every failure is an `ApiError`, sent by `sendError`.** Modules 17 and 18 added
+  query-string errors as `validation` with no new kind; module 20 added
+  `method_not_allowed`, and the `never` line walked it to `errorReply`.
+* **A validator answers the value or a list of `FieldError`s**, and the caller
+  tells them apart with `Array.isArray`. `listQueryFrom` is the same shape as
+  `changesFrom`, for a query string.
+* **`parseJson` is the only `JSON.parse`** — module 19 reads `todos.json` through
+  it too.
+* **The handler is a boundary around `route`**, so module 19's disk writes can
+  fail into a 500 rather than a crash, and module 20 could replace `route`'s
+  insides wholesale without touching it.
 
 ### What phase 3 established that batch E can rely on
 
@@ -717,14 +889,15 @@ API has. Decide the field-error shape with 15 in mind, or 15 rewrites 14.
 
 1. Write `tools/todo_mNN_topic.py` — it appends one `_pmod(…)` to
    `_TODO_MODULES` and may use any helper from the parent.
-2. Add it to `_TODO_MODULE_FILES` **in module order**, and delete the matching
-   `_pskel` line from the skeleton list below it.
+2. Add it to `_TODO_MODULE_FILES` **in module order**. (Every Todo module is now
+   authored, so there is no skeleton list any more; a *new* project would plan
+   its modules with `_pskel` and delete each line as its file lands.)
 3. Add that module's new syntax to `_TODO_SCOPE_RULES`, and make sure the module's
    `syntax` primer teaches each token — `_lint_syntax_taught` will tell you if
    not.
 4. `python tools/gen_seed.py && python tools/verify_projects.py --starters`
 
-### Three traps worth knowing
+### Four traps worth knowing
 
 **1. `_lint_scope` scans program text, not code** — comments and strings
 included. So a module numbered below 11 may not contain a literal `...` anywhere
@@ -767,6 +940,19 @@ with no fall-through) does fail the starter check, but only by timing out — 25
 in the Python verifier plus 30 s in the Rust one, every run, forever. Module 7
 declined to buy that lesson twice; module 4 already grades it cheaply.
 
+A **crash**, by contrast, is cheap to grade, and phase 4 leans on it: from
+module 16 the replayer has no boundary, so a missing (or `await`-less) boundary
+kills the run at once and the starter fails in well under a second.
+
+### A fourth, from phase 5: the scratch directory is shared across cases
+
+The real judge prepares a submission once and runs every test case in the same
+directory. Anything a program writes to disk is still there for the next case.
+Module 19 is the only module that writes files in a server program, and its
+replayer resets `todos.json` before every boot (from the `FILE` line, or by
+deleting it). A future module that writes any *other* file must do the same, or
+its cases stop being independent — and pass or fail depending on their order.
+
 ---
 
 ## What "done" looks like
@@ -775,9 +961,22 @@ One project · 20 modules · 5 phases · roughly 170 judged exercises · a Todo 
 that validates, paginates and persists · and a learner who was never once asked
 to write a line of TypeScript the track had not already taught them.
 
-At 13 of 20 the run rate is **9.5 exercises per module** (124 so far) — call the
-finished project 190. Seven modules remain, and one decision: module 14's error
-shape, which module 15 inherits.
+**Done, as of module 20:** one project · 20 modules · 5 phases · 80 steps ·
+**207 judged exercises** · 316 review questions · 363 pitfalls · twenty
+references, each one the whole `server.ts` at that point and each type-checked.
+The last reference is ~580 lines in four layers behind a table router, and ships
+with a hand-written test suite. Both verifiers pass on all 372 exercises across
+the two projects:
+
+```
+python tools/verify_projects.py --starters     # 372 solutions run, every starter fails
+cd src-tauri && cargo test --test verify_projects
+```
+
+Where this could go next, if it goes anywhere: the project-level stretch list
+(`PUT`, tags, SQLite through `node:sqlite`, an HTML page) is now, for each item,
+one route-table entry, one service function and some tests — which was module
+20's argument.
 
 ## The second project
 

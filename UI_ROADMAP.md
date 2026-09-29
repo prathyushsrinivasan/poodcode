@@ -21,12 +21,13 @@ Most of the rest of the app predates that work.
 
 ---
 
-## Status, 2026-09-28 — complete
+## Status, 2026-09-29 — complete
 
 Every item is done, bar one deliberate exception (a custom title bar, under
 C12). The first pass (2026-09-18) did steps 1–6 of the order of work; the
-second pass did the rest. The measures further down are the *original* audit;
-the current numbers are in the table beneath this section.
+second pass did the rest; a third pass finished L6, which had been marked done
+with only its contrast half built. The measures further down are the
+*original* audit; the current numbers are in the table beneath this section.
 
 **First pass (2026-09-18):** A1 A2 A4–A10 · B1–B5 · C1 C5 C7–C11 · D1 D2 D4–D8 ·
 E1 E3–E5 · F1–F8 (F7 retired with the modes it described) · G1 G2 G3 G5 · I2 ·
@@ -56,18 +57,34 @@ J2 J3 · K1–K5 · L1–L6.
 | J1 | `lib/layout`: compact < 1180 ≤ regular < 1440 ≤ wide, exposed as `data-layout`; checked by `npm run check:layout`. It found three real bugs, all fixed. |
 | J4 | Pop a lesson, a statement or an editorial into its own window. |
 
+**Third pass (2026-09-29):** L6 asked for axe on the pages *and* a token
+contrast check; only the second existed. `npm run check:a11y` now runs axe
+(WCAG 2.1 A/AA plus best practices) on all 36 routes in both themes, each at
+normal and high contrast. Its first run broke 7 rules, all of which the token
+check and the D9 audit had passed:
+
+| Rule | What it found | Fix |
+|---|---|---|
+| color-contrast (76 nodes) | Text on *tints* — faint text on raised and highlighted rows, accent text on `--accent-dim`, difficulty badges on their own 12% fill, white on the raw accent in the nav badge | `--text-faint`, the light difficulty colours, light `--good` and a comment colour darkened/lightened; a new `--accent-text` for accent on a tint; fills label with `--on-*`. `check:contrast` now composes tints (`--easy@12/--bg-elev`) and checks 140 pairs, up from 84 |
+| link-in-text-block (9) | Links in dim prose differed from it by colour alone (1.2–2.7:1) | Links in running text are underlined; component and navigation links are not |
+| heading-order (8) | Markdown kept its authored levels, so `### Input` sat straight under an h1 | `Markdown` rebases its headings on the D9 heading context and styles them by authored level; curriculum sections now open a `Deeper` level |
+| aria-required-children (6) | The problem form's `role="row"`s held inputs directly | Each control sits in a `role="cell"` |
+| scrollable-region-focusable (3) | Wide tables and long code lines scrolled only with a mouse | `ScrollX` / `useKeyboardScroll`: a focusable, named region only while the content overflows |
+| label, select-name (4) | Two unlabelled controls in the gallery | Labelled |
+
 ### Current numbers
 
 | Measure | Audit | 2026-09-18 | Now |
 |---|---|---|---|
 | Inline `style={{…}}` objects | ~1,500 | 1,071 | **246**, all dynamic or one-off (ratchet baseline) |
-| Token pairs failing WCAG AA | 21 of 42 | 0 of 84 | **0 of 84** |
+| Token pairs failing WCAG AA | 21 of 42 | 0 of 84 | **0 of 140** (tints included) |
+| axe violations, 36 routes × 2 themes × 2 contrast modes | — | — | **0** (7 rules, 108 nodes before the third pass) |
 | Clickable non-controls (`div`/`span onClick`) | dozens | some | **0** — the only `onClick`s left on non-controls are dialog backdrops and table rows whose target is also a real link inside the row |
 | `.catch(() => {})` in app code | 42 | — | **0** — every catch names a reason |
 | `window.confirm` | 4 | 0 | **0** |
 | Chrome emoji | ~500 | ~500 | **0**; 50 remain as content |
 | Largest page files | Projects 1,880 · Learn 1,501 | — | Learn 29 · Projects 155 (split into `pages/learn/`, `pages/projects/`) |
-| Routes with one h1 and no skipped heading levels | — | — | **31 of 31** |
+| Routes with one h1 and no skipped heading levels | — | — | **36 of 36**, checked by axe |
 | Pages scrolling sideways at 960 / 1180 / 1440 | — | — | **0** |
 | `global.css` | 1,698 lines, one file | 13 files | 21 files behind an index |
 
@@ -78,11 +95,16 @@ J2 J3 · K1–K5 · L1–L6.
 - `npm run check:contrast` — every token pair against WCAG AA.
 - `npm run check:styles` — the inline-style ratchet.
 - `npm run check:layout` — every page at 960, 1180 and 1440 (needs playwright-core).
+- `npm run check:a11y` — axe on every route, both themes, normal and high contrast
+  (needs playwright-core and axe-core; like the layout check, run against
+  `npm run dev:mock`).
 - `node tools/screenshots.mjs` — visual regression, both themes.
 - `node tools/style-codemod.mjs` — static inline styles onto token utilities.
 
 The CI wiring for the contrast and style guards is still in `ci-guards.patch`,
-held back because the push token lacks the `workflow` scope.
+held back because the push token lacks the `workflow` scope (still true on
+2026-09-29: `gh auth status` shows `gist, read:org, repo`). The layout and axe
+checks need a browser and a running dev server, so they stay local.
 
 ---
 
