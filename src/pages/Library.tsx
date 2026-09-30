@@ -140,6 +140,13 @@ export default function Library() {
           <Button icon="browse" onClick={() => nav("/library/browse")}>
             Browse all problems
           </Button>
+          <Button
+            icon="sparkles"
+            onClick={() => nav("/library/topic/sliding-window")}
+            title="The first topic in the NEW_DSA format: sixteen sections, in TypeScript, from the concept to mastery"
+          >
+            NEW DSA: Sliding Window
+          </Button>
         </div>
       </div>
 

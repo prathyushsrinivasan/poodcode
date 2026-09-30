@@ -93,6 +93,14 @@ function dsaCmds(c: DsaCurriculum | null, navigate: (to: string) => void): Cmd[]
       run: () => navigate(`/library/mixed/${stage.key}`),
     });
   });
+  // NEW_DSA topics live in their own seed; the one authored so far is listed
+  // here rather than fetched, so the palette stays one request.
+  out.push({
+    id: "ndsa-sliding-window",
+    label: "🪟 Sliding Window — NEW DSA topic",
+    hint: "Sixteen sections in TypeScript: concept, mental model, practice, variations, mastery",
+    run: () => navigate("/library/topic/sliding-window"),
+  });
   out.push({
     id: "dsa-placement",
     label: "DSA placement — skip what you already know",

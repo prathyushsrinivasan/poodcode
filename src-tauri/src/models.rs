@@ -1969,6 +1969,448 @@ pub struct DsaCurriculum {
     pub stages: Vec<CurriculumStage>,
 }
 
+// ---------------------------------------------------------------------------
+// NEW_DSA — one topic, sixteen sections (NEW_DSA.md is the template). Content
+// lives in the embedded seeds/new_dsa.json (authored in tools/new_dsa.py plus
+// one set of modules per topic, which enforce the template and compute every
+// expected output from a reference implementation); served read-only by the
+// `new_dsa` command.
+//
+// Like the DSA Curriculum it has no progress table of its own. Judged
+// exercises and answered questions are marks in `solved_exercises` keyed
+// `ndsa:<topic>:…`, and linked problems use the solved status the `problems`
+// table already holds.
+//
+// Markdown fields are plain `String`s; single exercises reuse [`Exercise`] and
+// every question reuses [`QuizQuestion`], so the page renders them with the
+// same components as the rest of the app.
+// ---------------------------------------------------------------------------
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdTerm {
+    pub term: String,
+    pub meaning: String,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdConcept {
+    pub body: String,
+    pub terms: Vec<NdTerm>,
+    pub analogy: String,
+}
+
+/// One frame of the mental-model stepper: where the edges are and why.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdFrame {
+    pub lo: i64,
+    /// -1 before the first element is absorbed.
+    pub hi: i64,
+    /// "start" | "absorb" | "release" | "measure" | "done".
+    pub action: String,
+    pub note: String,
+    pub state: String,
+    pub best: i64,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdStepper {
+    pub title: String,
+    pub input_label: String,
+    pub cells: Vec<String>,
+    pub state_label: String,
+    pub frames: Vec<NdFrame>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdMentalModel {
+    pub body: String,
+    pub stepper: NdStepper,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdSnippet {
+    pub name: String,
+    pub code: String,
+    pub explain: String,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdTsFundamentals {
+    pub intro: String,
+    pub items: Vec<NdSnippet>,
+    pub drills: Vec<Exercise>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdPatterns {
+    pub intro: String,
+    /// Reuses the curriculum's skeleton shape: name, when, code, note.
+    pub items: Vec<Skeleton>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdClue {
+    pub clue: String,
+    pub why: String,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdWhenToUse {
+    pub intro: String,
+    pub clues: Vec<NdClue>,
+    pub test: String,
+}
+
+/// "Looks like X → but Y → use Z instead."
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdLookalike {
+    pub looks_like: String,
+    pub but: String,
+    pub use_instead: String,
+    pub why: String,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdWhenNot {
+    pub intro: String,
+    pub cases: Vec<NdLookalike>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdCodeLine {
+    pub code: String,
+    pub explain: String,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdTable {
+    pub headers: Vec<String>,
+    pub rows: Vec<Vec<String>>,
+}
+
+/// One worked example. Explanation thins out from Basic to Real problem:
+/// `lines` (every line explained) on the first, `question` ("what changed?")
+/// on the second, only `trace` and `notes` on the third.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdExample {
+    pub level: String,
+    pub title: String,
+    pub problem: String,
+    pub code: String,
+    pub lines: Vec<NdCodeLine>,
+    pub question: Option<QuizQuestion>,
+    pub trace: Option<NdTable>,
+    pub notes: Vec<String>,
+    pub takeaway: String,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdLineNote {
+    pub line: i64,
+    pub text: String,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdRead {
+    pub title: String,
+    pub problem: String,
+    pub code: String,
+    pub notes: Vec<NdLineNote>,
+    pub why_it_works: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct NdPseudocode {
+    #[serde(default)]
+    pub title: String,
+    #[serde(default)]
+    pub problem: String,
+    #[serde(default)]
+    pub pseudocode: String,
+    pub exercise: Exercise,
+}
+
+/// Stage A read → B complete → C pseudocode → D from scratch.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct NdImplementation {
+    #[serde(default)]
+    pub read: NdRead,
+    pub complete: Exercise,
+    pub pseudocode: NdPseudocode,
+    pub scratch: Exercise,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdApproach {
+    pub approach: String,
+    pub time: String,
+    pub space: String,
+    pub note: String,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdRewrite {
+    pub slow: String,
+    pub fast: String,
+    pub edit: String,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdComplexity {
+    pub time: String,
+    pub space: String,
+    pub body: String,
+    pub compare: Vec<NdApproach>,
+    pub why_improved: String,
+    pub rewrite: NdRewrite,
+    pub questions: Vec<QuizQuestion>,
+}
+
+/// ❌ mistake → why it happens → how to recognise it → ✅ correct approach.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdMistake {
+    pub title: String,
+    pub category: String,
+    pub wrong: String,
+    pub why: String,
+    pub recognise: String,
+    pub right: String,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdQuestionSet {
+    pub intro: String,
+    pub questions: Vec<QuizQuestion>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdExampleIo {
+    pub input: String,
+    pub output: String,
+    pub note: String,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdHint {
+    /// "Nudge" | "Approach" | "Steps" | "Code" (asserted by the generator).
+    pub label: String,
+    pub text: String,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdEdgeTest {
+    pub case: String,
+    pub input: String,
+    pub expected: String,
+    pub why: String,
+}
+
+/// understand → identify → choose → pseudocode → implement → test.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct NdGuided {
+    #[serde(default)]
+    pub key: String,
+    #[serde(default)]
+    pub title: String,
+    #[serde(default)]
+    pub problem: String,
+    #[serde(default)]
+    pub examples: Vec<NdExampleIo>,
+    pub understand: QuizQuestion,
+    pub identify: QuizQuestion,
+    pub approach: QuizQuestion,
+    #[serde(default)]
+    pub pseudocode: String,
+    #[serde(default)]
+    pub hints: Vec<NdHint>,
+    pub exercise: Exercise,
+    #[serde(default)]
+    pub tests: Vec<NdEdgeTest>,
+}
+
+/// A problem-bank problem, by slug; `nudge`/`reveal` stay hidden until asked.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdProblemRef {
+    pub slug: String,
+    pub nudge: String,
+    pub reveal: String,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdIndependent {
+    pub intro: String,
+    pub problems: Vec<NdProblemRef>,
+}
+
+/// One step of basic → different input → constraint → optimisation →
+/// combination. Carries an in-page exercise, a problem-bank slug, or neither.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdVariation {
+    pub step: String,
+    pub title: String,
+    pub change: String,
+    pub insight: String,
+    pub exercise: Option<Exercise>,
+    pub slug: String,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdLabelled {
+    pub label: String,
+    pub text: String,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdQuickRef {
+    pub pattern: String,
+    pub syntax: String,
+    pub time: String,
+    pub space: String,
+    pub think_when: String,
+    pub careful: String,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdReview {
+    pub must_know: Vec<NdLabelled>,
+    pub must_do: Vec<String>,
+    pub quick_ref: NdQuickRef,
+}
+
+/// A graded sitting: answer every question, pass with `pass` right.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdSitting {
+    pub pass: i64,
+    pub questions: Vec<QuizQuestion>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdApplication {
+    /// How many of `problems` must be solved.
+    pub need: i64,
+    pub intro: String,
+    pub problems: Vec<NdProblemRef>,
+}
+
+/// Five abilities, each its own gate; the topic is mastered only when all pass.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct NdMastery {
+    #[serde(default)]
+    pub intro: String,
+    #[serde(default)]
+    pub understanding: NdSitting,
+    pub syntax: Exercise,
+    #[serde(default)]
+    pub recognition: NdSitting,
+    pub implementation: Exercise,
+    #[serde(default)]
+    pub application: NdApplication,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct NdTopic {
+    pub key: String,
+    pub title: String,
+    #[serde(default)]
+    pub icon: String,
+    #[serde(default)]
+    pub phase: String,
+    #[serde(default)]
+    pub tagline: String,
+    #[serde(default)]
+    pub est_minutes: i64,
+    #[serde(default)]
+    pub prereqs: Vec<String>,
+    #[serde(default)]
+    pub concept: NdConcept,
+    #[serde(default)]
+    pub mental_model: NdMentalModel,
+    #[serde(default)]
+    pub ts_fundamentals: NdTsFundamentals,
+    #[serde(default)]
+    pub patterns: NdPatterns,
+    #[serde(default)]
+    pub when_to_use: NdWhenToUse,
+    #[serde(default)]
+    pub when_not: NdWhenNot,
+    #[serde(default)]
+    pub examples: Vec<NdExample>,
+    pub implementation: NdImplementation,
+    #[serde(default)]
+    pub complexity: NdComplexity,
+    #[serde(default)]
+    pub mistakes: Vec<NdMistake>,
+    #[serde(default)]
+    pub recognition: NdQuestionSet,
+    #[serde(default)]
+    pub guided: Vec<NdGuided>,
+    #[serde(default)]
+    pub independent: NdIndependent,
+    #[serde(default)]
+    pub variations: Vec<NdVariation>,
+    #[serde(default)]
+    pub review: NdReview,
+    pub mastery: NdMastery,
+}
+
+/// One of the template's sixteen sections, in order.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct NdSection {
+    pub key: String,
+    pub title: String,
+    /// Where it sits on Understand → See → … → Master.
+    pub phase: String,
+}
+
+/// The whole NEW_DSA course (embedded seeds/new_dsa.json).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct NewDsa {
+    #[serde(default)]
+    pub key: String,
+    #[serde(default)]
+    pub title: String,
+    #[serde(default)]
+    pub subtitle: String,
+    #[serde(default)]
+    pub sections: Vec<NdSection>,
+    #[serde(default)]
+    pub topics: Vec<NdTopic>,
+}
+
 /// A review item joined with its problem for the review queue UI.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ReviewItem {

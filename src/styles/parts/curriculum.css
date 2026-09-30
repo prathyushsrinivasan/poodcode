@@ -1263,3 +1263,457 @@ button.star.on {
     writing-mode: vertical-rl;
   }
 }
+
+/* ---- NEW_DSA topic (/library/topic/:key) --------------------------------
+   Reuses the Library rail (.cur-layout, .cur-stage-btn, .cur-num); what is
+   here is the section body: blocks, the stepper, the guided walk, the gates. */
+.ndsa-head-side {
+  display: grid;
+  grid-template-columns: 180px auto;
+  gap: var(--space-1) var(--space-3);
+  align-items: center;
+  margin-left: auto;
+}
+.ndsa-head-side > .badge {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+.ndsa-rail {
+  gap: 2px;
+}
+.ndsa-rail-btn {
+  padding: 6px 10px;
+}
+.ndsa-rail-btn .cur-num {
+  width: 26px;
+  height: 26px;
+  font-size: 12px;
+}
+.ndsa-rail-btn .cur-stage-name {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}
+.ndsa-section {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.ndsa-h2 {
+  font-size: var(--text-2xl);
+  letter-spacing: -0.02em;
+  margin: var(--space-1) 0 0;
+}
+.ndsa-h3 {
+  font-size: var(--text-lg);
+  margin: 0 0 var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.ndsa-section-foot {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+}
+.ndsa-block > :last-child {
+  margin-bottom: 0;
+}
+.ndsa-tone-accent {
+  border-left: 3px solid var(--accent);
+}
+.ndsa-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr));
+  gap: var(--space-4);
+}
+
+/* Definition lists: terminology, the mistake's why/recognise, the review. */
+.ndsa-terms {
+  margin: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+.ndsa-term {
+  display: grid;
+  grid-template-columns: minmax(120px, 200px) minmax(0, 1fr);
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-top: 1px solid var(--border);
+}
+.ndsa-term:first-child {
+  border-top: 0;
+}
+.ndsa-term dt {
+  font-weight: var(--weight-bold);
+}
+.ndsa-term dd {
+  margin: 0;
+  min-width: 0;
+}
+
+.ndsa-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+.ndsa-table th,
+.ndsa-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+.ndsa-table th {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+  font-weight: var(--weight-bold);
+}
+.ndsa-table tr:last-child td {
+  border-bottom: 0;
+}
+.ndsa-clue {
+  font-weight: var(--weight-medium);
+  width: 38%;
+}
+.ndsa-trace td {
+  white-space: nowrap;
+}
+.ndsa-line-code {
+  width: 45%;
+}
+.ndsa-notes {
+  margin: 0;
+  padding-left: var(--space-5);
+  display: grid;
+  gap: var(--space-1);
+}
+
+/* When NOT: looks like, but, use instead. */
+.ndsa-flow {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+}
+.ndsa-flow > svg {
+  color: var(--text-faint);
+  margin-left: var(--space-3);
+}
+.ndsa-flow-step {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-elev-2);
+  max-width: 100%;
+}
+.ndsa-flow-step.is-bad {
+  border-color: color-mix(in srgb, var(--bad) 45%, var(--border));
+}
+.ndsa-flow-step.is-good {
+  border-color: color-mix(in srgb, var(--good) 45%, var(--border));
+}
+.ndsa-flow-why {
+  margin: var(--space-3) 0 0;
+  color: var(--text-dim);
+}
+
+/* Implementation stages A-D. */
+.ndsa-stage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.ndsa-stage-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.ndsa-stage-head .ndsa-h3 {
+  margin: 0;
+}
+.ndsa-stage-letter {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: var(--weight-bold);
+}
+
+.ndsa-bigo,
+.ndsa-rewrite,
+.ndsa-mistake,
+.ndsa-review {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: var(--space-3);
+}
+.ndsa-space {
+  font-weight: var(--weight-medium);
+  margin-top: var(--space-1);
+}
+.ndsa-mistake-code {
+  min-width: 0;
+  padding-left: var(--space-3);
+  border-left: 3px solid var(--border);
+}
+.ndsa-mistake-code.is-bad {
+  border-left-color: var(--bad);
+}
+.ndsa-mistake-code.is-good {
+  border-left-color: var(--good);
+}
+.ndsa-mistake + .ndsa-terms {
+  margin-top: var(--space-3);
+}
+
+/* Problem-bank rows: independent practice, variations, application. */
+.ndsa-problems {
+  display: flex;
+  flex-direction: column;
+}
+.ndsa-problem + .ndsa-problem {
+  border-top: 1px solid var(--border);
+}
+.ndsa-problem-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  flex-wrap: wrap;
+}
+.ndsa-problem-row .cur-num {
+  width: 26px;
+  height: 26px;
+}
+.ndsa-problem-title {
+  font-weight: var(--weight-medium);
+}
+.ndsa-problem-note {
+  margin: 0 0 var(--space-3) 38px;
+  color: var(--text-dim);
+}
+
+/* Variations: one ladder, basic to combination. */
+.ndsa-ladder {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 var(--space-4);
+  border-left: 2px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.ndsa-ladder-step > .cur-eyebrow {
+  display: block;
+  margin-bottom: var(--space-2);
+  color: var(--accent-text);
+}
+.ndsa-checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+.ndsa-checklist li {
+  display: flex;
+  gap: var(--space-2);
+  align-items: baseline;
+}
+
+/* Questions and sittings. */
+.ndsa-question {
+  margin: 0;
+}
+.ndsa-question-head {
+  display: flex;
+  gap: var(--space-2);
+  align-items: baseline;
+}
+.ndsa-question-text {
+  flex: 1;
+  min-width: 0;
+}
+.ndsa-sitting {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.ndsa-sitting-why {
+  margin-top: var(--space-2);
+  color: var(--text-dim);
+}
+
+/* The window stepper. */
+.ndsa-stepper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  border-radius: var(--radius);
+}
+.ndsa-stepper:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+.ndsa-cells {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding-bottom: var(--space-1);
+}
+.ndsa-cell {
+  display: grid;
+  justify-items: center;
+  min-width: 44px;
+  padding: var(--space-2) 0 var(--space-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elev-2);
+  transition: background var(--dur-1) var(--ease-out), border-color var(--dur-1) var(--ease-out);
+}
+.ndsa-cell.in {
+  background: color-mix(in srgb, var(--accent) 18%, var(--bg-elev));
+  border-color: var(--accent);
+}
+.ndsa-cell.is-hi {
+  box-shadow: inset 0 -3px 0 var(--accent);
+}
+.ndsa-cell-val {
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+}
+.ndsa-cell-idx {
+  font-size: var(--text-xs);
+  color: var(--text-faint);
+}
+.ndsa-cell-ptr {
+  min-height: 1.2em;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  color: var(--accent-text);
+}
+.ndsa-stepper-state {
+  display: flex;
+  gap: var(--space-4);
+  align-items: center;
+  flex-wrap: wrap;
+}
+.ndsa-stepper-note {
+  margin: 0;
+  min-height: 3em;
+}
+.ndsa-stepper-range {
+  flex: 1;
+  min-width: 120px;
+}
+
+/* Layered hints and the guided walk. */
+.ndsa-hints {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+.ndsa-hint {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border-left: 3px solid var(--accent);
+  background: var(--bg-elev-2);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.ndsa-hint-label {
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent-text);
+}
+.ndsa-guided {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.ndsa-guided-step {
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-3);
+}
+.ndsa-guided-step-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+.ndsa-guided-step-head .cur-num {
+  width: 26px;
+  height: 26px;
+}
+.ndsa-guided-step-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-left: 34px;
+}
+.ndsa-pseudo {
+  width: 100%;
+  min-height: 140px;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
+/* Mastery. */
+.ndsa-gates {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.ndsa-gate-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  font-size: var(--text-sm);
+  color: var(--text-dim);
+}
+.ndsa-gate-chip.is-passed {
+  border-color: var(--good);
+  color: var(--good);
+}
+.ndsa-gate-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  font-size: var(--text-md);
+  font-weight: var(--weight-normal);
+}
+
+@media (max-width: 980px) {
+  .ndsa-head-side {
+    margin-left: 0;
+  }
+  .ndsa-term {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+  .ndsa-guided-step-body {
+    padding-left: 0;
+  }
+}

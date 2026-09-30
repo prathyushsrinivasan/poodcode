@@ -28,6 +28,7 @@ import type {
   BackendTrack,
   ProjectTrack,
   DsaCurriculum,
+  NewDsa,
   MasteryTrack,
   MasteryProgress,
   SqlDataset,
@@ -91,6 +92,8 @@ export const api = {
   projectsTrack: () => invoke<ProjectTrack>("projects_track"),
   /** The DSA Curriculum — the problem bank sequenced into taught units. */
   dsaCurriculum: () => invoke<DsaCurriculum>("dsa_curriculum"),
+  /** NEW_DSA — topics taught in the sixteen sections of NEW_DSA.md. */
+  newDsa: () => invoke<NewDsa>("new_dsa"),
 
   // SQL track — the datasets its exercises query, plus the in-process engine
   // that runs SQL against a throwaway in-memory database (see src-tauri/src/sqlexec.rs).

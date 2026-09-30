@@ -16,6 +16,7 @@ import Library from "./pages/Library";
 import LibraryBrowse from "./pages/LibraryBrowse";
 import CurriculumUnit from "./pages/CurriculumUnit";
 import CurriculumDrill from "./pages/CurriculumDrill";
+import NewDsaTopic from "./pages/NewDsaTopic";
 import Solve from "./pages/Solve";
 import Settings from "./pages/Settings";
 import ProblemForm from "./pages/ProblemForm";
@@ -94,6 +95,7 @@ function Shell() {
           {/* Static segments, so neither can ever be shadowed by a unit key. */}
           <Route path="/library/browse" element={<LibraryBrowse />} />
           <Route path="/library/unit/:key" element={<CurriculumUnit />} />
+          <Route path="/library/topic/:key" element={<NewDsaTopic />} />
           <Route path="/library/placement" element={<CurriculumDrill view="placement" />} />
           <Route path="/library/mixed/:stage" element={<CurriculumDrill view="mixed" />} />
           <Route path="/learn" element={<Learn />} />

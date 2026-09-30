@@ -1,0 +1,2298 @@
+{
+  "key": "new-dsa",
+  "title": "NEW DSA",
+  "subtitle": "Every topic in sixteen sections, from the idea to mastery, in TypeScript.",
+  "sections": [
+    {
+      "key": "concept",
+      "title": "Concept",
+      "phase": "Understand"
+    },
+    {
+      "key": "mental_model",
+      "title": "Mental Model",
+      "phase": "Understand"
+    },
+    {
+      "key": "ts_fundamentals",
+      "title": "TypeScript Fundamentals",
+      "phase": "See"
+    },
+    {
+      "key": "patterns",
+      "title": "Syntax & Patterns",
+      "phase": "See"
+    },
+    {
+      "key": "when_to_use",
+      "title": "When to Use It",
+      "phase": "Recognize"
+    },
+    {
+      "key": "when_not",
+      "title": "When NOT to Use It",
+      "phase": "Recognize"
+    },
+    {
+      "key": "examples",
+      "title": "Step-by-Step Examples",
+      "phase": "See"
+    },
+    {
+      "key": "implementation",
+      "title": "Implementation",
+      "phase": "Copy → Complete → Implement"
+    },
+    {
+      "key": "complexity",
+      "title": "Complexity",
+      "phase": "Understand"
+    },
+    {
+      "key": "mistakes",
+      "title": "Common Mistakes",
+      "phase": "Understand"
+    },
+    {
+      "key": "recognition",
+      "title": "Problem Recognition",
+      "phase": "Recognize"
+    },
+    {
+      "key": "guided",
+      "title": "Guided Practice",
+      "phase": "Apply"
+    },
+    {
+      "key": "independent",
+      "title": "Independent Practice",
+      "phase": "Apply"
+    },
+    {
+      "key": "variations",
+      "title": "Variations",
+      "phase": "Combine"
+    },
+    {
+      "key": "review",
+      "title": "Review",
+      "phase": "Master"
+    },
+    {
+      "key": "mastery",
+      "title": "Mastery",
+      "phase": "Master"
+    }
+  ],
+  "topics": [
+    {
+      "key": "sliding-window",
+      "title": "Sliding Window",
+      "icon": "🪟",
+      "phase": "Phase 5 — Core Algorithmic Patterns",
+      "tagline": "Slide a range across the input and update what it holds, instead of recomputing it.",
+      "est_minutes": 150,
+      "prereqs": [
+        "Arrays",
+        "Strings",
+        "Hashing"
+      ],
+      "concept": {
+        "body": "### What it is\n\nA **sliding window** is a contiguous range `[lo, hi]` of an array or a\nstring that you move from left to right, while keeping a small **summary**\nof what is inside it up to date: a sum, a count per character, the number\nof zeros.\n\n### What problem it solves\n\nA whole family of questions is about **every contiguous subarray** (or\nsubstring): the longest one with some property, the shortest one, or how\nmany there are. An array of length `n` has `n(n + 1) / 2` of them. That is\nabout 5 billion when `n = 100 000`. Inspecting each one from scratch is\nhopeless.\n\n### Why it exists\n\nNeighbouring windows **overlap almost entirely**. `[2, 7]` and `[3, 8]`\nshare five of their six elements, and recomputing the shared part is the\nwaste. A sliding window pays only for what *changes*: one element enters on\nthe right, and sometimes one or more leave on the left.\n\n### How it works\n\nTwo indices, `lo` and `hi`, that **only ever move forward**.\n\n1. **Expand**: move `hi` one step right and *absorb* the new element into\n   the summary.\n2. **Repair**: while the window breaks the rule, *release* `a[lo]` from the\n   summary and move `lo` right.\n3. **Measure**: `[lo, hi]` is now a valid window. Compare it with the best\n   so far.\n\nNeither index ever moves back, so each moves at most `n` times: at most\n`2n` steps in total, which is O(n).\n\n### Internal behaviour: why skipping windows is allowed\n\nThe technique looks at only `n` of the `n^2 / 2` windows, yet it never misses\nthe answer. That works because of one property of the rule:\n**validity survives shrinking**. If a window is valid, every smaller window\ninside it is valid too. *\"At most k distinct characters\"*, *\"no repeated\ncharacter\"* and *\"sum ≤ S when every number is non-negative\"* all have\nit.\n\nSo when absorbing `a[hi]` breaks the window, no window that starts at or\nbefore the current `lo` and ends at `hi` can be valid. `lo` may only move\nright, and it never needs to come back. When a rule does **not** have this\nproperty, the technique does not apply (see section 6).\n",
+        "terms": [
+          {
+            "term": "Window",
+            "meaning": "The contiguous range `[lo, hi]` currently under consideration, both ends inclusive. Its length is `hi − lo + 1`."
+          },
+          {
+            "term": "`lo` / `hi`",
+            "meaning": "The left and right edges. Also called `left`/`right` or `start`/`end`. Both only increase."
+          },
+          {
+            "term": "Summary (window state)",
+            "meaning": "What you keep about the window so you never re-read it: a running sum, a `Map` of counts, a count of zeros."
+          },
+          {
+            "term": "Absorb / release",
+            "meaning": "Update the summary when an element enters (on the right) or leaves (on the left)."
+          },
+          {
+            "term": "Valid",
+            "meaning": "The window satisfies the problem's rule: at most k distinct, sum ≤ limit, no repeats…"
+          },
+          {
+            "term": "Fixed-size window",
+            "meaning": "Every window has length exactly k. Each step, one element enters and one leaves."
+          },
+          {
+            "term": "Variable-size window",
+            "meaning": "The window grows on the right every step and shrinks on the left only when the rule demands it."
+          },
+          {
+            "term": "Monotone rule",
+            "meaning": "A rule where validity survives shrinking. The whole technique rests on it."
+          },
+          {
+            "term": "Amortised O(1)",
+            "meaning": "One step may release many elements, but across the whole run every element is released at most once."
+          }
+        ],
+        "analogy": "**A caterpillar crawling along a branch.** Its head (`hi`) reaches forward\none leaf at a time and eats it. When its body gets too long or too heavy\nfor the rule, the tail (`lo`) pulls in until it is comfortable again. It\nnever crawls backwards, so it crosses the branch in one pass, however\nmany leaves it tries along the way.\n"
+      },
+      "mental_model": {
+        "body": "Picture **two fingers on the array** and a notebook beside it.\n\n```\nindex:   0   1   2   3   4   5   6   7\nvalue:   a   b   c   a   b   c   b   b\n                 ▲       ▲\n                 lo      hi          window = s[2..4] = \"cab\"\n\nnotebook (summary):  { c, a, b }     best so far: 3\n```\n\n- **What is stored:** the two indices, the summary of what lies between\n  them, and the best answer seen so far. The window's *contents* are never\n  copied, because they are already in the array.\n- **How the elements relate:** everything between the fingers is \"in\",\n  everything outside is \"out\". The summary must always describe exactly\n  the \"in\" part.\n- **What changes on each operation:**\n\n```\n┌─► hi += 1\n│      │\n│      ▼\n│   absorb a[hi]\n│      │\n│      ▼\n│   window invalid? ──yes──► release a[lo]; lo += 1 ─┐\n│      │        ▲                                    │\n│      no       └────────────────────────────────────┘\n│      ▼\n└── measure [lo, hi]\n```\n\n**The picture to hold while solving:** the right finger always moves. The\nleft finger moves only when the notebook says the window is broken, and\nit moves just far enough to fix it.\n",
+        "stepper": {
+          "title": "Step through it: longest substring with no repeated character",
+          "input_label": "s = \"abcabcbb\"",
+          "cells": [
+            "a",
+            "b",
+            "c",
+            "a",
+            "b",
+            "c",
+            "b",
+            "b"
+          ],
+          "state_label": "Characters in the window",
+          "frames": [
+            {
+              "lo": 0,
+              "hi": -1,
+              "action": "start",
+              "note": "Empty window: lo = 0, hi has not moved yet. best = 0.",
+              "state": "{ }",
+              "best": 0
+            },
+            {
+              "lo": 0,
+              "hi": 0,
+              "action": "absorb",
+              "note": "Absorb s[0] = 'a'. The window [0, 0] has no repeats.",
+              "state": "{ a }",
+              "best": 0
+            },
+            {
+              "lo": 0,
+              "hi": 0,
+              "action": "measure",
+              "note": "Measure: length 0 − 0 + 1 = 1. New best.",
+              "state": "{ a }",
+              "best": 1
+            },
+            {
+              "lo": 0,
+              "hi": 1,
+              "action": "absorb",
+              "note": "Absorb s[1] = 'b'. The window [0, 1] has no repeats.",
+              "state": "{ a, b }",
+              "best": 1
+            },
+            {
+              "lo": 0,
+              "hi": 1,
+              "action": "measure",
+              "note": "Measure: length 1 − 0 + 1 = 2. New best.",
+              "state": "{ a, b }",
+              "best": 2
+            },
+            {
+              "lo": 0,
+              "hi": 2,
+              "action": "absorb",
+              "note": "Absorb s[2] = 'c'. The window [0, 2] has no repeats.",
+              "state": "{ a, b, c }",
+              "best": 2
+            },
+            {
+              "lo": 0,
+              "hi": 2,
+              "action": "measure",
+              "note": "Measure: length 2 − 0 + 1 = 3. New best.",
+              "state": "{ a, b, c }",
+              "best": 3
+            },
+            {
+              "lo": 1,
+              "hi": 3,
+              "action": "release",
+              "note": "'a' is already inside, so the window would repeat it. Release s[0] = 'a' and move lo to 1.",
+              "state": "{ b, c }",
+              "best": 3
+            },
+            {
+              "lo": 1,
+              "hi": 3,
+              "action": "absorb",
+              "note": "Absorb s[3] = 'a'. The window [1, 3] has no repeats.",
+              "state": "{ b, c, a }",
+              "best": 3
+            },
+            {
+              "lo": 1,
+              "hi": 3,
+              "action": "measure",
+              "note": "Measure: length 3, not better than best = 3.",
+              "state": "{ b, c, a }",
+              "best": 3
+            },
+            {
+              "lo": 2,
+              "hi": 4,
+              "action": "release",
+              "note": "'b' is already inside, so the window would repeat it. Release s[1] = 'b' and move lo to 2.",
+              "state": "{ c, a }",
+              "best": 3
+            },
+            {
+              "lo": 2,
+              "hi": 4,
+              "action": "absorb",
+              "note": "Absorb s[4] = 'b'. The window [2, 4] has no repeats.",
+              "state": "{ c, a, b }",
+              "best": 3
+            },
+            {
+              "lo": 2,
+              "hi": 4,
+              "action": "measure",
+              "note": "Measure: length 3, not better than best = 3.",
+              "state": "{ c, a, b }",
+              "best": 3
+            },
+            {
+              "lo": 3,
+              "hi": 5,
+              "action": "release",
+              "note": "'c' is already inside, so the window would repeat it. Release s[2] = 'c' and move lo to 3.",
+              "state": "{ a, b }",
+              "best": 3
+            },
+            {
+              "lo": 3,
+              "hi": 5,
+              "action": "absorb",
+              "note": "Absorb s[5] = 'c'. The window [3, 5] has no repeats.",
+              "state": "{ a, b, c }",
+              "best": 3
+            },
+            {
+              "lo": 3,
+              "hi": 5,
+              "action": "measure",
+              "note": "Measure: length 3, not better than best = 3.",
+              "state": "{ a, b, c }",
+              "best": 3
+            },
+            {
+              "lo": 4,
+              "hi": 6,
+              "action": "release",
+              "note": "'b' is already inside, so the window would repeat it. Release s[3] = 'a' and move lo to 4.",
+              "state": "{ b, c }",
+              "best": 3
+            },
+            {
+              "lo": 5,
+              "hi": 6,
+              "action": "release",
+              "note": "'b' is already inside, so the window would repeat it. Release s[4] = 'b' and move lo to 5.",
+              "state": "{ c }",
+              "best": 3
+            },
+            {
+              "lo": 5,
+              "hi": 6,
+              "action": "absorb",
+              "note": "Absorb s[6] = 'b'. The window [5, 6] has no repeats.",
+              "state": "{ c, b }",
+              "best": 3
+            },
+            {
+              "lo": 5,
+              "hi": 6,
+              "action": "measure",
+              "note": "Measure: length 2, not better than best = 3.",
+              "state": "{ c, b }",
+              "best": 3
+            },
+            {
+              "lo": 6,
+              "hi": 7,
+              "action": "release",
+              "note": "'b' is already inside, so the window would repeat it. Release s[5] = 'c' and move lo to 6.",
+              "state": "{ b }",
+              "best": 3
+            },
+            {
+              "lo": 7,
+              "hi": 7,
+              "action": "release",
+              "note": "'b' is already inside, so the window would repeat it. Release s[6] = 'b' and move lo to 7.",
+              "state": "{ }",
+              "best": 3
+            },
+            {
+              "lo": 7,
+              "hi": 7,
+              "action": "absorb",
+              "note": "Absorb s[7] = 'b'. The window [7, 7] has no repeats.",
+              "state": "{ b }",
+              "best": 3
+            },
+            {
+              "lo": 7,
+              "hi": 7,
+              "action": "measure",
+              "note": "Measure: length 1, not better than best = 3.",
+              "state": "{ b }",
+              "best": 3
+            },
+            {
+              "lo": 7,
+              "hi": 7,
+              "action": "done",
+              "note": "hi has visited every index once; lo only ever moved forward. Answer: 3.",
+              "state": "{ b }",
+              "best": 3
+            }
+          ]
+        }
+      },
+      "ts_fundamentals": {
+        "intro": "Only the TypeScript this topic needs. Every item below appears in the\ncode later in this topic.\n",
+        "items": [
+          {
+            "name": "Arrays of numbers: `number[]`",
+            "code": "const nums: number[] = [2, 1, 5, 1, 3];\nnums.length;      // 5\nnums[0];          // 2 — indexing is O(1)\nnums[nums.length - 1]; // 3 — the last element\n",
+            "explain": "`number[]` is an array of numbers; `nums.length` is its size.\nReading `nums[i]` for an `i` outside `0 … length − 1` does not\nthrow. It quietly gives `undefined`, and `undefined + 1` is `NaN`.\nA window index that runs one past the end shows up as `NaN`, not\nas an error. Under the stricter `noUncheckedIndexedAccess` option,\nTypeScript types `nums[i]` as `number | undefined` to warn you about\nexactly that. This topic uses plain `strict`, where it is `number`.\n"
+          },
+          {
+            "name": "Strings: characters are strings too",
+            "code": "const s = \"abca\";\ns.length;               // 4\ns[1];                   // \"b\" — a string of length 1, not a char type\ns[1] === \"b\";           // true\ns.charCodeAt(1) - 97;   // 1 — 'a' is 97, so letters map to 0..25\n",
+            "explain": "TypeScript has no `char` type: `s[i]` is a one-character `string`,\nand you compare it with `===`. For a lowercase letter,\n`s.charCodeAt(i) - 97` turns it into an index `0 … 25`, which is\nhow a fixed-size count array is indexed.\n"
+          },
+          {
+            "name": "`Map<string, number>`: counting what is in the window",
+            "code": "const counts = new Map<string, number>();\n\n// absorb c\ncounts.set(c, (counts.get(c) ?? 0) + 1);\n\n// release c\nconst left = counts.get(c)! - 1;\nif (left === 0) counts.delete(c);\nelse counts.set(c, left);\n\ncounts.size;   // how many DISTINCT keys are in the window\n",
+            "explain": "`counts.get(c)` returns `number | undefined`: `undefined` when `c`\nwas never added. `?? 0` means \"use 0 if it is missing\". The `!` in\nthe release says \"I know it is there\". That is true, because you only\nrelease what you absorbed.\n\n**Delete keys that reach zero.** `counts.size` counts keys, not\npositive counts. A key left at `0` still counts as a distinct\ncharacter in the window.\n"
+          },
+          {
+            "name": "`Set<string>`: is it inside?",
+            "code": "const inWindow = new Set<string>();\ninWindow.add(\"a\");\ninWindow.has(\"a\");     // true\ninWindow.delete(\"a\");\ninWindow.size;         // 0\n",
+            "explain": "When the only question is *\"is this element in the window?\"*, a\n`Set` is simpler than a `Map`. `add`, `has` and `delete` are all\nO(1) on average.\n"
+          },
+          {
+            "name": "A fixed-size count array",
+            "code": "const counts: number[] = new Array<number>(26).fill(0);\ncounts[s.charCodeAt(i) - 97]++;\n",
+            "explain": "When the alphabet is small and known (26 lowercase letters), an\narray of 26 counters is faster than a `Map` and needs no `?? 0`.\n`new Array<number>(26)` alone is 26 *holes*, and `holes + 1` is\n`NaN`. The `.fill(0)` is not optional.\n"
+          },
+          {
+            "name": "`let` vs `const`",
+            "code": "let lo = 0;                           // reassigned: let\nlet best = 0;                         // reassigned: let\nconst counts = new Map<string, number>(); // never reassigned: const\ncounts.set(\"a\", 1);                   // …but still mutable inside\n",
+            "explain": "`const` means the *variable* is never pointed at something else,\nnot that the object is frozen. The indices and the best answer\nchange, so they are `let`. The `Map` or `Set` is the same object for\nthe whole run, so it is `const`.\n"
+          },
+          {
+            "name": "Functions with typed parameters",
+            "code": "function longestKDistinct(s: string, k: number): number {\n  // ...\n  return 0;\n}\n",
+            "explain": "Every exercise in this topic asks for exactly one function like\nthis. The checker calls it and prints what it returns, so you never\nwrite input or output code. The `: number` after the parentheses is\nthe return type: returning a string by mistake is a compile error,\nnot a wrong answer.\n"
+          },
+          {
+            "name": "`Math.max`, `Math.min` and `Infinity`",
+            "code": "best = Math.max(best, hi - lo + 1);   // longest\nlet shortest = Infinity;              // \"nothing found yet\"\nshortest = Math.min(shortest, hi - lo + 1);\nreturn shortest === Infinity ? 0 : shortest;\n",
+            "explain": "A *maximum* starts at `0` (or the first window). A *minimum* must\nstart **above** any real answer, and `Infinity` is a real\n`number` in TypeScript, so it type-checks. Convert it back before\nreturning.\n"
+          },
+          {
+            "name": "A queue you can pop from the front in O(1)",
+            "code": "const dq: number[] = [];\nlet head = 0;              // dq[head] is the front\ndq.push(7);                // push back:  O(1)\nconst front = dq[head++];  // pop front: O(1)\ndq.pop();                  // pop back:  O(1)\n// dq.shift() also pops the front — but it is O(n)\n",
+            "explain": "TypeScript has no built-in deque. `shift()` re-indexes the whole\narray on every call, which turns an O(n) window into O(n²). Keep a\n`head` index instead. You only need this for the\n\"maximum of every window\" variation in section 14.\n"
+          }
+        ],
+        "drills": [
+          {
+            "id": "ndsa:sliding-window:ts:map-count",
+            "title": "Count with a Map",
+            "prompt": "Return how many times the **most frequent** character appears in `s`\n(0 for an empty string). Fill in the one blank: add `c` to the\n`Map`, starting from 0 when it is not there yet.\n",
+            "hint": "",
+            "hints": [
+              "counts.get(c) is undefined the first time you see c.",
+              "?? 0 turns that undefined into 0; then add 1."
+            ],
+            "language": "typescript",
+            "kind": "drill",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "\n// ---- checker: reads the arguments, calls your function, prints the result ----\nimport * as __ndFs from \"fs\";\nconst __ndIn: string[] = __ndFs.readFileSync(0, \"utf8\").split(\"\\n\");\nconst __ndLine = (i: number): string => (__ndIn[i] ?? \"\").replace(/\\r$/, \"\");\nconst __ndA0 = __ndLine(0);\nconsole.log(String(maxCharCount(__ndA0)));\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "function maxCharCount(s: string): number {\n  const counts = new Map<string, number>();\n  let best = 0;\n  for (let i = 0; i < s.length; i++) {\n    const c = s[i];\n    counts.set(c, ____);\n    best = Math.max(best, counts.get(c)!);\n  }\n  return best;\n}\n",
+            "solution": "function maxCharCount(s: string): number {\n  const counts = new Map<string, number>();\n  let best = 0;\n  for (let i = 0; i < s.length; i++) {\n    const c = s[i];\n    counts.set(c, (counts.get(c) ?? 0) + 1);\n    best = Math.max(best, counts.get(c)!);\n  }\n  return best;\n}\n",
+            "tests": [
+              {
+                "input": "banana\n",
+                "output": "3\n"
+              },
+              {
+                "input": "\n",
+                "output": "0\n"
+              },
+              {
+                "input": "abc\n",
+                "output": "1\n"
+              },
+              {
+                "input": "zzzz\n",
+                "output": "4\n"
+              },
+              {
+                "input": "mississippi\n",
+                "output": "4\n"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": ""
+          },
+          {
+            "id": "ndsa:sliding-window:ts:count-array",
+            "title": "Count with a fixed array",
+            "prompt": "`s` holds only lowercase letters. Return how many **different**\nletters it contains, using a 26-slot count array rather than a `Set`.\nFill in the two blanks.\n",
+            "hint": "",
+            "hints": [
+              "'a' has char code 97, so subtracting 97 maps a..z to 0..25.",
+              "After checking whether this letter is new, increase its counter."
+            ],
+            "language": "typescript",
+            "kind": "drill",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "\n// ---- checker: reads the arguments, calls your function, prints the result ----\nimport * as __ndFs from \"fs\";\nconst __ndIn: string[] = __ndFs.readFileSync(0, \"utf8\").split(\"\\n\");\nconst __ndLine = (i: number): string => (__ndIn[i] ?? \"\").replace(/\\r$/, \"\");\nconst __ndA0 = __ndLine(0);\nconsole.log(String(distinctLetters(__ndA0)));\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "function distinctLetters(s: string): number {\n  const counts: number[] = new Array<number>(26).fill(0);\n  let distinct = 0;\n  for (let i = 0; i < s.length; i++) {\n    const idx = ____;\n    if (counts[idx] === 0) distinct++;\n    ____;\n  }\n  return distinct;\n}\n",
+            "solution": "function distinctLetters(s: string): number {\n  const counts: number[] = new Array<number>(26).fill(0);\n  let distinct = 0;\n  for (let i = 0; i < s.length; i++) {\n    const idx = s.charCodeAt(i) - 97;\n    if (counts[idx] === 0) distinct++;\n    counts[idx]++;\n  }\n  return distinct;\n}\n",
+            "tests": [
+              {
+                "input": "banana\n",
+                "output": "3\n"
+              },
+              {
+                "input": "\n",
+                "output": "0\n"
+              },
+              {
+                "input": "abcdefghijklmnopqrstuvwxyz\n",
+                "output": "26\n"
+              },
+              {
+                "input": "zzz\n",
+                "output": "1\n"
+              },
+              {
+                "input": "window\n",
+                "output": "5\n"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": ""
+          }
+        ]
+      },
+      "patterns": {
+        "intro": "Every sliding window is one of these few shapes, and each differs from\nthe others in one or two lines. Learn to recognise them on sight. The\ngeneral loop comes first:\n\n```ts\nfor (let hi = 0; hi < nums.length; hi++) {\n  // absorb nums[hi]\n  // while (window is invalid) release nums[lo++]\n  // measure\n}\n```\n",
+        "items": [
+          {
+            "name": "Fixed size k",
+            "when": "“every window of size k”, “k consecutive”, “substring of length k”",
+            "code": "let sum = 0;\nlet best = -Infinity;\nfor (let hi = 0; hi < nums.length; hi++) {\n  sum += nums[hi];                   // enters\n  if (hi >= k) sum -= nums[hi - k];  // leaves\n  if (hi >= k - 1) best = Math.max(best, sum); // full: measure\n}\n",
+            "note": "No `lo` at all: the leaving index is always `hi − k`. Measure only once the window is full."
+          },
+          {
+            "name": "Variable size: longest valid",
+            "when": "“longest”, “maximum length”, with an at-most rule",
+            "code": "let lo = 0;\nlet best = 0;\nfor (let hi = 0; hi < nums.length; hi++) {\n  absorb(nums[hi]);\n  while (invalid()) release(nums[lo++]);\n  best = Math.max(best, hi - lo + 1);  // AFTER the repair\n}\n",
+            "note": "Shrink **while invalid**, then measure. Every measured window is valid."
+          },
+          {
+            "name": "Variable size: shortest valid",
+            "when": "“shortest”, “minimum length”, with an at-least rule",
+            "code": "let lo = 0;\nlet best = Infinity;\nfor (let hi = 0; hi < nums.length; hi++) {\n  absorb(nums[hi]);\n  while (valid()) {\n    best = Math.min(best, hi - lo + 1); // INSIDE the loop\n    release(nums[lo++]);\n  }\n}\nreturn best === Infinity ? 0 : best;\n",
+            "note": "The mirror image: shrink **while still valid**, and measure before each release."
+          },
+          {
+            "name": "Count the valid windows",
+            "when": "“how many subarrays …” with an at-most rule",
+            "code": "let count = 0;\nfor (let hi = 0; hi < nums.length; hi++) {\n  absorb(nums[hi]);\n  while (invalid()) release(nums[lo++]);\n  count += hi - lo + 1;   // every start in [lo, hi] works\n}\n",
+            "note": "`[lo, hi]` valid ⇒ `[lo+1, hi]`, …, `[hi, hi]` are valid too: `hi − lo + 1` windows end at `hi`."
+          },
+          {
+            "name": "Exactly k = at most k − at most (k − 1)",
+            "when": "“exactly k distinct / odd / …”",
+            "code": "function atMost(k: number): number { /* count pattern above */ }\nreturn atMost(k) - atMost(k - 1);\n",
+            "note": "“Exactly” does not survive shrinking, but “at most” does. Subtract two counts that each do."
+          },
+          {
+            "name": "Choosing the summary",
+            "when": "What does `invalid()` need to know?",
+            "code": "let sum = 0;                                // sums with non-negative values\nconst counts = new Map<string, number>();   // distinct / frequencies\nconst counts26 = new Array<number>(26).fill(0); // lowercase letters\nlet zeros = 0;                              // a budget: “at most k zeros”\nconst inWindow = new Set<string>();         // “no repeats”\n",
+            "note": "Pick the smallest summary that answers “is the window valid?” in O(1)."
+          }
+        ]
+      },
+      "when_to_use": {
+        "intro": "No single word guarantees a sliding window. What the words below have in\ncommon is that each one tells you **the answer is a contiguous range**\nand **the rule can be checked incrementally**. Read each *why* column.\nThat reasoning carries over to problems whose wording you have never\nseen.\n",
+        "clues": [
+          {
+            "clue": "“contiguous”, “subarray”, “substring”, “consecutive”",
+            "why": "The answer is a range `[lo, hi]`, and a window can only describe ranges. Watch out for **subsequence**, which may skip elements and is a different problem."
+          },
+          {
+            "clue": "“of size k”, “every k consecutive”, “length exactly k”",
+            "why": "The width is given, so no rule decides when to shrink: the **fixed** window. Each step, one element enters and one leaves."
+          },
+          {
+            "clue": "“longest”, “maximum length”",
+            "why": "Grow as far as the rule allows, and measure **after** repairing. The variable window's *longest* shape."
+          },
+          {
+            "clue": "“shortest”, “minimum length”, “smallest”",
+            "why": "Once valid, shrink as far as it stays valid, and measure **inside** the shrink. The *shortest* shape."
+          },
+          {
+            "clue": "“at most k” (distinct, zeros, changes, cost)",
+            "why": "An at-most budget is exactly a rule that survives shrinking: removing an element never uses *more* of the budget."
+          },
+          {
+            "clue": "“all values are positive / non-negative” in the constraints",
+            "why": "With no negative numbers, a sum only grows as the window grows. That makes “sum ≤ S” and “sum ≥ S” monotone. Setters add this line precisely so that a window works."
+          },
+          {
+            "clue": "“count the subarrays where …” with an at-most rule",
+            "why": "Every valid window ending at `hi` starts in `[lo, hi]`: add `hi − lo + 1` per step instead of listing them."
+          },
+          {
+            "clue": "`n` up to 10⁵ or 10⁶ and the question is about all subarrays",
+            "why": "O(n²) is 10¹⁰ steps, far too slow. An O(n) scan over ranges usually means a window (or prefix sums)."
+          }
+        ],
+        "test": "**The real test is not the wording.** Ask: *\"If I shrink a valid window,\nis it still valid?\"* If yes, a variable window works. If the width is\nfixed, a fixed window works. If neither holds, see the next section.\n"
+      },
+      "when_not": {
+        "intro": "Each of these looks like a sliding window problem. In each, one detail\nbreaks the rule \"validity survives shrinking\", or the question is not\nreally about a sweeping range at all.\n",
+        "cases": [
+          {
+            "looks_like": "“Count the subarrays whose sum equals k.”",
+            "but": "The values **can be negative**.",
+            "use_instead": "Prefix sums + a hash map of prefix sums seen so far",
+            "why": "Removing a negative number *raises* the sum, so shrinking can turn a too-small window into a valid one, or the reverse. `lo` would need to move back. Prefix sums reduce every range to `prefix[hi+1] − prefix[lo]`, whatever the signs."
+          },
+          {
+            "looks_like": "“Find the longest … substring …”",
+            "but": "It actually says **subsequence**: elements may be skipped.",
+            "use_instead": "Dynamic programming (LIS / LCS family) or greedy",
+            "why": "A window is contiguous by definition. A subsequence has no `[lo, hi]` to slide."
+          },
+          {
+            "looks_like": "“Maximum sum of a subarray.”",
+            "but": "There is **no size and no budget**, and the values can be negative.",
+            "use_instead": "Kadane's algorithm (1-D DP)",
+            "why": "Without a rule, nothing tells `lo` when to move. Kadane restarts the range whenever the running sum goes negative. That is a different decision, based on the sum's sign rather than a budget."
+          },
+          {
+            "looks_like": "“Count subarrays with exactly k distinct values.”",
+            "but": "**Exactly** k does not survive shrinking: removing an element can take k down to k − 1.",
+            "use_instead": "Still windows, but twice: `atMost(k) − atMost(k − 1)`",
+            "why": "Change the rule until it *is* monotone, then subtract. A window on the “exactly” rule directly undercounts."
+          },
+          {
+            "looks_like": "“Answer many queries: the sum of range [l, r].”",
+            "but": "The ranges are **given and arbitrary**. Nothing is swept left to right.",
+            "use_instead": "Prefix sums (O(1) per query after O(n) setup)",
+            "why": "A window is a single left-to-right pass. Arbitrary ranges that jump around need random access to any range's total."
+          },
+          {
+            "looks_like": "“Find two numbers in the array that add up to the target.”",
+            "but": "The answer is a **pair of elements**, not a range.",
+            "use_instead": "A hash map of seen values, or two pointers from both ends if sorted",
+            "why": "Two pointers is not always a window. Moving inward from both ends searches pairs, not ranges."
+          },
+          {
+            "looks_like": "“Shortest subarray with sum at least k.”",
+            "but": "The values **can be negative**.",
+            "use_instead": "Prefix sums + a monotonic deque",
+            "why": "The plain shortest-window shape assumes shrinking only lowers the sum. With negatives it can raise it, so the valid starts are not a contiguous block."
+          }
+        ]
+      },
+      "examples": [
+        {
+          "level": "Basic",
+          "title": "Largest sum of any k consecutive numbers",
+          "problem": "Given `nums` and `k` (1 ≤ k ≤ nums.length), return the largest sum of\nany `k` consecutive elements. For `nums = [2, 1, 5, 1, 3, 2]`, `k = 3`\nthe answer is **9** (`5 + 1 + 3`).\n",
+          "code": "function maxSumWindow(nums: number[], k: number): number {\n  let windowSum = 0;\n  for (let i = 0; i < k; i++) {\n    windowSum += nums[i];\n  }\n  let best = windowSum;\n  for (let hi = k; hi < nums.length; hi++) {\n    windowSum += nums[hi];\n    windowSum -= nums[hi - k];\n    best = Math.max(best, windowSum);\n  }\n  return best;\n}\n",
+          "lines": [
+            {
+              "code": "let windowSum = 0;",
+              "explain": "The summary. This window only needs to remember its total."
+            },
+            {
+              "code": "for (let i = 0; i < k; i++) windowSum += nums[i];",
+              "explain": "Build the **first** window, `[0, k − 1]`, the slow way. This happens once only."
+            },
+            {
+              "code": "let best = windowSum;",
+              "explain": "The first window is a real candidate, so it is the best so far. Starting at `0` would be wrong when every number is negative."
+            },
+            {
+              "code": "for (let hi = k; hi < nums.length; hi++)",
+              "explain": "`hi` is the index that **enters**. It starts at `k`, just past the first window."
+            },
+            {
+              "code": "windowSum += nums[hi];",
+              "explain": "Absorb the entering element."
+            },
+            {
+              "code": "windowSum -= nums[hi - k];",
+              "explain": "Release the element that falls off the left. The window `[hi − k + 1, hi]` still has exactly `k` elements, so the leaver is `hi − k`."
+            },
+            {
+              "code": "best = Math.max(best, windowSum);",
+              "explain": "Measure. Each step cost two additions, however large `k` is."
+            },
+            {
+              "code": "return best;",
+              "explain": "Every window of size k was measured exactly once."
+            }
+          ],
+          "trace": {
+            "headers": [
+              "hi",
+              "enters",
+              "leaves",
+              "window",
+              "windowSum",
+              "best"
+            ],
+            "rows": [
+              [
+                "2",
+                "first k",
+                "—",
+                "[2, 1, 5]",
+                "8",
+                "8"
+              ],
+              [
+                "3",
+                "+1",
+                "−2",
+                "[1, 5, 1]",
+                "7",
+                "8"
+              ],
+              [
+                "4",
+                "+3",
+                "−1",
+                "[5, 1, 3]",
+                "9",
+                "9"
+              ],
+              [
+                "5",
+                "+2",
+                "−5",
+                "[1, 3, 2]",
+                "6",
+                "9"
+              ]
+            ]
+          },
+          "takeaway": "**Two reads per step instead of k.** Recomputing each window would be\nO(n·k). Sliding it is O(n).\n",
+          "question": null,
+          "notes": []
+        },
+        {
+          "level": "Slight variation",
+          "title": "How many windows of size k have average ≥ threshold?",
+          "problem": "Same input shape, but now count the windows of size `k` whose\n**average** is at least `threshold`. For `nums = [2, 2, 2, 2, 5, 5, 5, 8]`,\n`k = 3`, `threshold = 4` the answer is\n**3**.\n",
+          "code": "function countGoodWindows(nums: number[], k: number, threshold: number): number {\n  const target = k * threshold;\n  let windowSum = 0;\n  let count = 0;\n  for (let hi = 0; hi < nums.length; hi++) {\n    windowSum += nums[hi];\n    if (hi >= k) windowSum -= nums[hi - k];\n    if (hi >= k - 1 && windowSum >= target) count++;\n  }\n  return count;\n}\n",
+          "question": {
+            "question": "Compare this with Example 1. Which of these changed? Select every one that did.",
+            "options": [
+              "The measure step: it counts windows that pass a test instead of keeping a maximum",
+              "The first window is built inside the main loop, guarded by `hi >= k - 1`",
+              "The average is compared as `sum >= k * threshold`, with no division",
+              "What enters and what leaves the window each step",
+              "The time complexity"
+            ],
+            "answer": 0,
+            "explanation": "Three things changed and two did not. The **enter/leave** mechanics\n(`+= nums[hi]`, `-= nums[hi - k]`) are identical: that is the\ntechnique. What changed is the *measure* (count instead of max), how\nthe first window is built (one loop with a guard instead of a\nseparate loop; both are common), and a small trick. Comparing\n`sum ≥ k · threshold` avoids dividing, so no floating point is\ninvolved. The cost is still O(n).\n",
+            "why_not": [
+              "",
+              "",
+              "",
+              "It is the same pair of lines: `+= nums[hi]` and `-= nums[hi - k]`. That did not change.",
+              "Still one pass with O(1) work per step: O(n)."
+            ],
+            "kind": "multi",
+            "answers": [
+              0,
+              1,
+              2
+            ]
+          },
+          "notes": [
+            "The `hi >= k` guard stops a leaver being released before the window is full.",
+            "The `hi >= k - 1` guard stops a *partial* window from being measured. Without it, the first k − 1 steps count short windows."
+          ],
+          "lines": [],
+          "trace": null,
+          "takeaway": ""
+        },
+        {
+          "level": "Real problem",
+          "title": "Longest substring without repeating characters",
+          "problem": "Return the length of the longest substring of `s` with no repeated\ncharacter. For `s = \"abcabcbb\"` the answer is **3**\n(`\"abc\"`). The width is not given, so this is a **variable** window.\nThe rule, \"no repeats\", survives shrinking.\n",
+          "code": "function longestUnique(s: string): number {\n  const inWindow = new Set<string>();\n  let lo = 0;\n  let best = 0;\n  for (let hi = 0; hi < s.length; hi++) {\n    const c = s[hi];\n    while (inWindow.has(c)) {\n      inWindow.delete(s[lo]);\n      lo++;\n    }\n    inWindow.add(c);\n    best = Math.max(best, hi - lo + 1);\n  }\n  return best;\n}\n",
+          "trace": {
+            "headers": [
+              "hi",
+              "c",
+              "released",
+              "window",
+              "length",
+              "best"
+            ],
+            "rows": [
+              [
+                "0",
+                "'a'",
+                "—",
+                "\"a\"",
+                "1",
+                "1"
+              ],
+              [
+                "1",
+                "'b'",
+                "—",
+                "\"ab\"",
+                "2",
+                "2"
+              ],
+              [
+                "2",
+                "'c'",
+                "—",
+                "\"abc\"",
+                "3",
+                "3"
+              ],
+              [
+                "3",
+                "'a'",
+                "'a'",
+                "\"bca\"",
+                "3",
+                "3"
+              ],
+              [
+                "4",
+                "'b'",
+                "'b'",
+                "\"cab\"",
+                "3",
+                "3"
+              ],
+              [
+                "5",
+                "'c'",
+                "'c'",
+                "\"abc\"",
+                "3",
+                "3"
+              ],
+              [
+                "6",
+                "'b'",
+                "'a', 'b'",
+                "\"cb\"",
+                "2",
+                "3"
+              ],
+              [
+                "7",
+                "'b'",
+                "'c', 'b'",
+                "\"b\"",
+                "1",
+                "3"
+              ]
+            ]
+          },
+          "notes": [
+            "Here the repair runs **before** the absorb: the rule is about the *incoming* character, so the window is cleared of `c` first. That is equivalent to absorbing, then shrinking while `c` appears twice.",
+            "`lo` jumps several places at once at `hi = 6`: the `while` released two characters. It is still at most `n` releases over the whole run."
+          ],
+          "lines": [],
+          "question": null,
+          "takeaway": ""
+        }
+      ],
+      "implementation": {
+        "read": {
+          "title": "Longest subarray with sum ≤ limit (all values ≥ 0)",
+          "problem": "Given non-negative `nums` and a `limit`, return the length of the\nlongest contiguous subarray whose sum is at most `limit` (0 if none).\n",
+          "code": "function longestSumAtMost(nums: number[], limit: number): number {\n  let lo = 0;\n  let windowSum = 0;\n  let best = 0;\n  for (let hi = 0; hi < nums.length; hi++) {\n    windowSum += nums[hi];\n    while (windowSum > limit) {\n      windowSum -= nums[lo];\n      lo++;\n    }\n    best = Math.max(best, hi - lo + 1);\n  }\n  return best;\n}\n",
+          "notes": [
+            {
+              "line": 2,
+              "text": "`lo` is the left edge. The window starts empty."
+            },
+            {
+              "line": 3,
+              "text": "The summary: the sum of `nums[lo..hi]`."
+            },
+            {
+              "line": 6,
+              "text": "**Absorb.** The window is now `[lo, hi]`, possibly invalid."
+            },
+            {
+              "line": 7,
+              "text": "**Repair**, with `while` rather than `if`. One large entrant can require several releases."
+            },
+            {
+              "line": 8,
+              "text": "**Release** `nums[lo]`, then move the edge. The order matters: subtract first, then `lo++`."
+            },
+            {
+              "line": 11,
+              "text": "**Measure.** After the loop the window is valid, possibly empty (`lo = hi + 1`, length 0) if `nums[hi] > limit` alone."
+            },
+            {
+              "line": 13,
+              "text": "Every index entered once and left at most once: 2n steps."
+            }
+          ],
+          "why_it_works": "Because every value is ≥ 0, shrinking can only lower the sum. Once\n`[lo, hi]` is too heavy, every window starting at or before `lo` and\nending at `hi` is too heavy as well. Moving `lo` past them loses\nnothing.\n"
+        },
+        "complete": {
+          "id": "ndsa:sliding-window:impl:complete",
+          "title": "Complete it: longest substring with at most k distinct characters",
+          "prompt": "Return the length of the longest substring of `s` that contains **at\nmost `k` distinct characters** (`0 ≤ k`). The window, the loop and the\nrelease are written. Fill in the four blanks.\n\nExample: `s = \"eceba\"`, `k = 2` → `3` (`\"ece\"`).\n",
+          "hint": "",
+          "hints": [
+            "Absorb: the same Map update as the TypeScript fundamentals drill.",
+            "The window is invalid when it holds more than k distinct characters; counts.size tells you how many it holds.",
+            "A count that reaches zero must leave the Map entirely, or size keeps counting it.",
+            "Measure the longest variant after the repair: the window length is hi - lo + 1."
+          ],
+          "language": "typescript",
+          "kind": "drill",
+          "difficulty": "",
+          "strictness": "",
+          "harness": "\n// ---- checker: reads the arguments, calls your function, prints the result ----\nimport * as __ndFs from \"fs\";\nconst __ndIn: string[] = __ndFs.readFileSync(0, \"utf8\").split(\"\\n\");\nconst __ndLine = (i: number): string => (__ndIn[i] ?? \"\").replace(/\\r$/, \"\");\nconst __ndA0 = __ndLine(0);\nconst __ndA1 = Number(__ndLine(1).trim());\nconsole.log(String(longestKDistinct(__ndA0, __ndA1)));\n",
+          "judge_mode": "",
+          "forbid": [],
+          "starter": "function longestKDistinct(s: string, k: number): number {\n  const counts = new Map<string, number>();\n  let lo = 0;\n  let best = 0;\n  for (let hi = 0; hi < s.length; hi++) {\n    const c = s[hi];\n    counts.set(c, ____);\n    while (____) {\n      const out = s[lo];\n      const left = counts.get(out)! - 1;\n      if (left === 0) ____;\n      else counts.set(out, left);\n      lo++;\n    }\n    best = ____;\n  }\n  return best;\n}\n",
+          "solution": "function longestKDistinct(s: string, k: number): number {\n  const counts = new Map<string, number>();\n  let lo = 0;\n  let best = 0;\n  for (let hi = 0; hi < s.length; hi++) {\n    const c = s[hi];\n    counts.set(c, (counts.get(c) ?? 0) + 1);\n    while (counts.size > k) {\n      const out = s[lo];\n      const left = counts.get(out)! - 1;\n      if (left === 0) counts.delete(out);\n      else counts.set(out, left);\n      lo++;\n    }\n    best = Math.max(best, hi - lo + 1);\n  }\n  return best;\n}\n",
+          "tests": [
+            {
+              "input": "eceba\n2\n",
+              "output": "3\n"
+            },
+            {
+              "input": "aa\n1\n",
+              "output": "2\n"
+            },
+            {
+              "input": "\n3\n",
+              "output": "0\n"
+            },
+            {
+              "input": "abc\n0\n",
+              "output": "0\n"
+            },
+            {
+              "input": "abaccc\n2\n",
+              "output": "4\n"
+            },
+            {
+              "input": "abcadcacacaca\n3\n",
+              "output": "11\n"
+            },
+            {
+              "input": "aabbcc\n1\n",
+              "output": "2\n"
+            }
+          ],
+          "source_slug": "",
+          "dataset": "",
+          "explanation": "The four blanks are the four decisions in every variable window:\n**absorb** (`?? 0` + 1), **invalid?** (`counts.size > k`),\n**clean release** (`delete` at zero, so `size` stays honest) and\n**measure** after the repair.\n"
+        },
+        "pseudocode": {
+          "title": "Pseudocode → TypeScript: shortest subarray with sum ≥ target",
+          "problem": "Given **positive** integers `nums` and a `target`, return the length of\nthe shortest contiguous subarray whose sum is **at least** `target`,\nor `0` if there is none.\n",
+          "pseudocode": "lo ← 0;  sum ← 0;  best ← ∞\nfor hi from 0 to n − 1:\n    sum ← sum + nums[hi]\n    while sum ≥ target:               ▸ valid: try to make it shorter\n        best ← min(best, hi − lo + 1) ▸ measure INSIDE the loop\n        sum ← sum − nums[lo]\n        lo ← lo + 1\nreturn 0 if best is still ∞, else best\n",
+          "exercise": {
+            "id": "ndsa:sliding-window:impl:pseudocode",
+            "title": "Translate the pseudocode",
+            "prompt": "Turn the pseudocode above into TypeScript, line by line. Examples:\n`nums = [2, 3, 1, 2, 4, 3]`, `target = 7` → `2` (`[4, 3]`);\n`nums = [1, 1, 1]`, `target = 5` → `0`.\n",
+            "hint": "",
+            "hints": [
+              "∞ is Infinity in TypeScript, and it is a number, so best can start there.",
+              "The pseudocode's while becomes a while; the measurement goes before the release, inside it.",
+              "Convert Infinity back to 0 on the way out."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "\n// ---- checker: reads the arguments, calls your function, prints the result ----\nimport * as __ndFs from \"fs\";\nconst __ndIn: string[] = __ndFs.readFileSync(0, \"utf8\").split(\"\\n\");\nconst __ndLine = (i: number): string => (__ndIn[i] ?? \"\").replace(/\\r$/, \"\");\nconst __ndA0 = (__ndLine(0).trim() === \"\" ? [] : __ndLine(0).trim().split(/\\s+/).map(Number));\nconst __ndA1 = Number(__ndLine(1).trim());\nconsole.log(String(minLenSumAtLeast(__ndA0, __ndA1)));\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "function minLenSumAtLeast(nums: number[], target: number): number {\n  // lo ← 0; sum ← 0; best ← ∞\n  // for hi …\n  return 0;\n}\n",
+            "solution": "function minLenSumAtLeast(nums: number[], target: number): number {\n  let lo = 0;\n  let sum = 0;\n  let best = Infinity;\n  for (let hi = 0; hi < nums.length; hi++) {\n    sum += nums[hi];\n    while (sum >= target) {\n      best = Math.min(best, hi - lo + 1);\n      sum -= nums[lo];\n      lo++;\n    }\n  }\n  return best === Infinity ? 0 : best;\n}\n",
+            "tests": [
+              {
+                "input": "2 3 1 2 4 3\n7\n",
+                "output": "2\n"
+              },
+              {
+                "input": "1 1 1\n5\n",
+                "output": "0\n"
+              },
+              {
+                "input": "1 4 4\n4\n",
+                "output": "1\n"
+              },
+              {
+                "input": "5\n5\n",
+                "output": "1\n"
+              },
+              {
+                "input": "1 2 3 4 5\n11\n",
+                "output": "3\n"
+              },
+              {
+                "input": "1 1 1 1 1 1 1 1\n11\n",
+                "output": "0\n"
+              },
+              {
+                "input": "10 2 3\n6\n",
+                "output": "1\n"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": ""
+          }
+        },
+        "scratch": {
+          "id": "ndsa:sliding-window:impl:scratch",
+          "title": "From scratch: longest run of 1s with at most k flips",
+          "prompt": "`bits` holds only `0`s and `1`s. You may flip **at most `k`** zeros into\nones. Return the length of the longest run of consecutive 1s you can\nget.\n\n- `bits = [1,1,1,0,0,0,1,1,1,1,0]`, `k = 2` → `6`\n- `bits = [0,0,1,1,0,0,1,1,1,0,1,1,0,0,0,1,1,1,1]`, `k = 3` → `10`\n\nConstraints: `0 ≤ k ≤ bits.length ≤ 10^5`. O(n) expected.\n",
+          "hint": "",
+          "hints": [
+            "You never decide which zeros to flip. Any window with at most k zeros can be made all ones.",
+            "So the rule is: zeros in the window ≤ k. Keep a zeros counter as the summary."
+          ],
+          "language": "typescript",
+          "kind": "challenge",
+          "difficulty": "Medium",
+          "strictness": "",
+          "harness": "\n// ---- checker: reads the arguments, calls your function, prints the result ----\nimport * as __ndFs from \"fs\";\nconst __ndIn: string[] = __ndFs.readFileSync(0, \"utf8\").split(\"\\n\");\nconst __ndLine = (i: number): string => (__ndIn[i] ?? \"\").replace(/\\r$/, \"\");\nconst __ndA0 = (__ndLine(0).trim() === \"\" ? [] : __ndLine(0).trim().split(/\\s+/).map(Number));\nconst __ndA1 = Number(__ndLine(1).trim());\nconsole.log(String(longestOnesKFlips(__ndA0, __ndA1)));\n",
+          "judge_mode": "",
+          "forbid": [],
+          "starter": "function longestOnesKFlips(bits: number[], k: number): number {\n  return 0;\n}\n",
+          "solution": "function longestOnesKFlips(bits: number[], k: number): number {\n  let lo = 0;\n  let zeros = 0;\n  let best = 0;\n  for (let hi = 0; hi < bits.length; hi++) {\n    if (bits[hi] === 0) zeros++;\n    while (zeros > k) {\n      if (bits[lo] === 0) zeros--;\n      lo++;\n    }\n    best = Math.max(best, hi - lo + 1);\n  }\n  return best;\n}\n",
+          "tests": [
+            {
+              "input": "1 1 1 0 0 0 1 1 1 1 0\n2\n",
+              "output": "6\n"
+            },
+            {
+              "input": "0 0 1 1 0 0 1 1 1 0 1 1 0 0 0 1 1 1 1\n3\n",
+              "output": "10\n"
+            },
+            {
+              "input": "0 0 0\n0\n",
+              "output": "0\n"
+            },
+            {
+              "input": "1 1 1\n0\n",
+              "output": "3\n"
+            },
+            {
+              "input": "0 0 0\n5\n",
+              "output": "3\n"
+            },
+            {
+              "input": "\n0\n",
+              "output": "0\n"
+            },
+            {
+              "input": "1 0 1 0 1\n1\n",
+              "output": "3\n"
+            }
+          ],
+          "source_slug": "",
+          "dataset": "",
+          "explanation": "The reframing is the skill: *\"which zeros should I flip?\"* sounds\nlike a search, but any window with ≤ k zeros **can** be made all\nones. So the choice disappears, and the budget becomes the window's\nrule.\n"
+        }
+      },
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(1) for a sum or a counter · O(min(n, σ)) for a Map or Set (σ = alphabet size)",
+        "body": "### Where the O(n) comes from\n\nA `while` inside a `for` looks like O(n²). It is not, and the reason is\nworth being able to say out loud: **count pointer moves, not loop\nnesting.**\n\n- `hi` moves forward exactly `n` times, once per `for` iteration.\n- Every pass through the `while` body moves `lo` forward once, and `lo`\n  never moves back and never passes `n`. So across the **whole run**\n  the `while` body executes at most `n` times, however those runs are\n  spread over the steps.\n\nThat is at most `2n` pointer moves, each doing O(1) work on the summary:\n**O(n) total**. Any single step can be expensive (one step may release\nmany elements), but the cost averages out. That is what *amortised O(1)\nper step* means.\n\n### Where the space comes from\n\nThe window's contents are never copied, because they are already in the\narray. Only the summary costs memory. A running sum or a zero counter is\nO(1). A `Map` of counts holds at most one key per distinct value in the\nwindow: bounded by the window length and by the alphabet, so\nO(min(n, σ)). For lowercase letters that is at most 26: effectively O(1).\n",
+        "compare": [
+          {
+            "approach": "Every window, re-summed from scratch",
+            "time": "O(n³)",
+            "space": "O(1)",
+            "note": "n²/2 windows × up to n reads each."
+          },
+          {
+            "approach": "Every start, extend with a running sum",
+            "time": "O(n²)",
+            "space": "O(1)",
+            "note": "Reuses the sum while extending one start, but still visits every window."
+          },
+          {
+            "approach": "Sliding window",
+            "time": "O(n)",
+            "space": "O(1) – O(σ)",
+            "note": "Reuses the overlap between neighbours *and* skips windows that cannot win."
+          }
+        ],
+        "why_improved": "Two separate savings. **Reuse** takes O(n³) down to O(n²): a window's\nsummary is updated from its neighbour's, not rebuilt. **Skipping** takes\nO(n²) down to O(n): because the rule survives shrinking, once `[lo, hi]`\nis invalid no window starting at or before `lo` and ending later can be\nvalid, so `lo` only moves forward. At `n = 10^5` that is the difference\nbetween 10¹⁰ steps (minutes) and 2·10⁵ (about a millisecond).\n",
+        "rewrite": {
+          "slow": "// O(n · k): rebuilds each window\nfor (let hi = k - 1; hi < nums.length; hi++) {\n  const sum = nums.slice(hi - k + 1, hi + 1).reduce((a, b) => a + b, 0);\n  best = Math.max(best, sum);\n}\n",
+          "fast": "// O(n): updates the window\nfor (let hi = 0; hi < nums.length; hi++) {\n  sum += nums[hi];\n  if (hi >= k) sum -= nums[hi - k];\n  if (hi >= k - 1) best = Math.max(best, sum);\n}\n",
+          "edit": "Replace the rebuild (`slice` + `reduce`, O(k)) with one add and one subtract (O(1))."
+        },
+        "questions": [
+          {
+            "question": "What is the time complexity of this function?",
+            "options": [
+              "O(n)",
+              "O(n²)",
+              "O(n log n)",
+              "O(n · k)"
+            ],
+            "answer": 0,
+            "explanation": "`lo` only moves forward and never passes `n`, so the `while` body\nruns at most `n` times **in total** over the whole run, not per\nstep. `n` moves of `hi` plus at most `n` of `lo` is O(n).\n",
+            "why_not": [
+              "",
+              "That would be true if `lo` restarted from 0 on each iteration. It never moves back, so the inner loop's work is shared across all steps.",
+              "Nothing is sorted or halved here.",
+              "There is no `k` in this rule. The shrink is bounded by `n` moves overall."
+            ],
+            "code": "function f(nums: number[], limit: number): number {\n  let lo = 0, sum = 0, best = 0;\n  for (let hi = 0; hi < nums.length; hi++) {\n    sum += nums[hi];\n    while (sum > limit) sum -= nums[lo++];\n    best = Math.max(best, hi - lo + 1);\n  }\n  return best;\n}\n"
+          },
+          {
+            "question": "And this one? (n = nums.length)",
+            "options": [
+              "O(n · k)",
+              "O(n)",
+              "O(k)",
+              "O(n²) regardless of k"
+            ],
+            "answer": 0,
+            "explanation": "There are about `n − k + 1` windows, and each builds a fresh\n`slice` of length `k` and sums it: O(n · k). It is correct, but it\nis not a sliding window. Nothing is carried from one step to the\nnext.\n",
+            "why_not": [
+              "",
+              "`slice` and `reduce` are hidden loops: each costs O(k) per step.",
+              "That is the cost of *one* window, not of all of them.",
+              "When k ≈ n/2 it is quadratic, but for small k it is nearly linear. The honest answer mentions k."
+            ],
+            "code": "for (let hi = k - 1; hi < nums.length; hi++) {\n  const w = nums.slice(hi - k + 1, hi + 1);\n  best = Math.max(best, w.reduce((a, b) => a + b, 0));\n}\n"
+          },
+          {
+            "question": "`longestKDistinct(s, k)` with a `Map` of counts, where `s` is lowercase letters. What is the extra space?",
+            "options": [
+              "O(min(k, σ)): at most k + 1 keys, and never more than the 26 letters",
+              "O(n): the Map can hold the whole string",
+              "O(k²)",
+              "O(1) whatever the alphabet"
+            ],
+            "answer": 0,
+            "explanation": "The Map holds one key per distinct character **in the window**. The\nrepair keeps that at most `k` (briefly `k + 1` before shrinking),\nand it can never exceed the alphabet size σ.\n",
+            "why_not": [
+              "",
+              "Keys are distinct characters, not positions. `\"aaaa…\"` of any length is one key.",
+              "Nothing is quadratic here. There is one key per distinct character.",
+              "It is O(1) only *because* the alphabet is fixed at 26. For arbitrary numbers it would be O(k)."
+            ]
+          }
+        ]
+      },
+      "mistakes": [
+        {
+          "title": "Measuring before repairing (longest variant)",
+          "category": "Logic",
+          "wrong": "absorb(nums[hi]);\nbest = Math.max(best, hi - lo + 1);   // window may be invalid here\nwhile (invalid()) release(nums[lo++]);\n",
+          "why": "It feels natural to record right after growing.",
+          "recognise": "The answer is sometimes one too big: it counts a window that breaks the rule.",
+          "right": "absorb(nums[hi]);\nwhile (invalid()) release(nums[lo++]);\nbest = Math.max(best, hi - lo + 1);   // valid by construction\n"
+        },
+        {
+          "title": "Measuring after the loop (shortest variant)",
+          "category": "Logic",
+          "wrong": "while (sum >= target) sum -= nums[lo++];\nbest = Math.min(best, hi - lo + 1);   // the window is now INVALID\n",
+          "why": "Copying the longest-variant template without flipping where you measure.",
+          "recognise": "Answers are one too short, or you report windows whose sum is below target.",
+          "right": "while (sum >= target) {\n  best = Math.min(best, hi - lo + 1); // measure while still valid\n  sum -= nums[lo++];\n}\n"
+        },
+        {
+          "title": "Length off by one",
+          "category": "Off-by-one",
+          "wrong": "best = Math.max(best, hi - lo);\n",
+          "why": "`hi − lo` is the distance between the edges, not the number of elements.",
+          "recognise": "Every answer is exactly one short. A one-element window measures as 0.",
+          "right": "best = Math.max(best, hi - lo + 1);   // both ends inclusive\n"
+        },
+        {
+          "title": "`if` instead of `while` when shrinking",
+          "category": "Boundary",
+          "wrong": "if (sum > limit) sum -= nums[lo++];\n",
+          "why": "Usually one release is enough, so tests on small inputs pass.",
+          "recognise": "Fails when one large element enters: after one release the window is still invalid, and gets measured anyway.",
+          "right": "while (sum > limit) sum -= nums[lo++];\n"
+        },
+        {
+          "title": "Measuring a fixed window before it is full",
+          "category": "Boundary",
+          "wrong": "sum += nums[hi];\nif (hi >= k) sum -= nums[hi - k];\nbest = Math.max(best, sum);          // measures windows of size 1..k-1\n",
+          "why": "The guard on the release looks sufficient.",
+          "recognise": "Wrong only when a partial window happens to win, for example with negative numbers, where a short prefix beats every full window.",
+          "right": "if (hi >= k - 1) best = Math.max(best, sum);\n"
+        },
+        {
+          "title": "Starting a minimum at 0",
+          "category": "Initialisation",
+          "wrong": "let best = 0;\nbest = Math.min(best, hi - lo + 1);  // always 0\n",
+          "why": "Copied from the maximum version, where 0 is a fine start.",
+          "recognise": "The function returns 0 on every input.",
+          "right": "let best = Infinity;\n// …\nreturn best === Infinity ? 0 : best;\n"
+        },
+        {
+          "title": "`counts.get(c) + 1`",
+          "category": "TypeScript",
+          "wrong": "counts.set(c, counts.get(c) + 1);\n",
+          "why": "In JavaScript it would give `NaN` the first time. TypeScript stops it at compile time.",
+          "recognise": "Compile error TS2532: *Object is possibly 'undefined'*. (Silencing it with `!` just brings the `NaN` back.)",
+          "right": "counts.set(c, (counts.get(c) ?? 0) + 1);\n"
+        },
+        {
+          "title": "Leaving zero counts in the Map",
+          "category": "Built-ins",
+          "wrong": "counts.set(out, counts.get(out)! - 1);   // may leave out → 0\n",
+          "why": "Decrementing feels like the whole job.",
+          "recognise": "`counts.size` keeps growing. The window shrinks far too much, and answers come out too small.",
+          "right": "const left = counts.get(out)! - 1;\nif (left === 0) counts.delete(out);\nelse counts.set(out, left);\n"
+        },
+        {
+          "title": "Rebuilding the window every step",
+          "category": "Complexity",
+          "wrong": "// inside the loop:\nif (new Set(s.slice(lo, hi + 1)).size > k) { /* … */ }\n",
+          "why": "`slice` and `new Set` look like single operations.",
+          "recognise": "Correct on the examples, then *Time limit exceeded*: the loop is O(n · window).",
+          "right": "// keep a Map summary and update it by one element per step\n"
+        },
+        {
+          "title": "`shift()` as a queue",
+          "category": "Built-ins",
+          "wrong": "const front = dq.shift();   // re-indexes the whole array\n",
+          "why": "It reads like a deque's pop-front.",
+          "recognise": "The deque variation times out on large inputs even though the algorithm is O(n).",
+          "right": "const front = dq[head++];    // O(1): keep a head index\n"
+        },
+        {
+          "title": "`for … in` over a string",
+          "category": "TypeScript",
+          "wrong": "for (const i in s) {\n  best = Math.max(best, i - lo + 1);   // i is \"0\", \"1\", … — a string\n}\n",
+          "why": "`for … in` loops over *keys*, and array/string keys are strings.",
+          "recognise": "TS2362: *The left-hand side of an arithmetic operation must be of type 'any', 'number', …*. In plain JavaScript, `\"1\" + 1` would give `\"11\"`.",
+          "right": "for (let hi = 0; hi < s.length; hi++) { /* … */ }\n"
+        },
+        {
+          "title": "Assuming the values are non-negative",
+          "category": "Assumptions",
+          "wrong": "// \"subarray sum ≤ limit\" when nums may contain negatives\nwhile (sum > limit) sum -= nums[lo++];\n",
+          "why": "The template worked on the last three problems.",
+          "recognise": "Wrong answers only on tests with negative numbers. Read the constraints line before choosing.",
+          "right": "// negatives break “validity survives shrinking” — use prefix sums instead\n"
+        }
+      ],
+      "recognition": {
+        "intro": "No code. Read each scenario and name the tool you would reach for\n**before** thinking about how to write it. Several are deliberately\n*not* sliding windows. A wrong answer shows why that option does not\nfit.\n",
+        "questions": [
+          {
+            "question": "A delivery log records how many parcels arrived each minute. Find the busiest stretch of exactly 60 consecutive minutes.",
+            "options": [
+              "Sliding window: fixed size",
+              "Sliding window: variable size",
+              "Prefix sums + hash map",
+              "Dynamic programming"
+            ],
+            "answer": 0,
+            "explanation": "“Exactly 60 consecutive” fixes the width. One minute enters and one leaves per step.\n",
+            "why_not": [
+              "",
+              "Nothing decides when to shrink: the width is given.",
+              "It would work (each window is a prefix difference), but a fixed window needs no extra array and states the problem directly.",
+              "No choices to combine, just one sum per window."
+            ]
+          },
+          {
+            "question": "Find the longest stretch of days in which you spent at most B dollars in total. Spending is never negative.",
+            "options": [
+              "Sliding window: variable size",
+              "Sliding window: fixed size",
+              "Prefix sums + hash map",
+              "Binary search"
+            ],
+            "answer": 0,
+            "explanation": "Longest + at-most budget + non-negative values. Shrinking never breaks “≤ B”, so this is the variable window.\n",
+            "why_not": [
+              "",
+              "The length is what you are looking for, so it cannot be fixed.",
+              "Needed if spending could be negative. It cannot, so the window is simpler and O(1) space.",
+              "Binary search on the length plus a check works in O(n log n). The window is O(n)."
+            ]
+          },
+          {
+            "question": "Count the subarrays whose sum is exactly K. The values can be negative.",
+            "options": [
+              "Prefix sums + hash map",
+              "Sliding window: variable size",
+              "Sliding window: fixed size",
+              "Two pointers from both ends (sorted input)"
+            ],
+            "answer": 0,
+            "explanation": "Negatives break the window's monotone rule. Count pairs of prefix sums that differ by K with a hash map.\n",
+            "why_not": [
+              "",
+              "With negative values, shrinking can raise the sum, so `lo` would have to move back.",
+              "No width is given.",
+              "Nothing is sorted, and the answer is a range, not a pair."
+            ]
+          },
+          {
+            "question": "In a sorted array, find two numbers that add up to the target.",
+            "options": [
+              "Two pointers from both ends (sorted input)",
+              "Sliding window: variable size",
+              "Sliding window: fixed size",
+              "Dynamic programming"
+            ],
+            "answer": 0,
+            "explanation": "A pair, not a range, in sorted input: move inward from both ends.\n",
+            "why_not": [
+              "",
+              "The answer is two elements, not a contiguous run between them.",
+              "There is no range of size k here.",
+              "No overlapping subproblems. One linear scan decides it."
+            ]
+          },
+          {
+            "question": "Find the length of the longest strictly increasing subsequence (elements need not be adjacent).",
+            "options": [
+              "Dynamic programming",
+              "Sliding window: variable size",
+              "Sliding window: fixed size",
+              "Hash set / map, no window"
+            ],
+            "answer": 0,
+            "explanation": "“Subsequence” allows gaps, so there is no contiguous window. This is LIS, a DP problem.\n",
+            "why_not": [
+              "",
+              "A window is contiguous by definition. Skipping elements is exactly what it cannot do.",
+              "No fixed width, and elements may be skipped.",
+              "Membership does not capture order."
+            ]
+          },
+          {
+            "question": "For every window of 30 consecutive temperature readings, report the maximum.",
+            "options": [
+              "Sliding window + monotonic deque",
+              "Sliding window: fixed size",
+              "Sliding window: variable size",
+              "Binary search"
+            ],
+            "answer": 0,
+            "explanation": "A fixed window whose summary is a **maximum**, which cannot be un-added when an element leaves. A monotonic deque keeps the candidates in O(1) amortised.\n",
+            "why_not": [
+              "",
+              "Close, but a running max has no “subtract”: when the maximum leaves, you would have to rescan the window, O(n · k).",
+              "The width is fixed at 30.",
+              "Nothing is sorted."
+            ]
+          },
+          {
+            "question": "Does the text contain a substring that is a rearrangement (anagram) of the pattern “abc”?",
+            "options": [
+              "Sliding window: fixed size",
+              "Sliding window: variable size",
+              "Hash set / map, no window",
+              "Dynamic programming"
+            ],
+            "answer": 0,
+            "explanation": "Every anagram of the pattern has the pattern's length: a fixed window of letter counts, compared with the pattern's counts.\n",
+            "why_not": [
+              "",
+              "The candidate length is known in advance (3), so nothing needs to grow or shrink by a rule.",
+              "A set of whole substrings would be O(n · m). The window updates counts by one letter per step.",
+              "There is nothing to optimise, only a yes/no per window."
+            ]
+          },
+          {
+            "question": "Find the shortest run of consecutive songs whose total length is at least 60 minutes.",
+            "options": [
+              "Sliding window: variable size",
+              "Sliding window: fixed size",
+              "Prefix sums + hash map",
+              "Two pointers from both ends (sorted input)"
+            ],
+            "answer": 0,
+            "explanation": "Shortest + at-least + positive lengths: the variable window's shortest shape, measured inside the shrink.\n",
+            "why_not": [
+              "",
+              "The length is the unknown.",
+              "Works, but needs an extra array or a search. Positive lengths make the window enough.",
+              "It is a range, not a pair."
+            ]
+          },
+          {
+            "question": "Has any value appeared twice anywhere in the array?",
+            "options": [
+              "Hash set / map, no window",
+              "Sliding window: variable size",
+              "Sliding window: fixed size",
+              "Binary search"
+            ],
+            "answer": 0,
+            "explanation": "No range, no order: one pass with a Set answers it.\n",
+            "why_not": [
+              "",
+              "The question is about the whole array, not a range inside it.",
+              "No width is involved.",
+              "Sorting first and scanning neighbours works in O(n log n). A Set is O(n)."
+            ]
+          },
+          {
+            "question": "You need to find the first occurrence of a value ≥ x in a sorted array.",
+            "options": [
+              "Binary search",
+              "Sliding window: variable size",
+              "Sliding window: fixed size",
+              "Hash set / map, no window"
+            ],
+            "answer": 0,
+            "explanation": "Sorted + first position satisfying a monotone condition: binary search (lower bound), O(log n).\n",
+            "why_not": [
+              "",
+              "Scanning with a window would be O(n) and ignores that the input is sorted.",
+              "No range of fixed width is involved.",
+              "A hash lookup finds equal values, not the first one ≥ x."
+            ]
+          }
+        ]
+      },
+      "guided": [
+        {
+          "key": "max-vowels",
+          "title": "Maximum vowels in a substring of length k",
+          "problem": "Given a lowercase string `s` and an integer `k`\n(`1 ≤ k ≤ s.length ≤ 10^5`), return the **maximum number of vowels**\n(`a e i o u`) in any substring of length `k`.\n",
+          "examples": [
+            {
+              "input": "s = \"abciiidef\", k = 3",
+              "output": "3",
+              "note": "\"iii\""
+            },
+            {
+              "input": "s = \"aeiou\", k = 2",
+              "output": "2",
+              "note": "any two letters"
+            },
+            {
+              "input": "s = \"leetcode\", k = 3",
+              "output": "2",
+              "note": "\"lee\", \"eet\" or \"ode\""
+            }
+          ],
+          "understand": {
+            "question": "For s = \"rhythms\", k = 4, what should the function return?",
+            "options": [
+              "0",
+              "1",
+              "4",
+              "Nothing: it should throw"
+            ],
+            "answer": 0,
+            "explanation": "No substring contains a vowel, so the maximum is 0. The input is valid, and 0 is a real answer.\n",
+            "why_not": [
+              "",
+              "Count the vowels in “rhythms”: there are none (y is not in the list).",
+              "4 is the window length, not the vowel count.",
+              "1 ≤ k ≤ length holds, so the input is valid. It just has no vowels."
+            ]
+          },
+          "identify": {
+            "question": "Which technique fits?",
+            "options": [
+              "Sliding window: fixed size",
+              "Sliding window: variable size",
+              "Prefix sums + hash map",
+              "Dynamic programming"
+            ],
+            "answer": 0,
+            "explanation": "“Substring of length k” fixes the width. Every candidate has the same size, and one letter enters and one leaves per step.\n",
+            "why_not": [
+              "",
+              "Nothing makes the window shrink. The width is given.",
+              "A prefix count of vowels would work, but it is an extra array. The window keeps the count in one variable.",
+              "There is no choice to optimise over, only one count per window."
+            ]
+          },
+          "approach": {
+            "question": "What is the smallest summary the window needs?",
+            "options": [
+              "The number of vowels inside it",
+              "The substring itself",
+              "A Map of every letter's count",
+              "The index of the last vowel"
+            ],
+            "answer": 0,
+            "explanation": "One integer: +1 if the entering letter is a vowel, −1 if the leaving one is.\n",
+            "why_not": [
+              "",
+              "Keeping the substring means rebuilding it every step: O(k) per step.",
+              "It works, but it is more than the question needs. Only vowels matter.",
+              "It cannot tell you how many vowels are inside."
+            ]
+          },
+          "pseudocode": "count ← 0;  best ← 0\nfor hi from 0 to n − 1:\n    if s[hi] is a vowel:          count ← count + 1   ▸ enters\n    if hi ≥ k and s[hi − k] is a vowel: count ← count − 1   ▸ leaves\n    if hi ≥ k − 1:               best ← max(best, count)  ▸ full: measure\nreturn best\n",
+          "hints": [
+            {
+              "label": "Nudge",
+              "text": "Every candidate substring has the same length. What changes between one candidate and the next?"
+            },
+            {
+              "label": "Approach",
+              "text": "A fixed window of width `k`. Its summary is a single number: how many vowels are inside."
+            },
+            {
+              "label": "Steps",
+              "text": "For each `hi`: add 1 if `s[hi]` is a vowel. If `hi ≥ k`, subtract 1 if `s[hi − k]` is a vowel. Once `hi ≥ k − 1`, compare the count with the best."
+            },
+            {
+              "label": "Code",
+              "text": "A vowel test that type-checks cleanly: `\"aeiou\".includes(s[hi])`. The leaver is `s[hi - k]`."
+            }
+          ],
+          "exercise": {
+            "id": "ndsa:sliding-window:guided:max-vowels",
+            "title": "Implement maxVowels",
+            "prompt": "Implement `maxVowels(s, k)` as described above.\n",
+            "hint": "",
+            "hints": [],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "\n// ---- checker: reads the arguments, calls your function, prints the result ----\nimport * as __ndFs from \"fs\";\nconst __ndIn: string[] = __ndFs.readFileSync(0, \"utf8\").split(\"\\n\");\nconst __ndLine = (i: number): string => (__ndIn[i] ?? \"\").replace(/\\r$/, \"\");\nconst __ndA0 = __ndLine(0);\nconst __ndA1 = Number(__ndLine(1).trim());\nconsole.log(String(maxVowels(__ndA0, __ndA1)));\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "function maxVowels(s: string, k: number): number {\n  return 0;\n}\n",
+            "solution": "function maxVowels(s: string, k: number): number {\n  const isVowel = (c: string): boolean => \"aeiou\".includes(c);\n  let count = 0;\n  let best = 0;\n  for (let hi = 0; hi < s.length; hi++) {\n    if (isVowel(s[hi])) count++;\n    if (hi >= k && isVowel(s[hi - k])) count--;\n    if (hi >= k - 1) best = Math.max(best, count);\n  }\n  return best;\n}\n",
+            "tests": [
+              {
+                "input": "abciiidef\n3\n",
+                "output": "3\n"
+              },
+              {
+                "input": "aeiou\n2\n",
+                "output": "2\n"
+              },
+              {
+                "input": "leetcode\n3\n",
+                "output": "2\n"
+              },
+              {
+                "input": "rhythms\n4\n",
+                "output": "0\n"
+              },
+              {
+                "input": "bcdaei\n3\n",
+                "output": "3\n"
+              },
+              {
+                "input": "a\n1\n",
+                "output": "1\n"
+              },
+              {
+                "input": "zzzzzzzzza\n10\n",
+                "output": "1\n"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": ""
+          },
+          "tests": [
+            {
+              "case": "No vowels at all",
+              "input": "s = \"rhythms\", k = 4",
+              "expected": "0",
+              "why": "`best` must start at 0, and nothing may go negative."
+            },
+            {
+              "case": "k equals the length",
+              "input": "s = \"zzzzzzzzza\", k = 10",
+              "expected": "1",
+              "why": "Exactly one window, and it is only measured on the last index."
+            },
+            {
+              "case": "The best window is the last one",
+              "input": "s = \"bcdaei\", k = 3",
+              "expected": "3",
+              "why": "Catches a loop that stops one step early."
+            },
+            {
+              "case": "k = 1",
+              "input": "s = \"a\", k = 1",
+              "expected": "1",
+              "why": "The smallest window: enters and leaves on consecutive steps."
+            }
+          ]
+        },
+        {
+          "key": "product-less",
+          "title": "Count subarrays with product less than k",
+          "problem": "Given an array of **positive** integers `nums` (`1 ≤ nums[i] ≤ 1000`,\n`n ≤ 3·10^4`) and an integer `k` (`0 ≤ k ≤ 10^6`), return how many\ncontiguous subarrays have a product **strictly less than** `k`.\n",
+          "examples": [
+            {
+              "input": "nums = [10, 5, 2, 6], k = 100",
+              "output": "8",
+              "note": "[10] [5] [2] [6] [10,5] [5,2] [2,6] [5,2,6]"
+            },
+            {
+              "input": "nums = [1, 2, 3], k = 0",
+              "output": "0",
+              "note": "no product is below 0"
+            }
+          ],
+          "understand": {
+            "question": "For nums = [2, 3], k = 7, how many subarrays qualify?",
+            "options": [
+              "3",
+              "2",
+              "1",
+              "4"
+            ],
+            "answer": 0,
+            "explanation": "[2] → 2, [3] → 3, [2, 3] → 6. All three are below 7.\n",
+            "why_not": [
+              "",
+              "Don't forget the whole array [2, 3]: its product is 6 < 7.",
+              "Every single element qualifies on its own.",
+              "An array of two elements has exactly three non-empty contiguous subarrays."
+            ]
+          },
+          "identify": {
+            "question": "Which technique fits?",
+            "options": [
+              "Sliding window: variable size",
+              "Sliding window: fixed size",
+              "Prefix sums + hash map",
+              "Dynamic programming"
+            ],
+            "answer": 0,
+            "explanation": "Because every value is ≥ 1, a product only grows as the window grows. “Product < k” survives shrinking, so it is a variable window, in its **count** shape.\n",
+            "why_not": [
+              "",
+              "The subarrays have every possible length.",
+              "Prefix *products* overflow quickly, and the monotone window makes them unnecessary.",
+              "No choices to combine. It is a counting sweep."
+            ]
+          },
+          "approach": {
+            "question": "After the repair, [lo, hi] is valid. How many valid subarrays END at hi?",
+            "options": [
+              "hi − lo + 1",
+              "1",
+              "hi − lo",
+              "(hi − lo + 1)(hi − lo + 2) / 2"
+            ],
+            "answer": 0,
+            "explanation": "Any start between lo and hi gives a sub-window of a valid window, which is valid too (products only fall when you remove elements ≥ 1). That is hi − lo + 1 starts.\n",
+            "why_not": [
+              "",
+              "That counts only [lo, hi] itself. The shorter windows ending at hi are valid too.",
+              "Off by one: the window [hi, hi] counts.",
+              "That counts every sub-window of [lo, hi], but most of those end before hi and were already counted on earlier steps."
+            ]
+          },
+          "pseudocode": "if k ≤ 1: return 0                 ▸ no product of positive integers is < 1\nlo ← 0;  product ← 1;  count ← 0\nfor hi from 0 to n − 1:\n    product ← product × nums[hi]\n    while product ≥ k:\n        product ← product ÷ nums[lo]\n        lo ← lo + 1\n    count ← count + (hi − lo + 1)\nreturn count\n",
+          "hints": [
+            {
+              "label": "Nudge",
+              "text": "With every value ≥ 1, what happens to a product when you add an element? When you remove one?"
+            },
+            {
+              "label": "Approach",
+              "text": "A variable window whose rule is `product < k`, and you **count** windows instead of measuring one."
+            },
+            {
+              "label": "Steps",
+              "text": "Multiply in `nums[hi]`. While `product ≥ k`, divide out `nums[lo]` and move `lo`. Then add `hi − lo + 1`. Handle `k ≤ 1` first."
+            },
+            {
+              "label": "Code",
+              "text": "Start with `if (k <= 1) return 0;`. Without it, `k = 1` makes the `while` divide out elements past `hi`, and `nums[lo]` becomes `undefined`."
+            }
+          ],
+          "exercise": {
+            "id": "ndsa:sliding-window:guided:product-less",
+            "title": "Implement countProductLess",
+            "prompt": "Implement `countProductLess(nums, k)` as described above.\n",
+            "hint": "",
+            "hints": [],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "\n// ---- checker: reads the arguments, calls your function, prints the result ----\nimport * as __ndFs from \"fs\";\nconst __ndIn: string[] = __ndFs.readFileSync(0, \"utf8\").split(\"\\n\");\nconst __ndLine = (i: number): string => (__ndIn[i] ?? \"\").replace(/\\r$/, \"\");\nconst __ndA0 = (__ndLine(0).trim() === \"\" ? [] : __ndLine(0).trim().split(/\\s+/).map(Number));\nconst __ndA1 = Number(__ndLine(1).trim());\nconsole.log(String(countProductLess(__ndA0, __ndA1)));\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "function countProductLess(nums: number[], k: number): number {\n  return 0;\n}\n",
+            "solution": "function countProductLess(nums: number[], k: number): number {\n  if (k <= 1) return 0;\n  let lo = 0;\n  let product = 1;\n  let count = 0;\n  for (let hi = 0; hi < nums.length; hi++) {\n    product *= nums[hi];\n    while (product >= k) {\n      product /= nums[lo];\n      lo++;\n    }\n    count += hi - lo + 1;\n  }\n  return count;\n}\n",
+            "tests": [
+              {
+                "input": "10 5 2 6\n100\n",
+                "output": "8\n"
+              },
+              {
+                "input": "1 2 3\n0\n",
+                "output": "0\n"
+              },
+              {
+                "input": "1 1 1\n1\n",
+                "output": "0\n"
+              },
+              {
+                "input": "1 1 1\n2\n",
+                "output": "6\n"
+              },
+              {
+                "input": "2 3\n7\n",
+                "output": "3\n"
+              },
+              {
+                "input": "1000 1000 1000\n1000000\n",
+                "output": "3\n"
+              },
+              {
+                "input": "5 1 1 1 5\n6\n",
+                "output": "14\n"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": ""
+          },
+          "tests": [
+            {
+              "case": "k = 0",
+              "input": "nums = [1, 2, 3], k = 0",
+              "expected": "0",
+              "why": "The early return: no loop at all."
+            },
+            {
+              "case": "k = 1",
+              "input": "nums = [1, 1, 1], k = 1",
+              "expected": "0",
+              "why": "Without the guard, `1 ≥ 1` shrinks past `hi` and divides by `undefined`."
+            },
+            {
+              "case": "All ones",
+              "input": "nums = [1, 1, 1], k = 2",
+              "expected": "6",
+              "why": "The window never shrinks: 1 + 2 + 3 windows."
+            },
+            {
+              "case": "A single element hits k",
+              "input": "nums = [1000, 1000, 1000], k = 1000000",
+              "expected": "5",
+              "why": "The window shrinks to exclude the oldest element: products must be *strictly* less."
+            }
+          ]
+        }
+      ],
+      "independent": {
+        "intro": "No teaching from here on. Each problem opens in the normal Solve view\nwith its statement, examples, constraints and a TypeScript signature.\nThe hints there stay hidden until you ask. So does the one-line nudge\nbelow each problem.\n",
+        "problems": [
+          {
+            "slug": "permutation-in-string",
+            "nudge": "Every rearrangement of the pattern has the pattern's length.",
+            "reveal": ""
+          },
+          {
+            "slug": "longest-repeating-replacement",
+            "nudge": "A window is fixable when its length minus its most frequent letter's count is ≤ k.",
+            "reveal": ""
+          },
+          {
+            "slug": "max-sum-distinct-window",
+            "nudge": "A fixed window that also carries value counts, so you know when every value is distinct.",
+            "reveal": ""
+          },
+          {
+            "slug": "count-nice-subarrays",
+            "nudge": "Exactly k = at most k − at most (k − 1).",
+            "reveal": ""
+          },
+          {
+            "slug": "longest-ones-after-deleting",
+            "nudge": "A window with at most one zero, and the deletion makes it one shorter.",
+            "reveal": ""
+          }
+        ]
+      },
+      "variations": [
+        {
+          "step": "Basic version",
+          "title": "Longest substring without repeating characters",
+          "change": "The template problem from section 7, Example 3: a `Set` summary, the *longest* shape.\n",
+          "insight": "Everything below is this loop with **one thing changed**. Name the change before you write any code.\n",
+          "exercise": null,
+          "slug": ""
+        },
+        {
+          "step": "Different input",
+          "title": "Longest subarray with all distinct values: numbers, not letters",
+          "change": "The input is `number[]` with values up to `10^9` instead of a string.\nA 26-slot count array no longer fits the values. The `Set` still\nworks unchanged, because it does not care what the elements are.\n",
+          "insight": "The summary depends on the **values' range**, not on the technique. Small known range → array; anything else → `Set`/`Map`.\n",
+          "exercise": {
+            "id": "ndsa:sliding-window:var:distinct-values",
+            "title": "longestDistinctValues",
+            "prompt": "Return the length of the longest contiguous subarray of `nums` whose\nvalues are all different. `0 ≤ nums.length ≤ 10^5`,\n`−10^9 ≤ nums[i] ≤ 10^9`.\n",
+            "hint": "",
+            "hints": [],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "\n// ---- checker: reads the arguments, calls your function, prints the result ----\nimport * as __ndFs from \"fs\";\nconst __ndIn: string[] = __ndFs.readFileSync(0, \"utf8\").split(\"\\n\");\nconst __ndLine = (i: number): string => (__ndIn[i] ?? \"\").replace(/\\r$/, \"\");\nconst __ndA0 = (__ndLine(0).trim() === \"\" ? [] : __ndLine(0).trim().split(/\\s+/).map(Number));\nconsole.log(String(longestDistinctValues(__ndA0)));\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "function longestDistinctValues(nums: number[]): number {\n  return 0;\n}\n",
+            "solution": "function longestDistinctValues(nums: number[]): number {\n  const inWindow = new Set<number>();\n  let lo = 0;\n  let best = 0;\n  for (let hi = 0; hi < nums.length; hi++) {\n    while (inWindow.has(nums[hi])) {\n      inWindow.delete(nums[lo]);\n      lo++;\n    }\n    inWindow.add(nums[hi]);\n    best = Math.max(best, hi - lo + 1);\n  }\n  return best;\n}\n",
+            "tests": [
+              {
+                "input": "1 2 3 1 2 3 4\n",
+                "output": "4\n"
+              },
+              {
+                "input": "\n",
+                "output": "0\n"
+              },
+              {
+                "input": "5 5 5\n",
+                "output": "1\n"
+              },
+              {
+                "input": "1000000000 -1000000000 7 1000000000\n",
+                "output": "3\n"
+              },
+              {
+                "input": "4 2 4 5 6\n",
+                "output": "4\n"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": ""
+          },
+          "slug": ""
+        },
+        {
+          "step": "Additional constraint",
+          "title": "Count subarrays with exactly k distinct values",
+          "change": "*Exactly* instead of *at most*, and **count** instead of longest.\n“Exactly k” does not survive shrinking, so write the count-window for\n*at most* and subtract: `atMost(k) − atMost(k − 1)`.\n",
+          "insight": "When the rule is not monotone, look for **two monotone rules whose difference is it**.\n",
+          "exercise": {
+            "id": "ndsa:sliding-window:var:exactly-k",
+            "title": "countExactlyKDistinct",
+            "prompt": "Return how many contiguous subarrays of `nums` contain **exactly `k`**\ndistinct values. `1 ≤ k ≤ nums.length ≤ 2·10^4`.\n\nExample: `nums = [1, 2, 1, 2, 3]`, `k = 2` → `7`.\n",
+            "hint": "",
+            "hints": [
+              "Counting windows with at most k distinct values is the count pattern from section 4.",
+              "Subtract the windows with at most k - 1 distinct values: what is left has exactly k."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "\n// ---- checker: reads the arguments, calls your function, prints the result ----\nimport * as __ndFs from \"fs\";\nconst __ndIn: string[] = __ndFs.readFileSync(0, \"utf8\").split(\"\\n\");\nconst __ndLine = (i: number): string => (__ndIn[i] ?? \"\").replace(/\\r$/, \"\");\nconst __ndA0 = (__ndLine(0).trim() === \"\" ? [] : __ndLine(0).trim().split(/\\s+/).map(Number));\nconst __ndA1 = Number(__ndLine(1).trim());\nconsole.log(String(countExactlyKDistinct(__ndA0, __ndA1)));\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "function countExactlyKDistinct(nums: number[], k: number): number {\n  return 0;\n}\n",
+            "solution": "function countExactlyKDistinct(nums: number[], k: number): number {\n  const atMost = (limit: number): number => {\n    const counts = new Map<number, number>();\n    let lo = 0;\n    let total = 0;\n    for (let hi = 0; hi < nums.length; hi++) {\n      counts.set(nums[hi], (counts.get(nums[hi]) ?? 0) + 1);\n      while (counts.size > limit) {\n        const left = counts.get(nums[lo])! - 1;\n        if (left === 0) counts.delete(nums[lo]);\n        else counts.set(nums[lo], left);\n        lo++;\n      }\n      total += hi - lo + 1;\n    }\n    return total;\n  };\n  return atMost(k) - atMost(k - 1);\n}\n",
+            "tests": [
+              {
+                "input": "1 2 1 2 3\n2\n",
+                "output": "7\n"
+              },
+              {
+                "input": "1 2 1 3 4\n3\n",
+                "output": "3\n"
+              },
+              {
+                "input": "1 1 1\n1\n",
+                "output": "6\n"
+              },
+              {
+                "input": "1 2 3\n3\n",
+                "output": "1\n"
+              },
+              {
+                "input": "1 2 3\n1\n",
+                "output": "3\n"
+              },
+              {
+                "input": "2 1 2 1 2 1\n2\n",
+                "output": "15\n"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": ""
+          },
+          "slug": ""
+        },
+        {
+          "step": "Optimization requirement",
+          "title": "Maximum of every window of size k, in O(n)",
+          "change": "A fixed window whose summary is a **maximum**, and a maximum cannot\nbe “subtracted” when it leaves. Rescanning the window is O(n · k),\nand the hidden test has `n = 300 000, k = 150 000`. Keep a\n**deque of indices** whose values decrease from front to back:\npop smaller values off the back before pushing, and drop the front\nwhen it falls out of the window. The front is always the maximum.\n",
+          "insight": "An optimisation requirement often means **a smarter summary**, not a different loop. The loop here is the plain fixed window.\n",
+          "exercise": {
+            "id": "ndsa:sliding-window:var:window-maxima",
+            "title": "windowMaxima",
+            "prompt": "Return an array with the maximum of every window of size `k`, left\nto right. `1 ≤ k ≤ nums.length ≤ 3·10^5`. One hidden test is\ngenerated at the full size, so O(n · k) will time out.\n\nExample: `nums = [1, 3, -1, -3, 5, 3, 6, 7]`, `k = 3` →\n`[3, 3, 5, 5, 6, 7]`.\n",
+            "hint": "",
+            "hints": [
+              "Store indices in the deque, not values: you need the index to know when the front has left the window.",
+              "Before pushing hi, pop every index from the back whose value is <= nums[hi]; it can never be a maximum again.",
+              "Use a head index instead of shift() for the front, or the deque itself becomes O(n) per pop."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "",
+            "strictness": "",
+            "harness": "// ---- checker: reads the arguments, calls your function, prints the result ----\nimport * as __ndFs from \"fs\";\nconst __ndIn: string[] = __ndFs.readFileSync(0, \"utf8\").split(\"\\n\");\nconst __ndLine = (i: number): string => (__ndIn[i] ?? \"\").replace(/\\r$/, \"\");\nif (__ndLine(0).startsWith(\"gen \")) {\n  // A large generated case: n = 300 000, k = 150 000. An O(n·k) solution\n  // needs over 10^10 steps here; the deque needs about 6·10^5.\n  const [, n, k, seed] = __ndLine(0).split(\" \").map(Number);\n  const nums: number[] = [];\n  let x = seed;\n  for (let i = 0; i < n; i++) {\n    x = (x * 48271) % 2147483647;\n    nums.push(x % 1000);\n  }\n  let sum = 0;\n  for (const m of windowMaxima(nums, k)) sum = (sum + m) % 1000000007;\n  console.log(String(sum));\n} else {\n  const __ndA0 = (__ndLine(0).trim() === \"\" ? [] : __ndLine(0).trim().split(/\\s+/).map(Number));\n  const __ndA1 = Number(__ndLine(1).trim());\n  console.log(windowMaxima(__ndA0, __ndA1).join(\" \"));\n}\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "function windowMaxima(nums: number[], k: number): number[] {\n  const out: number[] = [];\n  return out;\n}\n",
+            "solution": "function windowMaxima(nums: number[], k: number): number[] {\n  const dq: number[] = [];   // indices; their values decrease\n  let head = 0;\n  const out: number[] = [];\n  for (let hi = 0; hi < nums.length; hi++) {\n    while (dq.length > head && nums[dq[dq.length - 1]] <= nums[hi]) dq.pop();\n    dq.push(hi);\n    if (dq[head] <= hi - k) head++;\n    if (hi >= k - 1) out.push(nums[dq[head]]);\n  }\n  return out;\n}\n",
+            "tests": [
+              {
+                "input": "1 3 -1 -3 5 3 6 7\n3\n",
+                "output": "3 3 5 5 6 7\n"
+              },
+              {
+                "input": "4\n1\n",
+                "output": "4\n"
+              },
+              {
+                "input": "9 8 7 6\n2\n",
+                "output": "9 8 7\n"
+              },
+              {
+                "input": "1 2 3 4\n4\n",
+                "output": "4\n"
+              },
+              {
+                "input": "2 2 2 1\n2\n",
+                "output": "2 2 2\n"
+              },
+              {
+                "input": "gen 300000 150000 7\n",
+                "output": "149850999\n"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": ""
+          },
+          "slug": ""
+        },
+        {
+          "step": "Combination with another technique",
+          "title": "Minimum window substring: a window plus a “need” counter",
+          "change": "The shortest window of `s` containing every character of `t`, with\nmultiplicity. The window is the *shortest* shape. The new idea is the\nvalidity test: comparing two `Map`s each step would be O(σ), so keep\n**one integer**, how many of `t`'s required counts are currently met,\nand update it only when a count crosses its requirement.\n",
+          "insight": "Windows combine with **hash-map counting** so that “is it valid?” stays O(1) even when validity involves many characters.\n",
+          "slug": "min-window-length",
+          "exercise": null
+        }
+      ],
+      "review": {
+        "must_know": [
+          {
+            "label": "Definition",
+            "text": "A contiguous range `[lo, hi]` swept left to right, with a summary of its contents updated as elements enter and leave."
+          },
+          {
+            "label": "Core idea",
+            "text": "Neighbouring windows overlap, so update rather than rebuild. When the rule survives shrinking, `lo` never needs to move back."
+          },
+          {
+            "label": "Syntax",
+            "text": "`for (let hi …)` + absorb + `while (invalid) release(nums[lo++])` + measure. `Map` counts with `?? 0` and delete at zero."
+          },
+          {
+            "label": "Recognition clues",
+            "text": "Contiguous / subarray / substring · longest, shortest, count · at most k · of size k · non-negative values."
+          },
+          {
+            "label": "Complexity",
+            "text": "O(n) time, because each pointer moves at most n times. O(1) space, or O(min(n, σ)) for a Map/Set summary."
+          }
+        ],
+        "must_do": [
+          "Implement the fixed, longest, shortest and count shapes from memory.",
+          "Explain why a `while` inside the `for` is still O(n).",
+          "Recognise when “validity survives shrinking” fails, and name what to use instead.",
+          "Apply it to a problem that does not say “window”, such as taking cards from both ends."
+        ],
+        "quick_ref": {
+          "pattern": "Expand hi → absorb → shrink lo while invalid (longest) / while valid (shortest) → measure",
+          "syntax": "let lo = 0, best = 0;\nfor (let hi = 0; hi < n; hi++) {\n  absorb(a[hi]);\n  while (invalid()) release(a[lo++]);\n  best = Math.max(best, hi - lo + 1);\n}\n",
+          "time": "O(n): amortised, 2n pointer moves",
+          "space": "O(1) for a sum or counter; O(min(n, σ)) for a Map or Set",
+          "think_when": "a contiguous range + a rule that stays true when the range shrinks, or a fixed width",
+          "careful": "negative numbers · “exactly” rules · measuring before the repair · `hi − lo + 1` · deleting zero counts"
+        }
+      },
+      "mastery": {
+        "intro": "Finishing the lessons is not the same as mastering the topic. This\nsection tests five separate abilities, and the topic is **mastered** only\nwhen all five pass. The questions here are new: none of them appeared\nearlier in the topic.\n",
+        "understanding": {
+          "pass": 4,
+          "questions": [
+            {
+              "question": "Why is the variable-size window O(n) even though it has a `while` inside a `for`?",
+              "options": [
+                "Each index enters the window once and leaves at most once, so there are at most 2n pointer moves in total",
+                "The `while` loop runs at most once per iteration",
+                "The window is never longer than k",
+                "JavaScript engines optimise nested loops"
+              ],
+              "answer": 0,
+              "explanation": "Count moves of `lo` and `hi`, not loop nesting. Neither moves back.\n",
+              "why_not": [
+                "",
+                "It can run many times on one step, when one entrant forces several releases.",
+                "Variable windows have no k bound, and the argument does not need one.",
+                "The bound is about the algorithm, not the engine."
+              ]
+            },
+            {
+              "question": "What property must the window's rule have for the variable-size technique to be correct?",
+              "options": [
+                "A valid window stays valid when you remove elements from its left end",
+                "The rule must involve a sum",
+                "The array must be sorted",
+                "The answer must be unique"
+              ],
+              "answer": 0,
+              "explanation": "“Validity survives shrinking” is what lets `lo` move forward without ever needing to come back.\n",
+              "why_not": [
+                "",
+                "Distinct counts, zero budgets and “no repeats” are not sums.",
+                "Windows work on unsorted data. Sorting would destroy contiguity.",
+                "The technique finds the optimal length, whether or not several windows achieve it."
+              ]
+            },
+            {
+              "question": "In “shortest subarray with sum ≥ target”, where must the answer be recorded?",
+              "options": [
+                "Inside the shrinking `while`, before each release",
+                "After the `while`, as in the longest variant",
+                "Only once, after the `for` loop",
+                "Before absorbing `nums[hi]`"
+              ],
+              "answer": 0,
+              "explanation": "The loop runs while the window is still valid. After it, the window is invalid, so the valid windows are only visible inside it.\n",
+              "why_not": [
+                "",
+                "After the loop the sum is below target, so you would be measuring an invalid window.",
+                "The best window can occur at any step. You must compare as you go.",
+                "Before absorbing, the window has not changed since the last step."
+              ]
+            },
+            {
+              "question": "Why does “sum ≤ limit” break the technique when values can be negative?",
+              "options": [
+                "Removing a negative number raises the sum, so shrinking can make a valid window invalid and `lo` would need to move back",
+                "Negative numbers cannot be stored in `number[]`",
+                "The sum might overflow",
+                "`Math.max` does not handle negatives"
+              ],
+              "answer": 0,
+              "explanation": "The rule no longer survives shrinking, so the skip argument fails.\n",
+              "why_not": [
+                "",
+                "`number[]` holds negatives fine.",
+                "Overflow is a separate concern, and it applies to positive values too.",
+                "`Math.max(-3, -5)` is `-3`, which is correct."
+              ]
+            },
+            {
+              "question": "In the count shape, why do you add `hi − lo + 1` at each step?",
+              "options": [
+                "Every start from lo to hi gives a valid window ending at hi, and there are hi − lo + 1 of them",
+                "It is the length of the longest window so far",
+                "It counts the elements released",
+                "It avoids an off-by-one in the longest variant"
+              ],
+              "answer": 0,
+              "explanation": "Sub-windows of a valid window are valid. Grouping them by their right end counts each window exactly once.\n",
+              "why_not": [
+                "",
+                "It is the *current* window's length, and here it is used as a count of windows ending at hi.",
+                "Releases are not counted anywhere.",
+                "It is not a correction. It is the count itself."
+              ]
+            }
+          ]
+        },
+        "syntax": {
+          "id": "ndsa:sliding-window:mastery:syntax",
+          "title": "Syntax: complete the window",
+          "prompt": "Return the length of the longest substring of `s` in which **no\ncharacter appears more than twice**. Fill in the three blanks.\n\nExample: `s = \"bcbbbcba\"` → `4` (`\"bcba\"`; `\"bcbb\"` has three `b`s).\n",
+          "hint": "",
+          "hints": [],
+          "language": "typescript",
+          "kind": "drill",
+          "difficulty": "",
+          "strictness": "",
+          "harness": "\n// ---- checker: reads the arguments, calls your function, prints the result ----\nimport * as __ndFs from \"fs\";\nconst __ndIn: string[] = __ndFs.readFileSync(0, \"utf8\").split(\"\\n\");\nconst __ndLine = (i: number): string => (__ndIn[i] ?? \"\").replace(/\\r$/, \"\");\nconst __ndA0 = __ndLine(0);\nconsole.log(String(longestAtMostTwice(__ndA0)));\n",
+          "judge_mode": "",
+          "forbid": [],
+          "starter": "function longestAtMostTwice(s: string): number {\n  const counts = new Map<string, number>();\n  let lo = 0;\n  let best = 0;\n  for (let hi = 0; hi < s.length; hi++) {\n    const c = s[hi];\n    counts.set(c, (counts.get(c) ?? 0) + 1);\n    while (____) {\n      const out = s[lo];\n      counts.set(out, ____);\n      lo++;\n    }\n    best = ____;\n  }\n  return best;\n}\n",
+          "solution": "function longestAtMostTwice(s: string): number {\n  const counts = new Map<string, number>();\n  let lo = 0;\n  let best = 0;\n  for (let hi = 0; hi < s.length; hi++) {\n    const c = s[hi];\n    counts.set(c, (counts.get(c) ?? 0) + 1);\n    while (counts.get(c)! > 2) {\n      const out = s[lo];\n      counts.set(out, counts.get(out)! - 1);\n      lo++;\n    }\n    best = Math.max(best, hi - lo + 1);\n  }\n  return best;\n}\n",
+          "tests": [
+            {
+              "input": "bcbbbcba\n",
+              "output": "4\n"
+            },
+            {
+              "input": "aaaa\n",
+              "output": "2\n"
+            },
+            {
+              "input": "\n",
+              "output": "0\n"
+            },
+            {
+              "input": "abcabc\n",
+              "output": "6\n"
+            },
+            {
+              "input": "aabbaabb\n",
+              "output": "4\n"
+            },
+            {
+              "input": "abacabad\n",
+              "output": "5\n"
+            }
+          ],
+          "source_slug": "",
+          "dataset": "",
+          "explanation": ""
+        },
+        "recognition": {
+          "pass": 5,
+          "questions": [
+            {
+              "question": "Find the longest run of a playlist that contains songs by at most 2 different artists.",
+              "options": [
+                "Sliding window: variable size",
+                "Sliding window: fixed size",
+                "Prefix sums + hash map",
+                "Dynamic programming"
+              ],
+              "answer": 0,
+              "explanation": "Longest + at-most-2-distinct: a variable window with a Map of artist counts.\n",
+              "why_not": [
+                "",
+                "The length is what you are looking for.",
+                "There is no sum involved.",
+                "One sweep decides it, with no subproblems."
+              ]
+            },
+            {
+              "question": "Report the average of every 7-day period of daily sales.",
+              "options": [
+                "Sliding window: fixed size",
+                "Sliding window: variable size",
+                "Sliding window + monotonic deque",
+                "Hash set / map, no window"
+              ],
+              "answer": 0,
+              "explanation": "Every 7 consecutive days: a fixed window with a running sum, divided by 7.\n",
+              "why_not": [
+                "",
+                "The width is fixed at 7.",
+                "A sum can be subtracted when a day leaves. The deque is for maxima and minima.",
+                "Averages need the values, not membership."
+              ]
+            },
+            {
+              "question": "Count the subarrays whose sum is divisible by k. Values may be negative.",
+              "options": [
+                "Prefix sums + hash map",
+                "Sliding window: variable size",
+                "Sliding window: fixed size",
+                "Two pointers from both ends (sorted input)"
+              ],
+              "answer": 0,
+              "explanation": "Two prefix sums with equal remainders mod k bound a divisible range: count remainders in a hash map.\n",
+              "why_not": [
+                "",
+                "Divisibility is not monotone. Adding an element can make the sum divisible or stop it being so.",
+                "No width is given.",
+                "The answer is ranges, and nothing is sorted."
+              ]
+            },
+            {
+              "question": "Find the minimum number of characters to delete so that a string becomes a palindrome.",
+              "options": [
+                "Dynamic programming",
+                "Sliding window: variable size",
+                "Sliding window: fixed size",
+                "Hash set / map, no window"
+              ],
+              "answer": 0,
+              "explanation": "The deletions can be anywhere, so the kept characters form a subsequence: longest palindromic subsequence, which is DP.\n",
+              "why_not": [
+                "",
+                "The kept characters need not be contiguous.",
+                "No width is given.",
+                "Counts do not capture order, and palindromes depend on order."
+              ]
+            },
+            {
+              "question": "Find the smallest group of consecutive houses that contains at least 3 red ones.",
+              "options": [
+                "Sliding window: variable size",
+                "Sliding window: fixed size",
+                "Binary search",
+                "Two pointers from both ends (sorted input)"
+              ],
+              "answer": 0,
+              "explanation": "Shortest + at-least + a count that only grows with the window: the shortest shape, measured inside the shrink.\n",
+              "why_not": [
+                "",
+                "The group's size is the unknown.",
+                "Nothing is sorted. Searching on the length would add a log factor for nothing.",
+                "It is a range, not a pair."
+              ]
+            },
+            {
+              "question": "Count the subarrays that contain at most 5 odd numbers.",
+              "options": [
+                "Sliding window: variable size",
+                "Prefix sums + hash map",
+                "Sliding window: fixed size",
+                "Dynamic programming"
+              ],
+              "answer": 0,
+              "explanation": "At most 5 odd survives shrinking: the count shape, adding `hi − lo + 1` per step.\n",
+              "why_not": [
+                "",
+                "It would work with extra space. The window is simpler because the rule is monotone.",
+                "Subarrays of every length count.",
+                "No choices to combine."
+              ]
+            }
+          ]
+        },
+        "implementation": {
+          "id": "ndsa:sliding-window:mastery:implementation",
+          "title": "Implementation: from scratch",
+          "prompt": "Return how many substrings of `s` of length **exactly `k`** contain no\nrepeated character. `1 ≤ k`, `0 ≤ s.length ≤ 10^4`, lowercase letters.\n\n- `s = \"havefunonleetcode\"`, `k = 5` → `6`\n- `s = \"home\"`, `k = 5` → `0`\n",
+          "hint": "",
+          "hints": [],
+          "language": "typescript",
+          "kind": "challenge",
+          "difficulty": "Medium",
+          "strictness": "",
+          "harness": "\n// ---- checker: reads the arguments, calls your function, prints the result ----\nimport * as __ndFs from \"fs\";\nconst __ndIn: string[] = __ndFs.readFileSync(0, \"utf8\").split(\"\\n\");\nconst __ndLine = (i: number): string => (__ndIn[i] ?? \"\").replace(/\\r$/, \"\");\nconst __ndA0 = __ndLine(0);\nconst __ndA1 = Number(__ndLine(1).trim());\nconsole.log(String(countKLenNoRepeat(__ndA0, __ndA1)));\n",
+          "judge_mode": "",
+          "forbid": [],
+          "starter": "function countKLenNoRepeat(s: string, k: number): number {\n  return 0;\n}\n",
+          "solution": "function countKLenNoRepeat(s: string, k: number): number {\n  const counts: number[] = new Array<number>(26).fill(0);\n  let repeated = 0;   // letters whose count is ≥ 2\n  let total = 0;\n  for (let hi = 0; hi < s.length; hi++) {\n    const inIdx = s.charCodeAt(hi) - 97;\n    counts[inIdx]++;\n    if (counts[inIdx] === 2) repeated++;\n    if (hi >= k) {\n      const outIdx = s.charCodeAt(hi - k) - 97;\n      if (counts[outIdx] === 2) repeated--;\n      counts[outIdx]--;\n    }\n    if (hi >= k - 1 && repeated === 0) total++;\n  }\n  return total;\n}\n",
+          "tests": [
+            {
+              "input": "havefunonleetcode\n5\n",
+              "output": "6\n"
+            },
+            {
+              "input": "home\n5\n",
+              "output": "0\n"
+            },
+            {
+              "input": "\n1\n",
+              "output": "0\n"
+            },
+            {
+              "input": "abcabc\n3\n",
+              "output": "4\n"
+            },
+            {
+              "input": "aaaa\n1\n",
+              "output": "4\n"
+            },
+            {
+              "input": "abcdefghijklmnopqrstuvwxyza\n26\n",
+              "output": "2\n"
+            },
+            {
+              "input": "abab\n2\n",
+              "output": "3\n"
+            }
+          ],
+          "source_slug": "",
+          "dataset": "",
+          "explanation": ""
+        },
+        "application": {
+          "need": 2,
+          "intro": "Three problems that never say “window”. Each one turns into a\nsliding window once you see the right reframing. Solve any **two**.\n",
+          "problems": [
+            {
+              "slug": "max-points-from-cards",
+              "reveal": "Taking k cards from the ends leaves a contiguous middle of n − k cards. Minimise that window's sum.",
+              "nudge": ""
+            },
+            {
+              "slug": "min-operations-reduce-x",
+              "reveal": "Removing from both ends is keeping a middle: find the longest window with sum = total − x.",
+              "nudge": ""
+            },
+            {
+              "slug": "min-swaps-group-ones",
+              "reveal": "Fix the target block's length (the number of 1s). The swaps needed are the zeros inside it. Slide it around the circle.",
+              "nudge": ""
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

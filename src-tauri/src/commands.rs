@@ -147,6 +147,17 @@ pub fn dsa_curriculum() -> AppResult<crate::models::DsaCurriculum> {
     Ok(serde_json::from_str(DSA_CURRICULUM_JSON)?)
 }
 
+/// NEW_DSA — every topic in the sixteen sections of NEW_DSA.md, in TypeScript
+/// (authored in tools/new_dsa.py plus one set of modules per topic; proven by
+/// tools/verify_new_dsa.py). Read-only content: progress is marks in
+/// `solved_exercises` plus the problems' own solved status.
+const NEW_DSA_JSON: &str = include_str!("../seeds/new_dsa.json");
+
+#[tauri::command]
+pub fn new_dsa() -> AppResult<crate::models::NewDsa> {
+    Ok(serde_json::from_str(NEW_DSA_JSON)?)
+}
+
 /// The 6-Month Mastery programme — the concept catalog sequenced into weeks
 /// (authored in tools/mastery_defs.py, which validates every concept key and
 /// problem slug it references at generation time). Read-only content; the

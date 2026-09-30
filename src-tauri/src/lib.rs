@@ -391,6 +391,7 @@ pub fn run() {
             commands::backend_track,
             commands::projects_track,
             commands::dsa_curriculum,
+            commands::new_dsa,
             commands::mastery,
             commands::mastery_progress,
             commands::mastery_record_quiz,

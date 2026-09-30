@@ -183,6 +183,8 @@ function loadSeed(name: string): Promise<any> {
       return import("../../src-tauri/seeds/concepts.json").then((m) => m.default);
     case "dsa_curriculum":
       return import("../../src-tauri/seeds/dsa_curriculum.json").then((m) => m.default);
+    case "new_dsa":
+      return import("../../src-tauri/seeds/new_dsa.json").then((m) => m.default);
     case "ts_course":
       return import("../../src-tauri/seeds/ts_course.json").then((m) => m.default);
     case "java_course":
@@ -521,6 +523,7 @@ const handlers: Record<string, (a: Args) => any | Promise<any>> = {
   },
   concepts: () => seed("concepts"),
   dsa_curriculum: () => seed("dsa_curriculum"),
+  new_dsa: () => seed("new_dsa"),
   ts_course: () => seed("ts_course"),
   java_course: () => seed("java_course"),
   backend_track: () => seed("backend_course"),

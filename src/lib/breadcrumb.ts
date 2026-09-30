@@ -42,6 +42,11 @@ const TREE: Record<string, RouteNode> = {
         label: "",
         children: { ":": { label: "", dynamicLabel: "Unit" } },
       },
+      // NEW_DSA topics (NEW_DSA.md) — "topic" is plumbing, like "unit".
+      topic: {
+        label: "",
+        children: { ":": { label: "", dynamicLabel: "Topic" } },
+      },
       mixed: {
         label: "",
         children: { ":": { label: "", dynamicLabel: "Mixed set" } },

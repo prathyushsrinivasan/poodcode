@@ -977,6 +977,179 @@ export interface DsaCurriculum {
   stages: CurriculumStage[];
 }
 
+// --- NEW_DSA (seeds/new_dsa.json, authored in tools/new_dsa.py) -------------
+// One topic, sixteen sections — NEW_DSA.md is the template. Mirrors the `Nd*`
+// structs in src-tauri/src/models.rs. Progress lives in `solved_exercises`
+// under `ndsa:<topic>:…` ids; see src/lib/newDsa.ts.
+
+export interface NdTerm {
+  term: string;
+  meaning: string;
+}
+export interface NdFrame {
+  lo: number;
+  /** -1 before anything is absorbed. */
+  hi: number;
+  action: "start" | "absorb" | "release" | "measure" | "done" | string;
+  note: string;
+  state: string;
+  best: number;
+}
+export interface NdStepper {
+  title: string;
+  input_label: string;
+  cells: string[];
+  state_label: string;
+  frames: NdFrame[];
+}
+export interface NdSnippet {
+  name: string;
+  code: string;
+  explain: string;
+}
+export interface NdClue {
+  clue: string;
+  why: string;
+}
+export interface NdLookalike {
+  looks_like: string;
+  but: string;
+  use_instead: string;
+  why: string;
+}
+export interface NdTable {
+  headers: string[];
+  rows: string[][];
+}
+export interface NdExample {
+  level: string;
+  title: string;
+  problem: string;
+  code: string;
+  lines: { code: string; explain: string }[];
+  question: QuizQuestion | null;
+  trace: NdTable | null;
+  notes: string[];
+  takeaway: string;
+}
+export interface NdApproach {
+  approach: string;
+  time: string;
+  space: string;
+  note: string;
+}
+export interface NdMistake {
+  title: string;
+  category: string;
+  wrong: string;
+  why: string;
+  recognise: string;
+  right: string;
+}
+export interface NdHint {
+  label: string;
+  text: string;
+}
+export interface NdEdgeTest {
+  case: string;
+  input: string;
+  expected: string;
+  why: string;
+}
+export interface NdGuided {
+  key: string;
+  title: string;
+  problem: string;
+  examples: { input: string; output: string; note: string }[];
+  understand: QuizQuestion;
+  identify: QuizQuestion;
+  approach: QuizQuestion;
+  pseudocode: string;
+  hints: NdHint[];
+  exercise: Exercise;
+  tests: NdEdgeTest[];
+}
+export interface NdProblemRef {
+  slug: string;
+  nudge: string;
+  reveal: string;
+}
+export interface NdVariation {
+  step: string;
+  title: string;
+  change: string;
+  insight: string;
+  exercise: Exercise | null;
+  /** A problem-bank problem instead of (or as well as) an in-page exercise. */
+  slug: string;
+}
+export interface NdSitting {
+  /** Right answers needed to pass. */
+  pass: number;
+  questions: QuizQuestion[];
+}
+export interface NdTopic {
+  key: string;
+  title: string;
+  icon: string;
+  phase: string;
+  tagline: string;
+  est_minutes: number;
+  prereqs: string[];
+  concept: { body: string; terms: NdTerm[]; analogy: string };
+  mental_model: { body: string; stepper: NdStepper };
+  ts_fundamentals: { intro: string; items: NdSnippet[]; drills: Exercise[] };
+  patterns: { intro: string; items: Skeleton[] };
+  when_to_use: { intro: string; clues: NdClue[]; test: string };
+  when_not: { intro: string; cases: NdLookalike[] };
+  examples: NdExample[];
+  implementation: {
+    read: { title: string; problem: string; code: string; notes: { line: number; text: string }[]; why_it_works: string };
+    complete: Exercise;
+    pseudocode: { title: string; problem: string; pseudocode: string; exercise: Exercise };
+    scratch: Exercise;
+  };
+  complexity: {
+    time: string;
+    space: string;
+    body: string;
+    compare: NdApproach[];
+    why_improved: string;
+    rewrite: { slow: string; fast: string; edit: string };
+    questions: QuizQuestion[];
+  };
+  mistakes: NdMistake[];
+  recognition: { intro: string; questions: QuizQuestion[] };
+  guided: NdGuided[];
+  independent: { intro: string; problems: NdProblemRef[] };
+  variations: NdVariation[];
+  review: {
+    must_know: { label: string; text: string }[];
+    must_do: string[];
+    quick_ref: { pattern: string; syntax: string; time: string; space: string; think_when: string; careful: string };
+  };
+  mastery: {
+    intro: string;
+    understanding: NdSitting;
+    syntax: Exercise;
+    recognition: NdSitting;
+    implementation: Exercise;
+    application: { need: number; intro: string; problems: NdProblemRef[] };
+  };
+}
+export interface NdSection {
+  key: keyof NdTopic & string;
+  title: string;
+  phase: string;
+}
+export interface NewDsa {
+  key: string;
+  title: string;
+  subtitle: string;
+  sections: NdSection[];
+  topics: NdTopic[];
+}
+
 export interface CardReview {
   card_id: string;
   ease: number;
