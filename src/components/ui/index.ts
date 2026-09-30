@@ -7,3 +7,4 @@ export { Field, Toggle, Segmented, NumberInput } from "./Field";
 export { Tooltip } from "./Tooltip";
 export { Modal, ConfirmDialog } from "./Modal";
 export { Tabs, TabPanel, type TabSpec } from "./Tabs";
+export { ScrollX, useKeyboardScroll } from "./ScrollX";

@@ -10,6 +10,10 @@ for _table in (TS_PROBLEM_SETS, TS_PROJECTS, TS_PRACTICE_MORE, TS_CARDS_MORE, TS
     _unknown = sorted(set(_table) - _ts_week_numbers)
     assert not _unknown, f"TS Mastery content for weeks that do not exist: {_unknown}"
 
+# Per-chapter content (mastery_ts_chapter_kit.py) shares the `tsm-ts_` prefix
+# with the chapter-derived exercises, but is authored at its week's strictness.
+_ts_authored = {ex["id"] for exs in TS_CHAPTER_PRACTICE.values() for ex in exs}
+
 _ts_ids = set()
 for _tsw in TS_WEEKS:
     for _ex in _tsw["practice"]:
@@ -25,7 +29,8 @@ for _tsw in TS_WEEKS:
         _want = _week_strictness(_n) or "strict"
         # Chapter-derived exercises (ids tsm-ts_*: order, spot, predict) are a
         # chapter's own code, checked at its plain `strict` (mastery_ts_derived.py).
-        assert _ex["kind"] in ("order", "spot") or _ex["id"].startswith("tsm-ts_") or (_ex.get("strictness") or "strict") in (_want, "strict+indexed"), \
+        _derived = _ex["id"].startswith("tsm-ts_") and _ex["id"] not in _ts_authored
+        assert _ex["kind"] in ("order", "spot") or _derived or (_ex.get("strictness") or "strict") in (_want, "strict+indexed"), \
             f"{_ex['id']}: runs at {_ex.get('strictness')!r}, week {_n} is {_want!r}"
     for _ex in _set:
         assert _ex["kind"] in ("challenge", "typelevel"), f"{_ex['id']}: problem-set kind {_ex['kind']!r}"

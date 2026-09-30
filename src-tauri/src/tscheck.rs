@@ -138,12 +138,13 @@ fn binary_runs(program: &str) -> bool {
 /// `.mts` scores the same but would flip every program in the app from CommonJS
 /// to ESM *at runtime*, which this does not.
 ///
-/// `lib` is ES2024 plus the individual `esnext.*` libraries whose runtime Node 24
-/// already ships: `Array.fromAsync`, the ES2025 `Set` methods, iterator helpers,
-/// `using`/`DisposableStack` and `Promise.try`. It is a list and not `esnext`
-/// because `esnext` would also declare APIs Node does not have, and a program
-/// that type-checks and then throws "is not a function" is worse than a clear
-/// compile error. The TypeScript Mastery chapters teach every one of these.
+/// `lib` is ES2025 (the `Set` methods, iterator helpers, `Promise.try`,
+/// `RegExp.escape`, `Float16Array`) plus the two `esnext.*` libraries whose
+/// runtime Node 24 already ships: `Array.fromAsync` and `using`/`DisposableStack`.
+/// It is a list and not `esnext` because `esnext` would also declare APIs Node
+/// does not have — `esnext.collection` is `Map.getOrInsert` as of TypeScript 6.0
+/// — and a program that type-checks and then throws "is not a function" is worse
+/// than a clear compile error. The TypeScript Mastery chapters teach these.
 /// Mirror any change in `LIBS` in tools/ts_typecheck.mjs and in src/monacoSetup.ts.
 fn tsconfig_json(preset: &str, env_dts: &Path, file: &str) -> String {
     let indexed = preset == STRICT_INDEXED;
@@ -153,7 +154,7 @@ fn tsconfig_json(preset: &str, env_dts: &Path, file: &str) -> String {
         r#"{{
   "compilerOptions": {{
     "target": "es2022",
-    "lib": ["es2024", "esnext.array", "esnext.collection", "esnext.iterator", "esnext.disposable", "esnext.promise"],
+    "lib": ["es2025", "esnext.array", "esnext.disposable"],
     "module": "esnext",
     "moduleResolution": "bundler",
     "moduleDetection": "force",

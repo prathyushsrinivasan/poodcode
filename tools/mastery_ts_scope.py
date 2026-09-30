@@ -66,11 +66,16 @@ def _sc_strip(src):
     return "\n".join(_sc_re.sub(r"//.*$", "", ln) for ln in src.split("\n"))
 
 
+_sc_authored = {ex["id"] for exs in TS_CHAPTER_PRACTICE.values() for ex in exs}
+
+
 def _sc_programs(w):
     out = []
     for ex in w.get("practice", []) + w.get("problem_set", []):
-        if ex["kind"] in ("order", "spot") or ex["id"].startswith("tsm-ts_"):
-            continue  # a chapter's own example code (mastery_ts_derived.py)
+        if ex["kind"] in ("order", "spot") or (ex["id"].startswith("tsm-ts_") and ex["id"] not in _sc_authored):
+            # A chapter's own example code (mastery_ts_derived.py). Per-chapter
+            # content (mastery_ts_chapter_kit.py) shares the id prefix and IS linted.
+            continue
         out.append((ex["id"], ex["solution"]))
         out.append((ex["id"] + ":starter", ex["starter"]))
     for key in w["concepts"]:

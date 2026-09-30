@@ -73,7 +73,7 @@
 .nav-badge {
   margin-left: auto;
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   font-size: 11px;
   padding: 0 7px;
   border-radius: 10px;

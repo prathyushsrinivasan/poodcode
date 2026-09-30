@@ -2500,17 +2500,18 @@ function sleep(ms: number, signal: AbortSignal): Promise<void> {
   return promise;
 }
 const c = new AbortController();
-setTimeout(() => c.abort(new Error("gave up")), 20);
 for (const ms of [5, 100]) {
+  const done = sleep(ms, c.signal);
+  if (ms > 50) c.abort(new Error("gave up")); // too long to wait: give up at once
   try {
-    await sleep(ms, c.signal);
+    await done;
     console.log(`slept ${ms}ms`);
   } catch (e) {
     console.log(`sleep ${ms}ms interrupted: ${e instanceof Error ? e.message : String(e)}`);
   }
 }
 """, [""],
-         "`withResolvers` hands `resolve` and `reject` to the timer and the abort listener. Whichever happens first wins, and it tidies up after the other so nothing fires later."),
+         "`withResolvers` hands `resolve` and `reject` to the timer and the abort listener. Whichever happens first wins, and it tidies up after the other so nothing fires later — the abandoned 100ms timer is cleared, so the program exits at once. The abort comes from the program itself, not from a competing timer, so the output never depends on how fast the machine is."),
         ("Cancel or time out, whichever comes first",
          r"""
 async function slowTask(signal: AbortSignal): Promise<string> {
@@ -2596,33 +2597,33 @@ console.log(`parts downloaded after abort: ${got}`);
 const log: string[] = [];
 async function work(): Promise<string> {
   for (let i = 1; i <= 4; i++) {
-    await new Promise<void>((r) => setTimeout(r, 30));
+    if (i > 1) await new Promise<void>((r) => setTimeout(r, 100));
     log.push(`step ${i}`);
   }
   return "done";
 }
-const timeout = new Promise<string>((r) => setTimeout(() => r("timed out"), 45));
+const timeout = new Promise<string>((r) => setTimeout(() => r("timed out"), 50));
 console.log(await Promise.race([work(), timeout]));
-await new Promise<void>((r) => setTimeout(r, 150));
+await new Promise<void>((r) => setTimeout(r, 400));
 console.log(log.join(", "));
 """,
          r"""
 const log: string[] = [];
 async function work(signal: AbortSignal): Promise<string> {
   for (let i = 1; i <= 4; i++) {
-    await new Promise<void>((r) => setTimeout(r, 30));
+    if (i > 1) await new Promise<void>((r) => setTimeout(r, 100));
     if (signal.aborted) return "cancelled";
     log.push(`step ${i}`);
   }
   return "done";
 }
 const c = new AbortController();
-const timeout = new Promise<string>((r) => setTimeout(() => { c.abort(); r("timed out"); }, 45));
+const timeout = new Promise<string>((r) => setTimeout(() => { c.abort(); r("timed out"); }, 50));
 console.log(await Promise.race([work(c.signal), timeout]));
-await new Promise<void>((r) => setTimeout(r, 150));
+await new Promise<void>((r) => setTimeout(r, 400));
 console.log(log.join(", "));
 """,
-         "The race resolved at 25ms, but the first `work` kept going to step 4. Racing only decides which result you *read*; stopping the work needs a signal the work checks."),
+         "The race resolved at 50ms, but the first `work` kept going to step 4. Racing only decides which result you *read*; stopping the work needs a signal the work checks. (Step 1 runs before any timer, and every later step is 100ms from the timeout, so the output never depends on machine speed.)"),
         ("Treating cancellation as a failure",
          r"""
 async function fetchData(signal: AbortSignal): Promise<string> {

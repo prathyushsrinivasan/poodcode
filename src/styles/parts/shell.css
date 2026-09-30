@@ -220,7 +220,7 @@
   height: 26px;
   border-radius: var(--radius-pill);
   background: var(--accent-dim);
-  color: var(--accent);
+  color: var(--accent-text);
   display: grid;
   place-items: center;
   font-weight: var(--weight-bold);

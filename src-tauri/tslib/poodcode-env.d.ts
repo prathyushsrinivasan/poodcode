@@ -40,6 +40,11 @@ declare module "fs" {
     data: string,
     encoding?: "utf8" | "utf-8"
   ): void;
+  /** The Todo API's module 19: has the data file been written yet? */
+  export function existsSync(path: string): boolean;
+  /** The Todo API's replayer only, from module 19: remove the data file so each
+   *  test case starts from the disk state its script asks for. */
+  export function rmSync(path: string, options?: { force?: boolean }): void;
 }
 
 declare module "node:fs" {

@@ -8980,7 +8980,8 @@
         "hints": [
           "The type variable goes in angle brackets: function first<T>(arr: T[]): T.",
           "The answer begins `function first<T>(arr: T[]): …`"
-        ]
+        ],
+        "strictness": "strict"
       },
       {
         "id": "ts_generics-last",
@@ -9010,7 +9011,8 @@
         "hints": [
           "The last index is arr.length - 1.",
           "The answer begins `return arr[arr.length …`"
-        ]
+        ],
+        "strictness": "strict"
       },
       {
         "id": "ts_generics-longest",
@@ -9040,7 +9042,8 @@
         "hints": [
           "The constraint { length: number } lets you compare .length; use >= so ties keep x.",
           "The reference solution is 4 lines and begins: `function longest<T extends { length: number }>(x: T, y: T): T {`"
-        ]
+        ],
+        "strictness": "strict"
       },
       {
         "id": "ts_generics-challenge",
@@ -9075,7 +9078,8 @@
           "Track seen values in a Set<T>; push only the first time you see each one.",
           "The reference solution uses `split`, a `Set`, `filter`, `join` and a `for` loop.",
           "The reference solution is 15 lines and begins: `function unique<T>(arr: T[]): T[] {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -9120,7 +9124,8 @@
         "hints": [
           "Assign the parameter to the field with this.count = start;.",
           "The answer begins `this.count = …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_classes-method",
@@ -9150,7 +9155,8 @@
         "hints": [
           "Inside a method, read fields via this: this.width * this.height.",
           "The answer begins `return this.width …`"
-        ]
+        ],
+        "strictness": "strict"
       },
       {
         "id": "ts_classes-inherit",
@@ -9181,7 +9187,8 @@
           "extends Animal, then redefine speak() to return the barking message.",
           "The reference solution uses a class.",
           "The reference solution is 5 lines and begins: `class Dog extends Animal {`"
-        ]
+        ],
+        "strictness": "strict"
       },
       {
         "id": "ts_classes-challenge",
@@ -9216,7 +9223,8 @@
           "Keep balance and a rejected counter as private fields; guard withdraw before subtracting.",
           "The reference solution uses `split`, a `for` loop and a class.",
           "The reference solution is 22 lines and begins: `class Account {`"
-        ]
+        ],
+        "strictness": "strict"
       }
     ],
     "cards": [],
@@ -9261,7 +9269,8 @@
         "hints": [
           "A getter is accessed like a field: r.area, not r.area().",
           "The answer is 6 characters long and begins `r.a`."
-        ]
+        ],
+        "strictness": "strict"
       },
       {
         "id": "ts_this_accessors-setter",
@@ -9291,7 +9300,8 @@
         "hints": [
           "A setter runs on assignment: b.square = side; sets both width and height.",
           "The answer begins `b.square = …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_this_accessors-account",
@@ -9321,7 +9331,8 @@
         "hints": [
           "Inside deposit, update the field: this.balance += amount;.",
           "The reference solution is 3 lines and begins: `deposit(amount: number): void {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_this_accessors-challenge",
@@ -9356,7 +9367,8 @@
           "A getter is read like a property: t.fahrenheit (no parentheses).",
           "The reference solution uses `split`, `map`, `join` and a class.",
           "The reference solution is 10 lines and begins: `class Temp {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -9401,7 +9413,8 @@
         "hints": [
           "Prefix the declaration with export: export function add(...) { ... }.",
           "The answer begins `export function add(x: number, …`"
-        ]
+        ],
+        "strictness": "strict"
       },
       {
         "id": "ts_modules-use",
@@ -9431,7 +9444,8 @@
         "hints": [
           "Multiply price by the exported constant TAX.",
           "The answer begins `price * …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_modules-default",
@@ -9461,7 +9475,8 @@
         "hints": [
           "export default function main(...) marks the file's single main export.",
           "The reference solution is 4 lines and begins: `export default function main(x: number): number {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_modules-challenge",
@@ -9496,7 +9511,8 @@
           "`export function` publishes a function; here you both export and call them in one file.",
           "The reference solution uses `split` and `map`.",
           "The reference solution is 5 lines and begins: `export function area(w: number, h: number): number { return w * h; }`"
-        ]
+        ],
+        "strictness": "strict"
       }
     ],
     "cards": [],
@@ -9682,7 +9698,8 @@
         "hints": [
           "throw new Error(\"...\") signals the failure the catch block handles.",
           "The answer begins `throw new Error(\"must …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_errors-catch",
@@ -9712,7 +9729,8 @@
         "hints": [
           "e instanceof Error narrows unknown so e.message is available.",
           "The answer begins `e instanceof …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_errors-finally",
@@ -9743,7 +9761,8 @@
           "finally runs no matter what, so put the 'done' print there.",
           "The reference solution uses `try`/`catch`.",
           "The reference solution is 9 lines and begins: `try {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_errors-challenge",
@@ -9778,7 +9797,8 @@
           "Wrap each toNumber call in try/catch; the catch branch just increments failures.",
           "The reference solution uses `split`, a `for` loop and `try`/`catch`.",
           "The reference solution is 16 lines and begins: `function toNumber(s: string): number {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -9823,7 +9843,8 @@
         "hints": [
           "Spread the base then the patch: { ...user, ...patch } — later fields win.",
           "The answer begins `{ ...user, …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_utility_types-record",
@@ -9853,7 +9874,8 @@
         "hints": [
           "Record<string, number> is just a string-keyed number map; increment as usual.",
           "The answer begins `counts[w] = (counts[w] ?? …`"
-        ]
+        ],
+        "strictness": "strict"
       },
       {
         "id": "ts_utility_types-pick",
@@ -9883,7 +9905,8 @@
         "hints": [
           "Pick<User, \"name\"> keeps only the name field, so build { name: user.name }.",
           "The reference solution is 2 lines and begins: `const card: NameOnly = { name: user.name };`"
-        ]
+        ],
+        "strictness": "strict"
       },
       {
         "id": "ts_utility_types-challenge",
@@ -9918,7 +9941,8 @@
           "Each patch is a Partial<User>; `{ ...user, ...patch }` overrides just its field.",
           "The reference solution uses `split` and a `for` loop.",
           "The reference solution is 12 lines and begins: `interface User { name: string; age: number; }`"
-        ]
+        ],
+        "strictness": "strict"
       }
     ],
     "cards": [],
@@ -9963,7 +9987,8 @@
         "hints": [
           "await pauses until the promise resolves: const x = await later(n);.",
           "The answer begins `const x = …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_async-all",
@@ -9993,7 +10018,8 @@
         "hints": [
           "Promise.all([p1, p2]) resolves to an array once both are done.",
           "The answer begins `await Promise.all([later(a), …`"
-        ]
+        ],
+        "strictness": "strict"
       },
       {
         "id": "ts_async-trycatch",
@@ -10024,7 +10050,8 @@
           "await throws on rejection, so wrap it in try/catch just like synchronous errors.",
           "The reference solution uses `await` and `try`/`catch`.",
           "The reference solution is 6 lines and begins: `try {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_async-challenge",
@@ -10059,7 +10086,8 @@
           "await square(n) inside the loop unwraps the Promise to a plain number to add up.",
           "The reference solution uses `split`, `map`, a `for` loop and `await`.",
           "The reference solution is 12 lines and begins: `function square(n: number): Promise<number> {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -10275,7 +10303,8 @@
         "hints": [
           "The assertion lets you read data.count as a number; multiply it by 2.",
           "The answer begins `data.count * …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_assertions-nonnull",
@@ -10305,7 +10334,8 @@
         "hints": [
           "nums.find(x => x > 10) returns the first match; the ! after it asserts it isn't undefined.",
           "The answer begins `nums.find(x => x …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_assertions-array",
@@ -10336,7 +10366,8 @@
           "JSON.parse(raw) as number[] gives a typed array you can reduce.",
           "The reference solution uses `reduce` and `JSON.parse`.",
           "The reference solution is 3 lines and begins: `const nums = JSON.parse(raw) as number[];`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_assertions-challenge",
@@ -10371,7 +10402,8 @@
           "`JSON.parse(input) as Person[]` tells TypeScript the parsed value's shape.",
           "The reference solution uses `JSON.parse`.",
           "The reference solution is 8 lines and begins: `interface Person { name: string; age: number; }`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -10416,7 +10448,8 @@
         "hints": [
           "An extended interface needs the inherited field (name) AND the new one (age).",
           "The answer begins `{ name: parts[0], …`"
-        ]
+        ],
+        "strictness": "strict"
       },
       {
         "id": "ts_compose-intersection",
@@ -10446,7 +10479,8 @@
         "hints": [
           "An intersection needs all members of both parts: name AND salary.",
           "The answer begins `{ name: parts[0], …`"
-        ]
+        ],
+        "strictness": "strict"
       },
       {
         "id": "ts_compose-circle",
@@ -10476,7 +10510,8 @@
         "hints": [
           "Circle needs x, y (from Point) and r; area uses the radius: 3 * r * r.",
           "The reference solution is 3 lines and begins: `const c: Circle = { x: parts[0], y: parts[1], r: parts[2] };`"
-        ]
+        ],
+        "strictness": "strict"
       },
       {
         "id": "ts_compose-challenge",
@@ -10511,7 +10546,8 @@
           "Point & Labeled requires x, y, AND label together in one object.",
           "The reference solution uses `split` and `Math`.",
           "The reference solution is 7 lines and begins: `type Point = { x: number; y: number };`"
-        ]
+        ],
+        "strictness": "strict"
       }
     ],
     "cards": [],
@@ -10689,7 +10725,8 @@
         "hints": [
           "{ ...user, age: user.age + 1 } copies user then overrides age; the original stays put.",
           "The answer begins `{ ...user, age: user.age …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_immutability-append",
@@ -10719,7 +10756,8 @@
         "hints": [
           "[...nums, 99] spreads the originals into a new array and adds 99 — nums itself is unchanged.",
           "The answer begins `[...nums, …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_immutability-freeze",
@@ -10750,7 +10788,8 @@
           "Object.freeze locks the object; the write is rejected, so limit keeps its original value.",
           "The reference solution uses `try`/`catch`.",
           "The reference solution is 7 lines and begins: `const config = Object.freeze({ limit: n });`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_immutability-challenge",
@@ -10785,7 +10824,8 @@
           "`state = { ...state, balance: ... }` makes a fresh object; push each new state to history.",
           "The reference solution uses `split` and a `for` loop.",
           "The reference solution is 10 lines and begins: `interface State { balance: number; steps: number; }`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -11513,7 +11553,8 @@
           "Seed best with items[0] and only replace it on a strictly greater length, so ties keep the earlier item.",
           "The reference solution uses a `for` loop.",
           "The reference solution is 5 lines and begins: `let best = items[0];`"
-        ]
+        ],
+        "strictness": "strict"
       },
       {
         "id": "ts_structural_typing-extra",
@@ -11547,7 +11588,8 @@
         "hints": [
           "Compare both fields with === and combine them with &&.",
           "The answer begins `return a.x === b.x …`"
-        ]
+        ],
+        "strictness": "strict"
       },
       {
         "id": "ts_structural_typing-challenge",
@@ -11582,7 +11624,8 @@
           "Spread the defaults into a Record<string, string> so unknown keys are allowed, and count an override only when the key is one of the defaults AND the value actually differs.",
           "The reference solution uses `split`, `filter`, `sort`, `slice` and a `for` loop.",
           "The reference solution is 16 lines and begins: `const lines = input.split(\"\\n\").filter((l) => l.trim().length > 0);`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -11661,7 +11704,8 @@
         "hints": [
           "`keyof typeof routes` is the union of the object's own keys — the cast tells the compiler the raw string is one of them.",
           "The reference solution is 2 lines and begins: `console.log(routes[input as keyof typeof routes]);`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_satisfies-tuple",
@@ -11688,7 +11732,8 @@
           "Index the palette with the cast key, then join the tuple and add its three entries.",
           "The reference solution uses `join`.",
           "The reference solution is 3 lines and begins: `const rgb = palette[input as keyof typeof palette];`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_satisfies-challenge",
@@ -11723,7 +11768,8 @@
           "`name in flags` narrows at runtime; the `as FlagName` cast is what lets you index the table afterwards.",
           "The reference solution uses `split`, `filter` and a `for` loop.",
           "The reference solution is 16 lines and begins: `const lines = input.split(\"\\n\");`"
-        ]
+        ],
+        "strictness": "strict"
       }
     ],
     "cards": [],
@@ -11802,7 +11848,8 @@
         "hints": [
           "Guard first, then `return raw as UserId`. A branded value is still a plain string at runtime, so .toUpperCase() works.",
           "The reference solution is 4 lines and begins: `function toUserId(raw: string): UserId {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_branded_types-units",
@@ -11836,7 +11883,8 @@
         "hints": [
           "An arrow with an explicit return type: (c: Cents): Dollars => (c / 100) as Dollars.",
           "The answer begins `const toDollars = (c: Cents): Dollars …`"
-        ]
+        ],
+        "strictness": "strict"
       },
       {
         "id": "ts_branded_types-challenge",
@@ -11871,7 +11919,8 @@
           "Returning `TicketId | null` rather than throwing makes the caller deal with bad input. Anchor the regex with ^ and $ so partial matches are rejected.",
           "The reference solution uses `split`, `join` and a `for` loop.",
           "The reference solution is 17 lines and begins: `const lines = input.split(\"\\n\");`"
-        ]
+        ],
+        "strictness": "strict"
       }
     ],
     "cards": [],
@@ -11951,7 +12000,8 @@
           "Two type parameters: T for the row and K constrained to keyof T. The return type is T[K][].",
           "The reference solution uses `map`.",
           "The reference solution is 3 lines and begins: `function pluck<T, K extends keyof T>(items: T[], key: K): T[K][] {`"
-        ]
+        ],
+        "strictness": "strict"
       },
       {
         "id": "ts_generic_constraints-max",
@@ -11982,7 +12032,8 @@
           "Because T is constrained, the body may call .valueOf() — and because it is still generic, the return keeps the caller's element type.",
           "The reference solution uses a `for` loop.",
           "The reference solution is 5 lines and begins: `let best = items[0];`"
-        ]
+        ],
+        "strictness": "strict"
       },
       {
         "id": "ts_generic_constraints-challenge",
@@ -12017,7 +12068,8 @@
           "The Map is keyed by T[K], so the grouping key keeps its real type. Push into an existing bucket or create a new one.",
           "The reference solution uses `split`, a `Map`, `map`, `sort`, `join`, `slice` and a `for` loop.",
           "The reference solution is 21 lines and begins: `const lines = input.split(\"\\n\");`"
-        ]
+        ],
+        "strictness": "strict"
       }
     ],
     "cards": [],
@@ -12096,7 +12148,8 @@
         "hints": [
           "One type parameter constrained to keyof Settings, returning Settings[K]. The body is just settings[key].",
           "The reference solution is 3 lines and begins: `function read<K extends keyof Settings>(key: K): Settings[K] {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_keyof_indexed-levels",
@@ -12130,7 +12183,8 @@
         "hints": [
           "indexOf on the readonly tuple gives the position — the type only has to accept a Level and return a number.",
           "The reference solution is 3 lines and begins: `function rank(level: Level): number {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_keyof_indexed-challenge",
@@ -12165,7 +12219,8 @@
           "`key in profile` is the runtime check; `as Key` is what lets you index afterwards. Object.keys returns string[], so cast it to Key[] to index safely.",
           "The reference solution uses `split`, `filter`, `sort`, `join` and a `for` loop.",
           "The reference solution is 17 lines and begins: `const lines = input.split(\"\\n\");`"
-        ]
+        ],
+        "strictness": "strict"
       }
     ],
     "cards": [],
@@ -12248,7 +12303,8 @@
         "hints": [
           "Spreading patch second lets its present keys win; absent keys leave base untouched.",
           "The answer begins `return { ...base, …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_mapped_types-getters",
@@ -12275,7 +12331,8 @@
           "The mapped type is erased, so the runtime loop has to build the renamed keys itself — and the final cast is where you assert it matches.",
           "The reference solution uses `slice` and a `for` loop.",
           "The reference solution is 6 lines and begins: `const out: Record<string, () => unknown> = {};`"
-        ]
+        ],
+        "strictness": "strict"
       },
       {
         "id": "ts_mapped_types-challenge",
@@ -12310,7 +12367,8 @@
           "`Pick<T, K>` is itself the mapped type `{ [P in K]: T[P] }`. Start from an empty object cast to that type and copy only the requested keys that exist.",
           "The reference solution uses `split`, `map`, `sort` and a `for` loop.",
           "The reference solution is 19 lines and begins: `const lines = input.split(\"\\n\");`"
-        ]
+        ],
+        "strictness": "strict"
       }
     ],
     "cards": [],
@@ -12389,7 +12447,8 @@
         "hints": [
           "One ternary on Array.isArray, then a cast — the conditional type describes the result the runtime branch produces.",
           "The answer begins `return (Array.isArray(value) ? value[0] …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_conditional_types-compact",
@@ -12423,7 +12482,8 @@
         "hints": [
           "A single filter rejecting both null and undefined, then a cast to NonNil<T>[].",
           "The answer begins `return items.filter((x) => x !== null …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_conditional_types-challenge",
@@ -12462,7 +12522,8 @@
           "Check the segment counts first, then walk both lists together — a `:` segment captures, anything else must be equal.",
           "The reference solution uses `split`, `map`, `filter`, `sort`, `join`, `slice` and a `for` loop.",
           "The reference solution is 19 lines and begins: `const lines = input.split(\"\\n\");`"
-        ]
+        ],
+        "strictness": "strict"
       }
     ],
     "cards": [],
@@ -12541,7 +12602,8 @@
         "hints": [
           "A backtick template with both holes, then a cast — the compiler cannot verify a runtime-built string matches the pattern.",
           "The reference solution is 3 lines and begins: `function toSize(value: number, unit: Unit): Size {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_template_literal_types-events",
@@ -12575,7 +12637,8 @@
         "hints": [
           "Widen the typed array to string[] before calling includes with an arbitrary string.",
           "The reference solution is 3 lines and begins: `function isHandled(name: string): boolean {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_template_literal_types-challenge",
@@ -12610,7 +12673,8 @@
           "The nested loops over the two `as const` arrays produce exactly the nine names the template literal type describes.",
           "The reference solution uses `split`, a `Set` and a `for` loop.",
           "The reference solution is 18 lines and begins: `const lines = input.split(\"\\n\");`"
-        ]
+        ],
+        "strictness": "strict"
       }
     ],
     "cards": [],
@@ -12694,7 +12758,8 @@
           "Test Array.isArray BEFORE the object check, since arrays are objects too — and remember typeof null is \"object\".",
           "The reference solution uses `map` and `Math`.",
           "The reference solution is 7 lines and begins: `function depth(value: Json): number {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_type_level-flatten",
@@ -12728,7 +12793,8 @@
         "hints": [
           "The base case wraps a single number; the recursive case is one flatMap over the children.",
           "The reference solution is 4 lines and begins: `function flatten(value: Nested): number[] {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_type_level-challenge",
@@ -12763,7 +12829,8 @@
           "A type predicate for 'plain object' keeps merge and canonical readable. Both functions recurse on exactly the branch where the type recurses.",
           "The reference solution uses `split`, `map`, `sort`, `join`, `JSON.parse` and a `for` loop.",
           "The reference solution is 29 lines and begins: `const lines = input.split(\"\\n\");`"
-        ]
+        ],
+        "strictness": "strict"
       }
     ],
     "cards": [],
@@ -12847,7 +12914,8 @@
           "A generator is declared with function* and hands out values with yield — no array is built inside it.",
           "The reference solution uses a `for` loop and a generator.",
           "The reference solution is 3 lines and begins: `function* squares(n: number): Generator<number> {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_iterators-iterable",
@@ -12877,7 +12945,8 @@
         "hints": [
           "The method name is the computed key [Symbol.iterator], written as a generator with the * before it. yield* forwards every element.",
           "The reference solution is 3 lines and begins: `*[Symbol.iterator](): Generator<string> {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_iterators-challenge",
@@ -12912,7 +12981,8 @@
           "take must `return` as soon as it has enough — that is what stops the infinite source. Compose them as take(filter(naturals(), ...), count).",
           "The reference solution uses `split`, `reduce`, `map`, `join`, a `while` loop, a `for` loop and a generator.",
           "The reference solution is 21 lines and begins: `const [count, divisor] = input.split(/\\s+/).map(Number);`"
-        ]
+        ],
+        "strictness": "strict"
       }
     ],
     "cards": [],
@@ -12999,7 +13069,8 @@
         "hints": [
           "Return the failure shapes early, then the success shape. Number(\"abc\") is NaN, which Number.isInteger rejects.",
           "The reference solution is 6 lines and begins: `function parsePort(raw: string): Result<number> {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_error_types-narrow",
@@ -13029,7 +13100,8 @@
         "hints": [
           "Check the most specific class first — a ParseError is also an Error, so the order of the instanceof tests matters.",
           "The reference solution is 3 lines and begins: `if (e instanceof ParseError) console.log(\"ParseError on line \" + e.line);`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_error_types-challenge",
@@ -13064,7 +13136,8 @@
           "Because Result is a discriminated union, `if (result.ok)` narrows to the branch that actually has `value` — no optional chaining needed.",
           "The reference solution uses `split` and a `for` loop.",
           "The reference solution is 24 lines and begins: `const lines = input.split(\"\\n\");`"
-        ]
+        ],
+        "strictness": "strict"
       }
     ],
     "cards": [],
@@ -13143,7 +13216,8 @@
         "hints": [
           "nums.map(delayed) creates every promise immediately; Promise.all waits for all of them and preserves the input order.",
           "The answer begins `const doubled = …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_async_patterns-settled",
@@ -13174,7 +13248,8 @@
           "PromiseSettledResult is a discriminated union on `status` — the fulfilled branch has `value`, the rejected branch has `reason`.",
           "The reference solution uses a `for` loop.",
           "The reference solution is 4 lines and begins: `for (const r of settled) {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_async_patterns-challenge",
@@ -13209,7 +13284,8 @@
           "Race each lookup against the timeout, then wrap the whole array in allSettled so one rejection does not lose the other results.",
           "The reference solution uses `split`, `map` and `await`.",
           "The reference solution is 24 lines and begins: `const ids = input.split(/\\s+/).map(Number);`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -13284,7 +13360,8 @@
         "hints": [
           "Two ambient declarations, one for a const and one for a function. They describe what the host provides; the assignments below are that host.",
           "The reference solution is 2 lines and begins: `declare const BUILD_VERSION: string;`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_declaration_files-augment",
@@ -13314,7 +13391,8 @@
         "hints": [
           "Declaring the same interface name twice merges the members — this is exactly how module augmentation adds a field to a library type.",
           "The reference solution is 3 lines and begins: `interface Session {`"
-        ]
+        ],
+        "strictness": "strict"
       },
       {
         "id": "ts_declaration_files-challenge",
@@ -13345,7 +13423,8 @@
           "`declare const host: Host` promises the binding exists; the assignment to globalThis is the runtime keeping that promise. `satisfies Host` checks the implementation matches.",
           "The reference solution uses `split` and a `for` loop.",
           "The reference solution is 22 lines and begins: `const lines = input.split(\"\\n\");`"
-        ]
+        ],
+        "strictness": "strict"
       }
     ],
     "cards": [],
@@ -13424,7 +13503,8 @@
         "hints": [
           "pop() returns T | undefined, which is why the caller needs ?? \"(empty)\". The #items field is private at runtime, not just to the compiler.",
           "The reference solution is 10 lines and begins: `#items: T[] = [];`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_ds_generics-queue",
@@ -13454,7 +13534,8 @@
         "hints": [
           "One generator method keyed by [Symbol.iterator]; yield* forwards the backing array's elements.",
           "The reference solution is 3 lines and begins: `*[Symbol.iterator](): Generator<T> {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_ds_generics-challenge",
@@ -13489,7 +13570,8 @@
           "Push then trim: once the array is longer than the capacity, shift the oldest off the front. toArray copies so callers cannot mutate the internals.",
           "The reference solution uses `split`, `filter`, `join`, a `for` loop and a class.",
           "The reference solution is 31 lines and begins: `const lines = input.split(\"\\n\");`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -13568,7 +13650,8 @@
         "hints": [
           "Narrow first with an early return; after the guard, TypeScript knows the value is a plain string.",
           "The reference solution is 2 lines and begins: `if (value === null) return \"(missing)\";`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_tsconfig-indexed",
@@ -13602,7 +13685,8 @@
         "hints": [
           "Read the element into a `T | undefined` first, then decide — an out-of-range index gives undefined at runtime whether the flag is on or not.",
           "The reference solution is 2 lines and begins: `const value: T | undefined = items[index];`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_tsconfig-challenge",
@@ -13637,7 +13721,8 @@
           "Derive the Flag union from the `as const` array so the settings record cannot drift from it. Treat both split halves as possibly-undefined.",
           "The reference solution uses `split`, `filter`, `sort` and a `for` loop.",
           "The reference solution is 23 lines and begins: `const lines = input.split(\"\\n\").filter((line) => line.trim().length > 0);`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -16901,7 +16986,8 @@
         "hints": [
           "`Object.entries` gives `[name, value]` pairs of the real object.",
           "The answer begins `Object.entries(Level).filter(([, value]) => value …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_erasable_syntax-fields",
@@ -16931,7 +17017,8 @@
         "hints": [
           "A parameter property is shorthand for `this.<name> = <name>;` in the constructor.",
           "The reference solution is 2 lines and begins: `this.name = name;`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_erasable_syntax-status",
@@ -16962,7 +17049,8 @@
           "`keyof typeof Status` is the union of names; search the names for the one whose value matches.",
           "The reference solution uses `split`, a `Map`, a `for` loop and `??`.",
           "The reference solution is 17 lines and begins: `const Status = { Active: \"A\", Suspended: \"S\", Closed: \"C\" } as const;`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -17074,7 +17162,8 @@
         "hints": [
           "`e` is `unknown`. Narrow with `instanceof Error` before reading `.message`.",
           "The answer begins `e instanceof Error ? …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_versions-init",
@@ -17104,7 +17193,8 @@
         "hints": [
           "Two assignments to `this`.",
           "The reference solution is 2 lines and begins: `this.name = name;`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_versions-config",
@@ -17135,7 +17225,8 @@
           "Two lookups: exact `option=value` pairs, and options that are deprecated whatever their value.",
           "The reference solution uses `split`, a `Set`, a `for` loop and `??`.",
           "The reference solution is 15 lines and begins: `const ANY_VALUE = new Set([\"outFile\", \"baseUrl\"]);`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -17247,7 +17338,8 @@
         "hints": [
           "`toSorted` returns a sorted copy; `byName` fits its comparator slot for `Dog`s because it accepts any `Animal`.",
           "The answer is 21 characters long and begins `dogs.toSor`."
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_variance-readonly",
@@ -17273,7 +17365,8 @@
         "hints": [
           "`reduce` without an initial value starts from the first element; keep the current best unless someone is strictly older.",
           "The answer begins `people.reduce((best, p) => (p.age > …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_variance-handlers",
@@ -17300,7 +17393,8 @@
           "A function that accepts any `BaseEvent` is assignable to one that accepts a `KeyEvent` — parameters are contravariant.",
           "The reference solution uses `split`, `map`, `join` and a `for` loop.",
           "The reference solution is 18 lines and begins: `type BaseEvent = { type: string; at: number };`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -17412,7 +17506,8 @@
         "hints": [
           "Check the characters first — `Number(\"1e3\")` is 1000 — then the range.",
           "The answer begins `/^\\d+$/.test(text) && n >= 1 …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_parse_dont_validate-nonempty",
@@ -17438,7 +17533,8 @@
         "hints": [
           "Destructure the head; if it exists, rebuild the tuple as `[head, ...rest]`.",
           "The answer begins `head === undefined ? …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_parse_dont_validate-usernames",
@@ -17465,7 +17561,8 @@
           "Return either the branded name or the reason it failed; narrow on the two reason strings.",
           "The reference solution uses `split`, a `Set` and a `for` loop.",
           "The reference solution is 21 lines and begins: `declare const UsernameBrand: unique symbol;`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -17577,7 +17674,8 @@
         "hints": [
           "Two conditions: the right `typeof`, and not `NaN`/`Infinity` (JSON can't produce those, but other sources can).",
           "The answer begins `typeof v === …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_runtime_validation-product",
@@ -17603,7 +17701,8 @@
         "hints": [
           "`obj({ … })` with one schema per property; `arr(str())` for a list of strings.",
           "The answer begins `obj({ name: str(), price: …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_runtime_validation-events",
@@ -17630,7 +17729,8 @@
           "Collect issues in an array instead of returning at the first one; return either the typed event or the issue list.",
           "The reference solution uses `split`, `join`, `JSON.parse` and a `for` loop.",
           "The reference solution is 38 lines and begins: `type Event = { id: number; type: string; tags: string[]; user?: { name: string } };`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -17742,7 +17842,8 @@
         "hints": [
           "Look up the current group (maybe missing), and store a new array with the item added.",
           "The answer begins `groups.set(key, [...(groups.get(key) ?? …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_generic_inference-explicit",
@@ -17772,7 +17873,8 @@
         "hints": [
           "Write the type argument between `<` and `>` right after the function name.",
           "The answer is 19 characters long and begins `counter<s`."
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_generic_inference-countby",
@@ -17799,7 +17901,8 @@
           "`T` is inferred from `items`; the callback's parameter then gets `T` for free.",
           "The reference solution uses `split`, a `Map`, `map`, `join`, a `for` loop and `??`.",
           "The reference solution is 16 lines and begins: `type Person = { name: string; age: number; city: string };`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -17911,7 +18014,8 @@
         "hints": [
           "`typeof SIZES` is a readonly tuple; index it with `number`.",
           "The answer begins `(typeof …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_lookup_types-pluck",
@@ -17937,7 +18041,8 @@
         "hints": [
           "An array of the value type at key `K` of `T`.",
           "The answer is 6 characters long and begins `T[K`."
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_lookup_types-limits",
@@ -17964,7 +18069,8 @@
           "`keyof (typeof LIMITS)[Plan]` is the keys every plan's limits share.",
           "The reference solution uses `split` and a `for` loop.",
           "The reference solution is 23 lines and begins: `const LIMITS = {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -18076,7 +18182,8 @@
         "hints": [
           "`as` followed by a template literal type; remember `string & K`.",
           "The answer begins `as `set${Capitalize<string …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_key_remapping-getters",
@@ -18102,7 +18209,8 @@
         "hints": [
           "`charAt(0).toUpperCase()` for the first letter, then the rest unchanged.",
           "The answer begins `\"get\" + key.charAt(0).toUpperCase() …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_key_remapping-emitter",
@@ -18129,7 +18237,8 @@
           "The handler object's keys are checked against `Handlers<Events>` — a misspelt `onJion` won't compile.",
           "The reference solution uses `split`, `join` and a `for` loop.",
           "The reference solution is 23 lines and begins: `type Events = { join: { user: string }; leave: { user: string; reason: string }; message: { user: string; text: string } };`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -18241,7 +18350,8 @@
         "hints": [
           "`infer E` inside `readonly (infer E)[]` captures the element type.",
           "The answer begins `T extends readonly (infer E)[] …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_distributive-never",
@@ -18271,7 +18381,8 @@
         "hints": [
           "After the three checks, `c` is `never`.",
           "The answer begins `return …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_distributive-partition",
@@ -18298,7 +18409,8 @@
           "`Extract` distributes over the union and keeps the members that match the pattern.",
           "The reference solution uses `split`, `reduce`, `map`, `filter`, `join` and a `for` loop.",
           "The reference solution is 12 lines and begins: `type Result = { ok: true; value: number } | { ok: false; error: string };`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -18410,7 +18522,8 @@
         "hints": [
           "Return the recursive call itself, with one more element in the accumulator.",
           "The answer begins `Build<N, [...Acc, …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_type_performance-split",
@@ -18436,7 +18549,8 @@
         "hints": [
           "Put `string` on the left: \"is plain `string` assignable to `S`?\" is true only when `S` is `string` itself.",
           "The answer begins `string extends …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_type_performance-depth",
@@ -18463,7 +18577,8 @@
           "An array or object is one level more than its deepest child; `Math.max(0, …)` handles the empty case.",
           "The reference solution uses `split`, `map`, `JSON.parse`, a `for` loop and `Math`.",
           "The reference solution is 9 lines and begins: `function depth(value: unknown): number {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -18571,7 +18686,8 @@
         "hints": [
           "Both bounds are allowed.",
           "The answer begins `value >= 0 && …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_class_design-abstract",
@@ -18597,7 +18713,8 @@
         "hints": [
           "Map each `[name, numbers]` pair to one row string.",
           "The answer begins `return this.data.map(([name, xs]) => `${name}: ${xs.reduce((a, …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_class_design-inventory",
@@ -18624,7 +18741,8 @@
           "Keep the map `#private` so nothing outside the class can make a count negative.",
           "The reference solution uses `split`, a `Map`, `map`, `filter`, `sort`, `join`, a `for` loop, `localeCompare`, `??` and a class.",
           "The reference solution is 31 lines and begins: `class Inventory {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -18736,7 +18854,8 @@
         "hints": [
           "Call the original with `.call`, passing `this` first.",
           "The answer begins `return target.call(this, …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_decorators-memo",
@@ -18766,7 +18885,8 @@
         "hints": [
           "Look up first; return early on a hit.",
           "The reference solution is 2 lines and begins: `const hit = cache.get(n);`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_decorators-validate",
@@ -18793,7 +18913,8 @@
           "The wrapper checks, then either throws or delegates.",
           "The reference solution uses `split`, a `for` loop, `Math` and `try`/`catch`.",
           "The reference solution is 23 lines and begins: `function validated(check: (x: number) => boolean, target: (x: number) => number, name: string): (x: number) => number {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -18905,7 +19026,8 @@
         "hints": [
           "`values()` gives an iterator; chain `filter`, `map`, `take`, then `toArray()`.",
           "The answer begins `words.values().filter((w) => w.length > …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_iterator_helpers-range",
@@ -18936,7 +19058,8 @@
           "A generator method named `[Symbol.iterator]`, with a `for` loop that `yield`s.",
           "The reference solution uses a `for` loop.",
           "The reference solution is 3 lines and begins: `*[Symbol.iterator](): Generator<number> {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_iterator_helpers-log",
@@ -18967,7 +19090,8 @@
           "Each question gets a fresh `lines.values()` — an iterator is consumed by the first pipeline that reads it.",
           "The reference solution uses `split`, `reduce`, `map`, `filter`, `slice`, a `for` loop and `??`.",
           "The reference solution is 8 lines and begins: `const lines = input.split(\"\\n\").map((l) => l.trim());`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -19079,7 +19203,8 @@
         "hints": [
           "Negative when `a` should come out first — so when `a` is *larger*.",
           "The answer begins `(a, b) => …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_heap_pq-kth",
@@ -19109,7 +19234,8 @@
         "hints": [
           "When the heap grows past k, remove its smallest.",
           "The answer begins `if (best.size > …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_heap_pq-scheduler",
@@ -19136,7 +19262,8 @@
           "Compare by priority, then by an arrival counter.",
           "The reference solution uses `split`, `join`, a `while` loop, a `for` loop and a class.",
           "The reference solution is 69 lines and begins: `class Heap<T> {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -19244,7 +19371,8 @@
         "hints": [
           "The well-known symbol `Symbol.dispose`, as a computed method name.",
           "The answer is 16 characters long and begins `[Symbol.`."
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_resource_management-stack",
@@ -19270,7 +19398,8 @@
         "hints": [
           "`stack.defer(fn)` registers a cleanup; `move()` at the end keeps them from running on success.",
           "The answer begins `stack.defer(() => console.log(\"rollback …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_resource_management-pool",
@@ -19297,7 +19426,8 @@
           "`using` accepts `undefined`, so an unavailable connection needs no special case in the cleanup.",
           "The reference solution uses `split`, `join`, a class and `try`/`catch`.",
           "The reference solution is 29 lines and begins: `class Pool {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -19409,7 +19539,8 @@
         "hints": [
           "`instanceof` narrows `unknown` to the subclass.",
           "The answer begins `e instanceof …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_error_cause-chain",
@@ -19435,7 +19566,8 @@
         "hints": [
           "The second argument to `Error` is an options object with `cause`.",
           "The answer begins `throw new Error(\"could not load …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_error_cause-http",
@@ -19462,7 +19594,8 @@
           "Check the most specific classes first; everything else is a 500.",
           "The reference solution uses `split`, a `for` loop, `??`, a class and `try`/`catch`.",
           "The reference solution is 28 lines and begins: `class NotFoundError extends Error {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -19570,7 +19703,8 @@
         "hints": [
           "`queueMicrotask(fn)` runs `fn` after the current synchronous code.",
           "The answer begins `queueMicrotask(() => …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_event_loop-all",
@@ -19596,7 +19730,8 @@
         "hints": [
           "Map to promises first, then await them all with `Promise.all`.",
           "The answer begins `await …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_event_loop-simulate",
@@ -19623,7 +19758,8 @@
           "Three buckets: synchronous logs, microtasks, timers sorted by delay then by position.",
           "The reference solution uses `split`, `map`, `filter`, `sort`, `join`, a `for` loop and `Math`.",
           "The reference solution is 24 lines and begins: `type Op = { kind: \"log\" | \"micro\"; label: string } | { kind: \"timer\"; ms: number; label: string };`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -19735,7 +19871,8 @@
         "hints": [
           "One call on the signal throws its reason if it has been aborted.",
           "The answer is 24 characters long and begins `signal.throw`."
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_cancellation-resolvers",
@@ -19761,7 +19898,8 @@
         "hints": [
           "`Promise.withResolvers<T>()` returns `{ promise, resolve, reject }`.",
           "The answer is 31 characters long and begins `Promise.withRes`."
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_cancellation-retry",
@@ -19792,7 +19930,8 @@
           "Check the signal before every attempt; keep the last error to rethrow when attempts run out.",
           "The reference solution uses `split`, a `for` loop, `await` and `try`/`catch`.",
           "The reference solution is 31 lines and begins: `async function retry<T>(task: () => Promise<T>, attempts: number, signal: AbortSignal): Promise<T> {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],
@@ -19905,7 +20044,8 @@
           "Loop over page numbers; stop (`return`) at the first empty page; `yield` each batch.",
           "The reference solution uses a `for` loop and `await`.",
           "The reference solution is 5 lines and begins: `for (let page = 0; ; page++) {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_async_iteration-for-await",
@@ -19935,7 +20075,8 @@
         "hints": [
           "`for await (const x of source)`.",
           "The answer begins `for await (const …`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       },
       {
         "id": "ts_async_iteration-merge",
@@ -19966,7 +20107,8 @@
           "Keep the current `next()` result of each source; yield the smaller and advance that source only.",
           "The reference solution uses `split`, `map`, `filter`, `join`, a `while` loop, a `for` loop, a generator and `await`.",
           "The reference solution is 30 lines and begins: `async function* fromList(xs: number[], counter: { pulled: number }): AsyncGenerator<number> {`"
-        ]
+        ],
+        "strictness": "strict+indexed"
       }
     ],
     "cards": [],

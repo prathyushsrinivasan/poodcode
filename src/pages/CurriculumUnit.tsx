@@ -48,7 +48,8 @@ import {
   variantQuestions,
   type VariantQuestion,
 } from "../lib/dsaRecognition";
-import { EmptyState, ErrorState, Icon, type IconName } from "../components/ui";
+import { EmptyState, ErrorState, Icon, ScrollX, type IconName } from "../components/ui";
+import { Deeper } from "../components/ui/Heading";
 import { loadFailed } from "../lib/failures";
 
 /**
@@ -346,7 +347,7 @@ function UnitView({
       count: String(u.signals.length),
       lead: "The routing table. Reading a prompt and landing on the technique without deriving it is most of what separates fast solvers from slow ones.",
       body: (
-        <div className="card p-0 overflow-x-auto">
+        <ScrollX label="Signals" className="card p-0">
           <table className="data">
             <thead>
               <tr>
@@ -365,7 +366,7 @@ function UnitView({
               ))}
             </tbody>
           </table>
-        </div>
+        </ScrollX>
       ),
     }
   );
@@ -379,7 +380,7 @@ function UnitView({
       count: String(u.stuck.length),
       lead: "Pitfalls are for after a failed run. This is for before any code exists — not answers, but the question that tends to produce one.",
       body: (
-        <div className="card p-0 overflow-x-auto">
+        <ScrollX label="When stuck" className="card p-0">
           <table className="data">
             <thead>
               <tr>
@@ -396,7 +397,7 @@ function UnitView({
               ))}
             </tbody>
           </table>
-        </div>
+        </ScrollX>
       ),
     }
   );
@@ -444,7 +445,7 @@ function UnitView({
       title: "What it costs",
       short: "Costs",
       body: (
-        <div className="card p-0 overflow-x-auto">
+        <ScrollX label="What it costs" className="card p-0">
           <table className="data">
             <thead>
               <tr>
@@ -465,7 +466,7 @@ function UnitView({
               ))}
             </tbody>
           </table>
-        </div>
+        </ScrollX>
       ),
     }
   );
@@ -1035,7 +1036,7 @@ function UnitView({
                 {s.meta}
               </div>
               {s.lead && <p className="cu-lead">{s.lead}</p>}
-              {s.body}
+              <Deeper>{s.body}</Deeper>
             </section>
           ))}
 
@@ -1325,7 +1326,7 @@ function InvariantBlock({ inv }: { inv: Invariant }) {
  * skeleton, and the column says what to edit. */
 function VariantTable({ variants }: { variants: Variant[] }) {
   return (
-    <div className="card p-0 overflow-x-auto">
+    <ScrollX label="Variants" className="card p-0">
       <table className="data">
         <thead>
           <tr>
@@ -1358,7 +1359,7 @@ function VariantTable({ variants }: { variants: Variant[] }) {
           ))}
         </tbody>
       </table>
-    </div>
+    </ScrollX>
   );
 }
 
@@ -1444,7 +1445,7 @@ function TraceTable({ trace }: { trace: Trace }) {
           <InlineMarkdown>{trace.intro}</InlineMarkdown>
         </p>
       )}
-      <div className="card p-0 overflow-x-auto">
+      <ScrollX label="Trace" className="card p-0">
         <table className="data">
           <thead>
             <tr>
@@ -1472,7 +1473,7 @@ function TraceTable({ trace }: { trace: Trace }) {
             )}
           </tbody>
         </table>
-      </div>
+      </ScrollX>
       {stepping && (
         <div className="row mt-2 gap-2">
           <button

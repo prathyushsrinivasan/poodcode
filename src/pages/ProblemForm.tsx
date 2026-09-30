@@ -266,10 +266,18 @@ export default function ProblemForm() {
               </div>
               {p.examples.map((ex, i) => (
                 <div key={i} className="form-table-row" role="row" id={fieldId(`examples.${i}`)}>
-                  <textarea aria-label={`Example ${i + 1} input`} rows={2} className="mono" value={ex.input} onChange={(e) => updateExample(i, { input: e.target.value })} />
-                  <textarea aria-label={`Example ${i + 1} output`} rows={2} className="mono" value={ex.output} onChange={(e) => updateExample(i, { output: e.target.value })} />
-                  <textarea aria-label={`Example ${i + 1} explanation`} rows={2} value={ex.explanation} onChange={(e) => updateExample(i, { explanation: e.target.value })} />
-                  <IconButton icon="delete" size="sm" label={`Remove example ${i + 1}`} onClick={() => set("examples", p.examples.filter((_, j) => j !== i))} />
+                  <Cell>
+                    <textarea aria-label={`Example ${i + 1} input`} rows={2} className="mono" value={ex.input} onChange={(e) => updateExample(i, { input: e.target.value })} />
+                  </Cell>
+                  <Cell>
+                    <textarea aria-label={`Example ${i + 1} output`} rows={2} className="mono" value={ex.output} onChange={(e) => updateExample(i, { output: e.target.value })} />
+                  </Cell>
+                  <Cell>
+                    <textarea aria-label={`Example ${i + 1} explanation`} rows={2} value={ex.explanation} onChange={(e) => updateExample(i, { explanation: e.target.value })} />
+                  </Cell>
+                  <Cell>
+                    <IconButton icon="delete" size="sm" label={`Remove example ${i + 1}`} onClick={() => set("examples", p.examples.filter((_, j) => j !== i))} />
+                  </Cell>
                   <RowIssue issue={issue(`examples.${i}`)} />
                 </div>
               ))}
@@ -314,27 +322,35 @@ export default function ProblemForm() {
               </div>
               {p.test_cases.map((c, i) => (
                 <div key={i} className="form-table-row" role="row" id={fieldId(`test_cases.${i}`)}>
-                  <select aria-label={`Case ${i + 1} kind`} value={c.kind} onChange={(e) => updateCase(i, { kind: e.target.value as TestCase["kind"] })}>
-                    <option value="example">example</option>
-                    <option value="hidden">hidden</option>
-                    <option value="user">user</option>
-                  </select>
-                  <input
-                    id={fieldId(`test_cases.${i}.name`)}
-                    aria-label={`Case ${i + 1} name`}
-                    aria-invalid={!!issue(`test_cases.${i}.name`)}
-                    value={c.name}
-                    onChange={(e) => updateCase(i, { name: e.target.value })}
-                  />
-                  <textarea aria-label={`Case ${i + 1} input`} rows={2} className="mono" value={c.input} onChange={(e) => updateCase(i, { input: e.target.value })} />
-                  <textarea
-                    aria-label={`Case ${i + 1} expected output`}
-                    rows={2}
-                    className="mono"
-                    value={c.expected_output}
-                    onChange={(e) => updateCase(i, { expected_output: e.target.value })}
-                  />
-                  <span className="form-row-actions">
+                  <Cell>
+                    <select aria-label={`Case ${i + 1} kind`} value={c.kind} onChange={(e) => updateCase(i, { kind: e.target.value as TestCase["kind"] })}>
+                      <option value="example">example</option>
+                      <option value="hidden">hidden</option>
+                      <option value="user">user</option>
+                    </select>
+                  </Cell>
+                  <Cell>
+                    <input
+                      id={fieldId(`test_cases.${i}.name`)}
+                      aria-label={`Case ${i + 1} name`}
+                      aria-invalid={!!issue(`test_cases.${i}.name`)}
+                      value={c.name}
+                      onChange={(e) => updateCase(i, { name: e.target.value })}
+                    />
+                  </Cell>
+                  <Cell>
+                    <textarea aria-label={`Case ${i + 1} input`} rows={2} className="mono" value={c.input} onChange={(e) => updateCase(i, { input: e.target.value })} />
+                  </Cell>
+                  <Cell>
+                    <textarea
+                      aria-label={`Case ${i + 1} expected output`}
+                      rows={2}
+                      className="mono"
+                      value={c.expected_output}
+                      onChange={(e) => updateCase(i, { expected_output: e.target.value })}
+                    />
+                  </Cell>
+                  <span className="form-row-actions" role="cell">
                     <IconButton icon="chevronUp" size="sm" label={`Move case ${i + 1} up`} disabled={i === 0} onClick={() => set("test_cases", moveItem(p.test_cases, i, i - 1))} />
                     <IconButton
                       icon="chevronDown"
@@ -550,10 +566,23 @@ function FieldMessage({ issue }: { issue: Issue }) {
   );
 }
 
+/**
+ * One cell of a form table. The rows are `role="row"` so a screen reader can
+ * say "row 2, Expected output", and a row may only contain cells — the inputs
+ * used to sit in it directly.
+ */
+function Cell({ children }: { children: ReactNode }) {
+  return (
+    <div role="cell" className="form-cell">
+      {children}
+    </div>
+  );
+}
+
 function RowIssue({ issue }: { issue?: Issue }) {
   if (!issue) return null;
   return (
-    <span className="form-row-issue">
+    <span className="form-row-issue" role="cell">
       <FieldMessage issue={issue} />
     </span>
   );

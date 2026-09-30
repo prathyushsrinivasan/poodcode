@@ -22,7 +22,7 @@ index 305d200..03eb975 100644
        - name: Unit tests
          run: npm run test
 +      # Design-system guards. Contrast checks every token pair the UI renders
-+      # against WCAG AA; the style check is a ratchet that stops the ~1,100
++      # against WCAG AA; the style check is a ratchet that stops the 246
 +      # inline style objects growing back (see UI_ROADMAP L4/L6).
 +      - name: Contrast (WCAG AA)
 +        run: npm run check:contrast

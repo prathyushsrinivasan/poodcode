@@ -138,7 +138,7 @@ h4.card-title {
 }
 .badge-accent {
   border-color: color-mix(in srgb, var(--accent) 55%, transparent);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .badge-good {
   border-color: color-mix(in srgb, var(--good) 55%, transparent);
@@ -527,7 +527,9 @@ button.result-head:hover:not(:disabled) {
   text-decoration: none;
 }
 .path-row.is-next {
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  /* 7%, like the curriculum's next unit: at 12% a difficulty badge on top of
+     it fell below AA. */
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
 }
 
 /* A favourite star is outlined when off and filled when on, so the state

@@ -231,19 +231,33 @@ table.data tbody tr:hover {
 .md {
   line-height: 1.65;
 }
-.md h1,
-.md h2,
-.md h3 {
+/* Headings are styled by the level they were written at, not the tag they
+   render as: the tag follows the page's outline (see Markdown.tsx). */
+.md .md-h1,
+.md .md-h2,
+.md .md-h3 {
   letter-spacing: -0.01em;
   margin-top: 1.3em;
 }
-.md h2 {
+.md .md-h1 {
+  font-size: 2em;
+}
+.md .md-h2 {
   font-size: 17px;
   border-bottom: 1px solid var(--border);
   padding-bottom: 5px;
 }
-.md h3 {
+.md .md-h3 {
   font-size: 15px;
+}
+.md .md-h4 {
+  font-size: 1em;
+}
+.md .md-h5 {
+  font-size: 0.83em;
+}
+.md .md-h6 {
+  font-size: 0.67em;
 }
 .md code {
   font-family: var(--font-mono);
@@ -452,7 +466,7 @@ table.data tbody tr:hover {
 .pill.on {
   background: var(--accent);
   border-color: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
 }
 .progress {
   height: 8px;
@@ -801,7 +815,7 @@ table.data tbody tr:hover {
   padding: var(--space-5) 0;
   border-top: 1px solid var(--border);
 }
-.gallery-row-head h3 {
+.gallery-row-head h2 {
   margin: 0 0 var(--space-1);
   font-size: var(--text-md);
 }
@@ -879,7 +893,7 @@ table.data thead th {
 /* An accent-outlined badge — was an inline borderColor/color pair in four places. */
 .badge.accent {
   border-color: var(--accent);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .gallery-icons {

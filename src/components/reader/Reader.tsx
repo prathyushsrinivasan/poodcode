@@ -126,9 +126,9 @@ interface OutlineItem {
 function collect(root: HTMLElement): OutlineItem[] {
   const items: OutlineItem[] = [];
   const used = new Set<string>();
-  // A lesson's own headings nest under its section. Lessons are written with
-  // `##` or `###` as their top level; use whichever the lesson actually has.
-  const headingSel = root.querySelector(".lesson-body .md h2") ? ".lesson-body .md h2" : ".lesson-body .md h3";
+  // A lesson's own headings nest under its section: its top level, whichever
+  // level it was written at (Markdown marks it).
+  const headingSel = ".lesson-body .md .md-top";
   const nodes = root.querySelectorAll<HTMLElement>(`[data-outline], ${headingSel}`);
   nodes.forEach((node) => {
     const isSection = node.hasAttribute("data-outline");

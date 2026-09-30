@@ -85,6 +85,9 @@ input[aria-invalid="true"] {
   letter-spacing: 0.05em;
   color: var(--text-faint);
 }
+.form-cell {
+  min-width: 0;
+}
 .form-table-row textarea,
 .form-table-row input,
 .form-table-row select {

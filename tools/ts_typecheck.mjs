@@ -41,15 +41,12 @@ const readLib = (f) => {
 };
 const sourceCache = new Map();
 
-// ES2024 plus the esnext libraries Node 24 already runs — see tsconfig_json()
+// ES2025 plus the esnext libraries Node 24 already runs — see tsconfig_json()
 // in src-tauri/src/tscheck.rs for why this is a list and not "esnext".
 const LIBS = [
-  "lib.es2024.d.ts",
+  "lib.es2025.d.ts",
   "lib.esnext.array.d.ts",
-  "lib.esnext.collection.d.ts",
-  "lib.esnext.iterator.d.ts",
   "lib.esnext.disposable.d.ts",
-  "lib.esnext.promise.d.ts",
 ];
 
 function optionsFor(preset) {

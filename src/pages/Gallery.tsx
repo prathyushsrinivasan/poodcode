@@ -47,7 +47,7 @@ function Row({ title, note, children }: { title: string; note?: string; children
   return (
     <section className="gallery-row">
       <div className="gallery-row-head">
-        <h3>{title}</h3>
+        <h2>{title}</h2>
         {note && <p className="faint">{note}</p>}
       </div>
       <div className="gallery-demo">{children}</div>
@@ -429,8 +429,8 @@ export default function Gallery() {
 
       <Row title="Form controls">
         <input placeholder="Text input" />
-        <input type="number" defaultValue={12} />
-        <select defaultValue="a">
+        <input type="number" defaultValue={12} aria-label="Number input" />
+        <select defaultValue="a" aria-label="Select">
           <option value="a">Select</option>
           <option value="b">Another</option>
         </select>

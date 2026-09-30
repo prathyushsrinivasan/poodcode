@@ -28,7 +28,7 @@ import {
   type Combinator,
   type TimedPromise,
 } from "../lib/eventLoop";
-import { Icon } from "../components/ui";
+import { Icon, ScrollX } from "../components/ui";
 
 const TABS = [
   ["stack", "Call stack"],
@@ -436,7 +436,7 @@ function Combinators() {
         <code>Promise.{comb}</code> — {COMBINATORS.find((c) => c.key === comb)!.note}.
       </p>
 
-      <div className="card overflow-x-auto">
+      <ScrollX label="Promise timeline" className="card">
         <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={`Timeline for Promise.${comb}`}>
           {items.map((p, k) => (
             <g key={k}>
@@ -491,7 +491,7 @@ function Combinators() {
             </>
           )}
         </p>
-      </div>
+      </ScrollX>
 
       <div className="io-label">Promises</div>
       {items.map((p, k) => (

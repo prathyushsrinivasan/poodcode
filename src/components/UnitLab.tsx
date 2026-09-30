@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Lab } from "../types";
 import { Markdown } from "./Markdown";
+import { ScrollX } from "./ui/ScrollX";
 import {
   bitRows,
   bits32,
@@ -151,7 +152,7 @@ function BitsLab({ v, set }: LabProps) {
       {!rows ? (
         <div className="dim">Type integers (decimal, 0x… or 0b…).</div>
       ) : (
-        <div className="overflow-x-auto">
+        <ScrollX label="Values in every base">
           <table className="data">
             <thead>
               <tr>
@@ -184,7 +185,7 @@ function BitsLab({ v, set }: LabProps) {
               ))}
             </tbody>
           </table>
-        </div>
+        </ScrollX>
       )}
     </>
   );
@@ -252,7 +253,7 @@ function ModularLab({ v, set }: LabProps) {
             />
           </div>
           <h4 style={{ margin: "8px 0 4px" }}>Extended Euclid — every row keeps r ≡ a·s (mod m)</h4>
-          <div className="overflow-x-auto mb-3">
+          <ScrollX label="Extended Euclid steps" className="mb-3">
             <table className="data">
               <thead>
                 <tr><th>q</th><th>r₀</th><th>s₀</th><th>r₁</th><th>s₁</th></tr>
@@ -269,9 +270,9 @@ function ModularLab({ v, set }: LabProps) {
                 ))}
               </tbody>
             </table>
-          </div>
+          </ScrollX>
           <h4 style={{ margin: "8px 0 4px" }}>Square and multiply — one row per bit of b</h4>
-          <div className="overflow-x-auto">
+          <ScrollX label="Square and multiply steps">
             <table className="data">
               <thead>
                 <tr><th>remaining e</th><th>low bit</th><th>base (squared each row)</th><th>result</th></tr>
@@ -287,7 +288,7 @@ function ModularLab({ v, set }: LabProps) {
                 ))}
               </tbody>
             </table>
-          </div>
+          </ScrollX>
         </>
       )}
     </>

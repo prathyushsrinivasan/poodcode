@@ -150,6 +150,118 @@ def _server(code, imports=_HTTP_IMPORTS):
     return imports + "\n" + _pbp(code) + "\n" + _pbp(_DRIVER)
 
 
+# From Todo module 16 the replayer takes its safety net away. Every module
+# before it had the replayer turn an escaping exception into a 500 — the
+# boundary module 16 has the learner read and then write — and from here on it
+# starts the server exactly the way the learner's own server.ts always has,
+# `createServer(handler)`. A throw that escapes `handler` now crashes the
+# process, which is what makes the learner's boundary gradable at all: without
+# it the run dies, with it the run prints a 500.
+_DRIVER_BARE = """
+// ---- request replayer (given — don't edit) --------------------------------
+// stdin:  one request per line —  METHOD /path [json body]
+// stdout: one line per request —  <status> <response body>
+// Since module 16 it starts your server exactly as server.ts does, with no
+// safety net: an error that escapes `handler` crashes the process.
+const server = createServer(handler);
+await new Promise<void>((ok) => server.listen(0, "127.0.0.1", () => ok()));
+const addr = server.address();
+const base = `http://127.0.0.1:${addr === null ? 0 : addr.port}`;
+for (const line of readFileSync(0, "utf8").split("\\n")) {
+  const text = line.trim();
+  if (!text) continue;
+  const parts = text.split(" ");
+  const method = parts[0] ?? "GET";
+  const path = parts[1] ?? "/";
+  const body = parts.slice(2).join(" ");
+  const headers: Record<string, string> = {};
+  if (body) headers["Content-Type"] = "application/json";
+  const reply = await fetch(base + path, { method, headers, body: body || undefined });
+  console.log(reply.status, (await reply.text()).trim());
+}
+server.close();
+"""
+
+
+def _server_bare(code, imports=_HTTP_IMPORTS):
+    """A module-16-on server program: no boundary but the learner's own."""
+    return imports + "\n" + _pbp(code) + "\n" + _pbp(_DRIVER_BARE)
+
+
+# From Todo module 19 the application keeps its todos in `todos.json`, and the
+# replayer does three more things, all so that persistence can be GRADED:
+#
+#   * Before boot it sets the file up from an optional first stdin line,
+#     `FILE <text>`, and deletes it when there is none. This is also what keeps
+#     test cases independent — the real judge runs every case of a submission in
+#     one scratch directory, so a file written by case 1 would otherwise still be
+#     there for case 2. (The roadmap flagged exactly this risk.)
+#   * It boots the way the learner's server.ts does — `loadStore()`, then
+#     `createServer(handler)` — and reports a load that throws as
+#     `boot refused: <message>` rather than crashing, so refusing a corrupt file
+#     is an answer the judge can check.
+#   * Last, it prints what the file holds: `FILE <text>`, or `FILE (none)`. That
+#     line is where a missing save shows up.
+#
+# A restart is therefore two cases, not one: what a set of requests leaves on
+# disk, and what a server booted from that disk answers.
+_DRIVER_DISK = """
+// ---- request replayer (given — don't edit) --------------------------------
+// stdin:  optionally first, `FILE <text>` — what todos.json holds before boot
+//         (no FILE line: there is no file, as on a first-ever start). Then one
+//         request per line —  METHOD /path [json body]
+// stdout: one line per request —  <status> <response body> — and last,
+//         `FILE <text>`: what todos.json holds afterwards.
+// It boots as server.ts does — loadStore(), then createServer(handler) — and
+// reports a loadStore that throws as `boot refused: <message>`.
+const script = readFileSync(0, "utf8").split("\\n");
+const head = (script[0] ?? "").trim();
+if (head.startsWith("FILE ")) {
+  writeFileSync(DATA_FILE, head.slice(5));
+  script.shift();
+} else {
+  rmSync(DATA_FILE, { force: true });
+}
+let booted = false;
+try {
+  loadStore();
+  booted = true;
+} catch (err: unknown) {
+  console.log("boot refused:", err instanceof Error ? err.message : String(err));
+}
+if (booted) {
+  const server = createServer(handler);
+  await new Promise<void>((ok) => server.listen(0, "127.0.0.1", () => ok()));
+  const addr = server.address();
+  const base = `http://127.0.0.1:${addr === null ? 0 : addr.port}`;
+  for (const line of script) {
+    const text = line.trim();
+    if (!text) continue;
+    const parts = text.split(" ");
+    const method = parts[0] ?? "GET";
+    const path = parts[1] ?? "/";
+    const body = parts.slice(2).join(" ");
+    const headers: Record<string, string> = {};
+    if (body) headers["Content-Type"] = "application/json";
+    const reply = await fetch(base + path, { method, headers, body: body || undefined });
+    console.log(reply.status, (await reply.text()).trim());
+  }
+  server.close();
+}
+console.log("FILE", existsSync(DATA_FILE) ? readFileSync(DATA_FILE, "utf8") : "(none)");
+"""
+
+_DISK_IMPORTS = (
+    'import { createServer, type IncomingMessage, type ServerResponse } from "node:http";\n'
+    'import { readFileSync, writeFileSync, existsSync, rmSync } from "node:fs";\n'
+)
+
+
+def _server_disk(code, imports=_DISK_IMPORTS):
+    """A module-19-on server program: boots from todos.json, and shows it after."""
+    return imports + "\n" + _pbp(code) + "\n" + _pbp(_DRIVER_DISK)
+
+
 def _plain(code):
     """A judged program with no server — pure logic printed to stdout."""
     return _pbp(code)
@@ -336,7 +448,14 @@ _TODO_SCOPE_RULES = [
     # `object` earns a readable property. Written with the closing quote so it
     # matches `"title" in obj` and not a `for (const k in xs)` loop.
     ('" in ', 13),
-    (".map(", 14),             # collecting one error per bad field
+    # A title of spaces is an empty title. Module 14's value rules are the first
+    # code that needs to look past the raw string.
+    (".trim(", 14),
+    # The discriminated union. `never` is gated with its colon because the word
+    # itself turns up in teaching comments from module 2 on.
+    ("switch (", 15),
+    ("case ", 15),
+    (": never", 15),
     ("try {", 16),
     ("catch ", 16),
     ("throw ", 16),
@@ -344,10 +463,24 @@ _TODO_SCOPE_RULES = [
     # --- Phase 5: make it real ---------------------------------------------
     ("searchParams", 17),
     (".filter(", 17),
+    # `.map(` was planned for 14, "collecting one error per bad field" — but
+    # module 14 collects with `push`, because each field is checked by different
+    # code. Its first honest use is here, next to `filter`, printing a list as
+    # its titles.
+    (".map(", 17),
+    (".toLowerCase(", 17),
+    (".includes(", 17),
     (".sort(", 18),
     (".slice(", 18),
+    ("localeCompare(", 18),
     ("writeFileSync(", 19),
     ("existsSync(", 19),
+    # The route tables. The replayer has used `Record<` and `.join(` since
+    # module 4, which is what `_GIVEN_MARKER` exempts; the learner writes them here.
+    ("Record<", 20),
+    ("Object.keys(", 20),
+    (".join(", 20),
+    ("setHeader(", 20),
     # --- Never. Type-stripping cannot run these (design rule 4). -----------
     ("enum ", 999),
     ("namespace ", 999),
@@ -492,19 +625,21 @@ _TODO_PHASES = [
 ]
 
 _TODO_ENDPOINTS = [
-    _pep("GET", "/todos", "List todos, newest first",
-         "", '{"items":[Todo],"total":n}', "200"),
+    _pep("GET", "/todos", "List todos — filter, search, sort and page",
+         "?done&q&sort&limit&offset", '{"items":[Todo],"total":n}', "200 · 400"),
     _pep("POST", "/todos", "Create a todo",
          '{"title":"Buy milk"}', "Todo", "201 · 400"),
     _pep("GET", "/todos/:id", "Fetch one todo", "", "Todo", "200 · 404"),
     _pep("PATCH", "/todos/:id", "Update title and/or done",
          '{"done":true}', "Todo", "200 · 400 · 404"),
     _pep("DELETE", "/todos/:id", "Delete a todo", "", "(empty)", "204 · 404"),
+    _pep("*", "/todos · /todos/:id", "A verb the path does not support",
+         "", '{"error":"method_not_allowed","allow":[…]}', "405"),
 ]
 
-# Every module of the Todo API, in order. Authored modules live one per file in
-# tools/todo_mNN_*.py, each appending to `_TODO_MODULES`; the rest are skeletons
-# below. Order in this tuple matters — `_lint_structure` checks it positionally.
+# Every module of the Todo API, in order, one per file in tools/todo_mNN_*.py,
+# each appending to `_TODO_MODULES`. Order in this tuple matters —
+# `_lint_structure` checks it positionally.
 _TODO_MODULE_FILES = (
     "todo_m01_shape.py",
     "todo_m02_store.py",
@@ -519,6 +654,13 @@ _TODO_MODULE_FILES = (
     "todo_m11_update.py",
     "todo_m12_delete.py",
     "todo_m13_unknown.py",
+    "todo_m14_validate.py",
+    "todo_m15_errors.py",
+    "todo_m16_boundary.py",
+    "todo_m17_filter.py",
+    "todo_m18_page.py",
+    "todo_m19_persist.py",
+    "todo_m20_structure.py",
 )
 
 _TODO_MODULES = []
@@ -528,39 +670,6 @@ for _fname in _TODO_MODULE_FILES:
     assert os.path.exists(_path), f"missing project module file: {_fname}"
     with open(_path, encoding="utf-8") as _f:
         exec(compile(_f.read(), _path, "exec"))
-
-# --- Planned modules ------------------------------------------------------
-# Delete a line here as its file lands in `_TODO_MODULE_FILES` above.
-_TODO_MODULES += [
-    _pskel("todo-validate", 14, "trust", "Validation and a field-level 400",
-           "a validator that reports which field was wrong, not just that something was",
-           "Reject a bad body with a useful error.",
-           "A client can tell what it got wrong from the response alone."),
-    _pskel("todo-errors", 15, "trust", "One error shape, everywhere",
-           "a discriminated union, and a single place that turns it into a response",
-           "Make every failure in the app answer in the same format.",
-           "Every error response has the same shape, whatever produced it."),
-    _pskel("todo-boundary", 16, "trust", "The error boundary",
-           "try/catch, headersSent, and never leaking a stack trace",
-           "Survive a bug in your own handler.",
-           "A thrown exception is a clean 500, not a hung request."),
-    _pskel("todo-filter", 17, "real", "Filtering with query strings",
-           "searchParams, and a default when the parameter is absent or junk",
-           "Serve ?done=true without breaking ?done=banana.",
-           "The list can be asked a question."),
-    _pskel("todo-page", 18, "real", "Sorting and pagination",
-           "?sort, ?limit, ?offset, and the envelope that makes paging usable",
-           "Return a page of results and the total count.",
-           "The list stays usable with ten thousand todos in it."),
-    _pskel("todo-persist", 19, "real", "Persistence on disk",
-           "read the file on boot, write it on change, and validate what you load",
-           "Survive a restart.",
-           "Your todos are still there tomorrow."),
-    _pskel("todo-structure", 20, "real", "A router, layers and a smoke test",
-           "split store / service / routes, then prove it with a test you wrote",
-           "Leave the code in a shape you would be happy to add a feature to.",
-           "The finished Todo API — structured, tested, and yours."),
-]
 
 _lint_scope(_TODO_MODULES, _TODO_SCOPE_RULES)
 _lint_syntax_taught(_TODO_MODULES, _TODO_SCOPE_RULES)
@@ -654,6 +763,8 @@ with `node --version`.
         "`GET /todos?done=true&limit=2` returns at most two todos, all completed, plus a total.",
         "Stopping the server and starting it again does not lose your todos.",
         "Every response, success or failure, is JSON with a `Content-Type` header.",
+        "`DELETE /todos` is a 405 that lists the methods `/todos` does allow.",
+        "`node test.ts` runs a suite you wrote, with no dependencies, and every test passes.",
     ],
     "manual_test": _pbp("""
 With `node server.ts` running in one terminal, drive it from another:
@@ -792,6 +903,13 @@ produces
 The replayer at the bottom of each program is **given** — you never edit it, and
 the syntax rules do not count it against the module it appears in. Your job is
 always the code above it.
+
+It changes twice, and each module that changes it says so. From **module 16** it
+no longer catches what your handler throws — writing that boundary is the
+module. From **module 19** it also manages `todos.json`: an optional first line
+`FILE <text>` sets the file up before the server boots, the last line printed is
+`FILE <text>` — what the file holds afterwards — and a boot that refuses a bad
+file prints `boot refused: <message>`.
 
 Three things worth knowing up front:
 

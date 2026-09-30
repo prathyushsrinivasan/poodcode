@@ -17,7 +17,7 @@ import {
   type UnitMatch,
 } from "../lib/curriculum";
 import { reviewLane, type ReviewLane } from "../lib/dsaReview";
-import { EmptyState, ErrorState, Icon, IconButton, Button } from "../components/ui";
+import { EmptyState, ErrorState, Icon, IconButton, Button, ScrollX } from "../components/ui";
 import { loadFailed } from "../lib/failures";
 
 /**
@@ -539,7 +539,7 @@ function StageRouter({
             Every unit in this stage takes an array and returns a number, so telling them apart
             from the prompt is the real skill. Read this before the stage, and again after.
           </p>
-          <div className="card p-0 overflow-x-auto">
+          <ScrollX label="Telling the units apart" className="card p-0">
             <table className="data">
               <thead>
                 <tr>
@@ -575,7 +575,7 @@ function StageRouter({
                 ))}
               </tbody>
             </table>
-          </div>
+          </ScrollX>
         </div>
       )}
     </>

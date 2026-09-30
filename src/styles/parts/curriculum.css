@@ -157,7 +157,7 @@
 .cur-num.complete {
   border-color: var(--good);
   background: var(--good);
-  color: #fff;
+  color: var(--on-good);
 }
 .cur-num.known {
   border: 1px dashed var(--medium);
@@ -318,7 +318,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #fff;
+  color: var(--on-accent);
   background: var(--accent);
   border-radius: 20px;
   padding: 1px 8px;

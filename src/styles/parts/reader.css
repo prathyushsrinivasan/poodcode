@@ -183,14 +183,12 @@
 
 /* The in-page target of an outline link: no focus ring on programmatic focus. */
 [data-outline]:focus,
-.lesson-body h2:focus,
-.lesson-body h3:focus {
+.lesson-body .md-top:focus {
   outline: none;
 }
 [data-outline] {
   scroll-margin-top: var(--space-4);
 }
-.lesson-body h2,
-.lesson-body h3 {
+.lesson-body .md-top {
   scroll-margin-top: var(--space-4);
 }

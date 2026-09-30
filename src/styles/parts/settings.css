@@ -43,7 +43,7 @@
 }
 .settings-rail-item.active {
   background: var(--accent-dim);
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: var(--weight-medium);
 }
 /* During a search, sections that do not match stay listed but recede — the

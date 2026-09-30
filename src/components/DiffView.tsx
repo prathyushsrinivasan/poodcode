@@ -98,7 +98,8 @@ export function DiffView({
                   style={{
                     cursor: "pointer",
                     padding: "3px 10px",
-                    color: "var(--text-faint)",
+                    // Dim, not faint: faint is 3.8:1 on the accent tint.
+                    color: "var(--text-dim)",
                     background: "var(--accent-dim)",
                     fontSize: 11.5,
                   }}
@@ -138,7 +139,8 @@ const gutter: React.CSSProperties = {
   minWidth: 34,
   padding: "0 6px",
   textAlign: "right",
-  color: "var(--text-faint)",
+  // Dim, not faint: the numbers sit on the added/removed tints as well.
+  color: "var(--text-dim)",
   userSelect: "none",
   borderRight: "1px solid var(--border)",
 };

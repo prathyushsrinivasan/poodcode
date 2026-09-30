@@ -9,6 +9,7 @@ IO model (app-wide): programs read from stdin and write to stdout. Each problem
 documents its own input/output contract.
 """
 
+import glob
 import hashlib
 import json
 import math
@@ -6533,11 +6534,11 @@ if TS_STARTERS_STALE:
           f"JavaScript starter changed or is new: {', '.join(TS_STARTERS_STALE[:8])}"
           f"{' ...' if len(TS_STARTERS_STALE) > 8 else ''} — run `node tools/gen_ts_starters.mjs`, then gen_seed.py again.")
 
+# Written further down, after the Mastery programme: its strictness ladder
+# (mastery_ts_ladder.py) sets the preset of the Learn exercises on TypeScript
+# chapters, and the Learn tab must grade a chapter the way its week does.
 CONCEPTS_OUT = os.path.join(HERE, "..", "src-tauri", "seeds", "concepts.json")
 concepts = build_concepts()
-with open(CONCEPTS_OUT, "w", encoding="utf-8", newline="\n") as f:
-    json.dump(concepts, f, indent=2, ensure_ascii=False)
-print(f"Wrote {len(concepts)} concepts to {os.path.relpath(CONCEPTS_OUT)}")
 
 # SQL datasets — the databases the SQL track's exercises are judged against.
 # Kept out of concepts.json because one schema is shared by many chapters, and
@@ -6571,13 +6572,27 @@ if os.path.exists(_mst_path):
     for _mst_extra in ["mastery_ts_cards.py", "mastery_ts_quiz.py", "mastery_ts_practice.py",
                        "mastery_ts_kit.py"] + [f"mastery_ts_more_m{_n}.py" for _n in range(1, 7)] + [
                        "mastery_ts_types_more.py", "mastery_ts_arc.py", "mastery_ts_w27.py", "mastery_ts_finals.py", "mastery_ts_alternates.py",
-                       "mastery_ts_final_exam.py", "mastery_ts_kinds_more.py", "mastery_ts_three_ways.py", "mastery_ts_families.py", "mastery_ts_derived.py", "mastery_ts_quiz_kinds.py", "mastery_ts_attach.py", "mastery_ts_scope.py"]:
+                       "mastery_ts_final_exam.py", "mastery_ts_kinds_more.py", "mastery_ts_three_ways.py", "mastery_ts_families.py",
+                       # Per-chapter practice (X-10, X-11, X-19): the kit, a month of
+                       # reading kinds or families per file (mastery_ts_x_m3.py,
+                       # mastery_ts_fam_m3a.py, …); the targets are checked once
+                       # everything is attached.
+                       "mastery_ts_chapter_kit.py"] + sorted(
+                       os.path.basename(_p) for _p in glob.glob(os.path.join(HERE, "mastery_ts_x_m*.py"))) + sorted(
+                       os.path.basename(_p) for _p in glob.glob(os.path.join(HERE, "mastery_ts_fam_m*.py"))) + [
+                       "mastery_ts_derived.py", "mastery_ts_quiz_kinds.py", "mastery_ts_attach.py", "mastery_ts_chapter_check.py",
+                       "mastery_ts_ladder.py", "mastery_ts_scope.py"]:
         _mstc_path = os.path.join(HERE, _mst_extra)
         if not os.path.exists(_mstc_path):
             continue
         with open(_mstc_path, encoding="utf-8") as _mf:
             exec(compile(_mf.read(), _mstc_path, "exec"))
     _finalize_mastery(MASTERY, CONCEPTS)
+    # Why-not notes for the single-choice quiz questions (X-37) — after
+    # _finalize_mastery, which merges the chapter questions into the banks.
+    _wn_main = os.path.join(HERE, "mastery_ts_why_not.py")
+    with open(_wn_main, encoding="utf-8") as _mf:
+        exec(compile(_mf.read(), _wn_main, "exec"))
     _check_mastery(MASTERY, CONCEPTS, {p["slug"]: p for p in out})
     MASTERY_OUT = os.path.join(HERE, "..", "src-tauri", "seeds", "mastery.json")
     with open(MASTERY_OUT, "w", encoding="utf-8", newline="\n") as f:
@@ -6585,6 +6600,10 @@ if os.path.exists(_mst_path):
     _weeks = sum(len(t["weeks"]) for t in MASTERY)
     print(f"Wrote {len(MASTERY)} mastery track(s), {_weeks} weeks "
           f"to {os.path.relpath(MASTERY_OUT)}")
+
+with open(CONCEPTS_OUT, "w", encoding="utf-8", newline="\n") as f:
+    json.dump(concepts, f, indent=2, ensure_ascii=False)
+print(f"Wrote {len(concepts)} concepts to {os.path.relpath(CONCEPTS_OUT)}")
 
 # Concept flashcards (signal -> technique), seeded idempotently at launch.
 FLASHCARDS_OUT = os.path.join(HERE, "..", "src-tauri", "seeds", "flashcards.json")

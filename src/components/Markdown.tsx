@@ -13,7 +13,7 @@
  * in a lesson and the same code in the editor look the same.
  */
 
-import { isValidElement, useState, type ReactNode } from "react";
+import { isValidElement, useMemo, useState, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
@@ -28,6 +28,10 @@ import json from "highlight.js/lib/languages/json";
 import xml from "highlight.js/lib/languages/xml";
 import css from "highlight.js/lib/languages/css";
 import plaintext from "highlight.js/lib/languages/plaintext";
+
+import { useHeadingLevel } from "./ui/Heading";
+import { useKeyboardScroll } from "./ui/ScrollX";
+import { topHeadingLevel } from "../lib/markdownOutline";
 
 /** Exactly the grammars the content uses. `text` is aliased so a fence tagged
  * ```text is highlighted as nothing rather than guessed at. */
@@ -49,6 +53,8 @@ const REHYPE = [[rehypeHighlight, { languages: LANGUAGES, detect: true, ignoreMi
 /** A fenced block with a copy button. */
 function CodeBlock({ children }: { children: ReactNode }) {
   const [copied, setCopied] = useState(false);
+  // A long line scrolls the block sideways; the keyboard needs to reach it.
+  const [preRef, scrollAttrs] = useKeyboardScroll<HTMLPreElement>("Code");
 
   const copy = async (e: React.MouseEvent<HTMLButtonElement>) => {
     // The text is whatever the <pre> ended up containing, which is the
@@ -93,20 +99,55 @@ function CodeBlock({ children }: { children: ReactNode }) {
           {copied ? "Copied" : "Copy"}
         </button>
       </span>
-      <pre>{children}</pre>
+      <pre ref={preRef} {...scrollAttrs}>
+        {children}
+      </pre>
     </div>
   );
 }
 
-const COMPONENTS = {
-  pre: ({ children }: { children?: ReactNode }) => <CodeBlock>{children}</CodeBlock>,
-};
+type HeadingProps = { children?: ReactNode; node?: unknown; className?: string; id?: string };
+
+/**
+ * Heading components for one rendering, rebased onto the page's outline.
+ *
+ * Content is authored with `##` or `###` as its top level, whatever it ends up
+ * inside, so a statement written with `### Input` sat straight under the
+ * page's h1 and a screen reader's heading list skipped a level (axe found it on
+ * Projects, Solve and every module page). The shallowest heading in the text
+ * now renders at the level the surrounding page expects (D9's heading
+ * context), the rest keep their distance from it, and the authored level stays
+ * a class so each one looks exactly as it did. `md-top` marks the top level
+ * for the lesson outline.
+ */
+function headings(offset: number, top: number) {
+  const make = (authored: number) =>
+    function MdHeading({ children, id }: HeadingProps) {
+      const level = Math.max(1, Math.min(6, authored + offset));
+      const Tag = `h${level}` as "h2";
+      return (
+        <Tag id={id} className={authored === top ? `md-h${authored} md-top` : `md-h${authored}`}>
+          {children}
+        </Tag>
+      );
+    };
+  return { h1: make(1), h2: make(2), h3: make(3), h4: make(4), h5: make(5), h6: make(6) };
+}
 
 /** Renders markdown (GFM: tables, checklists, etc.) inside a styled container. */
 export function Markdown({ children }: { children: string }) {
+  const level = useHeadingLevel();
+  const top = useMemo(() => topHeadingLevel(children || ""), [children]);
+  const components = useMemo(
+    () => ({
+      pre: ({ children: c }: { children?: ReactNode }) => <CodeBlock>{c}</CodeBlock>,
+      ...(top === null ? {} : headings(level - top, top)),
+    }),
+    [level, top]
+  );
   return (
     <div className="md">
-      <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={REHYPE} components={COMPONENTS}>
+      <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={REHYPE} components={components}>
         {children || ""}
       </ReactMarkdown>
     </div>

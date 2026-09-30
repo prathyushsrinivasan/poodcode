@@ -35,6 +35,17 @@ a {
 a:hover {
   text-decoration: underline;
 }
+/* A link inside running text is underlined: against dim or faint prose the
+   accent alone is 1.2-2.7:1 from its neighbours, so colour could not be the
+   only thing marking it (WCAG 1.4.1; axe's link-in-text-block). Links that are
+   components — buttons, rows, chips — carry a class and are left alone, and
+   so are lists of links that are navigation (breadcrumb, lesson outline) and a
+   badge that happens to be a link: neither is prose. */
+:is(p, li, dd, span, small, .page-sub, .page-eyebrow, .md) > a:not([class]):not(nav a, .badge > a) {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
 
 button {
   font-family: inherit;

@@ -87,9 +87,31 @@ function ratio(fg, bg) {
   return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
 }
 
+/**
+ * A colour spec: a token, a `#hex` literal, or a tint — `--easy@12/--bg-elev`
+ * is `color-mix(in srgb, var(--easy) 12%, transparent)` laid over --bg-elev,
+ * which is how badges and highlighted rows are drawn.
+ */
+function colour(tokens, spec) {
+  const tint = /^(--[\w-]+)@(\d+)\/(.+)$/.exec(spec);
+  if (tint) {
+    const fg = resolve(tokens, tokens[tint[1]] ?? "");
+    const under = colour(tokens, tint[3]);
+    if (!fg || !under) return null;
+    const a = +tint[2] / 100;
+    return fg.map((v, i) => Math.round(v * a + under[i] * (1 - a)));
+  }
+  return spec.startsWith("#") ? parseHex(spec) : resolve(tokens, tokens[spec] ?? "");
+}
+
 /* ----------------------------------------------------------------- pairs */
 
-/** [foreground, background, minimum, what it is]. `#fff` is a literal. */
+/**
+ * [foreground, background, minimum, what it is]. Either side may be a tint
+ * (see `colour`). The solid pairs alone once passed while the rendered pages
+ * failed: text mostly sits on raised rows and badge tints, which axe found
+ * (tools/a11y-check.mjs), so those surfaces are listed too.
+ */
 const PAIRS = [
   ["--text", "--bg", 4.5, "body text on the page"],
   ["--text", "--bg-elev", 4.5, "body text on a card"],
@@ -97,12 +119,16 @@ const PAIRS = [
   ["--text-dim", "--bg-elev", 4.5, "secondary text on a card"],
   ["--text-faint", "--bg", 4.5, "faint text on the page"],
   ["--text-faint", "--bg-elev", 4.5, "faint text on a card"],
+  ["--text-faint", "--bg-elev-2", 4.5, "faint text on a raised row"],
+  ["--text-faint", "--accent@6/--bg-elev", 4.5, "faint text on the highlighted next unit"],
+  ["--accent-text", "--accent-dim", 4.5, "accent text on an accent tint (active item, due count)"],
   ["--on-accent", "--accent", 4.5, "label on the primary button"],
   ["--on-good", "--good", 4.5, "label on the success button"],
   ["--on-bad", "--bad", 4.5, "label on the danger button"],
   ["--on-warn", "--warn", 4.5, "label on a warning fill"],
   ["--accent", "--bg", 4.5, "link on the page"],
   ["--accent", "--bg-elev", 4.5, "link on a card"],
+  ["--good", "--bg", 4.5, "pass badge on the page"],
   ["--good", "--bg-elev", 4.5, "pass verdict on a card"],
   ["--bad", "--bg-elev", 4.5, "fail verdict on a card"],
   ["--warn", "--bg-elev", 4.5, "warn verdict on a card"],
@@ -110,6 +136,16 @@ const PAIRS = [
   ["--easy", "--bg-elev", 4.5, "Easy difficulty on a card"],
   ["--medium", "--bg-elev", 4.5, "Medium difficulty on a card"],
   ["--hard", "--bg-elev", 4.5, "Hard difficulty on a card"],
+  ["--intro", "--intro@12/--bg-elev", 4.5, "Intro badge on its tint"],
+  ["--easy", "--easy@12/--bg-elev", 4.5, "Easy badge on its tint"],
+  ["--medium", "--medium@12/--bg-elev", 4.5, "Medium badge on its tint"],
+  ["--hard", "--hard@12/--bg-elev", 4.5, "Hard badge on its tint"],
+  ["--intro", "--intro@12/--accent@7/--bg-elev", 4.5, "Intro badge on the highlighted next row"],
+  ["--easy", "--easy@12/--accent@7/--bg-elev", 4.5, "Easy badge on the highlighted next row"],
+  ["--medium", "--medium@12/--accent@7/--bg-elev", 4.5, "Medium badge on the highlighted next row"],
+  ["--hard", "--hard@12/--accent@7/--bg-elev", 4.5, "Hard badge on the highlighted next row"],
+  ["--accent-text", "--accent@7/--bg-elev", 4.5, "accent badge on the highlighted next row"],
+  ["--text-dim", "--accent-dim", 4.5, "dim text on an accent tint (folded diff lines)"],
   ["--focus-ring", "--bg", 3, "focus ring on the page"],
   ["--focus-ring", "--bg-elev", 3, "focus ring on a card"],
 ];
@@ -135,8 +171,8 @@ for (const [themeName, tokens] of Object.entries(themes)) {
     ...PAIRS,
     ...ADVISORY.map((pair) => [...pair, true]),
   ]) {
-    const fg = fgTok.startsWith("#") ? parseHex(fgTok) : resolve(tokens, tokens[fgTok] ?? "");
-    const bg = bgTok.startsWith("#") ? parseHex(bgTok) : resolve(tokens, tokens[bgTok] ?? "");
+    const fg = colour(tokens, fgTok);
+    const bg = colour(tokens, bgTok);
     if (!fg || !bg) {
       results.push({ theme: themeName, label, fgTok, bgTok, ratio: null, min, ok: false, missing: true, advisory: !!advisory });
       if (!advisory) failures++;

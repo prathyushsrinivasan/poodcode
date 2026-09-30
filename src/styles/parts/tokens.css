@@ -97,10 +97,14 @@
   --text: #e6edf3;
   --text-dim: #9aa7b4;
   /* Was #6b7684 — 3.75:1 on a card, which failed AA at the 11-12px sizes it
-     was used at. */
-  --text-faint: #7b8694;
+     was used at. Then #7b8694, which passed on a card but not on the raised
+     and highlighted rows it also sits on (4.27:1); axe found those. */
+  --text-faint: #8a95a3;
   --accent: #4c8dff;
   --accent-dim: #21385f;
+  /* Accent-coloured text on an --accent-dim tint: the active settings section,
+     a due count, an info verdict. --accent itself is 3.65:1 there. */
+  --accent-text: #7aa8ff;
   --shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
   --good: #2bb673;
   --bad: #e15b64;
@@ -123,7 +127,8 @@
   --intro: #6b9bff;
   --easy: #2bb673;
   --medium: #e6a23c;
-  --hard: #e15b64;
+  /* Was #e15b64 — 4.23:1 on its own badge tint. */
+  --hard: #ef7880;
 }
 
 :root[data-theme="light"] {
@@ -134,14 +139,16 @@
   --border-strong: #b4c0cd;
   --text: #1b2430;
   --text-dim: #57636f;
-  /* Was #8a94a0 — 2.89:1 on the page. */
-  --text-faint: #687380;
+  /* Was #8a94a0 — 2.89:1 on the page. Then #687380, 4.33:1 on raised rows. */
+  --text-faint: #636e7b;
   /* Was #2f6fed — 4.27:1 on the page background. */
   --accent: #286aec;
   --accent-dim: #d9e5ff;
+  --accent-text: #1a5fd6;
   --shadow: 0 8px 24px rgba(20, 30, 50, 0.12);
-  /* Was #1f9d57 — 3.49:1 as text on a card, and the same as a white-label fill. */
-  --good: #1b864a;
+  /* Was #1f9d57 — 3.49:1 as text on a card, and the same as a white-label fill.
+     Then #1b864a, 4.33:1 on the page. */
+  --good: #187a43;
   --bad: #d23f49;
   /* Was #b8770f — 3.69:1 on a card. */
   --warn: #a2690d;
@@ -154,8 +161,10 @@
 
   --focus-ring: #1a5fd6;
 
-  --intro: #216aff;
-  --easy: #208554;
-  --medium: #a26915;
-  --hard: #da353f;
+  /* Each is text on its own 12% badge tint, which is darker than the card;
+     the previous values (#216aff #208554 #a26915 #da353f) reached ~3.9:1. */
+  --intro: #1858cc;
+  --easy: #18703f;
+  --medium: #865610;
+  --hard: #b8262f;
 }

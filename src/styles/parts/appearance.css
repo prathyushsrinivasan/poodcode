@@ -27,6 +27,7 @@
   --border: #5a6673;
   --border-strong: #8b97a4;
   --accent: #7fb4ff;
+  --accent-text: #a8cbff;
   --good: #4ad98d;
   --bad: #ff8a8a;
   --warn: #ffc247;
@@ -51,6 +52,7 @@
   --border: #6a7683;
   --border-strong: #3d4854;
   --accent: #0b46b8;
+  --accent-text: #0b46b8;
   --good: #0f6634;
   --bad: #a3121c;
   --warn: #71470a;

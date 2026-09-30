@@ -85,8 +85,8 @@ const tsLang = monaco.languages.typescript;
 function judgeCompilerOptions(strictness: string) {
   return {
     target: 9, // ES2022 — not in Monaco's ScriptTarget enum, but TS accepts it
-    // The judge's list (tscheck.rs) is es2024 + esnext.array/collection/
-    // iterator/disposable/promise. Monaco's bundled TypeScript 5.4 ships libs
+    // The judge's list (tscheck.rs) is es2025 + esnext.array/disposable.
+    // Monaco's bundled TypeScript 5.4 ships libs
     // only up to es2023, and naming a lib file it does not have silently drops
     // the WHOLE standard library — every editor used to report `Cannot find
     // name 'Error'`. So: the newest libs Monaco has, plus MONACO_LIB_SHIMS

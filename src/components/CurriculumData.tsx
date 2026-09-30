@@ -85,7 +85,8 @@ export function useCurriculumData() {
 
 const STATUS_META: Record<UnitStatus, { label: string; colour: string; icon: string }> = {
   new: { label: "Not started", colour: "var(--text-faint)", icon: "○" },
-  started: { label: "In progress", colour: "var(--accent)", icon: "◐" },
+  // --accent-text, not --accent: the badge sits on the highlighted next unit.
+  started: { label: "In progress", colour: "var(--accent-text)", icon: "◐" },
   solid: { label: "Solid", colour: "var(--medium)", icon: "◕" },
   complete: { label: "Complete", colour: "var(--good)", icon: "●" },
 };

@@ -71,6 +71,19 @@ def _bundled(code):
     return code
 
 
+def strict_pinned():
+    """STRICT_PINNED from mastery_ts_ladder.py, read without running the file
+    (it needs the generator's namespace)."""
+    import ast
+    path = os.path.join(HERE, "mastery_ts_ladder.py")
+    with open(path, encoding="utf-8") as f:
+        tree = ast.parse(f.read(), path)
+    for node in tree.body:
+        if isinstance(node, ast.Assign) and any(getattr(t, "id", "") == "STRICT_PINNED" for t in node.targets):
+            return set(ast.literal_eval(node.value))
+    raise SystemExit("error: STRICT_PINNED not found in mastery_ts_ladder.py")
+
+
 def as_exercise(eid, kind, starter, solution, tests, strictness=""):
     """A final or a project, shaped like an exercise so the shared checks apply."""
     starter, solution = _bundled(starter), _bundled(solution)
@@ -167,13 +180,35 @@ def main():
         print("nothing matched", file=sys.stderr)
         return 1
 
+    failures = check_work(work, a.types_only, a.jobs)
+    for f in failures:
+        print("FAIL " + f)
+    print(f"{len(work)} checked, {len(failures)} failure(s)")
+    return 1 if failures else 0
+
+
+def check_work(work, types_only=False, jobs=4):
+    """Every check this verifier makes, on [(where, exercise)]; the failures.
+    Shared with tools/check_ts_authoring.py, which runs it on content that is
+    not in the seeds yet."""
     failures = []
     batch = []
+    pinned = strict_pinned()
     for _w, ex in work:
         preset = ex.get("strictness") or "strict"
         batch.append((ex["id"], vc.compose(ex["solution"], ex), preset))
         batch.append((ex["id"] + "\0starter", vc.compose(ex["starter"], ex), preset))
+        if ex["id"] in pinned:
+            batch.append((ex["id"] + "\0indexed", vc.compose(ex["solution"], ex), "strict+indexed"))
     diags = vc.typecheck_batch(batch)
+
+    # The strictness ladder's exemptions (mastery_ts_ladder.py) must each still
+    # need one: a pinned exercise that now compiles under the flag belongs on
+    # the ladder with everything else.
+    for where, ex in work:
+        if ex["id"] in pinned and not diags.get(ex["id"] + "\0indexed"):
+            failures.append(f"{ex['id']} ({where}): in STRICT_PINNED but compiles under strict+indexed "
+                            "— take it off the list")
 
     starter_type_failed = set()
     for where, ex in work:
@@ -191,7 +226,7 @@ def main():
         elif ex.get("judge_mode") == "types":
             failures.append(f"{ex['id']} ({where}): the type-level starter already COMPILES")
 
-    if not a.types_only:
+    if not types_only:
         args = vc.ts_node_args()
 
         def run_one(item):
@@ -206,14 +241,10 @@ def main():
                     out += vc.check_starter(where, ex, args, False)
             return out
 
-        with ThreadPoolExecutor(max_workers=a.jobs) as pool:
+        with ThreadPoolExecutor(max_workers=jobs) as pool:
             for res in pool.map(run_one, work):
                 failures.extend(res)
-
-    for f in failures:
-        print("FAIL " + f)
-    print(f"{len(work)} checked, {len(failures)} failure(s)")
-    return 1 if failures else 0
+    return failures
 
 
 if __name__ == "__main__":
