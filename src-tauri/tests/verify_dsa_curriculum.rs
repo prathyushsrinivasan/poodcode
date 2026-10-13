@@ -682,3 +682,31 @@ fn units_that_need_followups_carry_them() {
         }
     }
 }
+
+/// The Cost & Core Patterns stage carries Solved Examples on every unit: at
+/// least three, easy to harder, each complete (tools/dsa_s2_solved.py).
+#[test]
+fn patterns_stage_units_carry_solved_examples() {
+    let curriculum: DsaCurriculum =
+        serde_json::from_str(CURRICULUM).expect("dsa_curriculum.json parses");
+    let stage = curriculum
+        .stages
+        .iter()
+        .find(|s| s.key == "patterns")
+        .expect("the patterns stage exists");
+    for u in &stage.units {
+        let k = &u.key;
+        assert!(u.solved_examples.len() >= 3, "{k}: wants at least three solved examples");
+        let ranks: Vec<i32> = u.solved_examples.iter().map(|e| rank(&e.difficulty)).collect();
+        assert!(ranks.windows(2).all(|w| w[0] <= w[1]), "{k}: solved examples must go easy to harder");
+        for e in &u.solved_examples {
+            for (name, v) in [("problem", &e.problem), ("naive", &e.naive), ("signals", &e.signals),
+                              ("code", &e.code), ("complexity", &e.complexity), ("sample_output", &e.sample_output)] {
+                assert!(!v.trim().is_empty(), "{k}/{}: empty {name}", e.title);
+            }
+            assert!(!e.steps.is_empty(), "{k}/{}: no steps", e.title);
+            let t = e.trace.as_ref().expect("every solved example has a trace");
+            assert!(t.rows.iter().all(|r| r.len() == t.headers.len()), "{k}/{}: ragged trace", e.title);
+        }
+    }
+}

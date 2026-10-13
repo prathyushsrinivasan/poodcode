@@ -90,6 +90,7 @@ function unit(key: string, rungs: Rung[], prereqs: string[] = []): CurriculumUni
     lab: null,
     extra_labs: [],
     followups: [],
+    solved_examples: [],
     drills: [],
     stuck: [],
     edge_cases: [],

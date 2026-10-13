@@ -218,11 +218,21 @@ twice") and **self-checks** with revealable answers. Each unit also links the
 full lesson for its technique in **Learn**: the unit page is the map, Learn is
 the terrain.
 
-A unit page is split into four tabs, in the order a unit is worked — **📖 Learn**
+A unit page is split into tabs, in the order a unit is worked — **📖 Learn**
 (why, the model, what is underneath, traces), **🧰 Toolkit** (signals, the
-playbook, costs, pitfalls), **🧗 Practice** (the ladder) and **🔁 Review**
-(self-checks, Big-O drills, interview notes) — and each tab ends by handing you
-to the next.
+playbook, costs, pitfalls), **✅ Solved Examples** (where a unit has them),
+**🧗 Practice** (the ladder) and **🔁 Review** (self-checks, Big-O drills,
+interview notes) — and each tab ends by handing you to the next.
+
+In the **Cost & Core Patterns** stage, each unit's model opens with a *Start
+here* block that builds the topic from fundamentals (every term defined, the
+prerequisite in a line, intuition, a tiny hand trace, then the steps), and the
+**Solved Examples** tab holds three fully worked problems, easy to harder: the
+statement, the naive approach and why it falls short, the signals that point
+at the technique, the Java solution explained step by step, a trace on a sample
+and the cost. They are authored in `tools/dsa_s2_solved.py`, and
+`python tools/verify_dsa_solved.py` compiles every solution and checks that it
+prints the sample output shown on the page (needs a JDK).
 
 Two beats are on **every** unit:
 

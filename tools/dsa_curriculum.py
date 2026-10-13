@@ -456,6 +456,9 @@ def _unit(key, title, icon, stage, tagline, why, model,
         # both playgrounds), and the interviewer's "what if…?" twists.
         "extra_labs": list(extra_labs),
         "followups": list(followups),
+        # Fully worked problems, shown on the "Solved Examples" tab between
+        # Toolkit and Practice. Attached by key (tools/dsa_s2_solved.py).
+        "solved_examples": [],
     })
 
 
@@ -475,6 +478,7 @@ for _name in (
     "dsa_s7_dp.py",
     "dsa_s8_beyond.py",
     "dsa_s8_more.py",
+    "dsa_s2_solved.py",
 ):
     _p = os.path.join(_HERE, _name)
     if os.path.exists(_p):

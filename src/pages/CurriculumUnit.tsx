@@ -13,6 +13,7 @@ import type {
   Trace,
   UnitCheck,
   Variant,
+  SolvedExample,
   Walkthrough,
 } from "../types";
 import { Markdown, InlineMarkdown } from "../components/Markdown";
@@ -63,10 +64,11 @@ import { loadFailed } from "../lib/failures";
  * unit ran past 5000px, and the thing you came back for (the ladder) sat below
  * everything you had already read.
  *
- * They are now four tabs, in the order a unit is worked:
+ * They are now up to five tabs (Solved Examples only where a unit has them), in the order a unit is worked:
  *
  *   📖 Learn     — why it exists, the model, the invariant, what is underneath, traces
  *   🧰 Toolkit   — signals, the playbook, the family, slow vs fast, costs, pitfalls
+ *   ✅ Solved    — worked problems: naive attempt, signals, code, steps, trace, cost
  *   🧗 Practice  — the problem ladder, and building it yourself
  *   🔁 Review    — self-checks, pricing snippets, interview notes
  *
@@ -154,11 +156,12 @@ export default function CurriculumUnit() {
   );
 }
 
-type TabKey = "learn" | "toolkit" | "practice" | "review";
+type TabKey = "learn" | "toolkit" | "solved" | "practice" | "review";
 
 const TABS: { key: TabKey; icon: IconName; label: string; hint: string }[] = [
   { key: "learn", icon: "learn", label: "Learn", hint: "Why it exists and how it works" },
   { key: "toolkit", icon: "tools", label: "Toolkit", hint: "Signals, code shapes, the family, costs, pitfalls" },
+  { key: "solved", icon: "done", label: "Solved Examples", hint: "Worked problems, easy to harder" },
   { key: "practice", icon: "trendUp", label: "Practice", hint: "The problem ladder" },
   { key: "review", icon: "refresh", label: "Review", hint: "Self-checks and interview prep" },
 ];
@@ -493,6 +496,21 @@ function UnitView({
       )),
     }
   );
+  u.solved_examples.forEach((ex, i) =>
+    add({
+      id: `solved-${i + 1}`,
+      tab: "solved",
+      icon: "done",
+      title: `Solved example ${i + 1}: ${ex.title}`,
+      short: ex.title,
+      meta: <DiffBadge d={ex.difficulty} />,
+      lead:
+        i === 0
+          ? "Each problem in full: the naive idea and why it falls short, the signals that point here, then the code, explained step by step, traced on a sample, and priced."
+          : undefined,
+      body: <SolvedExampleBlock ex={ex} />,
+    })
+  );
   add({
     id: "ladder",
     tab: "practice",
@@ -758,7 +776,7 @@ function UnitView({
   );
 
   /**
-   * `1`–`4` switch tabs, `[` / `]` page between units, `g l` goes back to the
+   * `1`–`5` switch tabs, `[` / `]` page between units, `g l` goes back to the
    * curriculum. Skipped while focus is in an input or a Monaco editor, because
    * those keys are characters there and stealing them would be worse than the
    * shortcut is good. The handler lives in a ref so the listener is registered
@@ -1756,6 +1774,41 @@ function EdgeCaseRow({ edge }: { edge: EdgeCase }) {
 }
 
 /** A worked solution: six fixed steps, numbered, with a way into the problem. */
+/** One Solved Example: problem → naive → signals → code → steps → trace → cost. */
+function SolvedExampleBlock({ ex }: { ex: SolvedExample }) {
+  const part = (label: string, body: React.ReactNode) => (
+    <div style={{ marginTop: 14 }}>
+      <div className="dim text-sm fw-bold">{label}</div>
+      {body}
+    </div>
+  );
+  return (
+    <div className="card">
+      {part("The problem", <Markdown>{ex.problem}</Markdown>)}
+      {part("The naive approach, and why it falls short", <Markdown>{ex.naive}</Markdown>)}
+      {part("Why this technique: the signals", <Markdown>{ex.signals}</Markdown>)}
+      {part("The solution", <Markdown>{"```java\n" + ex.code + "```\n"}</Markdown>)}
+      {part(
+        "Step by step",
+        <ol className="mt-1">
+          {ex.steps.map((st, i) => (
+            <li key={i}>
+              <Markdown>{st}</Markdown>
+            </li>
+          ))}
+        </ol>
+      )}
+      {ex.sample_call &&
+        part(
+          "Sample run",
+          <Markdown>{"```java\n" + ex.sample_call + "   // prints " + ex.sample_output + "\n```\n"}</Markdown>
+        )}
+      {ex.trace && part("Trace", <TraceTable trace={ex.trace} />)}
+      {part("Complexity", <Markdown>{ex.complexity}</Markdown>)}
+    </div>
+  );
+}
+
 function WalkthroughBlock({
   walk,
   problemId,
