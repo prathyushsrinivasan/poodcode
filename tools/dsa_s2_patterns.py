@@ -137,6 +137,80 @@ given a constraint, you have roughly 10⁸ simple operations to spend, and the
 constraint tells you which shapes of solution fit.
 """,
     model="""
+### Start here: the words this unit uses
+
+Nothing below assumes you have met Big-O before. Four words first, each with a
+one-line example, because every later sentence uses them.
+
+- **Input size, `n`.** How much data the program is handed: the length of the
+  array, the number of characters in the string. The constraints line of a
+  problem (`1 ≤ n ≤ 10⁵`) tells you the largest `n` the tests will use.
+- **Operation.** One cheap step a computer does in roughly constant time: an
+  addition, a comparison, reading `a[i]`, assigning a variable. We do not care
+  which exact step; we count *how many* happen.
+- **Running time as a function of `n`.** Run the program on bigger and bigger
+  inputs and count operations. The count is a function of `n`: `3n + 2`,
+  `n²/2`, `log₂ n`. That function is the cost.
+- **Big-O.** A shorthand for the *shape* of that function once `n` is large.
+  `3n + 2` and `n` grow the same way (double `n`, double the work), so both are
+  written **O(n)**. `n²/2` is **O(n²)** (double `n`, four times the work).
+
+**Intuition before the rule.** Imagine checking a list of names for yours. If
+the list doubles, you read twice as many names: linear, O(n). Now imagine
+checking every name against every other name for duplicates. Double the list
+and every one of the twice-as-many names is compared with twice as many others:
+four times the work, O(n²). Big-O is nothing more than *"what happens to the
+work when the input doubles?"*
+
+| When n doubles, work… | Shape | Name |
+| --- | --- | --- |
+| stays the same | O(1) | constant |
+| grows by one step | O(log n) | logarithmic |
+| doubles | O(n) | linear |
+| a bit more than doubles | O(n log n) | "n log n" |
+| quadruples | O(n²) | quadratic |
+| squares itself | O(2ⁿ) | exponential |
+
+### A tiny count, done by hand
+
+```java
+int total = 0;                      // 1 operation
+for (int i = 0; i < n; i++) {       // runs n times
+    total += a[i];                  // 1 operation each time
+}
+```
+
+Count it for `n = 4`: one assignment, then the body runs for `i = 0, 1, 2, 3`,
+so 1 + 4 = **5** operations. For `n = 8`: 1 + 8 = **9**. Doubling `n` roughly
+doubles the count, so this is O(n). Now the nested version:
+
+```java
+for (int i = 0; i < n; i++)
+    for (int j = 0; j < n; j++)
+        if (a[i] == a[j] && i != j) dup = true;
+```
+
+For `n = 4` the `if` runs 4 × 4 = **16** times; for `n = 8`, **64**. Doubling
+`n` quadrupled the work: O(n²).
+
+### Why we drop constants and small terms
+
+Step by step:
+
+1. Real machines differ by constant factors (a faster CPU does each operation
+   quicker), so a constant like the `3` in `3n` says more about the machine
+   than the algorithm. Drop it.
+2. When `n` is large, the biggest term swamps the rest: at `n = 10⁶`, `n²` is
+   10¹² while `n` is 10⁶. Keep only the biggest term.
+3. What is left, `n` or `n²` or `log n`, is the Big-O.
+
+### From Big-O to "will it pass?"
+
+The last fact you need: a judge allows roughly **10⁸ simple operations per
+second**. So plug the largest `n` into your Big-O and compare with 10⁸. For
+`n = 10⁵`: O(n²) is 10¹⁰ (100× too slow); O(n log n) is about 1.7 × 10⁶ (fine).
+That one multiplication is what the table below is built from.
+
 ### Read the constraint, pick the shape
 
 A rough but reliable table. Take the largest `n` in the constraints and read
@@ -741,6 +815,56 @@ whole tier of O(n²) solutions into O(n) with a few lines, and the cost is memor
 — which is nearly always the right trade.
 """,
     model="""
+### Start here: what a hash table is, from scratch
+
+**The problem it solves.** An array answers *"what is at position 5?"*
+instantly, because the computer jumps straight to slot 5. It cannot answer
+*"is the value 42 anywhere in here?"* without looking at every slot: O(n). A
+hash table is a trick for turning the second question into the first.
+
+**The words.**
+
+- **Key.** The thing you look up by: a number, a word.
+- **Value.** What you store against a key (a count, an index). A *set* stores
+  keys only; a *map* stores key → value pairs.
+- **Hash function.** A function that turns any key into a slot number, the same
+  slot every time for the same key. Toy example: for words, *"length of the
+  word"* (a terrible but readable hash).
+- **Bucket.** One slot of the underlying array. Two different keys can land in
+  the same bucket; that is a **collision**, and the bucket simply holds both.
+- **O(1) average.** With a good hash function, buckets stay short (a handful of
+  items), so add / contains / get each cost a constant amount of work no matter
+  how many items are stored.
+
+**A tiny trace with the toy hash** (slot = word length, 8 slots):
+
+| Step | Operation | Slot computed | Buckets after |
+| --- | --- | --- | --- |
+| 1 | add `"cat"` | 3 | 3: [cat] |
+| 2 | add `"horse"` | 5 | 3: [cat], 5: [horse] |
+| 3 | add `"dog"` | 3 | 3: [cat, dog] (collision, both kept) |
+| 4 | contains `"dog"`? | 3 | look only in bucket 3: **yes** |
+| 5 | contains `"emu"`? | 3 | bucket 3 has cat, dog: **no** |
+
+Step 4 never looked at `"horse"`. That is the whole speed-up: the hash tells
+you *where* to look, so you look in one short bucket instead of everywhere.
+
+**In Java** you never write the hash yourself: `HashSet<Integer>` and
+`HashMap<String, Integer>` do it, using each object's `hashCode()` and
+`equals()`. You only choose *what the key is* and *what the value means*.
+
+**Intuition for the pattern.** Most slow solutions are slow because, for each
+element, they *search* the rest of the input. If you instead *remember*
+everything you have passed in a hash table, each search becomes one O(1)
+lookup, and O(n) searches of O(n) each (O(n²)) become O(n) lookups of O(1)
+each (O(n)). You pay with memory: the table holds up to `n` items.
+
+Step by step, every hashing solution is:
+
+1. Decide the question you keep asking ("seen x?", "how many x?", "where x?").
+2. Pick the structure that answers it (set, count map, index map).
+3. Scan once: ask the question, then record the current element.
+
 ### Three structures, three questions
 
 | You need to know | Use | Cost |
@@ -1213,6 +1337,50 @@ It is also the answer to the interviewer's favourite follow-up, *"can you do it
 without the hash map?"*.
 """,
     model="""
+### Start here: what "a pointer" means here, and why sorting helps
+
+**The words.**
+
+- **Index.** A position in an array, `0` to `n - 1`. `a[i]` is the value at
+  index `i`.
+- **Pointer.** In this unit, just an `int` variable holding an index. "Move the
+  pointer right" means `i++`. No memory addresses are involved.
+- **Sorted (ascending).** `a[0] ≤ a[1] ≤ … ≤ a[n-1]`. Moving right never makes
+  the value smaller; moving left never makes it bigger.
+- **Search space.** The set of candidate answers still possible. For a pair
+  question on `n` items it starts as every pair `(l, r)` with `l < r`: about
+  n²/2 of them.
+
+**Intuition.** Picture people lined up by height and you need two whose heights
+add to 180 cm. Put one finger on the shortest and one on the tallest. Too short
+in total? Swapping the *tall* person for someone shorter can only make it worse,
+so the *short* person is the problem: move the left finger right. Too tall? Move
+the right finger left. Each move rules out one person for good, so at most
+`n` moves happen.
+
+**A tiny trace.** `a = [1, 3, 4, 6, 9]`, target `10`:
+
+| Step | l | r | a[l] + a[r] | Decision |
+| --- | --- | --- | --- | --- |
+| 1 | 0 | 4 | 1 + 9 = 10 | equal, found (0, 4) |
+
+Try target `7` instead:
+
+| Step | l | r | a[l] + a[r] | Decision |
+| --- | --- | --- | --- | --- |
+| 1 | 0 | 4 | 1 + 9 = 10 | too big: no pair with 9 can work (9 + smallest is already 10), `r--` |
+| 2 | 0 | 3 | 1 + 6 = 7 | equal, found (0, 3) |
+
+**Why the discard is safe, step by step.** When `a[l] + a[r]` is too big:
+
+1. `a[l]` is the smallest value still in play (everything left of `l` is gone).
+2. So `a[r] + a[l]` is the smallest sum `a[r]` can make with anything left.
+3. That smallest sum is already too big, so `a[r]` is in no valid pair. Drop it.
+
+The "too small" case is the mirror image. Because each step drops one element
+from the n²/2 pairs' worth of possibilities, the loop is O(n) instead of O(n²),
+and it needs no extra memory: O(1) space, which is what hashing could not give.
+
 ### Two arrangements
 
 **Converging** — one pointer at each end, walking inward:
@@ -1594,6 +1762,55 @@ That reuse is the whole technique, and it turns a cubic brute force into a
 single pass.
 """,
     model="""
+### Start here: subarrays, windows, and the reuse idea
+
+**The words.**
+
+- **Subarray / substring.** A *contiguous* run of elements: `a[l..r]`, every
+  index from `l` to `r` with none skipped. `[3, 4]` is a subarray of
+  `[2, 3, 4, 5]`; `[2, 4]` is not (it skips 3).
+- **Window.** A subarray we are currently looking at, described by two indices:
+  `l` (left edge) and `r` (right edge). Its length is `r - l + 1`.
+- **Window state.** A small summary of what is inside: its sum, a count of each
+  character, the number of distinct values. Kept in variables, updated as the
+  edges move.
+- **Valid / invalid.** Whether the window satisfies the problem's rule ("no
+  repeated character", "sum ≤ k").
+
+**Prerequisite in one line:** there are about n²/2 subarrays of an array of
+length `n`, so any approach that looks at each one separately is at least
+O(n²), and O(n³) if it re-sums each one.
+
+**Intuition.** Two neighbouring windows share almost everything. The window
+`[2, 3, 4]` and the next one `[3, 4, 5]` share `3, 4`. So instead of summing the
+new window from scratch, take the old sum, **add what entered on the right,
+subtract what left on the left**. Two operations instead of `k`.
+
+**A tiny trace.** Sums of every window of size 3 in `a = [2, 1, 5, 1, 3]`:
+
+| Window | Edges l..r | Entering | Leaving | Sum (reused) |
+| --- | --- | --- | --- | --- |
+| [2, 1, 5] | 0..2 | (first window, summed once) | | 8 |
+| [1, 5, 1] | 1..3 | a[3] = 1 | a[0] = 2 | 8 + 1 − 2 = 7 |
+| [5, 1, 3] | 2..4 | a[4] = 3 | a[1] = 1 | 7 + 3 − 1 = 9 |
+
+Each row did two operations, whatever the window size. That is the technique.
+
+**From fixed to variable, step by step.**
+
+1. *Fixed size*: both edges move together, one step at a time (the trace above).
+2. *Variable size*: the right edge `r` moves one step every iteration (the
+   window grows); the left edge `l` moves only when the window has become
+   invalid, and keeps moving until it is valid again (the window shrinks).
+3. Both edges only ever move **right**. Each element enters once (when `r`
+   reaches it) and leaves at most once (when `l` passes it), so the total work
+   is at most 2n steps: O(n).
+4. This only works if shrinking a window can *fix* it. That is true when the
+   rule is "monotone" (a sub-window of a valid window is valid, e.g. "no
+   repeats", or "sum ≤ k" with non-negative numbers). With negative numbers,
+   removing an element can make a sum go *up*, and the technique breaks; that
+   is the Prefix Sums unit.
+
 ### The one template
 
 ```java
@@ -2043,6 +2260,45 @@ run over a timeline is how every *"how many are active at once?"* problem is
 solved.
 """,
     model="""
+### Start here: a running total, and why subtracting two of them gives a range
+
+**The words.**
+
+- **Range sum `sum(a[l..r])`.** The total of the elements from index `l` to
+  index `r`, both included.
+- **Prefix.** The first `i` elements of the array, `a[0..i-1]`. The prefix of
+  length 0 is empty.
+- **Prefix sum `pre[i]`.** The sum of the prefix of length `i`. So `pre[0] = 0`
+  (empty), `pre[1] = a[0]`, `pre[2] = a[0] + a[1]`, and in general
+  `pre[i + 1] = pre[i] + a[i]`.
+- **Query.** One question asked of the data, such as one range sum. Problems
+  often ask many (`q` up to 10⁵).
+
+**Intuition.** Think of a car's odometer. To know how far you drove between
+the 2nd and the 5th stop, you do not re-drive the route; you read the odometer
+at both stops and subtract. `pre` is the odometer reading at each index.
+
+**A tiny trace.** `a = [3, 1, 4, 1, 5]`:
+
+| i | 0 | 1 | 2 | 3 | 4 | 5 |
+| --- | --- | --- | --- | --- | --- | --- |
+| pre[i] | 0 | 3 | 4 | 8 | 9 | 14 |
+
+`sum(a[1..3]) = 1 + 4 + 1 = 6`. With the table: `pre[4] − pre[1] = 9 − 3 = 6`.
+Why: `pre[4]` is `a[0] + a[1] + a[2] + a[3]`, `pre[1]` is `a[0]`; subtracting
+cancels the shared `a[0]` and leaves exactly `a[1] + a[2] + a[3]`.
+
+**Step by step, the identity.**
+
+1. `pre[r + 1]` covers indices `0..r`.
+2. `pre[l]` covers indices `0..l-1`, the part *before* the range.
+3. Subtract: what is left is `l..r`. So `sum(a[l..r]) = pre[r + 1] − pre[l]`.
+4. Building `pre` is one pass, O(n). Each query afterwards is one subtraction,
+   O(1). For `q` queries that is O(n + q) instead of O(n · q).
+
+The `n + 1` length with `pre[0] = 0` is not decoration: it means a range
+starting at index 0 (`l = 0`) uses `pre[0] = 0` and needs no special case.
+
 ### The identity
 
 With `pre[i]` = sum of the first `i` elements (`pre[0] = 0`):
@@ -2470,6 +2726,53 @@ turns letters into array indices — the trick behind every counting solution in
 this unit.
 """,
     model="""
+### Start here: what a string is to the computer
+
+**The words.**
+
+- **Character (`char`).** One letter, digit or symbol. In Java a `char` is
+  stored as a **number** (its Unicode code): `'a'` is 97, `'b'` is 98, …,
+  `'z'` is 122; `'0'` is 48.
+- **String.** A sequence of characters with indices `0` to `length() - 1`, read
+  with `s.charAt(i)`. Conceptually it is just an array of `char`.
+- **Immutable.** A Java `String` can never be changed after it is created.
+  "Changing" it really builds a brand-new string and copies characters into it.
+- **`StringBuilder`.** A *mutable* buffer of characters you append to in place;
+  call `toString()` once at the end.
+
+**Prerequisite in one line:** copying a string of length `m` costs O(m),
+because every character is copied one by one.
+
+**Intuition for the immutability tax.** Building `"abcd"` with `s += c` four
+times copies 1, then 2, then 3, then 4 characters: 10 copies for 4 letters. For
+`n` letters that is 1 + 2 + … + n ≈ n²/2 copies, O(n²). A `StringBuilder`
+appends each letter into spare room it already has: about `n` copies, O(n).
+
+| Step | `s += c` copies | `sb.append(c)` copies |
+| --- | --- | --- |
+| add 'a' | 1 | 1 |
+| add 'b' | 2 | 1 |
+| add 'c' | 3 | 1 |
+| add 'd' | 4 | 1 |
+| total | 10 | 4 |
+
+**Intuition for "characters are numbers".** Since `'a'..'z'` are the
+consecutive numbers 97..122, subtracting `'a'` maps them to 0..25:
+
+| c | code | c − 'a' |
+| --- | --- | --- |
+| 'a' | 97 | 0 |
+| 'c' | 99 | 2 |
+| 'z' | 122 | 25 |
+
+So an `int[26]` can count letters: `freq[c - 'a']++` is "add one to the box for
+this letter". Step by step for `"cab"`: `c` → box 2 becomes 1; `a` → box 0
+becomes 1; `b` → box 1 becomes 1. Two words are anagrams exactly when their 26
+boxes end up equal.
+
+Everything below is these two ideas, applied: build with a `StringBuilder`,
+and treat letters as small array indices.
+
 ### The costs that matter
 
 | Operation | Cost | Note |
