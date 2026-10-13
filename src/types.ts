@@ -820,6 +820,29 @@ export interface CurriculumUnit {
   extra_labs: Lab[];
   /** The interviewer's "what if…?" twists. */
   followups: Followup[];
+  /** Fully worked problems, easy to harder, on the "Solved Examples" tab. */
+  solved_examples: SolvedExample[];
+}
+
+/** One problem worked start to finish: statement, the naive attempt and why it
+ * falls short, the signals that point at the technique, the code with a
+ * step-by-step explanation, a trace on a sample, and the cost. Markdown fields
+ * except `code` (Java), `sample_call` and `sample_output`. */
+export interface SolvedExample {
+  title: string;
+  difficulty: "Easy" | "Medium" | "Hard";
+  /** A problem-bank slug when the example is also on the ladder, else "". */
+  slug: string;
+  problem: string;
+  naive: string;
+  signals: string;
+  code: string;
+  steps: string[];
+  /** A Java expression printed by the verifier (tools/verify_dsa_solved.py). */
+  sample_call: string;
+  sample_output: string;
+  trace: Trace | null;
+  complexity: string;
 }
 
 /** A "what if…?" follow-up; `a` is markdown. */

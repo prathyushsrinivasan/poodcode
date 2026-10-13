@@ -319,7 +319,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         },
         {
           "key": "branching",
@@ -602,7 +603,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         },
         {
           "key": "loops-and-digits",
@@ -901,7 +903,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         },
         {
           "key": "arrays-first-pass",
@@ -1249,7 +1252,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         }
       ]
     },
@@ -1354,7 +1358,7 @@
             "arrays-first-pass"
           ],
           "why": "Every problem you have solved so far was small enough that nothing you wrote\ncould be too slow. That ends here. From this unit on, the interesting question\nis never *\"does it work?\"* but *\"does it work at n = 200,000?\"* — and the answer\nhas to be decidable **before** you type, because a wrong choice of approach is\nnot something you can patch afterwards.\n\nBig-O gets taught as a maths topic. It is really a *budgeting* topic: you are\ngiven a constraint, you have roughly 10⁸ simple operations to spend, and the\nconstraint tells you which shapes of solution fit.\n",
-          "model": "### Read the constraint, pick the shape\n\nA rough but reliable table. Take the largest `n` in the constraints and read\noff what you can afford:\n\n| n up to | Budget allows | Typical approach |\n| --- | --- | --- |\n| 10–12 | O(n!) | Permutations, brute force |\n| 20–25 | O(2ⁿ) | Subsets, bitmask DP |\n| 500 | O(n³) | Triple loop, Floyd–Warshall |\n| 5,000 | O(n²) | Every pair, 2-D DP |\n| 10⁵–10⁶ | O(n log n) | Sort, heap, binary search |\n| 10⁶–10⁷ | O(n) | One pass, hashing, two pointers |\n| 10⁹+ | O(log n) or O(1) | Binary search on the answer, a formula |\n\nRead it backwards too, and it becomes a *hint*: a constraint of `n ≤ 20` is the\nsetter telling you an exponential search is intended. A constraint of `n ≤ 10⁵`\nis them telling you O(n²) will time out.\n\n### Counting the work\n\nBig-O keeps the fastest-growing term and drops constants, because at large n\nnothing else matters:\n\n- **Sequential** code adds: O(n) then O(n) is O(n). Two passes are still linear.\n- **Nested** code multiplies: a loop inside a loop over the same data is O(n²).\n- **Halving** is logarithmic: each step throws away half the remaining input, so\n  it finishes in about log₂ n steps — 20 for a million, 30 for a billion.\n- **A call inside a loop counts.** `list.contains(x)` inside a `for` is O(n²),\n  and it is the most common accidental quadratic there is, because the nesting\n  is hidden behind a method name.\n\n### Amortized cost: price the loop, not the step\n\nCounting by nesting has a blind spot, and it is the one that makes people\n\"optimise\" code that was already linear:\n\n```java\nDeque<Integer> st = new ArrayDeque<>();\nfor (int i = 0; i < n; i++) {\n    while (!st.isEmpty() && a[st.peek()] < a[i]) st.pop();   // a loop, inside a loop\n    st.push(i);\n}\n```\n\nTwo nested loops, so O(n²)? No — **O(n)**. The inner `while` can only pop what\nsome earlier iteration pushed, and each index is pushed once. The right question\nis not *\"how many steps can one iteration take?\"* (n, in the worst case) but\n*\"how many steps can the whole loop take?\"* (2n: one push and one pop per index).\nDivide by n and each iteration costs **O(1) amortized**.\n\nThat is the whole idea:\n\n> **Amortized cost = total work over a sequence of operations ÷ the number of\n> operations.** It is a worst case, not an average — no lucky input is assumed.\n\nThe accounting argument is always the same shape: find a quantity that each\noperation pays into, and show that every expensive step spends what an earlier\ncheap step deposited. For the stack, the deposit is the push.\n\nYou have already relied on this without naming it:\n\n| Where | Why one step looks expensive | Why the sequence is cheap |\n| --- | --- | --- |\n| `ArrayList.add` | Occasionally copies the whole array | Doubling: n adds copy 1 + 2 + 4 + … < 2n elements, so **O(1) amortized** |\n| Two pointers | The inner pointer can jump far | Neither pointer ever moves backwards — 2n moves total |\n| Sliding window | One shrink can empty the window | Every element enters and leaves once |\n| Monotonic stack | One iteration can pop everything | Each index is pushed once and popped once |\n| Union-find | One `find` can walk a long chain | Path compression flattens it; the sequence is near-constant per call |\n\n### Amortized is not average, and not per-call\n\nThree different claims, often muddled:\n\n- **Worst case per call** — `ArrayList.add` is O(n) on the call that resizes.\n  True, and it is what a latency-sensitive system cares about.\n- **Amortized** — n calls cost O(n) *total*, guaranteed, on every input.\n- **Average case** — assumes a distribution over inputs (quickselect's O(n) is\n  this kind, and an adversary can break it; amortized cannot be broken).\n\nSay \"amortized O(1)\" when you mean the sequence, and be ready for the follow-up:\n*\"is there a single call that is slow?\"* For a doubling array, yes — and that is\nwhy a real-time system pre-sizes it.\n\n### Space\n\nSame counting, applied to memory you allocate. An extra array is O(n); a fixed\n26-slot counter is O(1). Recursion costs stack depth even when it allocates\nnothing — a recursion n deep is O(n) space.\n\n### When O(n²) is the right answer\n\nWhen n is small, when the quadratic version is obviously correct and the linear\none is delicate, or when you need a baseline to test the fast one against.\n\"Optimal\" is defined by the constraints, not by pride.\n",
+          "model": "### Start here: the words this unit uses\n\nNothing below assumes you have met Big-O before. Four words first, each with a\none-line example, because every later sentence uses them.\n\n- **Input size, `n`.** How much data the program is handed: the length of the\n  array, the number of characters in the string. The constraints line of a\n  problem (`1 ≤ n ≤ 10⁵`) tells you the largest `n` the tests will use.\n- **Operation.** One cheap step a computer does in roughly constant time: an\n  addition, a comparison, reading `a[i]`, assigning a variable. We do not care\n  which exact step; we count *how many* happen.\n- **Running time as a function of `n`.** Run the program on bigger and bigger\n  inputs and count operations. The count is a function of `n`: `3n + 2`,\n  `n²/2`, `log₂ n`. That function is the cost.\n- **Big-O.** A shorthand for the *shape* of that function once `n` is large.\n  `3n + 2` and `n` grow the same way (double `n`, double the work), so both are\n  written **O(n)**. `n²/2` is **O(n²)** (double `n`, four times the work).\n\n**Intuition before the rule.** Imagine checking a list of names for yours. If\nthe list doubles, you read twice as many names: linear, O(n). Now imagine\nchecking every name against every other name for duplicates. Double the list\nand every one of the twice-as-many names is compared with twice as many others:\nfour times the work, O(n²). Big-O is nothing more than *\"what happens to the\nwork when the input doubles?\"*\n\n| When n doubles, work… | Shape | Name |\n| --- | --- | --- |\n| stays the same | O(1) | constant |\n| grows by one step | O(log n) | logarithmic |\n| doubles | O(n) | linear |\n| a bit more than doubles | O(n log n) | \"n log n\" |\n| quadruples | O(n²) | quadratic |\n| squares itself | O(2ⁿ) | exponential |\n\n### A tiny count, done by hand\n\n```java\nint total = 0;                      // 1 operation\nfor (int i = 0; i < n; i++) {       // runs n times\n    total += a[i];                  // 1 operation each time\n}\n```\n\nCount it for `n = 4`: one assignment, then the body runs for `i = 0, 1, 2, 3`,\nso 1 + 4 = **5** operations. For `n = 8`: 1 + 8 = **9**. Doubling `n` roughly\ndoubles the count, so this is O(n). Now the nested version:\n\n```java\nfor (int i = 0; i < n; i++)\n    for (int j = 0; j < n; j++)\n        if (a[i] == a[j] && i != j) dup = true;\n```\n\nFor `n = 4` the `if` runs 4 × 4 = **16** times; for `n = 8`, **64**. Doubling\n`n` quadrupled the work: O(n²).\n\n### Why we drop constants and small terms\n\nStep by step:\n\n1. Real machines differ by constant factors (a faster CPU does each operation\n   quicker), so a constant like the `3` in `3n` says more about the machine\n   than the algorithm. Drop it.\n2. When `n` is large, the biggest term swamps the rest: at `n = 10⁶`, `n²` is\n   10¹² while `n` is 10⁶. Keep only the biggest term.\n3. What is left, `n` or `n²` or `log n`, is the Big-O.\n\n### From Big-O to \"will it pass?\"\n\nThe last fact you need: a judge allows roughly **10⁸ simple operations per\nsecond**. So plug the largest `n` into your Big-O and compare with 10⁸. For\n`n = 10⁵`: O(n²) is 10¹⁰ (100× too slow); O(n log n) is about 1.7 × 10⁶ (fine).\nThat one multiplication is what the table below is built from.\n\n### Read the constraint, pick the shape\n\nA rough but reliable table. Take the largest `n` in the constraints and read\noff what you can afford:\n\n| n up to | Budget allows | Typical approach |\n| --- | --- | --- |\n| 10–12 | O(n!) | Permutations, brute force |\n| 20–25 | O(2ⁿ) | Subsets, bitmask DP |\n| 500 | O(n³) | Triple loop, Floyd–Warshall |\n| 5,000 | O(n²) | Every pair, 2-D DP |\n| 10⁵–10⁶ | O(n log n) | Sort, heap, binary search |\n| 10⁶–10⁷ | O(n) | One pass, hashing, two pointers |\n| 10⁹+ | O(log n) or O(1) | Binary search on the answer, a formula |\n\nRead it backwards too, and it becomes a *hint*: a constraint of `n ≤ 20` is the\nsetter telling you an exponential search is intended. A constraint of `n ≤ 10⁵`\nis them telling you O(n²) will time out.\n\n### Counting the work\n\nBig-O keeps the fastest-growing term and drops constants, because at large n\nnothing else matters:\n\n- **Sequential** code adds: O(n) then O(n) is O(n). Two passes are still linear.\n- **Nested** code multiplies: a loop inside a loop over the same data is O(n²).\n- **Halving** is logarithmic: each step throws away half the remaining input, so\n  it finishes in about log₂ n steps — 20 for a million, 30 for a billion.\n- **A call inside a loop counts.** `list.contains(x)` inside a `for` is O(n²),\n  and it is the most common accidental quadratic there is, because the nesting\n  is hidden behind a method name.\n\n### Amortized cost: price the loop, not the step\n\nCounting by nesting has a blind spot, and it is the one that makes people\n\"optimise\" code that was already linear:\n\n```java\nDeque<Integer> st = new ArrayDeque<>();\nfor (int i = 0; i < n; i++) {\n    while (!st.isEmpty() && a[st.peek()] < a[i]) st.pop();   // a loop, inside a loop\n    st.push(i);\n}\n```\n\nTwo nested loops, so O(n²)? No — **O(n)**. The inner `while` can only pop what\nsome earlier iteration pushed, and each index is pushed once. The right question\nis not *\"how many steps can one iteration take?\"* (n, in the worst case) but\n*\"how many steps can the whole loop take?\"* (2n: one push and one pop per index).\nDivide by n and each iteration costs **O(1) amortized**.\n\nThat is the whole idea:\n\n> **Amortized cost = total work over a sequence of operations ÷ the number of\n> operations.** It is a worst case, not an average — no lucky input is assumed.\n\nThe accounting argument is always the same shape: find a quantity that each\noperation pays into, and show that every expensive step spends what an earlier\ncheap step deposited. For the stack, the deposit is the push.\n\nYou have already relied on this without naming it:\n\n| Where | Why one step looks expensive | Why the sequence is cheap |\n| --- | --- | --- |\n| `ArrayList.add` | Occasionally copies the whole array | Doubling: n adds copy 1 + 2 + 4 + … < 2n elements, so **O(1) amortized** |\n| Two pointers | The inner pointer can jump far | Neither pointer ever moves backwards — 2n moves total |\n| Sliding window | One shrink can empty the window | Every element enters and leaves once |\n| Monotonic stack | One iteration can pop everything | Each index is pushed once and popped once |\n| Union-find | One `find` can walk a long chain | Path compression flattens it; the sequence is near-constant per call |\n\n### Amortized is not average, and not per-call\n\nThree different claims, often muddled:\n\n- **Worst case per call** — `ArrayList.add` is O(n) on the call that resizes.\n  True, and it is what a latency-sensitive system cares about.\n- **Amortized** — n calls cost O(n) *total*, guaranteed, on every input.\n- **Average case** — assumes a distribution over inputs (quickselect's O(n) is\n  this kind, and an adversary can break it; amortized cannot be broken).\n\nSay \"amortized O(1)\" when you mean the sequence, and be ready for the follow-up:\n*\"is there a single call that is slow?\"* For a doubling array, yes — and that is\nwhy a real-time system pre-sizes it.\n\n### Space\n\nSame counting, applied to memory you allocate. An extra array is O(n); a fixed\n26-slot counter is O(1). Recursion costs stack depth even when it allocates\nnothing — a recursion n deep is O(n) space.\n\n### When O(n²) is the right answer\n\nWhen n is small, when the quadratic version is obviously correct and the linear\none is delicate, or when you need a baseline to test the fast one against.\n\"Optimal\" is defined by the constraints, not by pride.\n",
           "internals": "",
           "signals": [
             {
@@ -1988,7 +1992,162 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": [
+            {
+              "title": "Does any value repeat?",
+              "difficulty": "Easy",
+              "slug": "",
+              "problem": "Given an array `a` of `n` integers (`1 ≤ n ≤ 10⁵`), return `true` if some value\nappears at least twice.\n",
+              "naive": "Compare every pair `(i, j)` with `i < j`. That is n(n−1)/2 comparisons: at\n`n = 10⁵` about **5 × 10⁹**, fifty times the ~10⁸ operations a judge allows in\na second. Correct, but it times out.\n",
+              "signals": "- `n ≤ 10⁵` rules out O(n²) before you write anything (table: 10⁵ wants\n  O(n log n) or better).\n- \"Appears twice\" only needs equal values to be found, and **sorting puts\n  equal values next to each other**, so one pass over neighbours suffices.\n",
+              "code": "static boolean hasDuplicate(int[] a) {\n    int[] b = a.clone();                 // do not reorder the caller's array\n    java.util.Arrays.sort(b);            // O(n log n)\n    for (int i = 1; i < b.length; i++) {\n        if (b[i] == b[i - 1]) return true;   // equal values are now adjacent\n    }\n    return false;\n}\n",
+              "steps": [
+                "`a.clone()` copies the input (O(n)) so the caller's order survives.\n",
+                "`Arrays.sort(b)` costs O(n log n): about 1.7 × 10⁶ steps at n = 10⁵.\n",
+                "After sorting, any repeated value sits in a block, so comparing each element with the one before it (`b[i] == b[i - 1]`) sees every repeat.\n",
+                "If the loop finishes without a match, no two neighbours are equal, so no value repeats: return `false`.\n"
+              ],
+              "sample_call": "String.valueOf(hasDuplicate(new int[]{4, 1, 3, 1}))",
+              "sample_output": "true",
+              "trace": {
+                "title": "hasDuplicate([4, 1, 3, 1])",
+                "intro": "After sorting, b = [1, 1, 3, 4].",
+                "headers": [
+                  "i",
+                  "b[i-1]",
+                  "b[i]",
+                  "Equal?"
+                ],
+                "rows": [
+                  [
+                    "1",
+                    "1",
+                    "1",
+                    "yes: return true"
+                  ]
+                ],
+                "takeaway": "The repeat was found on the first comparison because sorting made it adjacent."
+              },
+              "complexity": "**Time O(n log n)** (the sort dominates the O(n) scan). **Space O(n)** for the\ncopy. A `HashSet` would give O(n) time; the point here is reading the budget:\nboth fit, O(n²) does not.\n"
+            },
+            {
+              "title": "Remove duplicates, keep the order (the hidden quadratic)",
+              "difficulty": "Medium",
+              "slug": "",
+              "problem": "Given `a` (`n ≤ 10⁵`), return the values in order of first appearance, each\nonce. `[3, 1, 3, 2, 1]` → `[3, 1, 2]`.\n",
+              "naive": "```java\nList<Integer> out = new ArrayList<>();\nfor (int x : a) if (!out.contains(x)) out.add(x);\n```\n\nIt *looks* like one loop, O(n). But `out.contains(x)` scans the whole list, up\nto `n` elements, so the real cost is O(n²): the nesting hides behind a method\nname.\n",
+              "signals": "- A **call inside a loop counts**: price `contains` on a `List` (O(n)) before\n  you trust the single `for`.\n- The inner question is *\"have I seen x?\"*, which a `HashSet` answers in O(1).\n",
+              "code": "static java.util.List<Integer> dedupe(int[] a) {\n    java.util.Set<Integer> seen = new java.util.HashSet<>();\n    java.util.List<Integer> out = new java.util.ArrayList<>();\n    for (int x : a) {\n        if (seen.add(x)) out.add(x);   // add() returns false if x was already there\n    }\n    return out;\n}\n",
+              "steps": [
+                "`seen` remembers every value passed so far; `out` keeps the order.\n",
+                "`seen.add(x)` does the membership test **and** the insert in one O(1) call; it returns `true` only the first time `x` is added.\n",
+                "Only on that first time is `x` appended to `out`, so each value appears once, in first-appearance order.\n"
+              ],
+              "sample_call": "String.valueOf(dedupe(new int[]{3, 1, 3, 2, 1}))",
+              "sample_output": "[3, 1, 2]",
+              "trace": {
+                "title": "dedupe([3, 1, 3, 2, 1])",
+                "intro": "",
+                "headers": [
+                  "x",
+                  "seen.add(x)",
+                  "seen after",
+                  "out after"
+                ],
+                "rows": [
+                  [
+                    "3",
+                    "true",
+                    "{3}",
+                    "[3]"
+                  ],
+                  [
+                    "1",
+                    "true",
+                    "{1, 3}",
+                    "[3, 1]"
+                  ],
+                  [
+                    "3",
+                    "false",
+                    "{1, 3}",
+                    "[3, 1]"
+                  ],
+                  [
+                    "2",
+                    "true",
+                    "{1, 2, 3}",
+                    "[3, 1, 2]"
+                  ],
+                  [
+                    "1",
+                    "false",
+                    "{1, 2, 3}",
+                    "[3, 1, 2]"
+                  ]
+                ],
+                "takeaway": "Every row is O(1) work, so five rows is five units of work, not 5 × |out|."
+              },
+              "complexity": "**Time O(n)**: n iterations of O(1) average work. **Space O(n)** for the set.\nThe fix changed one data structure, and the cost dropped from O(n²) to O(n).\n"
+            },
+            {
+              "title": "Next greater element (amortized O(n))",
+              "difficulty": "Hard",
+              "slug": "",
+              "problem": "For each index `i` of `a` (`n ≤ 10⁵`), output the first value to its right that\nis larger than `a[i]`, or `-1` if there is none. `[2, 1, 4, 3]` → `[4, 4, -1, -1]`.\n",
+              "naive": "For each `i`, walk right until something bigger appears. In the worst case\n(a decreasing array) each walk goes to the end: n + (n−1) + … ≈ n²/2 steps,\n5 × 10⁹ at n = 10⁵. Too slow.\n",
+              "signals": "- `n ≤ 10⁵` again demands better than O(n²).\n- Elements still *waiting* for their answer are always in decreasing order\n  (a bigger one would have answered the smaller ones), which is a **stack**.\n- The code will have a `while` inside a `for`; the amortized argument\n  (each index pushed once, popped at most once) is what proves it linear.\n",
+              "code": "static int[] nextGreater(int[] a) {\n    int n = a.length;\n    int[] ans = new int[n];\n    java.util.Arrays.fill(ans, -1);              // default: no greater element\n    java.util.Deque<Integer> st = new java.util.ArrayDeque<>();  // indices waiting\n    for (int i = 0; i < n; i++) {\n        while (!st.isEmpty() && a[st.peek()] < a[i]) {\n            ans[st.pop()] = a[i];                // a[i] answers everyone smaller\n        }\n        st.push(i);                              // i now waits for its own answer\n    }\n    return ans;\n}\n",
+              "steps": [
+                "`ans` starts as all `-1`: anything never answered keeps it.\n",
+                "`st` holds indices whose answer is not known yet. Their values are decreasing from bottom to top.\n",
+                "When `a[i]` arrives, every waiting index with a smaller value has found its first greater element: pop it and record `a[i]`.\n",
+                "Then push `i`; it waits until something larger shows up.\n",
+                "Counting: each index is pushed exactly once and popped at most once, so the `while` runs at most n times **in total**, not n times per `i`.\n"
+              ],
+              "sample_call": "java.util.Arrays.toString(nextGreater(new int[]{2, 1, 4, 3}))",
+              "sample_output": "[4, 4, -1, -1]",
+              "trace": {
+                "title": "nextGreater([2, 1, 4, 3])",
+                "intro": "Stack shows values (bottom → top).",
+                "headers": [
+                  "i",
+                  "a[i]",
+                  "Popped (answered)",
+                  "Stack after"
+                ],
+                "rows": [
+                  [
+                    "0",
+                    "2",
+                    "none",
+                    "[2]"
+                  ],
+                  [
+                    "1",
+                    "1",
+                    "none",
+                    "[2, 1]"
+                  ],
+                  [
+                    "2",
+                    "4",
+                    "1 → 4, 2 → 4",
+                    "[4]"
+                  ],
+                  [
+                    "3",
+                    "3",
+                    "none",
+                    "[4, 3]"
+                  ]
+                ],
+                "takeaway": "Four pushes and two pops in total: 6 stack operations for n = 4, at most 2n in general."
+              },
+              "complexity": "**Time O(n) amortized**: at most n pushes and n pops overall. **Space O(n)** for\nthe stack and the answer. Nested loops do not automatically mean O(n²); count\nthe total work of the whole run.\n"
+            }
+          ]
         },
         {
           "key": "hashing",
@@ -2002,7 +2161,7 @@
             "complexity"
           ],
           "why": "The commonest reason code is quadratic is that it searches. *For each element,\nlook through the rest* is two nested loops, and the inner one is almost always\nasking a question a hash table can answer instantly: **have I seen this value,\nand if so, where or how often?**\n\nHashing is the single highest-return pattern in this curriculum. It turns a\nwhole tier of O(n²) solutions into O(n) with a few lines, and the cost is memory\n— which is nearly always the right trade.\n",
-          "model": "### Three structures, three questions\n\n| You need to know | Use | Cost |\n| --- | --- | --- |\n| *Have I seen x?* | `HashSet<T>` | O(1) add / contains |\n| *How many times have I seen x?* | `HashMap<T, Integer>` | O(1) get / put |\n| *Where did I see x?* | `HashMap<T, Integer>` value = index | O(1) |\n\nAll three are the same structure underneath. Choosing is just naming what the\nvalue means.\n\n### The complement trick\n\nTwo-sum is the archetype, and it generalises: **as you scan, ask whether the\npartner you need has already gone past.**\n\n```java\nfor (int i = 0; i < n; i++) {\n    int need = target - a[i];\n    if (seen.containsKey(need)) return new int[]{ seen.get(need), i };\n    seen.put(a[i], i);          // AFTER the check, never before\n}\n```\n\nChecking before inserting is what stops an element pairing with itself. That one\nline ordering is the whole difference between right and wrong.\n\n### Canonical forms\n\n*Group the anagrams* is the same question as *are these equal?* once you can\nreduce each item to a **canonical form** — a representative that is identical\nfor everything in a group. Sorted letters (`\"eat\"` → `\"aet\"`) is one; a\n26-length count signature is another, and is O(n) rather than O(n log n).\n\nThe pattern is worth naming because it is how you hash something that is not\nalready a key: reduce it to something equal-when-equivalent, then hash *that*.\n\n### Counting when the keys are small\n\nIf the keys are letters or small integers, an `int[]` beats a `HashMap` on every\naxis — no boxing, no hashing, cache friendly:\n\n```java\nint[] freq = new int[26];\nfreq[c - 'a']++;\n```\n\nReach for the map only when the key space is large or not an integer.\n",
+          "model": "### Start here: what a hash table is, from scratch\n\n**The problem it solves.** An array answers *\"what is at position 5?\"*\ninstantly, because the computer jumps straight to slot 5. It cannot answer\n*\"is the value 42 anywhere in here?\"* without looking at every slot: O(n). A\nhash table is a trick for turning the second question into the first.\n\n**The words.**\n\n- **Key.** The thing you look up by: a number, a word.\n- **Value.** What you store against a key (a count, an index). A *set* stores\n  keys only; a *map* stores key → value pairs.\n- **Hash function.** A function that turns any key into a slot number, the same\n  slot every time for the same key. Toy example: for words, *\"length of the\n  word\"* (a terrible but readable hash).\n- **Bucket.** One slot of the underlying array. Two different keys can land in\n  the same bucket; that is a **collision**, and the bucket simply holds both.\n- **O(1) average.** With a good hash function, buckets stay short (a handful of\n  items), so add / contains / get each cost a constant amount of work no matter\n  how many items are stored.\n\n**A tiny trace with the toy hash** (slot = word length, 8 slots):\n\n| Step | Operation | Slot computed | Buckets after |\n| --- | --- | --- | --- |\n| 1 | add `\"cat\"` | 3 | 3: [cat] |\n| 2 | add `\"horse\"` | 5 | 3: [cat], 5: [horse] |\n| 3 | add `\"dog\"` | 3 | 3: [cat, dog] (collision, both kept) |\n| 4 | contains `\"dog\"`? | 3 | look only in bucket 3: **yes** |\n| 5 | contains `\"emu\"`? | 3 | bucket 3 has cat, dog: **no** |\n\nStep 4 never looked at `\"horse\"`. That is the whole speed-up: the hash tells\nyou *where* to look, so you look in one short bucket instead of everywhere.\n\n**In Java** you never write the hash yourself: `HashSet<Integer>` and\n`HashMap<String, Integer>` do it, using each object's `hashCode()` and\n`equals()`. You only choose *what the key is* and *what the value means*.\n\n**Intuition for the pattern.** Most slow solutions are slow because, for each\nelement, they *search* the rest of the input. If you instead *remember*\neverything you have passed in a hash table, each search becomes one O(1)\nlookup, and O(n) searches of O(n) each (O(n²)) become O(n) lookups of O(1)\neach (O(n)). You pay with memory: the table holds up to `n` items.\n\nStep by step, every hashing solution is:\n\n1. Decide the question you keep asking (\"seen x?\", \"how many x?\", \"where x?\").\n2. Pick the structure that answers it (set, count map, index map).\n3. Scan once: ask the question, then record the current element.\n\n### Three structures, three questions\n\n| You need to know | Use | Cost |\n| --- | --- | --- |\n| *Have I seen x?* | `HashSet<T>` | O(1) add / contains |\n| *How many times have I seen x?* | `HashMap<T, Integer>` | O(1) get / put |\n| *Where did I see x?* | `HashMap<T, Integer>` value = index | O(1) |\n\nAll three are the same structure underneath. Choosing is just naming what the\nvalue means.\n\n### The complement trick\n\nTwo-sum is the archetype, and it generalises: **as you scan, ask whether the\npartner you need has already gone past.**\n\n```java\nfor (int i = 0; i < n; i++) {\n    int need = target - a[i];\n    if (seen.containsKey(need)) return new int[]{ seen.get(need), i };\n    seen.put(a[i], i);          // AFTER the check, never before\n}\n```\n\nChecking before inserting is what stops an element pairing with itself. That one\nline ordering is the whole difference between right and wrong.\n\n### Canonical forms\n\n*Group the anagrams* is the same question as *are these equal?* once you can\nreduce each item to a **canonical form** — a representative that is identical\nfor everything in a group. Sorted letters (`\"eat\"` → `\"aet\"`) is one; a\n26-length count signature is another, and is O(n) rather than O(n log n).\n\nThe pattern is worth naming because it is how you hash something that is not\nalready a key: reduce it to something equal-when-equivalent, then hash *that*.\n\n### Counting when the keys are small\n\nIf the keys are letters or small integers, an `int[]` beats a `HashMap` on every\naxis — no boxing, no hashing, cache friendly:\n\n```java\nint[] freq = new int[26];\nfreq[c - 'a']++;\n```\n\nReach for the map only when the key space is large or not an integer.\n",
           "internals": "### What `HashMap` actually is\n\nA **bucket array**, plus a rule for turning a key into an index into it.\n\n```\nhash = key.hashCode()\nhash ^= (hash >>> 16)          // spread the high bits down\nindex = hash & (table.length - 1)   // cheap modulo, because length is a power of 2\n```\n\nEach bucket holds the entries whose keys landed on that index — a **collision**.\nJava keeps them in a short linked list, and once a single bucket reaches **8**\nentries (with a table of at least 64) it converts that list into a red-black\ntree, so a pathological bucket degrades to O(log k) rather than O(k). That is\nthe entire reason `get` can be called O(1) with a straight face: the average\nbucket is tiny, and the worst bucket is bounded.\n\n### Load factor, and why the cost is *amortised*\n\n`HashMap` grows when `size > capacity × 0.75`. Growing means allocating a table\nof twice the length and re-indexing **every** entry, because the index depends\non `table.length`. That single insert costs O(n).\n\nSpread over the n inserts that led to it, the cost per insert is still O(1) —\nthe same amortisation argument as `ArrayList` growth. It is worth being able to\nsay out loud, because \"insert is O(1)\" is false about *that* insert and true\nabout the sequence.\n\nIf you know the final size, `new HashMap<>(expectedSize / 0.75f + 1)` skips the\nresizes entirely. Rarely decisive, occasionally the difference between passing\nand timing out on 10⁶ insertions.\n\n### What `HashMap` does *not* promise\n\n**Any order at all.** Not insertion order, not key order, and not a stable\norder across runs or across JDK versions. Code that iterates a `HashMap` and\nprints is code whose output is not specified, and the judge compares text — so\nthis is a correctness bug, not a style one.\n\nWhen order matters, say which order you mean:\n\n| You want | Use |\n|---|---|\n| insertion order | `LinkedHashMap` |\n| sorted by key | `TreeMap` — O(log n) per op, not O(1) |\n| no order, fastest | `HashMap` |\n\n### `hashCode` and `equals` are a pair\n\nTwo keys that are `equals` **must** have the same `hashCode`, or the map will\nstore both and find neither reliably. Java's `Integer`, `Long`, `String` and\n`List` all honour this. A custom key class that overrides `equals` and forgets\n`hashCode` is the classic silent bug — and an `int[]` used as a key is the same\nbug with no override in sight, because arrays hash by identity. Use a\n`List<Integer>` or a joined string instead.\n",
           "signals": [
             {
@@ -2515,7 +2674,177 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": [
+            {
+              "title": "Two Sum",
+              "difficulty": "Easy",
+              "slug": "",
+              "problem": "Given `nums` and `target`, return the indices `[i, j]` (`i < j`) of the two\nnumbers that add up to `target`. Exactly one answer exists; `n ≤ 10⁵`.\n",
+              "naive": "Try every pair: O(n²), about 5 × 10⁹ checks at the limit. The inner loop is\n*searching* for one specific value, `target − nums[i]`.\n",
+              "signals": "- \"Find a pair with a given sum\" in an **unsorted** array whose indices matter.\n- The inner loop asks *\"have I seen value v, and where?\"*: an index map,\n  `HashMap<value, index>`.\n",
+              "code": "static int[] twoSum(int[] nums, int target) {\n    java.util.Map<Integer, Integer> seen = new java.util.HashMap<>();\n    for (int i = 0; i < nums.length; i++) {\n        int need = target - nums[i];             // the partner we would need\n        Integer j = seen.get(need);\n        if (j != null) return new int[]{j, i};   // partner already passed\n        seen.put(nums[i], i);                    // record AFTER checking\n    }\n    return new int[0];\n}\n",
+              "steps": [
+                "`seen` maps each value already passed to its index.\n",
+                "For `nums[i]`, the only partner that works is `need = target − nums[i]`.\n",
+                "`seen.get(need)` checks in O(1) whether that partner appeared earlier; if so, return both indices.\n",
+                "Only then store `nums[i]`, so an element can never pair with itself (e.g. target 6, value 3).\n"
+              ],
+              "sample_call": "java.util.Arrays.toString(twoSum(new int[]{2, 7, 11, 15}, 9))",
+              "sample_output": "[0, 1]",
+              "trace": {
+                "title": "twoSum([2, 7, 11, 15], 9)",
+                "intro": "",
+                "headers": [
+                  "i",
+                  "nums[i]",
+                  "need",
+                  "In seen?",
+                  "seen after"
+                ],
+                "rows": [
+                  [
+                    "0",
+                    "2",
+                    "7",
+                    "no",
+                    "{2: 0}"
+                  ],
+                  [
+                    "1",
+                    "7",
+                    "2",
+                    "yes, at 0: return [0, 1]",
+                    "{2: 0}"
+                  ]
+                ],
+                "takeaway": ""
+              },
+              "complexity": "**Time O(n)**, one pass with O(1) lookups. **Space O(n)** for the map.\n"
+            },
+            {
+              "title": "Group anagrams",
+              "difficulty": "Medium",
+              "slug": "",
+              "problem": "Given a list of lowercase words, group the words that are anagrams of each\nother (same letters, same counts), keeping groups in order of first appearance.\n",
+              "naive": "Compare every pair of words by sorting both and checking equality: O(n²) pairs,\neach O(m log m) for words of length m. With n = 10⁴ that is 10⁸ comparisons of\nsorted strings: too slow.\n",
+              "signals": "- \"Group by some equivalence\" means: **find a canonical form**, a key that is\n  identical for every member of a group, and hash it.\n- Sorted letters are such a key: `\"eat\"`, `\"tea\"`, `\"ate\"` all become `\"aet\"`.\n",
+              "code": "static java.util.List<java.util.List<String>> groupAnagrams(String[] words) {\n    java.util.Map<String, java.util.List<String>> groups = new java.util.LinkedHashMap<>();\n    for (String w : words) {\n        char[] cs = w.toCharArray();\n        java.util.Arrays.sort(cs);\n        String key = new String(cs);                         // canonical form\n        groups.computeIfAbsent(key, k -> new java.util.ArrayList<>()).add(w);\n    }\n    return new java.util.ArrayList<>(groups.values());\n}\n",
+              "steps": [
+                "`LinkedHashMap` keeps keys in insertion order, so groups come out in first-appearance order.\n",
+                "Sorting the letters of `w` produces its canonical key; anagrams produce the same key.\n",
+                "`computeIfAbsent` creates an empty list the first time a key is seen, then `add(w)` appends the word.\n",
+                "The values of the map are the groups.\n"
+              ],
+              "sample_call": "String.valueOf(groupAnagrams(new String[]{\"eat\", \"tea\", \"tan\", \"ate\", \"nat\"}))",
+              "sample_output": "[[eat, tea, ate], [tan, nat]]",
+              "trace": {
+                "title": "groupAnagrams([eat, tea, tan, ate, nat])",
+                "intro": "",
+                "headers": [
+                  "Word",
+                  "Key",
+                  "Groups after"
+                ],
+                "rows": [
+                  [
+                    "eat",
+                    "aet",
+                    "aet: [eat]"
+                  ],
+                  [
+                    "tea",
+                    "aet",
+                    "aet: [eat, tea]"
+                  ],
+                  [
+                    "tan",
+                    "ant",
+                    "aet: [eat, tea], ant: [tan]"
+                  ],
+                  [
+                    "ate",
+                    "aet",
+                    "aet: [eat, tea, ate], ant: [tan]"
+                  ],
+                  [
+                    "nat",
+                    "ant",
+                    "aet: [eat, tea, ate], ant: [tan, nat]"
+                  ]
+                ],
+                "takeaway": "Each word is touched once; the map does the grouping."
+              },
+              "complexity": "**Time O(n · m log m)** for n words of length up to m (sorting each word).\nA 26-count signature key makes it O(n · m). **Space O(n · m)** for the map.\n"
+            },
+            {
+              "title": "Longest consecutive sequence",
+              "difficulty": "Hard",
+              "slug": "",
+              "problem": "Given an unsorted array, return the length of the longest run of consecutive\nintegers (e.g. 1, 2, 3, 4) that can be formed from its values, in O(n).\n`[100, 4, 200, 1, 3, 2]` → `4`.\n",
+              "naive": "Sort and scan for runs: O(n log n), which the \"in O(n)\" requirement forbids.\nOr, for each value, count upward with repeated `contains` on the array: O(n²).\n",
+              "signals": "- Repeated *\"is x + 1 present?\"* questions: a `HashSet` makes each O(1).\n- To avoid counting the same run many times, **start counting only at a run's\n  first value**, the one whose `x − 1` is absent.\n",
+              "code": "static int longestRun(int[] a) {\n    java.util.Set<Integer> set = new java.util.HashSet<>();\n    for (int x : a) set.add(x);\n    int best = 0;\n    for (int x : set) {\n        if (set.contains(x - 1)) continue;   // not the start of a run\n        int len = 1;\n        while (set.contains(x + len)) len++; // walk the run upward\n        best = Math.max(best, len);\n    }\n    return best;\n}\n",
+              "steps": [
+                "Put every value in a set: O(n), and duplicates disappear.\n",
+                "For each value, if `x − 1` exists, `x` is in the middle of some run; skip it.\n",
+                "Otherwise `x` starts a run: count `x + 1`, `x + 2`, … while present.\n",
+                "Each value is walked over by exactly one `while` (the one from its run's start), so all the `while`s together cost O(n).\n"
+              ],
+              "sample_call": "String.valueOf(longestRun(new int[]{100, 4, 200, 1, 3, 2}))",
+              "sample_output": "4",
+              "trace": {
+                "title": "longestRun([100, 4, 200, 1, 3, 2])",
+                "intro": "Set = {1, 2, 3, 4, 100, 200}.",
+                "headers": [
+                  "x",
+                  "x−1 in set?",
+                  "Run counted",
+                  "best"
+                ],
+                "rows": [
+                  [
+                    "1",
+                    "no",
+                    "1, 2, 3, 4 (len 4)",
+                    "4"
+                  ],
+                  [
+                    "2",
+                    "yes: skip",
+                    "",
+                    "4"
+                  ],
+                  [
+                    "3",
+                    "yes: skip",
+                    "",
+                    "4"
+                  ],
+                  [
+                    "4",
+                    "yes: skip",
+                    "",
+                    "4"
+                  ],
+                  [
+                    "100",
+                    "no",
+                    "100 (len 1)",
+                    "4"
+                  ],
+                  [
+                    "200",
+                    "no",
+                    "200 (len 1)",
+                    "4"
+                  ]
+                ],
+                "takeaway": "Only the starts 1, 100 and 200 did any walking."
+              },
+              "complexity": "**Time O(n)** amortized (each value is visited by one walk). **Space O(n)** for the set.\n"
+            }
+          ]
         },
         {
           "key": "two-pointers",
@@ -2528,7 +2857,7 @@
             "arrays-first-pass"
           ],
           "why": "Hashing costs O(n) memory. When the array is **sorted** — or can be — you can\noften get the same O(n) time for O(1) space, because sortedness tells you which\ndirection to move. That is the whole idea: each comparison rules out a whole\nrange, so a pointer never has to revisit anything.\n\nIt is also the answer to the interviewer's favourite follow-up, *\"can you do it\nwithout the hash map?\"*.\n",
-          "model": "### Two arrangements\n\n**Converging** — one pointer at each end, walking inward:\n\n```java\nint l = 0, r = n - 1;\nwhile (l < r) {\n    if (good(a[l], a[r])) return ...;\n    else if (tooSmall) l++;\n    else r--;\n}\n```\n\nCorrect because of an *invariant*: at every step the answer, if it exists, lies\nbetween `l` and `r`. When the sum is too small, no pair using `a[l]` can work —\n`a[l]` is already paired with the largest remaining value — so discarding it\nloses nothing. Being able to state that sentence is the difference between\nknowing the pattern and having memorised it.\n\n**Same direction** — a `read` pointer that always advances and a `write`\npointer that only advances when something is kept:\n\n```java\nint write = 0;\nfor (int read = 0; read < n; read++) {\n    if (keep(a[read])) a[write++] = a[read];\n}\n```\n\nThis is how every in-place filter, dedupe and compaction works, and it is\nexactly the shape of `move-zeroes`.\n\n### Reversal and palindromes\n\nSwapping inward from both ends reverses in place in O(1) space; comparing\ninward instead of swapping tests a palindrome. Same skeleton, one line changed.\n\n### When the array is *not* sorted\n\nYou may sort it first — if the problem does not depend on original positions.\nThat is the trade: O(n log n) time for O(1) extra space. If indices must be\npreserved, hashing is the right tool and two pointers is not.\n",
+          "model": "### Start here: what \"a pointer\" means here, and why sorting helps\n\n**The words.**\n\n- **Index.** A position in an array, `0` to `n - 1`. `a[i]` is the value at\n  index `i`.\n- **Pointer.** In this unit, just an `int` variable holding an index. \"Move the\n  pointer right\" means `i++`. No memory addresses are involved.\n- **Sorted (ascending).** `a[0] ≤ a[1] ≤ … ≤ a[n-1]`. Moving right never makes\n  the value smaller; moving left never makes it bigger.\n- **Search space.** The set of candidate answers still possible. For a pair\n  question on `n` items it starts as every pair `(l, r)` with `l < r`: about\n  n²/2 of them.\n\n**Intuition.** Picture people lined up by height and you need two whose heights\nadd to 180 cm. Put one finger on the shortest and one on the tallest. Too short\nin total? Swapping the *tall* person for someone shorter can only make it worse,\nso the *short* person is the problem: move the left finger right. Too tall? Move\nthe right finger left. Each move rules out one person for good, so at most\n`n` moves happen.\n\n**A tiny trace.** `a = [1, 3, 4, 6, 9]`, target `10`:\n\n| Step | l | r | a[l] + a[r] | Decision |\n| --- | --- | --- | --- | --- |\n| 1 | 0 | 4 | 1 + 9 = 10 | equal, found (0, 4) |\n\nTry target `7` instead:\n\n| Step | l | r | a[l] + a[r] | Decision |\n| --- | --- | --- | --- | --- |\n| 1 | 0 | 4 | 1 + 9 = 10 | too big: no pair with 9 can work (9 + smallest is already 10), `r--` |\n| 2 | 0 | 3 | 1 + 6 = 7 | equal, found (0, 3) |\n\n**Why the discard is safe, step by step.** When `a[l] + a[r]` is too big:\n\n1. `a[l]` is the smallest value still in play (everything left of `l` is gone).\n2. So `a[r] + a[l]` is the smallest sum `a[r]` can make with anything left.\n3. That smallest sum is already too big, so `a[r]` is in no valid pair. Drop it.\n\nThe \"too small\" case is the mirror image. Because each step drops one element\nfrom the n²/2 pairs' worth of possibilities, the loop is O(n) instead of O(n²),\nand it needs no extra memory: O(1) space, which is what hashing could not give.\n\n### Two arrangements\n\n**Converging** — one pointer at each end, walking inward:\n\n```java\nint l = 0, r = n - 1;\nwhile (l < r) {\n    if (good(a[l], a[r])) return ...;\n    else if (tooSmall) l++;\n    else r--;\n}\n```\n\nCorrect because of an *invariant*: at every step the answer, if it exists, lies\nbetween `l` and `r`. When the sum is too small, no pair using `a[l]` can work —\n`a[l]` is already paired with the largest remaining value — so discarding it\nloses nothing. Being able to state that sentence is the difference between\nknowing the pattern and having memorised it.\n\n**Same direction** — a `read` pointer that always advances and a `write`\npointer that only advances when something is kept:\n\n```java\nint write = 0;\nfor (int read = 0; read < n; read++) {\n    if (keep(a[read])) a[write++] = a[read];\n}\n```\n\nThis is how every in-place filter, dedupe and compaction works, and it is\nexactly the shape of `move-zeroes`.\n\n### Reversal and palindromes\n\nSwapping inward from both ends reverses in place in O(1) space; comparing\ninward instead of swapping tests a palindrome. Same skeleton, one line changed.\n\n### When the array is *not* sorted\n\nYou may sort it first — if the problem does not depend on original positions.\nThat is the trade: O(n log n) time for O(1) extra space. If indices must be\npreserved, hashing is the right tool and two pointers is not.\n",
           "internals": "",
           "signals": [
             {
@@ -3057,7 +3386,213 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": [
+            {
+              "title": "Valid palindrome",
+              "difficulty": "Easy",
+              "slug": "",
+              "problem": "Given a string `s`, return `true` if, after ignoring every character that is\nnot a letter or digit and ignoring case, it reads the same forwards and\nbackwards. `\"A man, a plan, a canal: Panama\"` → `true`.\n",
+              "naive": "Build a cleaned, lower-cased copy, then a reversed copy, and compare. It works\nin O(n) time but uses O(n) extra memory for two new strings.\n",
+              "signals": "- \"Reads the same from both ends\" compares position `l` from the left with\n  position `r` from the right: **converging pointers**.\n- Skipping unwanted characters is just moving a pointer past them, so no copy\n  is needed: O(1) space.\n",
+              "code": "static boolean isPalindrome(String s) {\n    int l = 0, r = s.length() - 1;\n    while (l < r) {\n        char a = s.charAt(l), b = s.charAt(r);\n        if (!Character.isLetterOrDigit(a)) { l++; continue; }\n        if (!Character.isLetterOrDigit(b)) { r--; continue; }\n        if (Character.toLowerCase(a) != Character.toLowerCase(b)) return false;\n        l++; r--;\n    }\n    return true;\n}\n",
+              "steps": [
+                "Start `l` at the first character and `r` at the last.\n",
+                "If either side is punctuation or a space, step past it and try again.\n",
+                "Compare the two letters case-insensitively; one mismatch proves it is not a palindrome.\n",
+                "On a match, move both inward. When they meet, every pair matched.\n"
+              ],
+              "sample_call": "String.valueOf(isPalindrome(\"race a car\"))",
+              "sample_output": "false",
+              "trace": {
+                "title": "isPalindrome(\"race a car\")",
+                "intro": "Indices 0..9; position 4 is a space.",
+                "headers": [
+                  "l",
+                  "r",
+                  "s[l]",
+                  "s[r]",
+                  "Action"
+                ],
+                "rows": [
+                  [
+                    "0",
+                    "9",
+                    "r",
+                    "r",
+                    "match, move in"
+                  ],
+                  [
+                    "1",
+                    "8",
+                    "a",
+                    "a",
+                    "match, move in"
+                  ],
+                  [
+                    "2",
+                    "7",
+                    "c",
+                    "c",
+                    "match, move in"
+                  ],
+                  [
+                    "3",
+                    "6",
+                    "e",
+                    " ",
+                    "space on the right, r--"
+                  ],
+                  [
+                    "3",
+                    "5",
+                    "e",
+                    "a",
+                    "mismatch: return false"
+                  ]
+                ],
+                "takeaway": ""
+              },
+              "complexity": "**Time O(n)**: each step moves at least one pointer. **Space O(1)**.\n"
+            },
+            {
+              "title": "Two Sum II (sorted input)",
+              "difficulty": "Medium",
+              "slug": "",
+              "problem": "`numbers` is sorted ascending. Return the **1-based** indices `[i, j]` of the\ntwo numbers adding to `target`, using only O(1) extra space.\n",
+              "naive": "The hash-map Two Sum works in O(n) time but uses O(n) space, which the\nstatement forbids. Checking every pair is O(1) space but O(n²) time.\n",
+              "signals": "- **Sorted** + **find a pair** + **O(1) space**: converging pointers. Sortedness\n  tells you which pointer to move.\n",
+              "code": "static int[] twoSumSorted(int[] numbers, int target) {\n    int l = 0, r = numbers.length - 1;\n    while (l < r) {\n        int sum = numbers[l] + numbers[r];\n        if (sum == target) return new int[]{l + 1, r + 1};\n        if (sum < target) l++;     // need bigger: drop the smallest\n        else r--;                  // need smaller: drop the largest\n    }\n    return new int[0];\n}\n",
+              "steps": [
+                "Start with the smallest (`l`) and largest (`r`) values.\n",
+                "If the sum is too small, `numbers[l]` is useless: even paired with the largest value left it falls short. Drop it with `l++`.\n",
+                "If too big, `numbers[r]` is useless for the mirror reason: `r--`.\n",
+                "Each step removes one candidate, so the loop runs at most n − 1 times.\n"
+              ],
+              "sample_call": "java.util.Arrays.toString(twoSumSorted(new int[]{2, 3, 4, 7, 11}, 10))",
+              "sample_output": "[2, 4]",
+              "trace": {
+                "title": "twoSumSorted([2, 3, 4, 7, 11], 10)",
+                "intro": "",
+                "headers": [
+                  "l",
+                  "r",
+                  "sum",
+                  "Decision"
+                ],
+                "rows": [
+                  [
+                    "0",
+                    "4",
+                    "2 + 11 = 13",
+                    "too big, r--"
+                  ],
+                  [
+                    "0",
+                    "3",
+                    "2 + 7 = 9",
+                    "too small, l++"
+                  ],
+                  [
+                    "1",
+                    "3",
+                    "3 + 7 = 10",
+                    "found: return [2, 4]"
+                  ]
+                ],
+                "takeaway": ""
+              },
+              "complexity": "**Time O(n)**. **Space O(1)**: two integers, no map.\n"
+            },
+            {
+              "title": "Container with most water",
+              "difficulty": "Hard",
+              "slug": "",
+              "problem": "`height[i]` is the height of a vertical line at position `i`. Choose two lines\nthat, with the x-axis, hold the most water. Area = `(j − i) × min(height[i],\nheight[j])`. `n ≤ 10⁵`.\n",
+              "naive": "Try every pair: O(n²) ≈ 5 × 10⁹ at the limit. Sorting does not help, because\npositions matter.\n",
+              "signals": "- A pair `(i, j)` scored by width and the *shorter* side.\n- Start with the widest pair. Moving the **taller** side inward can only shrink\n  the width without raising the limiting height, so it is never useful: always\n  move the shorter side. Each move discards one line for good: converging\n  pointers, without needing sorted input.\n",
+              "code": "static int maxArea(int[] height) {\n    int l = 0, r = height.length - 1, best = 0;\n    while (l < r) {\n        int area = (r - l) * Math.min(height[l], height[r]);\n        best = Math.max(best, area);\n        if (height[l] < height[r]) l++;   // the shorter side limits the area\n        else r--;\n    }\n    return best;\n}\n",
+              "steps": [
+                "Begin at maximum width, `l = 0`, `r = n − 1`.\n",
+                "Score the current pair and keep the best.\n",
+                "The shorter line is the bottleneck. Any other pair using it is narrower and still capped by it, so it can never beat the current area: discard it.\n",
+                "Repeat until the pointers meet: n − 1 steps.\n"
+              ],
+              "sample_call": "String.valueOf(maxArea(new int[]{1, 8, 6, 2, 5, 4, 8, 3, 7}))",
+              "sample_output": "49",
+              "trace": {
+                "title": "maxArea([1, 8, 6, 2, 5, 4, 8, 3, 7])",
+                "intro": "",
+                "headers": [
+                  "l",
+                  "r",
+                  "Area",
+                  "best",
+                  "Move"
+                ],
+                "rows": [
+                  [
+                    "0",
+                    "8",
+                    "8 × 1 = 8",
+                    "8",
+                    "h[0]=1 shorter, l++"
+                  ],
+                  [
+                    "1",
+                    "8",
+                    "7 × 7 = 49",
+                    "49",
+                    "h[8]=7 shorter, r--"
+                  ],
+                  [
+                    "1",
+                    "7",
+                    "6 × 3 = 18",
+                    "49",
+                    "h[7]=3 shorter, r--"
+                  ],
+                  [
+                    "1",
+                    "6",
+                    "5 × 8 = 40",
+                    "49",
+                    "tie, r--"
+                  ],
+                  [
+                    "1",
+                    "5",
+                    "4 × 4 = 16",
+                    "49",
+                    "r--"
+                  ],
+                  [
+                    "1",
+                    "4",
+                    "3 × 5 = 15",
+                    "49",
+                    "r--"
+                  ],
+                  [
+                    "1",
+                    "3",
+                    "2 × 2 = 4",
+                    "49",
+                    "r--"
+                  ],
+                  [
+                    "1",
+                    "2",
+                    "1 × 6 = 6",
+                    "49",
+                    "r--, pointers meet"
+                  ]
+                ],
+                "takeaway": "Eight pairs scored instead of 36."
+              },
+              "complexity": "**Time O(n)**. **Space O(1)**.\n"
+            }
+          ]
         },
         {
           "key": "sliding-window",
@@ -3071,7 +3606,7 @@
             "hashing"
           ],
           "why": "*\"The longest substring with …\"*, *\"the smallest subarray such that …\"*,\n*\"every window of size k\"* — these all look like they need to examine every\nsubarray, which is O(n²) starts times O(n) work. They do not. Because the\nwindows overlap almost completely, the answer for one window is the answer for\nthe last one with **one element added and maybe a few removed**.\n\nThat reuse is the whole technique, and it turns a cubic brute force into a\nsingle pass.\n",
-          "model": "### The one template\n\n```java\nint l = 0;\nfor (int r = 0; r < n; r++) {\n    add(a[r]);                       // extend the window to the right\n    while (windowIsInvalid()) {\n        remove(a[l++]);              // shrink from the left until it is valid again\n    }\n    best = Math.max(best, r - l + 1);   // every window here is valid\n}\n```\n\nFour things to fill in, and they are the whole design:\n\n1. **What state does the window carry?** A count, a sum, a frequency map.\n2. **What makes it invalid?** A duplicate, a sum over the limit, too many\n   distinct values.\n3. **When is the answer recorded?** After shrinking, for a *longest* question;\n   inside the shrink loop, for a *shortest* one.\n4. **Can the left pointer ever move backwards?** If yes, this is not a sliding\n   window.\n\n### Why it is O(n), not O(n²)\n\nThe `while` inside the `for` looks quadratic but is not: `l` only ever\nincreases, and it can increase at most n times in total across the whole run.\nThat argument — *amortised, because each element enters and leaves the window\nexactly once* — is the one to say aloud in an interview.\n\n### Fixed versus variable windows\n\n**Fixed size k**: no `while`. Add the entering element, remove the leaving one,\nrecord after the window is full.\n\n```java\nfor (int r = 0; r < n; r++) {\n    sum += a[r];\n    if (r >= k) sum -= a[r - k];\n    if (r >= k - 1) best = Math.max(best, sum);\n}\n```\n\n**Variable size**: the `while` shrinks until valid. Longest asks for the biggest\nvalid window; shortest asks for the smallest, and records inside the shrink.\n\n### The limit\n\nSliding window needs the property that **extending can only make things worse\nand shrinking can only make them better** (monotonicity). With negative numbers\nin a sum problem that breaks — adding an element can *reduce* the sum — and the\ntechnique is simply wrong. That is when prefix sums with a hash map take over.\n",
+          "model": "### Start here: subarrays, windows, and the reuse idea\n\n**The words.**\n\n- **Subarray / substring.** A *contiguous* run of elements: `a[l..r]`, every\n  index from `l` to `r` with none skipped. `[3, 4]` is a subarray of\n  `[2, 3, 4, 5]`; `[2, 4]` is not (it skips 3).\n- **Window.** A subarray we are currently looking at, described by two indices:\n  `l` (left edge) and `r` (right edge). Its length is `r - l + 1`.\n- **Window state.** A small summary of what is inside: its sum, a count of each\n  character, the number of distinct values. Kept in variables, updated as the\n  edges move.\n- **Valid / invalid.** Whether the window satisfies the problem's rule (\"no\n  repeated character\", \"sum ≤ k\").\n\n**Prerequisite in one line:** there are about n²/2 subarrays of an array of\nlength `n`, so any approach that looks at each one separately is at least\nO(n²), and O(n³) if it re-sums each one.\n\n**Intuition.** Two neighbouring windows share almost everything. The window\n`[2, 3, 4]` and the next one `[3, 4, 5]` share `3, 4`. So instead of summing the\nnew window from scratch, take the old sum, **add what entered on the right,\nsubtract what left on the left**. Two operations instead of `k`.\n\n**A tiny trace.** Sums of every window of size 3 in `a = [2, 1, 5, 1, 3]`:\n\n| Window | Edges l..r | Entering | Leaving | Sum (reused) |\n| --- | --- | --- | --- | --- |\n| [2, 1, 5] | 0..2 | (first window, summed once) | | 8 |\n| [1, 5, 1] | 1..3 | a[3] = 1 | a[0] = 2 | 8 + 1 − 2 = 7 |\n| [5, 1, 3] | 2..4 | a[4] = 3 | a[1] = 1 | 7 + 3 − 1 = 9 |\n\nEach row did two operations, whatever the window size. That is the technique.\n\n**From fixed to variable, step by step.**\n\n1. *Fixed size*: both edges move together, one step at a time (the trace above).\n2. *Variable size*: the right edge `r` moves one step every iteration (the\n   window grows); the left edge `l` moves only when the window has become\n   invalid, and keeps moving until it is valid again (the window shrinks).\n3. Both edges only ever move **right**. Each element enters once (when `r`\n   reaches it) and leaves at most once (when `l` passes it), so the total work\n   is at most 2n steps: O(n).\n4. This only works if shrinking a window can *fix* it. That is true when the\n   rule is \"monotone\" (a sub-window of a valid window is valid, e.g. \"no\n   repeats\", or \"sum ≤ k\" with non-negative numbers). With negative numbers,\n   removing an element can make a sum go *up*, and the technique breaks; that\n   is the Prefix Sums unit.\n\n### The one template\n\n```java\nint l = 0;\nfor (int r = 0; r < n; r++) {\n    add(a[r]);                       // extend the window to the right\n    while (windowIsInvalid()) {\n        remove(a[l++]);              // shrink from the left until it is valid again\n    }\n    best = Math.max(best, r - l + 1);   // every window here is valid\n}\n```\n\nFour things to fill in, and they are the whole design:\n\n1. **What state does the window carry?** A count, a sum, a frequency map.\n2. **What makes it invalid?** A duplicate, a sum over the limit, too many\n   distinct values.\n3. **When is the answer recorded?** After shrinking, for a *longest* question;\n   inside the shrink loop, for a *shortest* one.\n4. **Can the left pointer ever move backwards?** If yes, this is not a sliding\n   window.\n\n### Why it is O(n), not O(n²)\n\nThe `while` inside the `for` looks quadratic but is not: `l` only ever\nincreases, and it can increase at most n times in total across the whole run.\nThat argument — *amortised, because each element enters and leaves the window\nexactly once* — is the one to say aloud in an interview.\n\n### Fixed versus variable windows\n\n**Fixed size k**: no `while`. Add the entering element, remove the leaving one,\nrecord after the window is full.\n\n```java\nfor (int r = 0; r < n; r++) {\n    sum += a[r];\n    if (r >= k) sum -= a[r - k];\n    if (r >= k - 1) best = Math.max(best, sum);\n}\n```\n\n**Variable size**: the `while` shrinks until valid. Longest asks for the biggest\nvalid window; shortest asks for the smallest, and records inside the shrink.\n\n### The limit\n\nSliding window needs the property that **extending can only make things worse\nand shrinking can only make them better** (monotonicity). With negative numbers\nin a sum problem that breaks — adding an element can *reduce* the sum — and the\ntechnique is simply wrong. That is when prefix sums with a hash map take over.\n",
           "internals": "",
           "signals": [
             {
@@ -3660,7 +4195,247 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": [
+            {
+              "title": "Maximum sum of a window of size k",
+              "difficulty": "Easy",
+              "slug": "",
+              "problem": "Given `a` (`n ≤ 10⁵`) and `k` (`1 ≤ k ≤ n`), return the largest sum of any `k`\nconsecutive elements.\n",
+              "naive": "For each of the n − k + 1 starting positions, add up `k` elements: O(n · k),\nwhich is O(n²) when `k` is about n/2 (2.5 × 10⁹ at the limit).\n",
+              "signals": "- \"**Consecutive** elements\" + \"**every window of size k**\": a fixed-size window.\n- Neighbouring windows share k − 1 elements, so update the sum instead of\n  recomputing it.\n",
+              "code": "static int maxWindowSum(int[] a, int k) {\n    int sum = 0, best = Integer.MIN_VALUE;\n    for (int r = 0; r < a.length; r++) {\n        sum += a[r];                       // a[r] enters\n        if (r >= k) sum -= a[r - k];       // a[r - k] leaves\n        if (r >= k - 1) best = Math.max(best, sum);   // window is full\n    }\n    return best;\n}\n",
+              "steps": [
+                "`r` is the right edge; the window is `a[r−k+1..r]`.\n",
+                "Each step adds the entering element.\n",
+                "Once the window would exceed `k` elements (`r ≥ k`), subtract the one that just fell off the left, `a[r − k]`.\n",
+                "From `r = k − 1` on, the window holds exactly `k` elements: record its sum.\n",
+                "`best` starts at `MIN_VALUE` so all-negative arrays still work.\n"
+              ],
+              "sample_call": "String.valueOf(maxWindowSum(new int[]{2, 1, 5, 1, 3, 2}, 3))",
+              "sample_output": "9",
+              "trace": {
+                "title": "maxWindowSum([2, 1, 5, 1, 3, 2], k = 3)",
+                "intro": "",
+                "headers": [
+                  "r",
+                  "Enters",
+                  "Leaves",
+                  "sum",
+                  "best"
+                ],
+                "rows": [
+                  [
+                    "0",
+                    "2",
+                    "",
+                    "2",
+                    "(not full)"
+                  ],
+                  [
+                    "1",
+                    "1",
+                    "",
+                    "3",
+                    "(not full)"
+                  ],
+                  [
+                    "2",
+                    "5",
+                    "",
+                    "8",
+                    "8"
+                  ],
+                  [
+                    "3",
+                    "1",
+                    "2",
+                    "7",
+                    "8"
+                  ],
+                  [
+                    "4",
+                    "3",
+                    "1",
+                    "9",
+                    "9"
+                  ],
+                  [
+                    "5",
+                    "2",
+                    "5",
+                    "6",
+                    "9"
+                  ]
+                ],
+                "takeaway": "Two operations per step, whatever k is."
+              },
+              "complexity": "**Time O(n)**. **Space O(1)**.\n"
+            },
+            {
+              "title": "Longest substring without repeating characters",
+              "difficulty": "Medium",
+              "slug": "",
+              "problem": "Given a string `s` (`n ≤ 5 × 10⁴`), return the length of the longest substring\nwith no repeated character. `\"abcabcbb\"` → `3` (`\"abc\"`).\n",
+              "naive": "Check every substring for repeats: O(n²) substrings × O(n) to check each =\nO(n³), about 10¹⁴ at the limit.\n",
+              "signals": "- \"Longest **substring**\" (contiguous) with a rule (\"no repeats\").\n- The rule is monotone: if a window has no repeats, neither does any part of\n  it. So when a repeat appears, shrinking from the left fixes it: a\n  **variable-size window**.\n",
+              "code": "static int longestUnique(String s) {\n    int[] count = new int[128];          // occurrences of each ASCII char in the window\n    int l = 0, best = 0;\n    for (int r = 0; r < s.length(); r++) {\n        char c = s.charAt(r);\n        count[c]++;                      // extend right\n        while (count[c] > 1) {           // invalid: c appears twice\n            count[s.charAt(l)]--;        // shrink from the left\n            l++;\n        }\n        best = Math.max(best, r - l + 1);   // window is valid here\n    }\n    return best;\n}\n",
+              "steps": [
+                "Window state: `count[c]`, how many times `c` is in `s[l..r]`.\n",
+                "Add `s[r]`. Only the character just added can have become a repeat.\n",
+                "While it is repeated, remove `s[l]` and advance `l`; this stops right after the earlier copy of `c` leaves.\n",
+                "Now the window is valid; its length `r − l + 1` is a candidate.\n",
+                "`l` and `r` only move right, so the total work is at most 2n steps.\n"
+              ],
+              "sample_call": "String.valueOf(longestUnique(\"abcabcbb\"))",
+              "sample_output": "3",
+              "trace": {
+                "title": "longestUnique(\"abcabcbb\")",
+                "intro": "",
+                "headers": [
+                  "r",
+                  "s[r]",
+                  "Shrink?",
+                  "Window",
+                  "best"
+                ],
+                "rows": [
+                  [
+                    "0",
+                    "a",
+                    "no",
+                    "a",
+                    "1"
+                  ],
+                  [
+                    "1",
+                    "b",
+                    "no",
+                    "ab",
+                    "2"
+                  ],
+                  [
+                    "2",
+                    "c",
+                    "no",
+                    "abc",
+                    "3"
+                  ],
+                  [
+                    "3",
+                    "a",
+                    "drop a",
+                    "bca",
+                    "3"
+                  ],
+                  [
+                    "4",
+                    "b",
+                    "drop b",
+                    "cab",
+                    "3"
+                  ],
+                  [
+                    "5",
+                    "c",
+                    "drop c",
+                    "abc",
+                    "3"
+                  ],
+                  [
+                    "6",
+                    "b",
+                    "drop a, b",
+                    "cb",
+                    "3"
+                  ],
+                  [
+                    "7",
+                    "b",
+                    "drop c, b",
+                    "b",
+                    "3"
+                  ]
+                ],
+                "takeaway": ""
+              },
+              "complexity": "**Time O(n)** (each character enters and leaves once). **Space O(1)**: a fixed 128-entry table.\n"
+            },
+            {
+              "title": "Shortest subarray with sum at least target",
+              "difficulty": "Hard",
+              "slug": "",
+              "problem": "Given **positive** integers `a` (`n ≤ 10⁵`) and `target`, return the length of\nthe shortest contiguous subarray whose sum is `≥ target`, or `0` if none.\n",
+              "naive": "For every start, extend until the sum reaches `target`: O(n²) in the worst\ncase (5 × 10⁹ at the limit).\n",
+              "signals": "- \"Shortest **subarray**\" with a sum condition.\n- All values are **positive**, so growing a window raises its sum and shrinking\n  lowers it: the condition behaves monotonically, which a window needs.\n- *Shortest* means: record the answer **inside** the shrink loop, while the\n  window is still valid.\n",
+              "code": "static int minSubarrayLen(int target, int[] a) {\n    int l = 0, sum = 0, best = Integer.MAX_VALUE;\n    for (int r = 0; r < a.length; r++) {\n        sum += a[r];                         // grow until it is big enough\n        while (sum >= target) {              // valid: try to make it shorter\n            best = Math.min(best, r - l + 1);\n            sum -= a[l++];\n        }\n    }\n    return best == Integer.MAX_VALUE ? 0 : best;\n}\n",
+              "steps": [
+                "Grow the window to the right, adding each element.\n",
+                "As soon as the sum reaches `target`, the window is a candidate: record its length.\n",
+                "Then shrink from the left while it stays valid, recording each shorter candidate. Positivity guarantees no shorter window ending at `r` was missed.\n",
+                "If nothing ever qualified, `best` is untouched: return 0.\n"
+              ],
+              "sample_call": "String.valueOf(minSubarrayLen(7, new int[]{2, 3, 1, 2, 4, 3}))",
+              "sample_output": "2",
+              "trace": {
+                "title": "minSubarrayLen(7, [2, 3, 1, 2, 4, 3])",
+                "intro": "",
+                "headers": [
+                  "r",
+                  "a[r]",
+                  "sum after add",
+                  "Shrinks (length recorded)",
+                  "best"
+                ],
+                "rows": [
+                  [
+                    "0",
+                    "2",
+                    "2",
+                    "",
+                    "∞"
+                  ],
+                  [
+                    "1",
+                    "3",
+                    "5",
+                    "",
+                    "∞"
+                  ],
+                  [
+                    "2",
+                    "1",
+                    "6",
+                    "",
+                    "∞"
+                  ],
+                  [
+                    "3",
+                    "2",
+                    "8",
+                    "len 4, drop 2 → 6",
+                    "4"
+                  ],
+                  [
+                    "4",
+                    "4",
+                    "10",
+                    "len 4, drop 3 → 7; len 3, drop 1 → 6",
+                    "3"
+                  ],
+                  [
+                    "5",
+                    "3",
+                    "9",
+                    "len 3, drop 2 → 7; len 2, drop 4 → 3",
+                    "2"
+                  ]
+                ],
+                "takeaway": "The answer [4, 3] was found while shrinking, which is where shortest-window answers live."
+              },
+              "complexity": "**Time O(n)**: `l` and `r` each move at most n times. **Space O(1)**. With\nnegative numbers this breaks (shrinking could raise the sum); use prefix sums.\n"
+            }
+          ]
         },
         {
           "key": "prefix-sums",
@@ -3674,7 +4449,7 @@
             "hashing"
           ],
           "why": "Answering *\"what is the sum of `a[l..r]`?\"* by looping costs O(n), and a problem\nthat asks it many times is quietly quadratic. One preprocessing pass fixes it\npermanently: store the running total, and every range sum becomes a single\nsubtraction.\n\nThe pattern then generalises past sums in two directions that are worth far more\nthan the base case: **prefix + hash map** solves subarray-sum counting with\nnegative numbers (where sliding window fails), and the same difference trick\nrun over a timeline is how every *\"how many are active at once?\"* problem is\nsolved.\n",
-          "model": "### The identity\n\nWith `pre[i]` = sum of the first `i` elements (`pre[0] = 0`):\n\n```\nsum(a[l..r]) = pre[r + 1] − pre[l]\n```\n\nThe `+1` offset and `pre[0] = 0` exist so that ranges starting at index 0 need\nno special case. Use an array of size `n + 1`; the off-by-ones disappear.\n\n### Prefix + hash map\n\n*\"How many subarrays sum to k?\"* becomes a **complement** question about prefix\nvalues: a subarray ending at `r` sums to k exactly when some earlier prefix\nequals `pre[r] − k`. So count prefix values as you go:\n\n```java\nMap<Long, Integer> seen = new HashMap<>();\nseen.put(0L, 1);                    // the empty prefix\nlong run = 0; int count = 0;\nfor (int x : a) {\n    run += x;\n    count += seen.getOrDefault(run - k, 0);\n    seen.merge(run, 1, Integer::sum);\n}\n```\n\n`seen.put(0L, 1)` before the loop is what lets a subarray starting at index 0 be\ncounted. Forgetting it is the classic bug.\n\nThis works with negative numbers, which is exactly where sliding window gave up.\n\n### Prefix products\n\nProduct-except-self is the same idea in two directions: a prefix product from\nthe left and a suffix product from the right, multiplied at each index. It\navoids division, which matters because the array may contain zeros.\n\n### Difference arrays and sweeps\n\nTo apply *\"add v to every index in [l, r]\"* many times, do not touch the range.\nRecord `diff[l] += v` and `diff[r + 1] -= v`, then take the prefix sum once at\nthe end: k updates become O(k + n) instead of O(k · n).\n\nThe same idea run over events (`+1` at a start, `−1` at an end, processed in\ntime order) answers *\"the maximum number of things active at once\"* — which is\nthe whole intervals unit in embryo.\n",
+          "model": "### Start here: a running total, and why subtracting two of them gives a range\n\n**The words.**\n\n- **Range sum `sum(a[l..r])`.** The total of the elements from index `l` to\n  index `r`, both included.\n- **Prefix.** The first `i` elements of the array, `a[0..i-1]`. The prefix of\n  length 0 is empty.\n- **Prefix sum `pre[i]`.** The sum of the prefix of length `i`. So `pre[0] = 0`\n  (empty), `pre[1] = a[0]`, `pre[2] = a[0] + a[1]`, and in general\n  `pre[i + 1] = pre[i] + a[i]`.\n- **Query.** One question asked of the data, such as one range sum. Problems\n  often ask many (`q` up to 10⁵).\n\n**Intuition.** Think of a car's odometer. To know how far you drove between\nthe 2nd and the 5th stop, you do not re-drive the route; you read the odometer\nat both stops and subtract. `pre` is the odometer reading at each index.\n\n**A tiny trace.** `a = [3, 1, 4, 1, 5]`:\n\n| i | 0 | 1 | 2 | 3 | 4 | 5 |\n| --- | --- | --- | --- | --- | --- | --- |\n| pre[i] | 0 | 3 | 4 | 8 | 9 | 14 |\n\n`sum(a[1..3]) = 1 + 4 + 1 = 6`. With the table: `pre[4] − pre[1] = 9 − 3 = 6`.\nWhy: `pre[4]` is `a[0] + a[1] + a[2] + a[3]`, `pre[1]` is `a[0]`; subtracting\ncancels the shared `a[0]` and leaves exactly `a[1] + a[2] + a[3]`.\n\n**Step by step, the identity.**\n\n1. `pre[r + 1]` covers indices `0..r`.\n2. `pre[l]` covers indices `0..l-1`, the part *before* the range.\n3. Subtract: what is left is `l..r`. So `sum(a[l..r]) = pre[r + 1] − pre[l]`.\n4. Building `pre` is one pass, O(n). Each query afterwards is one subtraction,\n   O(1). For `q` queries that is O(n + q) instead of O(n · q).\n\nThe `n + 1` length with `pre[0] = 0` is not decoration: it means a range\nstarting at index 0 (`l = 0`) uses `pre[0] = 0` and needs no special case.\n\n### The identity\n\nWith `pre[i]` = sum of the first `i` elements (`pre[0] = 0`):\n\n```\nsum(a[l..r]) = pre[r + 1] − pre[l]\n```\n\nThe `+1` offset and `pre[0] = 0` exist so that ranges starting at index 0 need\nno special case. Use an array of size `n + 1`; the off-by-ones disappear.\n\n### Prefix + hash map\n\n*\"How many subarrays sum to k?\"* becomes a **complement** question about prefix\nvalues: a subarray ending at `r` sums to k exactly when some earlier prefix\nequals `pre[r] − k`. So count prefix values as you go:\n\n```java\nMap<Long, Integer> seen = new HashMap<>();\nseen.put(0L, 1);                    // the empty prefix\nlong run = 0; int count = 0;\nfor (int x : a) {\n    run += x;\n    count += seen.getOrDefault(run - k, 0);\n    seen.merge(run, 1, Integer::sum);\n}\n```\n\n`seen.put(0L, 1)` before the loop is what lets a subarray starting at index 0 be\ncounted. Forgetting it is the classic bug.\n\nThis works with negative numbers, which is exactly where sliding window gave up.\n\n### Prefix products\n\nProduct-except-self is the same idea in two directions: a prefix product from\nthe left and a suffix product from the right, multiplied at each index. It\navoids division, which matters because the array may contain zeros.\n\n### Difference arrays and sweeps\n\nTo apply *\"add v to every index in [l, r]\"* many times, do not touch the range.\nRecord `diff[l] += v` and `diff[r + 1] -= v`, then take the prefix sum once at\nthe end: k updates become O(k + n) instead of O(k · n).\n\nThe same idea run over events (`+1` at a start, `−1` at an end, processed in\ntime order) answers *\"the maximum number of things active at once\"* — which is\nthe whole intervals unit in embryo.\n",
           "internals": "",
           "signals": [
             {
@@ -4178,7 +4953,178 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": [
+            {
+              "title": "Many range-sum queries",
+              "difficulty": "Easy",
+              "slug": "",
+              "problem": "Given `a` (`n ≤ 10⁵`) and `q ≤ 10⁵` queries `(l, r)`, return the sum of\n`a[l..r]` for each.\n",
+              "naive": "Loop from `l` to `r` per query: up to O(n) each, O(n · q) = 10¹⁰ in total.\n",
+              "signals": "- **Many** questions about **ranges** of a **fixed** array: precompute once,\n  answer each in O(1) with `pre[r + 1] − pre[l]`.\n",
+              "code": "static long[] rangeSums(int[] a, int[][] queries) {\n    long[] pre = new long[a.length + 1];          // pre[0] = 0\n    for (int i = 0; i < a.length; i++) pre[i + 1] = pre[i] + a[i];\n    long[] out = new long[queries.length];\n    for (int k = 0; k < queries.length; k++) {\n        int l = queries[k][0], r = queries[k][1];\n        out[k] = pre[r + 1] - pre[l];             // indices l..r\n    }\n    return out;\n}\n",
+              "steps": [
+                "`pre` has `n + 1` entries; `pre[i]` is the sum of the first `i` elements.\n",
+                "Each `pre[i + 1]` is the previous total plus `a[i]`: one pass.\n",
+                "A query subtracts the total before `l` from the total through `r`.\n",
+                "`long` avoids overflow: 10⁵ values of 10⁹ exceed `int`.\n"
+              ],
+              "sample_call": "java.util.Arrays.toString(rangeSums(new int[]{3, 1, 4, 1, 5}, new int[][]{{1, 3}, {0, 4}, {2, 2}}))",
+              "sample_output": "[6, 14, 4]",
+              "trace": {
+                "title": "rangeSums([3, 1, 4, 1, 5])",
+                "intro": "pre = [0, 3, 4, 8, 9, 14].",
+                "headers": [
+                  "Query",
+                  "pre[r+1]",
+                  "pre[l]",
+                  "Answer"
+                ],
+                "rows": [
+                  [
+                    "(1, 3)",
+                    "pre[4] = 9",
+                    "pre[1] = 3",
+                    "6"
+                  ],
+                  [
+                    "(0, 4)",
+                    "pre[5] = 14",
+                    "pre[0] = 0",
+                    "14"
+                  ],
+                  [
+                    "(2, 2)",
+                    "pre[3] = 8",
+                    "pre[2] = 4",
+                    "4"
+                  ]
+                ],
+                "takeaway": ""
+              },
+              "complexity": "**Time O(n + q)**. **Space O(n)** for `pre`.\n"
+            },
+            {
+              "title": "Count subarrays summing to k (with negatives)",
+              "difficulty": "Medium",
+              "slug": "",
+              "problem": "Given `a` (values may be **negative**, `n ≤ 2 × 10⁴`) and `k`, count the\ncontiguous subarrays whose sum is exactly `k`.\n",
+              "naive": "Every `(l, r)` pair with a running sum: O(n²) = 4 × 10⁸, borderline at best.\nA sliding window does not apply: with negatives, shrinking can raise the sum.\n",
+              "signals": "- \"Count **subarrays** with sum exactly k\" + **negative numbers**: prefix sums\n  plus a hash map.\n- `sum(a[l..r]) = pre[r+1] − pre[l] = k` means `pre[l] = pre[r+1] − k`: a\n  *complement* lookup, exactly like Two Sum, but over prefix values.\n",
+              "code": "static int countSumK(int[] a, int k) {\n    java.util.Map<Long, Integer> seen = new java.util.HashMap<>();\n    seen.put(0L, 1);                     // the empty prefix\n    long run = 0;\n    int count = 0;\n    for (int x : a) {\n        run += x;                                    // pre of everything so far\n        count += seen.getOrDefault(run - k, 0);      // earlier prefixes that complete k\n        seen.merge(run, 1, Integer::sum);            // record this prefix\n    }\n    return count;\n}\n",
+              "steps": [
+                "`seen` counts how many earlier prefixes had each total.\n",
+                "`seen.put(0L, 1)`: the empty prefix exists, so a subarray starting at index 0 can be counted.\n",
+                "At each element, every earlier prefix equal to `run − k` starts a subarray ending here with sum `k`.\n",
+                "Record `run` afterwards, so a subarray is never empty.\n"
+              ],
+              "sample_call": "String.valueOf(countSumK(new int[]{1, -1, 1, 1}, 1))",
+              "sample_output": "5",
+              "trace": {
+                "title": "countSumK([1, -1, 1, 1], k = 1)",
+                "intro": "",
+                "headers": [
+                  "x",
+                  "run",
+                  "run − k",
+                  "Found",
+                  "count",
+                  "seen after"
+                ],
+                "rows": [
+                  [
+                    "1",
+                    "1",
+                    "0",
+                    "1",
+                    "1",
+                    "{0:1, 1:1}"
+                  ],
+                  [
+                    "-1",
+                    "0",
+                    "-1",
+                    "0",
+                    "1",
+                    "{0:2, 1:1}"
+                  ],
+                  [
+                    "1",
+                    "1",
+                    "0",
+                    "2",
+                    "3",
+                    "{0:2, 1:2}"
+                  ],
+                  [
+                    "1",
+                    "2",
+                    "1",
+                    "2",
+                    "5",
+                    "{0:2, 1:2, 2:1}"
+                  ]
+                ],
+                "takeaway": "The five subarrays: [1] (index 0), [1, -1, 1], [-1, 1, 1], [1] (index 2), [1] (index 3)."
+              },
+              "complexity": "**Time O(n)**. **Space O(n)** for the map.\n"
+            },
+            {
+              "title": "Apply many range additions (difference array)",
+              "difficulty": "Hard",
+              "slug": "",
+              "problem": "Start with `n` zeros. Apply `u ≤ 10⁵` updates `(l, r, v)`: add `v` to every\nindex in `l..r`. Return the final array. `n ≤ 10⁵`.\n",
+              "naive": "Loop over `l..r` for each update: O(n) per update, O(n · u) = 10¹⁰ in total.\n",
+              "signals": "- **Many range updates**, and the result is only read **at the end**: record\n  each update at its two edges, then take a single prefix sum.\n- It is prefix sums run backwards: a difference array is what you take the\n  prefix sum *of*.\n",
+              "code": "static long[] applyUpdates(int n, int[][] updates) {\n    long[] diff = new long[n + 1];\n    for (int[] u : updates) {\n        diff[u[0]] += u[2];          // +v starts at l\n        diff[u[1] + 1] -= u[2];      // and stops after r\n    }\n    long[] out = new long[n];\n    long run = 0;\n    for (int i = 0; i < n; i++) {\n        run += diff[i];              // prefix sum turns edges into ranges\n        out[i] = run;\n    }\n    return out;\n}\n",
+              "steps": [
+                "`diff[i]` stores how much the value *changes* when stepping onto index `i`.\n",
+                "An update adds `v` from `l` onward and cancels it from `r + 1` onward: two O(1) writes.\n",
+                "The running sum of `diff` is the actual value at each index.\n",
+                "`diff` has `n + 1` slots so `r + 1 = n` needs no special case.\n"
+              ],
+              "sample_call": "java.util.Arrays.toString(applyUpdates(5, new int[][]{{1, 3, 2}, {2, 4, 3}, {0, 2, -2}}))",
+              "sample_output": "[-2, 0, 3, 5, 3]",
+              "trace": {
+                "title": "applyUpdates(5, [(1,3,+2), (2,4,+3), (0,2,−2)])",
+                "intro": "diff after the updates = [−2, 2, 3, 2, −2, −3].",
+                "headers": [
+                  "i",
+                  "diff[i]",
+                  "run = out[i]"
+                ],
+                "rows": [
+                  [
+                    "0",
+                    "-2",
+                    "-2"
+                  ],
+                  [
+                    "1",
+                    "2",
+                    "0"
+                  ],
+                  [
+                    "2",
+                    "3",
+                    "3"
+                  ],
+                  [
+                    "3",
+                    "2",
+                    "5"
+                  ],
+                  [
+                    "4",
+                    "-2",
+                    "3"
+                  ]
+                ],
+                "takeaway": ""
+              },
+              "complexity": "**Time O(n + u)**. **Space O(n)**.\n"
+            }
+          ]
         },
         {
           "key": "strings",
@@ -4192,7 +5138,7 @@
             "hashing"
           ],
           "why": "Strings are arrays of characters, so every pattern in this stage applies\nunchanged. What is new is **cost**: in Java a `String` is immutable, so every\n`+=` allocates a whole new one. A loop that builds a string with `+=` is O(n²)\nin total characters, and it is the most common accidental quadratic after\n`list.contains`.\n\nThe other new thing is that characters are numbers. `c - 'a'` gives 0…25, which\nturns letters into array indices — the trick behind every counting solution in\nthis unit.\n",
-          "model": "### The costs that matter\n\n| Operation | Cost | Note |\n| --- | --- | --- |\n| `charAt(i)` | O(1) | It is an array read |\n| `length()` | O(1) | Stored, not counted |\n| `substring(i, j)` | O(j − i) | **Copies** — it is not a view |\n| `s + t` | O(\\|s\\| + \\|t\\|) | Allocates a new string every time |\n| `StringBuilder.append` | O(1) amortised | The right tool for building |\n| `equals` | O(n) | Compares content; `==` compares identity |\n\n`substring` copying is why a naive *\"check every substring\"* loop is O(n³)\nrather than O(n²) — the copy hides inside the comparison.\n\n### Characters are numbers\n\n```java\nint idx = c - 'a';                    // 'a'..'z' → 0..25\nchar back = (char) ('a' + idx);\nboolean isDigit = c >= '0' && c <= '9';\n```\n\nThat mapping gives you an O(1)-space frequency table for any lowercase problem —\n`int[26]` — which is faster and clearer than a `HashMap<Character, Integer>`.\n\n### Building output\n\n```java\nStringBuilder sb = new StringBuilder();\nfor (...) sb.append(x);\nSystem.out.println(sb);\n```\n\nBuild once, print once. Printing inside a loop with `println` is also slow, for\nthe same underlying reason — each call flushes.\n\n### Canonical forms, again\n\nAnagrams, case-insensitive comparison and \"ignore punctuation\" are all the same\nmove: reduce each string to a canonical form and compare *those*. That is the\nhashing unit's idea, and text is where it earns its keep.\n\n### Palindromes: expand around a centre\n\nEvery palindrome has a centre, and growing outwards from it meets every\npalindrome with that centre, shortest first — each one confirmed in O(1), because\nthe inner part was confirmed one step earlier. There are **2n − 1** centres: each\ncharacter (odd lengths) and each gap between neighbours (even lengths).\n\n```java\nfor (int c = 0; c < 2 * n - 1; c++) {\n    int l = c / 2, r = l + c % 2;              // even c: a letter; odd c: a gap\n    while (l >= 0 && r < n && s.charAt(l) == s.charAt(r)) { /* s[l..r] is a palindrome */ l--; r++; }\n}\n```\n\nO(n²) in total, O(1) memory — versus O(n³) for checking every substring. Count\ninside the loop for *how many*; keep the widest for *the longest*.\n\n### Matching: the KMP prefix function\n\nSearching for a pattern by restarting after every mismatch is O(n·m). But after\nmatching k characters, the text's last k characters *are* the pattern's first k,\nso a mismatch need not throw them away.\n\n`pi[i]` = the length of the longest proper prefix of `t[0..i]` that is also a\nsuffix of it (a **border**). On a mismatch, fall back to the next shorter border,\n`k = pi[k − 1]`, instead of to 0:\n\n```java\nint[] pi = new int[m];\nfor (int i = 1, k = 0; i < m; i++) {                 // the pattern against itself\n    while (k > 0 && t.charAt(i) != t.charAt(k)) k = pi[k - 1];\n    if (t.charAt(i) == t.charAt(k)) k++;\n    pi[i] = k;\n}\nfor (int i = 0, k = 0; i < n; i++) {                 // the pattern against the text\n    while (k > 0 && s.charAt(i) != t.charAt(k)) k = pi[k - 1];\n    if (s.charAt(i) == t.charAt(k)) k++;\n    if (k == m) return i - m + 1;                     // or count, and set k = pi[k - 1]\n}\n```\n\nThe text pointer never moves back, and `k` falls at most as often as it rose, so\nthe search is O(n + m). The same array answers questions about one string:\n`pi[n − 1]` is its longest border (*longest happy prefix*), and running it on\n`s + \"#\" + reverse(s)` finds the longest palindromic prefix (*shortest\npalindrome*).\n",
+          "model": "### Start here: what a string is to the computer\n\n**The words.**\n\n- **Character (`char`).** One letter, digit or symbol. In Java a `char` is\n  stored as a **number** (its Unicode code): `'a'` is 97, `'b'` is 98, …,\n  `'z'` is 122; `'0'` is 48.\n- **String.** A sequence of characters with indices `0` to `length() - 1`, read\n  with `s.charAt(i)`. Conceptually it is just an array of `char`.\n- **Immutable.** A Java `String` can never be changed after it is created.\n  \"Changing\" it really builds a brand-new string and copies characters into it.\n- **`StringBuilder`.** A *mutable* buffer of characters you append to in place;\n  call `toString()` once at the end.\n\n**Prerequisite in one line:** copying a string of length `m` costs O(m),\nbecause every character is copied one by one.\n\n**Intuition for the immutability tax.** Building `\"abcd\"` with `s += c` four\ntimes copies 1, then 2, then 3, then 4 characters: 10 copies for 4 letters. For\n`n` letters that is 1 + 2 + … + n ≈ n²/2 copies, O(n²). A `StringBuilder`\nappends each letter into spare room it already has: about `n` copies, O(n).\n\n| Step | `s += c` copies | `sb.append(c)` copies |\n| --- | --- | --- |\n| add 'a' | 1 | 1 |\n| add 'b' | 2 | 1 |\n| add 'c' | 3 | 1 |\n| add 'd' | 4 | 1 |\n| total | 10 | 4 |\n\n**Intuition for \"characters are numbers\".** Since `'a'..'z'` are the\nconsecutive numbers 97..122, subtracting `'a'` maps them to 0..25:\n\n| c | code | c − 'a' |\n| --- | --- | --- |\n| 'a' | 97 | 0 |\n| 'c' | 99 | 2 |\n| 'z' | 122 | 25 |\n\nSo an `int[26]` can count letters: `freq[c - 'a']++` is \"add one to the box for\nthis letter\". Step by step for `\"cab\"`: `c` → box 2 becomes 1; `a` → box 0\nbecomes 1; `b` → box 1 becomes 1. Two words are anagrams exactly when their 26\nboxes end up equal.\n\nEverything below is these two ideas, applied: build with a `StringBuilder`,\nand treat letters as small array indices.\n\n### The costs that matter\n\n| Operation | Cost | Note |\n| --- | --- | --- |\n| `charAt(i)` | O(1) | It is an array read |\n| `length()` | O(1) | Stored, not counted |\n| `substring(i, j)` | O(j − i) | **Copies** — it is not a view |\n| `s + t` | O(\\|s\\| + \\|t\\|) | Allocates a new string every time |\n| `StringBuilder.append` | O(1) amortised | The right tool for building |\n| `equals` | O(n) | Compares content; `==` compares identity |\n\n`substring` copying is why a naive *\"check every substring\"* loop is O(n³)\nrather than O(n²) — the copy hides inside the comparison.\n\n### Characters are numbers\n\n```java\nint idx = c - 'a';                    // 'a'..'z' → 0..25\nchar back = (char) ('a' + idx);\nboolean isDigit = c >= '0' && c <= '9';\n```\n\nThat mapping gives you an O(1)-space frequency table for any lowercase problem —\n`int[26]` — which is faster and clearer than a `HashMap<Character, Integer>`.\n\n### Building output\n\n```java\nStringBuilder sb = new StringBuilder();\nfor (...) sb.append(x);\nSystem.out.println(sb);\n```\n\nBuild once, print once. Printing inside a loop with `println` is also slow, for\nthe same underlying reason — each call flushes.\n\n### Canonical forms, again\n\nAnagrams, case-insensitive comparison and \"ignore punctuation\" are all the same\nmove: reduce each string to a canonical form and compare *those*. That is the\nhashing unit's idea, and text is where it earns its keep.\n\n### Palindromes: expand around a centre\n\nEvery palindrome has a centre, and growing outwards from it meets every\npalindrome with that centre, shortest first — each one confirmed in O(1), because\nthe inner part was confirmed one step earlier. There are **2n − 1** centres: each\ncharacter (odd lengths) and each gap between neighbours (even lengths).\n\n```java\nfor (int c = 0; c < 2 * n - 1; c++) {\n    int l = c / 2, r = l + c % 2;              // even c: a letter; odd c: a gap\n    while (l >= 0 && r < n && s.charAt(l) == s.charAt(r)) { /* s[l..r] is a palindrome */ l--; r++; }\n}\n```\n\nO(n²) in total, O(1) memory — versus O(n³) for checking every substring. Count\ninside the loop for *how many*; keep the widest for *the longest*.\n\n### Matching: the KMP prefix function\n\nSearching for a pattern by restarting after every mismatch is O(n·m). But after\nmatching k characters, the text's last k characters *are* the pattern's first k,\nso a mismatch need not throw them away.\n\n`pi[i]` = the length of the longest proper prefix of `t[0..i]` that is also a\nsuffix of it (a **border**). On a mismatch, fall back to the next shorter border,\n`k = pi[k − 1]`, instead of to 0:\n\n```java\nint[] pi = new int[m];\nfor (int i = 1, k = 0; i < m; i++) {                 // the pattern against itself\n    while (k > 0 && t.charAt(i) != t.charAt(k)) k = pi[k - 1];\n    if (t.charAt(i) == t.charAt(k)) k++;\n    pi[i] = k;\n}\nfor (int i = 0, k = 0; i < n; i++) {                 // the pattern against the text\n    while (k > 0 && s.charAt(i) != t.charAt(k)) k = pi[k - 1];\n    if (s.charAt(i) == t.charAt(k)) k++;\n    if (k == m) return i - m + 1;                     // or count, and set k = pi[k - 1]\n}\n```\n\nThe text pointer never moves back, and `k` falls at most as often as it rose, so\nthe search is O(n + m). The same array answers questions about one string:\n`pi[n − 1]` is its longest border (*longest happy prefix*), and running it on\n`s + \"#\" + reverse(s)` finds the longest palindromic prefix (*shortest\npalindrome*).\n",
           "internals": "### What a Java `String` actually is\n\nA `String` wraps a private byte array and a coder flag, and it is **immutable** —\nthere is no method on it that changes it. Everything that looks like a mutation\nreturns a new object:\n\n```java\ns.toUpperCase();      // a new String; `s` is untouched\ns.trim();             // a new String\ns + \"x\";              // a new String, and a new StringBuilder behind the scenes\n```\n\nImmutability buys thread safety, safe use as a `HashMap` key, and a cached hash\ncode. It costs a copy on every edit, and that cost is where nearly every\nstring-performance bug in this unit comes from.\n\n### `substring` copies. It did not always.\n\nBefore Java 7, `substring` returned a view sharing the original array — O(1),\nand a 10-character substring of a 10 MB string kept all 10 MB alive. That leak\nwas judged worse than the copy, so since Java 7 `substring` **allocates and\ncopies**:\n\n| Call | Cost |\n| --- | --- |\n| `s.charAt(i)` | O(1), no allocation |\n| `s.substring(i, j)` | O(j − i) time **and** O(j − i) memory |\n| `s.regionMatches(i, t, 0, m)` | O(m) time, **no** allocation |\n| `s.equals(t)` | O(m), with a length check first |\n\nSo a loop that takes a substring per iteration is allocating per iteration, and\nthe allocation does not show up as a nested loop in the source.\n\n### Why `+=` in a loop is quadratic\n\n`a + b` compiles to a `StringBuilder` — one *per expression*, not per loop. So\n`out += part` inside a loop allocates a builder, copies everything accumulated\nso far into it, appends, and calls `toString()` to copy it all out again. Over n\nparts that is 1 + 2 + 3 + … characters: **O(n²) in the total length**, from code\nthat reads as linear.\n\n`StringBuilder` keeps one `byte[]` and doubles it when full, so n appends cost\nO(n) amortized — the same argument as `ArrayList.add` in the cost unit.\n\n### Latin-1 and UTF-16, and why `char` is not a character\n\nSince Java 9 a `String` stores one byte per character when every character fits\nin Latin-1, and two bytes otherwise. That is invisible to `charAt` and it is\n*not* what breaks: what breaks is that a `char` is a **UTF-16 code unit**, 16\nbits. Characters outside the Basic Multilingual Plane — emoji, some CJK\nextensions — occupy *two* chars, a surrogate pair.\n\n```java\n\"😀\".length();            // 2, not 1\n\"😀\".charAt(0);           // half of a surrogate pair, meaningless alone\n\"😀\".codePointCount(0, 2) // 1 — the honest count\n```\n\nEvery problem in this unit says \"lowercase English letters\", which makes this\nsafe to ignore *here* and a real bug in production. Reversing a string by\nswapping `char`s corrupts every emoji in it.\n\n### `char` arithmetic\n\n`char` promotes to `int` in arithmetic, which is what makes the array-index\ntrick work:\n\n```java\nint idx = c - 'a';              // 0..25, an int\nchar back = (char) (idx + 'a'); // the cast is required — int does not narrow implicitly\n```\n\n`'a' + 1` is the `int` 98, not the `char` `'b'`. Printing it without the cast\nprints `98`, which is the most common surprise in the first ten minutes of this\nunit.\n\n### The string pool\n\nString *literals* are interned: `\"abc\" == \"abc\"` is true because both refer to\none pooled object. `new String(\"abc\") == \"abc\"` is false, and so is\n`(\"ab\" + variable) == \"abc\"`. This is why **`equals` is the only correct way to\ncompare strings** — `==` sometimes works, which is worse than never working,\nbecause it passes in testing and fails on computed input.\n",
           "signals": [
             {
@@ -4777,7 +5723,179 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": [
+            {
+              "title": "Valid anagram",
+              "difficulty": "Easy",
+              "slug": "",
+              "problem": "Given lowercase strings `s` and `t`, return `true` if `t` is a rearrangement of\n`s` (same letters, same counts).\n",
+              "naive": "Sort both and compare: O(n log n), fine but not optimal. Removing each letter\nof `t` from a copy of `s` with `indexOf` is O(n²).\n",
+              "signals": "- **Lowercase letters only**: 26 possible keys, so an `int[26]` count table\n  (`c − 'a'` as the index) beats both sorting and a `HashMap`.\n",
+              "code": "static boolean isAnagram(String s, String t) {\n    if (s.length() != t.length()) return false;\n    int[] freq = new int[26];\n    for (int i = 0; i < s.length(); i++) {\n        freq[s.charAt(i) - 'a']++;      // count s up\n        freq[t.charAt(i) - 'a']--;      // count t down\n    }\n    for (int f : freq) if (f != 0) return false;\n    return true;\n}\n",
+              "steps": [
+                "Different lengths can never be anagrams.\n",
+                "`c − 'a'` turns a letter into a box 0..25.\n",
+                "Add one for each letter of `s`, subtract one for each letter of `t`.\n",
+                "Anagrams cancel out exactly, so every box must end at zero.\n"
+              ],
+              "sample_call": "String.valueOf(isAnagram(\"rat\", \"tar\"))",
+              "sample_output": "true",
+              "trace": {
+                "title": "isAnagram(\"rat\", \"tar\")",
+                "intro": "Only the boxes a, r, t are shown.",
+                "headers": [
+                  "i",
+                  "s[i] (+1)",
+                  "t[i] (−1)",
+                  "a, r, t after"
+                ],
+                "rows": [
+                  [
+                    "0",
+                    "r",
+                    "t",
+                    "0, 1, −1"
+                  ],
+                  [
+                    "1",
+                    "a",
+                    "a",
+                    "0, 1, −1"
+                  ],
+                  [
+                    "2",
+                    "t",
+                    "r",
+                    "0, 0, 0"
+                  ]
+                ],
+                "takeaway": "All zero: anagrams."
+              },
+              "complexity": "**Time O(n)**. **Space O(1)**: 26 counters regardless of n.\n"
+            },
+            {
+              "title": "Run-length compression",
+              "difficulty": "Medium",
+              "slug": "",
+              "problem": "Compress a string by replacing each run of a repeated character with the\ncharacter followed by the run length: `\"aaabccdddd\"` → `\"a3b1c2d4\"`.\n`n ≤ 10⁵`.\n",
+              "naive": "```java\nString out = \"\";\nfor (...) out += c + count;\n```\n\nCorrect, but each `+=` copies the whole output so far: O(n²) characters copied\nin total, around 5 × 10⁹ at the limit.\n",
+              "signals": "- **Building** a string piece by piece in a loop: use a `StringBuilder`.\n- \"Runs\" of equal characters: scan with an index and count while the next\n  character matches.\n",
+              "code": "static String compress(String s) {\n    StringBuilder sb = new StringBuilder();\n    int i = 0;\n    while (i < s.length()) {\n        char c = s.charAt(i);\n        int j = i;\n        while (j < s.length() && s.charAt(j) == c) j++;   // end of this run\n        sb.append(c).append(j - i);                        // char + run length\n        i = j;                                             // next run starts here\n    }\n    return sb.toString();\n}\n",
+              "steps": [
+                "`i` marks the start of the current run.\n",
+                "Advance `j` while the character equals `c`; `j − i` is the run length.\n",
+                "Append `c` and the length to the builder: amortized O(1) per character appended.\n",
+                "Jump `i` to `j`. Every index is visited once across both loops.\n"
+              ],
+              "sample_call": "compress(\"aaabccdddd\")",
+              "sample_output": "a3b1c2d4",
+              "trace": {
+                "title": "compress(\"aaabccdddd\")",
+                "intro": "",
+                "headers": [
+                  "i",
+                  "c",
+                  "j",
+                  "Appended",
+                  "sb"
+                ],
+                "rows": [
+                  [
+                    "0",
+                    "a",
+                    "3",
+                    "a3",
+                    "a3"
+                  ],
+                  [
+                    "3",
+                    "b",
+                    "4",
+                    "b1",
+                    "a3b1"
+                  ],
+                  [
+                    "4",
+                    "c",
+                    "6",
+                    "c2",
+                    "a3b1c2"
+                  ],
+                  [
+                    "6",
+                    "d",
+                    "10",
+                    "d4",
+                    "a3b1c2d4"
+                  ]
+                ],
+                "takeaway": ""
+              },
+              "complexity": "**Time O(n)**. **Space O(n)** for the output.\n"
+            },
+            {
+              "title": "Longest palindromic substring",
+              "difficulty": "Hard",
+              "slug": "",
+              "problem": "Given `s` (`n ≤ 1000`), return its longest substring that reads the same both\nways. `\"babad\"` → `\"bab\"` (`\"aba\"` is also correct; return the first found).\n",
+              "naive": "Check all O(n²) substrings, each in O(n): O(n³) = 10⁹ at n = 1000, too slow.\n",
+              "signals": "- Every palindrome has a **centre**: a character (odd length) or a gap between\n  two characters (even length). There are 2n − 1 centres.\n- Growing outward from a centre checks each longer palindrome in O(1), because\n  the inside was already confirmed: O(n) per centre, O(n²) total, which fits\n  `n ≤ 1000`.\n",
+              "code": "static String longestPalindrome(String s) {\n    int bestL = 0, bestLen = 0;\n    for (int c = 0; c < s.length(); c++) {\n        for (int odd = 1; odd >= 0; odd--) {        // centre on c, then on the gap after c\n            int l = c, r = c + 1 - odd;\n            while (l >= 0 && r < s.length() && s.charAt(l) == s.charAt(r)) {\n                l--; r++;                           // grow while the ends match\n            }\n            int len = r - l - 1;                    // the last palindrome was l+1..r-1\n            if (len > bestLen) { bestLen = len; bestL = l + 1; }\n        }\n    }\n    return s.substring(bestL, bestL + bestLen);\n}\n",
+              "steps": [
+                "For each index `c`, try two centres: the character itself (`l = r = c`) and the gap after it (`l = c`, `r = c + 1`).\n",
+                "Grow outward while both ends exist and match.\n",
+                "When the loop stops, the ends no longer match, so the palindrome is `l + 1 .. r − 1`, length `r − l − 1`.\n",
+                "Keep the longest; take one `substring` at the very end (a single O(n) copy).\n"
+              ],
+              "sample_call": "longestPalindrome(\"babad\")",
+              "sample_output": "bab",
+              "trace": {
+                "title": "longestPalindrome(\"babad\")",
+                "intro": "Only odd centres shown; even centres find nothing longer than 0 here.",
+                "headers": [
+                  "Centre c",
+                  "Grows to",
+                  "Palindrome",
+                  "Best"
+                ],
+                "rows": [
+                  [
+                    "0 (b)",
+                    "0..0",
+                    "b",
+                    "b"
+                  ],
+                  [
+                    "1 (a)",
+                    "0..2",
+                    "bab",
+                    "bab"
+                  ],
+                  [
+                    "2 (b)",
+                    "1..3",
+                    "aba",
+                    "bab (not longer)"
+                  ],
+                  [
+                    "3 (a)",
+                    "3..3",
+                    "a",
+                    "bab"
+                  ],
+                  [
+                    "4 (d)",
+                    "4..4",
+                    "d",
+                    "bab"
+                  ]
+                ],
+                "takeaway": ""
+              },
+              "complexity": "**Time O(n²)**: 2n − 1 centres, each growing at most n/2 steps. **Space O(1)** besides the answer.\n"
+            }
+          ]
         }
       ]
     },
@@ -5799,7 +6917,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         },
         {
           "key": "sorting",
@@ -6722,7 +7841,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         },
         {
           "key": "binary-search",
@@ -7663,7 +8783,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         },
         {
           "key": "greedy",
@@ -8629,7 +9750,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         },
         {
           "key": "intervals",
@@ -9545,7 +10667,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         }
       ]
     },
@@ -10933,7 +12056,8 @@
             }
           ],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         },
         {
           "key": "bit-manipulation",
@@ -12133,7 +13257,8 @@
             }
           ],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         },
         {
           "key": "simulation-and-matrix",
@@ -13289,7 +14414,8 @@
             }
           ],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         }
       ]
     },
@@ -13754,7 +14880,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         },
         {
           "key": "queues-and-deques",
@@ -14195,7 +15322,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         },
         {
           "key": "linked-lists",
@@ -14704,7 +15832,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         },
         {
           "key": "heaps",
@@ -15157,7 +16286,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         }
       ]
     },
@@ -16607,7 +17737,8 @@
               "q": "Max path sum: what if the path must start at the root?",
               "a": "Then there is no \"bend\": it is a top-down (or single return value) recursion — best(n) = n.val + max(0, best(left), best(right)) — and nothing is recorded in a field.\n"
             }
-          ]
+          ],
+          "solved_examples": []
         },
         {
           "key": "bst",
@@ -17737,7 +18868,8 @@
               "q": "Merge two BSTs into one balanced BST — what is the cost?",
               "a": "Two in-order walks (O(n + m)), merge the two sorted lists (O(n + m)), then the middle-first build (O(n + m)). Inserting one tree's values into the other is O(m log(n + m)) at best and O(m · (n + m)) if it degenerates.\n"
             }
-          ]
+          ],
+          "solved_examples": []
         },
         {
           "key": "backtracking",
@@ -19100,7 +20232,8 @@
               "q": "Word search with 10⁴ words on one board?",
               "a": "Do not run one search per word. Put the words in a trie and run one DFS per cell, descending the trie as you walk — stage 7's word-search-with-a-trie pattern.\n"
             }
-          ]
+          ],
+          "solved_examples": []
         },
         {
           "key": "graph-traversal",
@@ -20396,7 +21529,8 @@
               "q": "Is the graph bipartite — and if not, show the odd cycle?",
               "a": "When BFS finds an edge u–v with equal colours, walk parent pointers up from u and v until they meet at their lowest common ancestor; the two paths plus u–v form an odd cycle.\n"
             }
-          ]
+          ],
+          "solved_examples": []
         },
         {
           "key": "topological-sort",
@@ -21500,7 +22634,8 @@
               "q": "Longest path in a DAG — why not negate the weights and run Dijkstra?",
               "a": "Negated weights are negative, which Dijkstra cannot handle. On a DAG you do not need it: relax in topological order with max (or with min on the negated weights).\n"
             }
-          ]
+          ],
+          "solved_examples": []
         },
         {
           "key": "union-find",
@@ -22571,7 +23706,8 @@
               "q": "Could BFS do the job of union-find here?",
               "a": "For one static graph and one question, yes — components by BFS are O(V + E). Union-find wins when edges arrive over time and questions interleave with them.\n"
             }
-          ]
+          ],
+          "solved_examples": []
         },
         {
           "key": "mst",
@@ -23656,7 +24792,8 @@
               "q": "Directed graph: cheapest set of edges so every vertex is reachable from the root?",
               "a": "That is a minimum **arborescence**, not an MST — Kruskal and Prim fail on directed edges. Chu–Liu/Edmonds solves it in O(V · E).\n"
             }
-          ]
+          ],
+          "solved_examples": []
         },
         {
           "key": "shortest-paths",
@@ -24852,7 +25989,8 @@
               "q": "Why not use BFS on a weighted graph by splitting an edge of weight w into w unit edges?",
               "a": "It is correct, and it is exactly what Dijkstra simulates efficiently. With weights up to 10⁹ the split graph is astronomically large; with weights 0/1 or tiny integers, the idea becomes 0-1 BFS or a bucket queue (Dial's algorithm).\n"
             }
-          ]
+          ],
+          "solved_examples": []
         }
       ]
     },
@@ -25197,7 +26335,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         },
         {
           "key": "dp-knapsack",
@@ -25580,7 +26719,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         },
         {
           "key": "dp-2d",
@@ -25919,7 +27059,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         },
         {
           "key": "dp-intervals-states",
@@ -26280,7 +27421,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         },
         {
           "key": "tries",
@@ -26634,7 +27776,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         },
         {
           "key": "design",
@@ -27071,7 +28214,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         }
       ]
     },
@@ -27504,7 +28648,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         },
         {
           "key": "range-queries",
@@ -27890,7 +29035,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         },
         {
           "key": "advanced-graphs",
@@ -28198,7 +29344,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         },
         {
           "key": "bitmask-dp",
@@ -28508,7 +29655,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         },
         {
           "key": "tree-queries",
@@ -28896,7 +30044,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         },
         {
           "key": "advanced-bits",
@@ -29292,7 +30441,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         },
         {
           "key": "dp-advanced",
@@ -29632,7 +30782,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         },
         {
           "key": "flows-and-matching",
@@ -29992,7 +31143,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         },
         {
           "key": "geometry",
@@ -30337,7 +31489,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         },
         {
           "key": "randomized",
@@ -30748,7 +31901,8 @@
           "lab": null,
           "drills": [],
           "extra_labs": [],
-          "followups": []
+          "followups": [],
+          "solved_examples": []
         }
       ]
     }

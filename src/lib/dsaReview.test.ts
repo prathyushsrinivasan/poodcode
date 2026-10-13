@@ -101,6 +101,7 @@ function unit(key: string, rungs: Rung[], checks: UnitCheck[] = []): CurriculumU
     lab: null,
     extra_labs: [],
     followups: [],
+    solved_examples: [],
     drills: [],
     stuck: [],
     edge_cases: [],

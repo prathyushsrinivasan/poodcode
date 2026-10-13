@@ -1734,6 +1734,37 @@ pub struct CurriculumUnit {
     /// The interviewer's "what if…?" twists, each with its answer.
     #[serde(default)]
     pub followups: Vec<Followup>,
+    /// Fully worked problems, easy to harder, shown on the "Solved Examples" tab.
+    #[serde(default)]
+    pub solved_examples: Vec<SolvedExample>,
+}
+
+/// One problem worked start to finish (see `SolvedExample` in src/types.ts).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SolvedExample {
+    pub title: String,
+    #[serde(default)]
+    pub difficulty: String,
+    #[serde(default)]
+    pub slug: String,
+    #[serde(default)]
+    pub problem: String,
+    #[serde(default)]
+    pub naive: String,
+    #[serde(default)]
+    pub signals: String,
+    #[serde(default)]
+    pub code: String,
+    #[serde(default)]
+    pub steps: Vec<String>,
+    #[serde(default)]
+    pub sample_call: String,
+    #[serde(default)]
+    pub sample_output: String,
+    #[serde(default)]
+    pub trace: Option<Trace>,
+    #[serde(default)]
+    pub complexity: String,
 }
 
 /// A "what if…?" follow-up question and its answer (markdown).
