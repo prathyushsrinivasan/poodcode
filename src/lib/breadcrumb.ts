@@ -93,7 +93,13 @@ const TREE: Record<string, RouteNode> = {
     children: { ":": { label: "", dynamicLabel: "Checkpoint" } },
   },
   "jp-bridge": { label: "日本語 → Java" },
-  japanese: { label: "日本語 vocabulary" },
+  japanese: {
+    label: "日本語 vocabulary",
+    children: { n2: { label: "JLPT N2 patterns", children: {
+      review: { label: "Mistake review" },
+      ":": { label: "", dynamicLabel: "Pattern lesson" },
+    } } },
+  },
   paths: { label: "Topic playlists" },
   insights: { label: "Insights" },
   settings: { label: "Settings" },

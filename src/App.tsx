@@ -31,6 +31,7 @@ import TsPlayground from "./pages/TsPlayground";
 import AsyncVisualiser from "./pages/AsyncVisualiser";
 import Contest from "./pages/Contest";
 import JapaneseBridge from "./pages/JapaneseBridge";
+import JlptN2 from "./pages/JlptN2";
 import Paths from "./pages/Paths";
 import Insights from "./pages/Insights";
 import Popout from "./pages/Popout";
@@ -101,6 +102,8 @@ function Shell() {
           <Route path="/learn" element={<Learn />} />
           <Route path="/learn/:key" element={<Learn />} />
           <Route path="/japanese" element={<JapanesePage />} />
+          <Route path="/japanese/n2" element={<JlptN2 />} />
+          <Route path="/japanese/n2/:lessonId" element={<JlptN2 />} />
           <Route path="/course" element={<Course />} />
           <Route path="/course/:week" element={<Course />} />
           <Route path="/java-course" element={<JavaCourse />} />

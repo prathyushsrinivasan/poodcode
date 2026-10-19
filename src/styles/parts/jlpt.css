@@ -1,0 +1,30 @@
+.n2-page { display: flex; flex-direction: column; gap: var(--space-5); }
+.n2-page .page-header { margin-bottom: 0; }
+.n2-page .card h2 { font-size: var(--text-xl); margin: 0 0 var(--space-3); }
+.n2-page .card h3 { font-size: var(--text-lg); margin: var(--space-5) 0 var(--space-2); }
+.n2-page p { line-height: var(--leading-loose); }
+.n2-page .card > p:last-child { margin-bottom: 0; }
+.n2-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+.n2-actions .btn { display: inline-flex; padding: var(--space-2) var(--space-4); border-radius: var(--radius-sm); }
+.n2-actions a.primary { color: var(--on-accent); background: var(--accent); }
+.n2-overview { display: grid; gap: var(--space-4); }
+.n2-meta { color: var(--text-dim); font-size: var(--text-sm); }
+.n2-filters { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--space-4); }
+.n2-search, .n2-answer { display: grid; gap: var(--space-2); font-weight: var(--weight-medium); }
+.n2-search input { min-width: 0; width: 100%; }
+.n2-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
+.n2-lesson { display: flex; flex-direction: column; gap: var(--space-3); color: var(--text); text-decoration: none; }
+.n2-lesson:hover { border-color: var(--accent); text-decoration: none; }
+.n2-page .n2-lesson h2, .n2-lesson p { margin: 0; }
+.n2-lesson .progress-wrap { margin-top: auto; }
+.n2-rule p:last-child { color: var(--text-dim); }
+.n2-exercise { min-width: 0; }
+.n2-exercise > .progress-wrap { margin-top: var(--space-4); }
+.n2-sentence { font-size: var(--text-2xl); line-height: 2; overflow-wrap: anywhere; }
+.n2-blank { color: var(--accent-text); white-space: nowrap; }
+.n2-answer { max-width: 32rem; }
+.n2-answer input { font-size: var(--text-xl); min-width: 0; width: 100%; }
+.n2-feedback { border-top: 1px solid var(--border); margin-top: var(--space-5); padding-top: var(--space-3); }
+.n2-solution { color: var(--accent-text); text-decoration: underline; text-underline-offset: var(--space-1); }
+.n2-finish { display: grid; justify-items: start; gap: var(--space-3); }
+@media (max-width: 1180px) { .n2-grid { grid-template-columns: minmax(0, 1fr); } }

@@ -15,6 +15,7 @@ import { loadCurriculumSeed } from "./CurriculumData";
 import { TS_ERRORS } from "../lib/tsErrors";
 import { clearRecents, readRecents } from "../lib/recents";
 import { ignore } from "../lib/failures";
+import { N2_LESSONS } from "../data/jlptN2";
 
 interface Cmd {
   id: string;
@@ -139,13 +140,24 @@ function courseCmds(
  */
 function japaneseCmds(concepts: Concept[], navigate: (to: string) => void): Cmd[] {
   const sets = concepts.filter((c) => c.language === "japanese");
-  if (sets.length === 0) return [];
   return [
+    {
+      id: "jlpt-n2",
+      label: "JLPT N2 patterns — fill the blank",
+      hint: "120 questions · one kanji · vocabulary · explanations · mistake review",
+      run: () => navigate("/japanese/n2"),
+    },
+    ...N2_LESSONS.map((l) => ({
+      id: `jlpt-n2-${l.id}`,
+      label: `JLPT N2 · ${l.title}`,
+      hint: l.rule,
+      run: () => navigate(`/japanese/n2/${l.id}`),
+    })),
     {
       id: "jp-vocab",
       label: "日本語 Vocabulary — 語彙",
       hint: "Tagged words with readings and example sentences, on spaced repetition",
-      run: () => navigate("/learn"),
+      run: () => navigate("/japanese"),
     },
     {
       id: "jp-bridge",

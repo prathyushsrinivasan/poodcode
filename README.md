@@ -11,6 +11,14 @@ Built with **Tauri 2 · React + TypeScript · Rust · SQLite · Monaco · EChart
 
 ## Quick start
 
+The **Languages → JLPT N2 patterns** course contains 120 original fill-in-the-blank
+questions in 24 taught families: 60 single-kanji word-building questions and 60
+contextual vocabulary questions. Each answer includes its reading, translation,
+explanation, and the limits of the general rule. Type only the missing part;
+listed alternative answers are accepted. Progress is saved in the local SQLite
+settings, and missed or revealed answers go into a dedicated mistake review.
+The existing coding tracks and Japanese technical vocabulary remain available.
+
 Prerequisites (already verified on this machine):
 
 - **Node.js** 18+ (22+ recommended — enables running TypeScript solutions)
