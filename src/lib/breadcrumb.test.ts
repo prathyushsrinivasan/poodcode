@@ -31,6 +31,15 @@ describe("breadcrumb", () => {
     expect(labels("/library/browse")).toEqual(["Today", "DSA Curriculum", "Browse problems"]);
   });
 
+  it("nests both N2 course formats under the course menu", () => {
+    expect(labels("/japanese/n2/patterns/a01")).toEqual([
+      "Today", "日本語 vocabulary", "JLPT N2 courses", "Kanji & Vocabulary Blanks", "Pattern lesson",
+    ]);
+    expect(hrefs("/japanese/n2/patterns/a01")).toEqual(["/", "/japanese", "/japanese/n2", "/japanese/n2/patterns", null]);
+    expect(labels("/japanese/n2/sentence-order/review").slice(-2)).toEqual(["Sentence Assembly ★", "Mistake review"]);
+    expect(labels("/japanese/n2/a01").slice(-1)[0]).toBe("Pattern lesson");
+  });
+
   it("skips plumbing segments that carry no label", () => {
     // "/library/unit/two-pointers" is three segments but two crumbs — "unit"
     // is routing, not a place.

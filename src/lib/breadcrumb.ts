@@ -95,7 +95,20 @@ const TREE: Record<string, RouteNode> = {
   "jp-bridge": { label: "日本語 → Java" },
   japanese: {
     label: "日本語 vocabulary",
-    children: { n2: { label: "JLPT N2 patterns", children: {
+    children: { n2: { label: "JLPT N2 courses", children: {
+      patterns: { label: "Kanji & Vocabulary Blanks", children: {
+        review: { label: "Mistake review" }, ":": { label: "", dynamicLabel: "Pattern lesson" },
+      } },
+      "sentence-order": { label: "Sentence Assembly ★", children: {
+        review: { label: "Mistake review" }, mixed: { label: "Mixed practice" },
+        ":": { label: "", dynamicLabel: "Assembly lesson" },
+      } },
+      reading: { label: "読解 · Reading", children: {
+        vocabulary: { label: "Reading vocabulary" },
+        ":": { label: "", dynamicLabel: "Reading section", children: {
+          ":": { label: "", dynamicLabel: "Reading passage" },
+        } },
+      } },
       review: { label: "Mistake review" },
       ":": { label: "", dynamicLabel: "Pattern lesson" },
     } } },

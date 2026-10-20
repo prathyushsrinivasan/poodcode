@@ -1,59 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { api } from "../api";
 import { useCrumb } from "../store";
 import { Badge, Button, Card, Chip, ErrorState, PageHeader, ProgressBar } from "../components/ui";
 import { N2_LESSONS, N2_QUESTIONS, type N2Kind, type N2Question } from "../data/jlptN2";
-import { isN2Answer, N2_PROGRESS_KEY, n2LessonFor, n2ResumeIndex, n2ReviewQuestions,
-  n2Stats, parseN2Progress, recordN2Answer, type N2Progress } from "../lib/jlptN2";
+import { isN2Answer, n2LessonFor, n2ResumeIndex, n2ReviewQuestions,
+  n2Stats, type N2Progress } from "../lib/jlptN2";
 
-// Serialize snapshots so rapid answers cannot let an older write win. Await
-// this queue on remount too, before reading the persisted progress again.
-let pendingSave: Promise<void> = Promise.resolve();
-
-function useN2Progress() {
-  const [progress, setProgress] = useState<N2Progress | null>(null);
-  const latest = useRef<N2Progress>({});
-  const [loadError, setLoadError] = useState("");
-  const [saveError, setSaveError] = useState("");
-  const [attempt, setAttempt] = useState(0);
-  const mounted = useRef(false);
-  useEffect(() => {
-    let canceled = false;
-    mounted.current = true;
-    setLoadError("");
-    pendingSave.catch(() => undefined)
-      .then(() => api.getSettings())
-      .then((settings) => {
-        if (canceled) return;
-        latest.current = parseN2Progress(settings[N2_PROGRESS_KEY]);
-        setProgress(latest.current);
-      })
-      .catch((e) => { if (!canceled) setLoadError(String(e)); });
-    return () => { canceled = true; mounted.current = false; };
-  }, [attempt]);
-
-  function persist(next: N2Progress) {
-    pendingSave = pendingSave.catch(() => undefined)
-      .then(() => api.setSetting(N2_PROGRESS_KEY, JSON.stringify(next)))
-      .then(() => { if (mounted.current) setSaveError(""); })
-      .catch((e) => {
-        if (mounted.current) setSaveError(String(e));
-        // Retain the rejected queue for the next mount/retry to recover from.
-        throw e;
-      });
-    // A failed save is shown inline; this handler prevents an unhandled rejection.
-    void pendingSave.catch(() => undefined);
-  }
-  function record(id: string, correct: boolean) {
-    const next = recordN2Answer(latest.current, id, correct);
-    latest.current = next;
-    setProgress(next);
-    persist(next);
-  }
-  return { progress, record, loadError, saveError,
-    retryLoad: () => setAttempt((n) => n + 1), retrySave: () => persist(latest.current) };
-}
+import { useN2Progress } from "../lib/useN2Progress";
 
 export default function JlptN2() {
   const { lessonId } = useParams();
@@ -65,19 +18,20 @@ export default function JlptN2() {
 
   if (lessonId && !lesson && !reviewing) return <div className="page">
     <PageHeader title="Lesson not found" subtitle="Choose one of the course's pattern families." />
-    <Link to="/japanese/n2">Back to JLPT N2</Link>
+    <Link to="/japanese/n2/patterns">Back to JLPT N2</Link>
   </div>;
   if (state.loadError) return <div className="page">
-    <PageHeader title="JLPT N2 patterns" />
+    <PageHeader title="Kanji & Vocabulary Blanks" />
     <ErrorState title="Your course progress could not be loaded." error={state.loadError} onRetry={state.retryLoad} />
   </div>;
   if (!state.progress) return <div className="page" role="status">Loading your JLPT N2 course…</div>;
 
   const questions = reviewing ? n2ReviewQuestions(state.progress) : lesson?.questions;
   return <div className="page n2-page">
-    {lessonId && <Link className="ghost-link" to="/japanese/n2">← All pattern families</Link>}
+    <Link className="ghost-link" to="/japanese/n2">← JLPT N2 courses</Link>
+    {lessonId && <Link className="ghost-link" to="/japanese/n2/patterns">← All pattern families</Link>}
     <PageHeader eyebrow="日本語 · JLPT N2 preparation"
-      title={reviewing ? "Revisit your mistakes" : lesson?.title ?? "Learn the pattern. Fill the blank."}
+      title={reviewing ? "Revisit your mistakes" : lesson?.title ?? "Kanji & Vocabulary Blanks"}
       subtitle={lessonId
         ? "Read the surrounding words, supply only the missing part, then explain your choice."
         : "120 original questions in 24 taught families: 60 one-kanji blanks and 60 vocabulary blanks. Readings, translations and an explanation for every answer."} />
@@ -108,8 +62,8 @@ function CourseIndex({ progress }: { progress: N2Progress }) {
         <p>{stats.attempted} practiced · {stats.missed} to revisit. Progress stays in your local app database.</p></div>
       <ProgressBar value={stats.correct} max={stats.total} label="N2 questions correct on latest attempt" />
       <div className="n2-actions">
-        <Link className="btn primary" to={`/japanese/n2/${next.id}`}>{stats.attempted ? "Continue course" : "Start course"}</Link>
-        {stats.missed > 0 && <Link className="btn" to="/japanese/n2/review">Review {stats.missed} mistakes</Link>}
+        <Link className="btn primary" to={`/japanese/n2/patterns/${next.id}`}>{stats.attempted ? "Continue course" : "Start course"}</Link>
+        {stats.missed > 0 && <Link className="btn" to="/japanese/n2/patterns/review">Review {stats.missed} mistakes</Link>}
       </div>
     </Card>
     <Card>
@@ -132,7 +86,7 @@ function CourseIndex({ progress }: { progress: N2Progress }) {
     <div className="n2-grid">
       {lessons.map((l) => {
         const s = n2Stats(l.questions, progress);
-        return <Link key={l.id} to={`/japanese/n2/${l.id}`} className="card n2-lesson">
+        return <Link key={l.id} to={`/japanese/n2/patterns/${l.id}`} className="card n2-lesson">
           <div className="n2-actions"><Badge>{l.kind === "kanji" ? "One kanji" : "Vocabulary"}</Badge>
             <span className="n2-meta">{l.id.toUpperCase()} · 5 questions</span></div>
           <h2>{l.title}</h2><p>{l.rule}</p>
@@ -168,13 +122,13 @@ function N2Session({ questions, progress, reviewing, onRecord, onRestart }: {
 
   if (!round.length) return <Card>
     <h2>No mistakes waiting</h2><p>Try a pattern family. Revealed answers and missed targets will appear here for another attempt.</p>
-    <Link to="/japanese/n2">Choose a family →</Link>
+    <Link to="/japanese/n2/patterns">Choose a family →</Link>
   </Card>;
   if (!q) return <Card className="n2-finish">
     <Badge tone="good">Round complete</Badge><h2>{correctCount} / {round.length} correct this round</h2>
     <p>Review an explanation, then try producing the answer again without looking. Only a submitted correct answer counts as correct progress.</p>
     <div className="n2-actions"><Button variant="primary" onClick={onRestart}>Practice again</Button>
-      <Link to="/japanese/n2">Choose another family →</Link></div>
+      <Link to="/japanese/n2/patterns">Choose another family →</Link></div>
   </Card>;
 
   const lesson = n2LessonFor(q);

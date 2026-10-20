@@ -32,6 +32,9 @@ import AsyncVisualiser from "./pages/AsyncVisualiser";
 import Contest from "./pages/Contest";
 import JapaneseBridge from "./pages/JapaneseBridge";
 import JlptN2 from "./pages/JlptN2";
+import JlptN2Courses from "./pages/JlptN2Courses";
+import JlptN2SentenceOrder from "./pages/JlptN2SentenceOrder";
+import JlptReading from "./pages/JlptReading";
 import Paths from "./pages/Paths";
 import Insights from "./pages/Insights";
 import Popout from "./pages/Popout";
@@ -102,7 +105,14 @@ function Shell() {
           <Route path="/learn" element={<Learn />} />
           <Route path="/learn/:key" element={<Learn />} />
           <Route path="/japanese" element={<JapanesePage />} />
-          <Route path="/japanese/n2" element={<JlptN2 />} />
+          <Route path="/japanese/n2" element={<JlptN2Courses />} />
+          <Route path="/japanese/n2/patterns" element={<JlptN2 />} />
+          <Route path="/japanese/n2/patterns/:lessonId" element={<JlptN2 />} />
+          <Route path="/japanese/n2/sentence-order" element={<JlptN2SentenceOrder />} />
+          <Route path="/japanese/n2/sentence-order/:lessonId" element={<JlptN2SentenceOrder />} />
+          <Route path="/japanese/n2/reading" element={<JlptReading />} />
+          <Route path="/japanese/n2/reading/:section" element={<JlptReading />} />
+          <Route path="/japanese/n2/reading/:section/:passageId" element={<JlptReading />} />
           <Route path="/japanese/n2/:lessonId" element={<JlptN2 />} />
           <Route path="/course" element={<Course />} />
           <Route path="/course/:week" element={<Course />} />

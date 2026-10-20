@@ -22,13 +22,13 @@ export function isN2Answer(question: N2Question, input: string): boolean {
 
 /** Settings can be imported from older backups. Ignore unknown/malformed rows
  * rather than allowing them to inflate progress or break a lesson. */
-export function parseN2Progress(raw?: string): N2Progress {
+export function parseN2Progress(raw?: string, questions: { id: string }[] = N2_QUESTIONS): N2Progress {
   if (!raw) return {};
   let parsed: unknown;
   try { parsed = JSON.parse(raw); } catch { return {}; }
   if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
   const out: N2Progress = {};
-  for (const q of N2_QUESTIONS) {
+  for (const q of questions) {
     const row = (parsed as Record<string, unknown>)[q.id];
     if (!row || typeof row !== "object") continue;
     const r = row as N2Result;
@@ -50,7 +50,7 @@ export function recordN2Answer(progress: N2Progress, id: string, correct: boolea
   } };
 }
 
-export function n2Stats(questions: N2Question[], progress: N2Progress) {
+export function n2Stats(questions: { id: string }[], progress: N2Progress) {
   return {
     total: questions.length,
     attempted: questions.filter((q) => progress[q.id]).length,
@@ -65,7 +65,7 @@ export function n2ReviewQuestions(progress: N2Progress): N2Question[] {
 
 /** Resume the first unanswered question, then the first mistake. A completely
  * correct lesson opens at the beginning for another practice session. */
-export function n2ResumeIndex(questions: N2Question[], progress: N2Progress): number {
+export function n2ResumeIndex(questions: { id: string }[], progress: N2Progress): number {
   const unanswered = questions.findIndex((q) => !progress[q.id]);
   if (unanswered >= 0) return unanswered;
   const missed = questions.findIndex((q) => !progress[q.id]?.lastCorrect);

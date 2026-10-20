@@ -16,6 +16,8 @@ import { TS_ERRORS } from "../lib/tsErrors";
 import { clearRecents, readRecents } from "../lib/recents";
 import { ignore } from "../lib/failures";
 import { N2_LESSONS } from "../data/jlptN2";
+import { N2_ASSEMBLY_LESSONS } from "../data/jlptN2SentenceOrder";
+import { READING_SECTIONS, READING_PASSAGES } from "../data/dokkai";
 
 interface Cmd {
   id: string;
@@ -143,15 +145,31 @@ function japaneseCmds(concepts: Concept[], navigate: (to: string) => void): Cmd[
   return [
     {
       id: "jlpt-n2",
-      label: "JLPT N2 patterns — fill the blank",
-      hint: "120 questions · one kanji · vocabulary · explanations · mistake review",
+      label: "JLPT N2 courses",
+      hint: "読解 Reading · Kanji & Vocabulary Blanks · Sentence Assembly ★",
       run: () => navigate("/japanese/n2"),
     },
+    { id: "jlpt-n2-patterns", label: "Kanji & Vocabulary Blanks — JLPT N2",
+      hint: "120 questions · one kanji · vocabulary", run: () => navigate("/japanese/n2/patterns") },
+    { id: "jlpt-n2-assembly", label: "Sentence Assembly ★ — JLPT N2",
+      hint: "文の組み立て · 125 questions · sentence ordering · tips", run: () => navigate("/japanese/n2/sentence-order") },
+    { id: "jlpt-n2-reading", label: "読解 Dokkai — JLPT N2 Reading",
+      hint: "100 short passages · vocabulary · timed practice · mistake review", run: () => navigate("/japanese/n2/reading") },
+    { id: "jlpt-n2-reading-vocabulary", label: "Reading vocabulary — saved words",
+      hint: "読解 · kana · meanings · spaced review", run: () => navigate("/japanese/n2/reading/vocabulary") },
+    ...READING_SECTIONS.map((s) => ({ id: `jlpt-reading-${s.id}`, label: `${s.name} · ${s.english}`,
+      hint: `JLPT N2 読解 · ${s.length}`, run: () => navigate(`/japanese/n2/reading/${s.id}`) })),
+    ...READING_PASSAGES.map((p) => ({ id: `jlpt-reading-${p.id}`, label: `読解 · ${p.title}`,
+      hint: `${p.topic} · ${p.skill}`, run: () => navigate(`/japanese/n2/reading/${p.kind}/${p.id}`) })),
+    ...N2_ASSEMBLY_LESSONS.map((l) => ({
+      id: `jlpt-n2-assembly-${l.id}`, label: `Sentence Assembly ★ · ${l.title}`,
+      hint: l.strategy, run: () => navigate(`/japanese/n2/sentence-order/${l.id}`),
+    })),
     ...N2_LESSONS.map((l) => ({
       id: `jlpt-n2-${l.id}`,
       label: `JLPT N2 · ${l.title}`,
       hint: l.rule,
-      run: () => navigate(`/japanese/n2/${l.id}`),
+      run: () => navigate(`/japanese/n2/patterns/${l.id}`),
     })),
     {
       id: "jp-vocab",

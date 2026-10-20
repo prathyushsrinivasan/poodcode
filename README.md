@@ -11,13 +11,22 @@ Built with **Tauri 2 · React + TypeScript · Rust · SQLite · Monaco · EChart
 
 ## Quick start
 
-The **Languages → JLPT N2 patterns** course contains 120 original fill-in-the-blank
-questions in 24 taught families: 60 single-kanji word-building questions and 60
-contextual vocabulary questions. Each answer includes its reading, translation,
-explanation, and the limits of the general rule. Type only the missing part;
-listed alternative answers are accepted. Progress is saved in the local SQLite
-settings, and missed or revealed answers go into a dedicated mistake review.
-The existing coding tracks and Japanese technical vocabulary remain available.
+**Languages → JLPT N2 courses** offers three practice courses:
+
+- **Kanji & Vocabulary Blanks:** 120 original questions in 24 families, with
+  readings, translations, explanations, and accepted alternative answers.
+- **Sentence Assembly ★:** 125 questions, solving tips, and mistake review.
+- **読解 Reading:** 113 original passages and 128 questions across 短文, 中文,
+  AB問題文, 長文, and 情報検索. The short-passage library contains 100 texts of
+  about 200 characters. Click annotated words for kana and meanings, save them
+  for spaced vocabulary review, and study the evidence and explanations for
+  every answer. Study and timed practice have separate results, with bookmarks,
+  filters, translations, and mistake review.
+
+Course progress is saved in the local SQLite settings and works offline. The
+existing coding tracks and Japanese technical vocabulary remain available.
+See [reading content authoring](src/data/dokkai/README.md) for the passage format
+and [the 中文 expansion prompt](prompts/jlpt-chuubun.md) for the next content batch.
 
 Prerequisites (already verified on this machine):
 

@@ -27,4 +27,57 @@
 .n2-feedback { border-top: 1px solid var(--border); margin-top: var(--space-5); padding-top: var(--space-3); }
 .n2-solution { color: var(--accent-text); text-decoration: underline; text-underline-offset: var(--space-1); }
 .n2-finish { display: grid; justify-items: start; gap: var(--space-3); }
+.n2-tips { padding-left: var(--space-5); }
+.n2-tips li { margin-bottom: var(--space-3); line-height: var(--leading-loose); }
+.n2-slot { display: inline-block; margin-inline: var(--space-2); font-family: inherit; }
+.n2-star { color: var(--accent-text); font-weight: var(--weight-bold); }
+.n2-choice-group { border: 0; padding: 0; margin: var(--space-4) 0; min-width: 0; }
+.n2-choice-group legend { margin-bottom: var(--space-3); font-weight: var(--weight-medium); }
+.n2-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
+.n2-choice { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4); border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; overflow-wrap: anywhere; }
+.n2-choice.is-selected, .n2-choice:focus-within { border-color: var(--accent); background: var(--accent-dim); }
+.n2-choice input { flex: 0 0 auto; accent-color: var(--accent); }
+.n2-choice-group:disabled .n2-choice { cursor: default; }
+.n2-scratch { margin-bottom: var(--space-5); }
+.n2-page summary { cursor: pointer; padding-block: var(--space-2); font-weight: var(--weight-medium); }
+.n2-scratch-preview { font-size: var(--text-xl); overflow-wrap: anywhere; }
+.n2-hint { padding: var(--space-3); border-left: 3px solid var(--accent); }
+@media (max-width: 700px) { .n2-choices { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 1180px) { .n2-grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* Shared reader for all five N2 reading formats. */
+.dokkai-spread { justify-content: space-between; }
+.dokkai-filters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); align-items: end; }
+.dokkai-filters select, .dokkai-filters input { width: 100%; min-width: 0; }
+.dokkai-library-card { display: grid; gap: var(--space-3); }
+.dokkai-page .dokkai-library-card h2, .dokkai-page .dokkai-library-card p { margin: 0; }
+.dokkai-mode-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); }
+.dokkai-mode-stats > div { border-left: 3px solid var(--border); padding-left: var(--space-3); line-height: var(--leading-loose); }
+.dokkai-check { display: inline-flex; align-items: center; gap: var(--space-2); cursor: pointer; }
+.dokkai-check input { accent-color: var(--accent); }
+.dokkai-session-bar { display: grid; gap: var(--space-3); }
+.dokkai-countdown { font-family: var(--font-mono); font-size: var(--text-xl); font-variant-numeric: tabular-nums; }
+.dokkai-countdown.is-low { color: var(--bad); font-weight: var(--weight-bold); }
+.dokkai-texts { margin-top: var(--space-5); }
+.dokkai-paired { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5); }
+.dokkai-paired > section { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: var(--space-4); min-width: 0; }
+.dokkai-page .dokkai-paired h3 { margin-top: 0; }
+.dokkai-passage { font-size: var(--text-lg); line-height: 2.4; white-space: pre-wrap; overflow-wrap: anywhere; line-break: strict; }
+.dokkai-notice { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: var(--space-5); }
+.dokkai-word { display: inline; padding: 0; margin: 0; border: 0; border-radius: 0; background: transparent; color: inherit; font: inherit; line-height: inherit; text-decoration: underline dotted; text-decoration-color: var(--accent-text); text-underline-offset: 0.22em; cursor: pointer; white-space: normal; }
+.dokkai-word:hover { color: var(--accent-text); background: var(--accent-dim); }
+.dokkai-word:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.dokkai-word rt { font-size: var(--text-xs); color: var(--text-dim); }
+.dokkai-evidence { background: var(--accent-dim); box-shadow: inset 0 -2px var(--accent); }
+.dokkai-choices { display: grid; gap: var(--space-3); }
+.dokkai-correct { border-color: var(--good); }
+.dokkai-dialog { width: min(30rem, calc(100vw - 2rem)); max-height: calc(100dvh - 4rem); overflow: auto; padding: var(--space-5); border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-elev); color: var(--text); box-shadow: var(--shadow-3); }
+.dokkai-dialog::backdrop { background: rgb(0 0 0 / 55%); }
+.dokkai-dialog h2 { margin: 0; }
+.dokkai-kana { font-size: var(--text-xl); }
+.dokkai-page blockquote { margin: var(--space-3) 0; padding-left: var(--space-4); border-left: 3px solid var(--accent); line-height: var(--leading-loose); }
+@media (max-width: 1180px) { .dokkai-paired { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 700px) {
+  .dokkai-filters, .dokkai-mode-stats { grid-template-columns: minmax(0, 1fr); }
+  .dokkai-notice { padding: var(--space-3); }
+}

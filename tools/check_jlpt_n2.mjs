@@ -22,7 +22,7 @@ const page = await browser.newPage({ viewport: { width: 1360, height: 900 } });
 const errors = [];
 page.on("pageerror", (error) => errors.push(error.message));
 const go = async (path) => {
-  await page.goto(`${base}/#${path}`);
+  await page.goto(`${base}/#${path.replace("/japanese/n2", "/japanese/n2/patterns")}`);
   await page.locator(".n2-page").waitFor();
 };
 const answer = async (value) => {
