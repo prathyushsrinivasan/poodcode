@@ -38,6 +38,14 @@ try {
       lengths: p.texts.map((t) => characterCount(t.text)), glosses: p.texts.map((t) => readingSegments(t.text, COMMON_READING_WORDS).filter((s) => s.word).length) })) };
   });
   assert.equal(corpus.passages.filter((p) => p.kind === "short").length, 100);
+  const medium = corpus.passages.filter((p) => p.kind === "medium");
+  assert.equal(medium.length, 100);
+  assert.equal(medium.flatMap((p) => p.questions).length, 200);
+  assert.equal(corpus.passages.length, 208);
+  assert.equal(corpus.passages.flatMap((p) => p.questions).length, 318);
+  for (const size of corpus.sizes.filter((p) => p.kind === "medium" && Number(p.id.slice(7)) > 5)) {
+    assert.ok(size.lengths.every((n) => n >= 450 && n <= 550), `${size.id}: new medium length`);
+  }
   console.log("Corpus:", JSON.stringify(Object.fromEntries(["short", "medium", "ab", "long", "information"].map((kind) => {
     const texts = corpus.sizes.filter((p) => p.kind === kind).flatMap((p) => p.lengths);
     return [kind, { passages: corpus.sizes.filter((p) => p.kind === kind).length, min: Math.min(...texts), max: Math.max(...texts) }];
@@ -107,6 +115,90 @@ try {
   assert.equal(result.results[second.questions[0].id].timed.attempts, 1);
   await page.clock.resume();
 
+  console.log("Checking expanded 中文 sets, review, persistence and timed expiry.");
+  await go(`${root}/medium`);
+  await page.getByText("100 passages match · Set 1 of 10", { exact: true }).waitFor();
+  for (let i = 1; i < 10; i++) await page.getByRole("button", { name: "Next set", exact: true }).click();
+  await page.getByText("100 passages match · Set 10 of 10", { exact: true }).waitFor();
+  assert.equal(await page.locator(".dokkai-library-card").count(), 10);
+  const setLink = page.getByRole("link", { name: "Practice this set · 10 passages", exact: true });
+  assert.equal(new URL(`${base}/${await setLink.getAttribute("href")}`).hash.includes("round=set"), true);
+  await setLink.click();
+  await page.getByRole("heading", { name: medium[90].title, exact: true }).waitFor();
+  assert.equal(await page.locator(".n2-choice-group").count(), 2);
+
+  const last = medium.at(-1);
+  await go(`${root}/medium/${last.id}`);
+  assert.equal(await page.getByText("English translation", { exact: true }).count(), 0);
+  for (const question of last.questions) await page.locator(`input[name="${question.id}"]`).nth(question.answer).check();
+  await page.getByRole("button", { name: "Check answers", exact: true }).click();
+  await page.getByText("Recorded as independent study.", { exact: true }).waitFor();
+  await page.getByText("English translation", { exact: true }).click();
+  assert.equal(await page.getByText(last.texts[0].translation, { exact: true }).isVisible(), true);
+  assert.ok(await page.locator(".dokkai-evidence").count());
+  await waitSaved((s) => last.questions.every((q) => s.results?.[q.id]?.independent?.lastCorrect === true));
+  await page.getByRole("button", { name: "Bookmark passage", exact: true }).click();
+  await waitSaved((s) => s.bookmarks?.includes(last.id));
+  await page.reload();
+  await page.locator(".dokkai-page").waitFor();
+  await page.getByRole("button", { name: "Bookmarked", exact: true }).waitFor();
+  const restored = await saved();
+  assert.ok(last.questions.every((q) => restored.results[q.id].independent.lastCorrect));
+
+  await page.getByRole("checkbox", { name: "Show kana above annotated words", exact: true }).check();
+  assert.ok(await page.locator(".dokkai-passage ruby rt").count());
+
+  // Identical spellings keep the reading for their own occurrence.
+  await go(`${root}/medium/medium-068`);
+  await page.getByRole("button", { name: "Look up 生物", exact: true }).first().click();
+  await page.getByRole("dialog").waitFor();
+  assert.equal(await page.locator(".dokkai-kana").innerText(), "せいぶつ");
+  await page.keyboard.press("Escape");
+  await go(`${root}/medium/medium-096`);
+  await page.getByRole("button", { name: "Look up 生物", exact: true }).first().click();
+  await page.getByRole("dialog").waitFor();
+  assert.equal(await page.locator(".dokkai-kana").innerText(), "なまもの");
+  await page.keyboard.press("Escape");
+  await go(`${root}/medium/${last.id}`);
+
+  // A grammar lookup in a question must mark both answers as assisted too.
+  await page.locator(".n2-choice-group legend .dokkai-word").first().click();
+  await page.getByRole("dialog").waitFor();
+  await page.getByRole("button", { name: "Save for vocabulary review", exact: true }).click();
+  await page.keyboard.press("Escape");
+  await page.getByRole("dialog").waitFor({ state: "hidden" });
+  for (const question of last.questions) await page.locator(`input[name="${question.id}"]`).nth((question.answer + 1) % 4).check();
+  await page.getByRole("button", { name: "Check answers", exact: true }).click();
+  await page.getByText("Recorded as study with help.", { exact: true }).waitFor();
+  await waitSaved((s) => last.questions.every((q) => s.results?.[q.id]?.assisted?.lastCorrect === false) &&
+    Object.values(s.words ?? {}).some((w) => w.source === last.id));
+  await go(`${root}/medium`);
+  await page.getByRole("combobox", { name: /^Show/ }).selectOption("bookmarks");
+  assert.equal(await page.locator(".dokkai-library-card").count(), 1);
+  await page.getByRole("combobox", { name: /^Show/ }).selectOption("mistakes");
+  assert.equal(await page.locator(".dokkai-library-card").count(), 1);
+  await page.getByRole("combobox", { name: /^Result history/ }).selectOption("independent");
+  assert.equal(await page.locator(".dokkai-library-card").count(), 0);
+  await page.getByRole("combobox", { name: /^Result history/ }).selectOption("assisted");
+  assert.equal(await page.locator(".dokkai-library-card").count(), 1);
+
+  await go(`${root}/medium/${last.id}?mode=timed&minutes=1`);
+  await page.getByRole("button", { name: "Begin timed practice", exact: true }).click();
+  assert.equal(await page.locator(".dokkai-word, .dokkai-evidence, ruby").count(), 0);
+  assert.equal(await page.getByText("English translation", { exact: true }).count(), 0);
+  await page.locator(`input[name="${last.questions[0].id}"]`).nth(last.questions[0].answer).check();
+  await page.clock.fastForward(61_000);
+  await page.getByText(/Time is up\./).waitFor();
+  const timedMedium = await waitSaved((s) => last.questions.every((q) => s.results?.[q.id]?.timed?.attempts === 1));
+  assert.equal(timedMedium.results[last.questions[0].id].timed.lastCorrect, true);
+  assert.equal(timedMedium.results[last.questions[1].id].timed.lastCorrect, false);
+  assert.ok(last.questions.every((q) => timedMedium.results[q.id].independent.lastCorrect && !timedMedium.results[q.id].assisted.lastCorrect));
+  assert.ok(await page.locator(".dokkai-word, .dokkai-evidence").count());
+  await page.clock.resume();
+  await page.reload();
+  await page.locator(".dokkai-page").waitFor();
+  assert.deepEqual((await saved()).results[last.questions[1].id], timedMedium.results[last.questions[1].id]);
+
   // Review rounds must keep their initial membership after a correct answer.
   console.log("Timeout passed; checking round navigation and responsive layouts.");
   await go(`${root}/short/practice?ids=${first.id},${second.id}&round=set`);
@@ -123,15 +215,21 @@ try {
 
   for (const width of [390, 960, 1440]) {
     await page.setViewportSize({ width, height: 900 });
-    for (const route of [root, `${root}/short`, `${root}/ab/ab-001`, `${root}/information/information-003`]) {
+    for (const route of [root, `${root}/short`, `${root}/medium`, `${root}/medium/medium-096`, `${root}/medium/medium-100`, `${root}/ab/ab-001`, `${root}/information/information-003`]) {
       await go(route);
+      // Resizing crosses the shell's animated sidebar breakpoint. Wait for
+      // settled geometry; an immediate read can inspect the outgoing layout.
+      await page.waitForFunction(() => {
+        const main = document.getElementById("main");
+        return main && main.scrollWidth <= main.clientWidth;
+      }, null, { timeout: 3_000 });
       assert.ok(await page.evaluate(() => { const main = document.getElementById("main"); return main.scrollWidth <= main.clientWidth; }), `${route} overflows at ${width}px`);
     }
   }
   if (arg("screenshot", "")) await page.screenshot({ path: arg("screenshot"), fullPage: true });
   if (arg("axe", "")) {
     const source = readFileSync(arg("axe"), "utf8");
-    for (const theme of ["light", "dark"]) for (const route of [root, `${root}/short`, `${root}/ab/ab-001`, `${root}/information/information-003`, `${root}/vocabulary`]) {
+    for (const theme of ["light", "dark"]) for (const route of [root, `${root}/short`, `${root}/medium`, `${root}/medium/medium-096`, `${root}/ab/ab-001`, `${root}/information/information-003`, `${root}/vocabulary`]) {
       await go(route);
       await page.evaluate((theme) => { document.documentElement.dataset.theme = theme; }, theme);
       await page.waitForTimeout(300);
@@ -144,5 +242,5 @@ try {
     console.log("Reading accessibility checks passed in light and dark themes.");
   }
   assert.deepEqual(errors, []);
-  console.log("Reading browser checks passed: five formats, independent/assisted/timed results, vocabulary save and recall, bookmarks, filtering, stable rounds, timeout and responsive layouts.");
+  console.log("Reading browser checks passed: five formats, 100 中文 passages / ten sets, independent/assisted/timed results, translations, vocabulary save and recall, reload persistence, bookmarks, filtering, stable rounds, multi-question timeout and responsive layouts.");
 } finally { await browser.close(); }
