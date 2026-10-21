@@ -4,7 +4,7 @@ import { Markdown } from "../components/Markdown";
 import { Badge, PageHeader } from "../components/ui";
 import { AWS_LESSONS } from "../data/awsMla/lessons";
 import { AWS_DOMAINS, AWS_GUIDE, AWS_SKILLS, AWS_TASKS, AWS_VERIFIED, type AwsLesson } from "../data/awsMla/syllabus";
-import { awsStatus, awsStudyStreak, gradeAwsQuestion, planAwsSession, recordAwsAttempt, setAwsNote, type AwsProgress, type AwsTarget } from "../lib/awsMla";
+import { awsStatus, awsStudyMinutes, awsStudyStreak, gradeAwsQuestion, planAwsSession, recordAwsAttempt, type AwsProgress, type AwsTarget } from "../lib/awsMla";
 import { optionOrder } from "../lib/quizShuffle";
 import { todayISO } from "../lib/srs";
 import { useAwsProgress } from "../lib/useAwsProgress";
@@ -13,6 +13,7 @@ import roadmap from "../../AWS_MLA_C02_ROADMAP.md?raw";
 
 type State = ReturnType<typeof useAwsProgress> & { progress: AwsProgress };
 const statusLabels = { new: "New", due: "Review due", learning: "Learning", retained: "Retained" };
+const moduleOne = AWS_LESSONS.filter((lesson) => lesson.teaching);
 
 function nextReview(due: number, now: number): string {
   if (due <= now) return "now";
@@ -57,10 +58,19 @@ function CourseHome({ state, now }: { state: State; now: number }) {
   const due = AWS_LESSONS.filter((lesson) => awsStatus(progress.lessons[lesson.id], now) === "due");
   const matches = AWS_LESSONS.filter((lesson) => (domain === "all" || lesson.task[0] === domain)
     && (filter === "all" || awsStatus(progress.lessons[lesson.id], now) === filter)
-    && `${lesson.title} ${lesson.task} ${lesson.model} ${lesson.rules.join(" ")} ${lesson.skills.map((id) => `${id} ${AWS_SKILLS.find((s) => s.id === id)?.title}`).join(" ")}`.toLowerCase().includes(query.toLowerCase()));
+    && `${lesson.title} ${lesson.task} ${lesson.model} ${lesson.rules.join(" ")} ${lesson.teaching?.sections.map((section) => `${section.title} ${section.body}`).join(" ") ?? ""} ${lesson.skills.map((id) => `${id} ${AWS_SKILLS.find((s) => s.id === id)?.title}`).join(" ")}`.toLowerCase().includes(query.toLowerCase()));
   return <>
-    <PageHeader eyebrow="AWS certification · daily practice" title="AWS MLA-C02"
-      subtitle="Build the decision skills. Recall the idea, solve a scenario, and revisit it before it fades." />
+    <PageHeader eyebrow="AWS certification · guided learning" title="AWS MLA-C02"
+      subtitle="Understand the ideas, follow worked examples, then check your decisions. Every question is graded from your selections." />
+    <section className="card aws-module-intro">
+      <Badge>Module 1 · Full lessons available</Badge><h2>Data preparation for ML and AI</h2>
+      <p>Learn how raw records become trustworthy model inputs. Six in-depth lessons cover storage, ingestion, features, retrieval data, quality and bias, with worked examples and curated sources.</p>
+      <p className="faint">Start here. About {moduleOne.reduce((sum, lesson) => sum + awsStudyMinutes(lesson), 0)} minutes across six lessons, plus optional videos and reading. No AWS account required.</p>
+      <ol className="aws-module-sequence">{moduleOne.map((lesson) => <li key={lesson.id}>
+        <Link to={`/aws-mla/${lesson.id}`}>{lesson.title}</Link><span className="faint">{awsStudyMinutes(lesson)} min · {lesson.questions.length} checks</span>
+      </li>)}</ol>
+      <p className="faint">Modules 2–4 are introductory outlines awaiting the same expansion. The exam map shows assigned coverage, rather than proof of mastery.</p>
+    </section>
     <div className="aws-summary" aria-label="Course progress">
       <div><strong>{studied.length}<small> / {AWS_LESSONS.length}</small></strong><span>lessons practiced</span></div>
       <div><strong>{retained.length}</strong><span>retained through spaced checks</span></div>
@@ -83,7 +93,7 @@ function CourseHome({ state, now }: { state: State; now: number }) {
           </select>
           {plan.length > 0 ? <Link className="btn primary" to="/aws-mla/daily">Start {plan.length}-lesson session →</Link>
             : <p role="status">{(day?.minutes ?? 0) >= progress.target ? "Daily target reached. Come back tomorrow, or browse another lesson." : "No lessons fit the remaining target. Browse a lesson or return for your next review."}</p>}
-          <span className="faint">New lesson ≈ 6 min · review ≈ 3 min</span>
+          <span className="faint">Full lesson ≈ 25 min · review ≈ 6 min. A session may exceed your target to fit one complete lesson. You can read a lesson in smaller sittings.</span>
         </div>
       </section>
       {plan.length > 0 && <section className="aws-stack"><h2>Up next</h2>{plan.map((id, index) => {
@@ -101,11 +111,11 @@ function CourseHome({ state, now }: { state: State; now: number }) {
             <p className="faint">{count} / {total} skills introduced</p></div>;
         })}
       </div></section>
-      <div className="card aws-explainer"><h2>Make it stick</h2><p>Try the recall prompt before opening the notes. A perfect first submission moves a due lesson along the 1, 3, 7, 14, 30 day review ladder. A miss comes back in 10 minutes. Early repeat passes keep the current review date.</p>
+      <div className="card aws-explainer"><h2>Learn, then revisit</h2><p>Read the lesson and worked examples before taking the scenario checks. You can return to any explanation while practicing. A perfect submission moves a due lesson along the 1, 3, 7, 14, 30 day review ladder. A miss comes back in 10 minutes. Early repeat passes keep the current review date.</p>
         <p>Retained means three successful spaced checks with a current correct result. This small question bank is a study signal; use hands-on work and official practice resources to assess exam readiness.</p></div>
     </>}
     {view === "lessons" && <section className="aws-stack">
-      <h2>Learn the complete published blueprint</h2>
+      <h2>Course library</h2>
       <div className="aws-filters">
         <label>Search topic, service, or skill ID<input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="e.g. RAG, IAM, 3.2.9" /></label>
         <label>Domain<select value={domain} onChange={(event) => setDomain(event.target.value)}><option value="all">All domains</option>
@@ -115,13 +125,13 @@ function CourseHome({ state, now }: { state: State; now: number }) {
       </div>
       <p className="faint" role="status">{matches.length} lessons · {matches.reduce((sum, lesson) => sum + lesson.skills.length, 0)} mapped skills</p>
       <div className="aws-lesson-grid">{matches.map((lesson) => <Link className="card aws-lesson-card" key={lesson.id} to={`/aws-mla/${lesson.id}`}>
-        <div className="aws-card-meta"><Badge>Task {lesson.task}</Badge><span>{statusLabels[awsStatus(progress.lessons[lesson.id], now)]}</span></div>
-        <h3>{lesson.title}</h3><p>{lesson.model}</p><span className="faint">{lesson.skills.length} skills · 2 scenarios · ≈ 6 min</span>
+        <div className="aws-card-meta"><Badge>{lesson.teaching ? "Full lesson" : "Introductory outline"} · {lesson.task}</Badge><span>{statusLabels[awsStatus(progress.lessons[lesson.id], now)]}</span></div>
+        <h3>{lesson.title}</h3><p>{lesson.model}</p><span className="faint">{lesson.skills.length} mapped skills · {lesson.questions.length} scenarios · ≈ {awsStudyMinutes(lesson)} min</span>
       </Link>)}</div>
       {!matches.length && <p>No matching lessons. Try another service or clear the filters.</p>}
     </section>}
     {view === "blueprint" && <section className="aws-stack"><h2>Every published task and skill</h2>
-      <p>Verified {AWS_VERIFIED}. Short study labels map to AWS skill IDs. The official blueprint is non-exhaustive, and lessons provide introductory coverage.</p>
+      <p>Blueprint verified {AWS_VERIFIED}. Module 1 contains full lessons; modules 2–4 currently provide introductory outlines. Mapped skills describe the intended scope, not independent assessment of every skill.</p>
       <a href={`data:text/markdown;charset=utf-8,${encodeURIComponent(roadmap)}`} download="AWS_MLA_C02_ROADMAP.md">Download the full Markdown roadmap</a>
       {AWS_TASKS.map((task) => <details className="card aws-task" key={task.id}><summary>{task.id} · {task.title} <span className="faint">({task.labels.length} skills)</span></summary>
         <ul>{AWS_SKILLS.filter((skill) => skill.task === task.id).map((skill) => {
@@ -133,7 +143,7 @@ function CourseHome({ state, now }: { state: State; now: number }) {
     </section>}
     <footer className="aws-footer"><a href={AWS_GUIDE} target="_blank" rel="noreferrer">Official MLA-C02 guide ↗</a>
       <a href="https://aws.amazon.com/certification/certified-machine-learning-engineer-associate/" target="_blank" rel="noreferrer">Exam format & beta status ↗</a>
-      <span>Content verified {AWS_VERIFIED} · Works offline · Progress saved locally</span></footer>
+      <span>Sources reviewed {AWS_VERIFIED} · Lessons work offline · External sources need internet · Progress stored locally</span></footer>
   </>;
 }
 
@@ -150,17 +160,24 @@ function DailySession({ state, now }: { state: State; now: number }) {
 }
 
 function Lesson({ lesson, state, now, onNext }: { lesson: AwsLesson; state: State; now: number; onNext?: () => void }) {
-  const [revealed, setRevealed] = useState(false);
-  const [recall, setRecall] = useState("");
-  const [exercise, setExercise] = useState("");
-  const [showExercise, setShowExercise] = useState(false);
+  const [mode, setMode] = useState<"learn" | "practice">("learn");
   const [picks, setPicks] = useState<number[][]>(() => lesson.questions.map(() => []));
   const [submitted, setSubmitted] = useState(false);
-  const [optionSalt] = useState(() => String(state.progress.lessons[lesson.id]?.attempts ?? 0));
-  const [note, setNote] = useState(state.progress.lessons[lesson.id]?.note ?? "");
+  const [optionSalt, setOptionSalt] = useState(() => String(state.progress.lessons[lesson.id]?.attempts ?? 0));
   const row = state.progress.lessons[lesson.id];
   const score = lesson.questions.filter((question, index) => gradeAwsQuestion(question, picks[index])).length;
   const next = AWS_LESSONS[AWS_LESSONS.indexOf(lesson) + 1];
+  const canSubmit = picks.every((picked, index) => picked.length === lesson.questions[index].answers.length);
+  const sectionId = (id: string) => `${lesson.id}-${id}`;
+  function readSection(id: string) {
+    setMode("learn");
+    requestAnimationFrame(() => document.getElementById(sectionId(id))?.scrollIntoView({ block: "start" }));
+  }
+  function retry() {
+    setPicks(lesson.questions.map(() => []));
+    setSubmitted(false);
+    setOptionSalt(String(row?.attempts ?? 0));
+  }
   function choose(questionIndex: number, optionIndex: number) {
     if (submitted) return;
     setPicks((previous) => previous.map((selected, index) => index !== questionIndex ? selected
@@ -168,55 +185,77 @@ function Lesson({ lesson, state, now, onNext }: { lesson: AwsLesson; state: Stat
         : selected.includes(optionIndex) ? selected.filter((item) => item !== optionIndex) : [...selected, optionIndex]));
   }
   return <article className="aws-study">
-    <PageHeader eyebrow={`AWS MLA-C02 · Task ${lesson.task} · ${row?.attempts ? "Review ≈ 3 min" : "Lesson ≈ 6 min"}`}
+    <PageHeader eyebrow={`AWS MLA-C02 · Task ${lesson.task} · ${lesson.teaching ? "Full lesson" : "Introductory outline"} ≈ ${awsStudyMinutes(lesson)} min`}
       title={lesson.title} subtitle={lesson.skills.map((id) => `${id}: ${AWS_SKILLS.find((skill) => skill.id === id)?.title}`).join(" · ")} />
-    <section className="card aws-recall"><Badge>1 · Recall first</Badge><h2>Try before looking</h2><p>{lesson.recall}</p>
-      <label htmlFor="aws-recall">Your explanation in a few words<textarea id="aws-recall" value={recall} onChange={(event) => setRecall(event.target.value)} placeholder="Explain it as if teaching a teammate…" rows={3} /></label>
-      <button className="primary" aria-expanded={revealed} aria-controls="aws-lesson-notes" onClick={() => setRevealed((value) => !value)}>{revealed ? "Hide lesson notes" : "Reveal lesson notes"}</button>
-    </section>
-    {revealed && <section className="card aws-notes" id="aws-lesson-notes"><h2>The mental model</h2><p className="aws-model">{lesson.model}</p>
+    <nav className="aws-switcher" aria-label="Lesson views">
+      <button aria-pressed={mode === "learn"} onClick={() => setMode("learn")}>1 · Learn the topic</button>
+      <button aria-pressed={mode === "practice"} onClick={() => setMode("practice")}>2 · Scenario checks ({lesson.questions.length})</button>
+    </nav>
+    {mode === "learn" && <>
+    {lesson.teaching ? <>
+      <section className="card aws-objectives"><h2>What you will learn</h2>
+        <ul>{lesson.teaching.objectives.map((objective) => <li key={objective}>{objective}</li>)}</ul>
+        <p className="faint">Read at your own pace. Estimates include the lesson and checks; optional external resources take extra time.</p>
+        <nav aria-label="Topics in this lesson" className="aws-topic-nav">{lesson.teaching.sections.map((section, index) =>
+          <button key={section.id} onClick={() => readSection(section.id)}>{index + 1}. {section.title}</button>)}</nav>
+      </section>
+      {lesson.teaching.sections.map((section, index) => <section className="card aws-teaching-section" id={sectionId(section.id)} key={section.id}>
+        <Badge>Topic {index + 1} / {lesson.teaching!.sections.length}</Badge><h2>{section.title}</h2>
+        <Markdown>{section.body}</Markdown>
+      </section>)}
+    </> : <section className="card aws-notes"><Badge>Expansion planned</Badge><h2>The mental model</h2>
+      <p className="faint">This topic currently has summary notes and a worked approach. Module 1 shows the full lesson format.</p><p className="aws-model">{lesson.model}</p>
       <ul>{lesson.rules.map((rule) => <li key={rule}>{rule}</li>)}</ul><div className="aws-trap"><strong>Common trap</strong><p>{lesson.trap}</p></div>
-      <p className="faint">Go deeper: {lesson.references.map((reference, index) => <span key={reference.url}>{index > 0 && " · "}<a href={reference.url} target="_blank" rel="noreferrer">{reference.title} ↗</a></span>)}</p>
+      <h2>Worked approach</h2><p>{lesson.exercise}</p><p>{lesson.exerciseAnswer}</p>
     </section>}
-    <section className="card aws-exercise"><Badge>2 · Apply the idea</Badge><h2>A small design exercise</h2><p>{lesson.exercise}</p>
-      <label htmlFor="aws-exercise">Your approach<textarea id="aws-exercise" value={exercise} onChange={(event) => setExercise(event.target.value)} rows={3} /></label>
-      <button aria-expanded={showExercise} onClick={() => setShowExercise((value) => !value)}>{showExercise ? "Hide suggested approach" : "Compare with a suggested approach"}</button>
-      {showExercise && <p className="aws-exercise-answer">{lesson.exerciseAnswer}</p>}
+    <section className="card aws-resources"><h2>Watch and read further</h2>
+      <p>Choose a source for a different explanation or more detail. These links open online; the teaching and quizzes above work offline.</p>
+      <ul>{lesson.references.map((reference) => <li key={reference.url}>
+        <Badge>{reference.kind ?? "Documentation"}</Badge> <a href={reference.url} target="_blank" rel="noreferrer">{reference.title} ↗</a>
+        {reference.focus && <p>{reference.focus}</p>}{reference.note && <p className="faint">{reference.note}</p>}
+      </li>)}</ul>
     </section>
-    <section className="card aws-quiz"><Badge>3 · Check your decision skills</Badge><h2>Scenario checks</h2>
-      <p className="faint">Submit once to record this check. Select-all questions require every correct option. These are original study questions.</p>
+    <div className="card aws-start-check"><h2>Ready to apply it?</h2><p>{lesson.questions.length} automatically graded questions. Select your answer and get explanations for every option after submitting. No written answers required.</p>
+      <button className="primary" onClick={() => { setMode("practice"); document.getElementById("main")?.scrollTo(0, 0); }}>Start scenario checks</button>
+    </div>
+    </>}
+    {mode === "practice" && <section className="card aws-quiz"><Badge>Apply what you learned</Badge><h2>Scenario checks</h2>
+      <p className="faint">Original study questions, graded exactly from your selections. Select the stated number of options. Review uses the same questions, so a perfect score is a practice signal rather than proof of mastery.</p>
       <form onSubmit={(event) => {
         event.preventDefault();
-        if (submitted || picks.some((picked) => !picked.length)) return;
+        if (submitted || !canSubmit) return;
         setSubmitted(true);
         state.update((progress) => recordAwsAttempt(progress, lesson.id, picks));
       }}>
-        {lesson.questions.map((question, questionIndex) => <fieldset key={question.id} disabled={submitted}>
+        {lesson.questions.map((question, questionIndex) => <fieldset key={question.id}>
           <legend>{questionIndex + 1}. {question.prompt} {question.answers.length > 1 && <strong>(Select {question.answers.length})</strong>}</legend>
           {optionOrder(question.id, question.options.length, optionSalt).map((optionIndex) => {
             const option = question.options[optionIndex];
             const selected = picks[questionIndex].includes(optionIndex);
             const correct = question.answers.includes(optionIndex);
             return <label className={`aws-option ${submitted ? correct ? "aws-correct" : selected ? "aws-incorrect" : "" : ""}`} key={optionIndex}>
-              <span className="aws-option-choice"><input type={question.answers.length > 1 ? "checkbox" : "radio"} name={question.id} checked={selected} onChange={() => choose(questionIndex, optionIndex)} /><span>{option.text}</span></span>
-              {submitted && <span className="aws-option-reason"><strong>{correct ? "Correct option. " : selected ? "Your selection was incorrect. " : "Other option. "}</strong>{option.why}</span>}
+              <span className="aws-option-choice"><input type={question.answers.length > 1 ? "checkbox" : "radio"} name={question.id} checked={selected} disabled={submitted} onChange={() => choose(questionIndex, optionIndex)} /><span>{option.text}</span></span>
+              {submitted && <span className="aws-option-reason"><strong>{correct ? selected ? "Correct selection. " : "Missed correct option. " : selected ? "Your selection was incorrect. " : "Other option. "}</strong>{option.why}</span>}
             </label>;
           })}
-          {submitted && <p><strong>{gradeAwsQuestion(question, picks[questionIndex]) ? "Correct" : "Review this decision"}</strong></p>}
+          {question.answers.length > 1 && !submitted && <p className="faint">{picks[questionIndex].length} / {question.answers.length} selected</p>}
+          {submitted && <div className="aws-question-feedback"><p><strong>{gradeAwsQuestion(question, picks[questionIndex]) ? "Correct" : "Review this decision"}</strong></p>
+            {question.section && <button type="button" onClick={() => readSection(question.section!)}>Revisit the explanation</button>}
+          </div>}
         </fieldset>)}
-        {!submitted && <button type="submit" className="primary" disabled={picks.some((picked) => !picked.length)}>Check answers & schedule review</button>}
+        {!submitted && <><p className="faint" role="status">{picks.filter((picked, index) => picked.length === lesson.questions[index].answers.length).length} / {lesson.questions.length} questions ready to submit</p>
+          <button type="submit" className="primary" disabled={!canSubmit}>Check answers & schedule review</button></>}
       </form>
       {submitted && <div className="aws-result" role="status"><h3>{score} / {lesson.questions.length} correct</h3>
-        <p>{score === lesson.questions.length ? "Good recall. " : "Read the explanations and revisit the mental model. "}Next review: {row ? nextReview(row.due, now) : "scheduled"}.</p>
+        <p>{score === lesson.questions.length ? "All decisions correct. " : "Read the explanations and revisit the topics you missed. "}Next review: {row ? nextReview(row.due, now) : "scheduled"}.</p>
+        <button type="button" onClick={retry}>Try these checks again</button>
+        <p className="faint">An early repeat does not advance the spaced-review interval.</p>
         {onNext ? <button className="primary" onClick={onNext}>Continue session →</button> : <div className="aws-switcher">
           {next && <Link className="btn primary" to={`/aws-mla/${next.id}`}>Next lesson →</Link>}
           <Link to="/aws-mla">Back to course</Link>
         </div>}
       </div>}
-    </section>
-    <section className="card aws-personal-note"><h2>Your takeaway</h2><label htmlFor="aws-note">Save a rule you want to remember<textarea id="aws-note" rows={3} maxLength={10_000} value={note} onChange={(event) => setNote(event.target.value)}
-      onBlur={() => { if (note !== (row?.note ?? "")) state.update((progress) => setAwsNote(progress, lesson.id, note)); }} /></label>
-      <button onClick={() => state.update((progress) => setAwsNote(progress, lesson.id, note))}>Save takeaway</button><span className="faint">{note === (row?.note ?? "") ? " Saved locally" : " Unsaved changes"}</span>
-    </section>
+    </section>}
+    {row?.note && <details className="card aws-saved-note"><summary>Your previously saved takeaway</summary><p>{row.note}</p></details>}
   </article>;
 }

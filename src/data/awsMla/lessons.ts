@@ -1,4 +1,5 @@
 import { type AwsLesson, type AwsQuestion } from "./syllabus";
+import { AWS_MODULE_ONE } from "./module1";
 
 // Questions are original learning scenarios, not recalled certification items.
 // Correct answers use authored indices; the UI shuffles their display order.
@@ -8,7 +9,7 @@ function question(id: string, prompt: string, options: [string, string][], answe
 const ref = (title: string, path: string) => ({ title, url: `https://docs.aws.amazon.com/${path}` });
 const skills = (task: string, ...numbers: number[]) => numbers.map((n) => `${task}.${n}`);
 
-export const AWS_LESSONS: AwsLesson[] = [
+const LESSON_OUTLINES: AwsLesson[] = [
   {
     id: "storage-and-formats", task: "1.1", title: "Choose storage from the access pattern",
     skills: skills("1.1", 1, 2, 5, 6, 8),
@@ -713,3 +714,7 @@ export const AWS_LESSONS: AwsLesson[] = [
     ],
   },
 ];
+
+export const AWS_LESSONS: AwsLesson[] = LESSON_OUTLINES.map((lesson) => ({
+  ...lesson, ...AWS_MODULE_ONE[lesson.id],
+}));

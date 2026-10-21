@@ -23,6 +23,10 @@ export interface AwsProgress {
 }
 
 export const emptyAwsProgress = (): AwsProgress => ({ version: 1, target: 15, lessons: {}, days: {} });
+/** Estimates include reading and checks, but exclude optional external resources. */
+export function awsStudyMinutes(lesson: (typeof AWS_LESSONS)[number], review = false): number {
+  return review ? (lesson.teaching ? 6 : 3) : (lesson.teaching?.minutes ?? 6);
+}
 const object = (value: unknown): value is Record<string, unknown> => !!value && typeof value === "object" && !Array.isArray(value);
 const nonnegative = (value: unknown): value is number => typeof value === "number" && Number.isFinite(value) && value >= 0;
 const integer = (value: unknown): value is number => nonnegative(value) && Number.isSafeInteger(value);
@@ -86,7 +90,7 @@ export function recordAwsAttempt(progress: AwsProgress, id: string, picks: numbe
       attempts: (previous?.attempts ?? 0) + 1, streak, interval, due, lastStudied: now, lastScore: score, note: previous?.note ?? "",
     } },
     days: { ...progress.days, [day]: {
-      minutes: activity.minutes + (previous?.attempts ? 3 : 6),
+      minutes: activity.minutes + awsStudyMinutes(lesson, !!previous?.attempts),
       lessons: [...new Set([...activity.lessons, id])],
     } },
   };
@@ -114,8 +118,10 @@ export function planAwsSession(progress: AwsProgress, now = Date.now()): string[
   const queue: string[] = [];
   let minutes = available;
   for (const lesson of [...due, ...unseen]) {
-    const cost = progress.lessons[lesson.id]?.attempts ? 3 : 6;
-    if (cost > minutes) continue;
+    const cost = awsStudyMinutes(lesson, !!progress.lessons[lesson.id]?.attempts);
+    // Offer one complete lesson when it exceeds the remaining target instead
+    // of skipping prerequisites to reach shorter outlines in later domains.
+    if (cost > minutes && queue.length) break;
     queue.push(lesson.id);
     minutes -= cost;
   }

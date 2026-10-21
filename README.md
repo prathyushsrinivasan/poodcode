@@ -11,29 +11,49 @@ Built with **Tauri 2 · React + TypeScript · Rust · SQLite · Monaco · EChart
 
 ## Quick start
 
-**Courses → AWS MLA-C02** adds 24 short lessons covering all 107 published
-exam skill IDs, with 48 original scenario questions, recall prompts, design
-exercises, local notes, daily targets, and spaced reviews. Read the
-[complete exam roadmap](AWS_MLA_C02_ROADMAP.md) for the topic checklist,
-official sources, service list, and hands-on milestones. Course progress is
-saved locally through the existing SQLite settings API.
+**Courses → AWS SAA quizzes** offers 100 original SAA-C03 scenario questions
+across ten topics, with single-answer and multiple-answer formats. Practice a
+topic, try a mixed set of ten, revisit mistakes, or complete five daily questions.
+Every option has an explanation. Daily sets and submitted answers resume after
+restart, and progress is stored locally. See the
+[SAA quiz authoring notes](src/data/awsSaa/README.md).
 
-**Languages → JLPT N2 courses** offers three practice courses:
+**Courses → AWS MLA-C02** starts with six in-depth Data Preparation lessons:
+worked examples, service comparisons, curated videos/articles and 36 explained
+choice questions. Written-answer exercises have been removed throughout the
+course. Modules 2–4 remain introductory outlines; all 24 lessons map to the
+107 published skill IDs and include 72 scenario questions in total. Daily
+targets and spaced reviews remain available. Read the
+[complete exam roadmap](AWS_MLA_C02_ROADMAP.md) for the topic checklist,
+official sources, service list, and hands-on milestones. The
+[course audit and improvement backlog](AWS_MLA_C02_IMPROVEMENTS.md) records
+the earlier audit and remaining improvement ideas. The
+[Module 1 authoring notes](src/data/awsMla/README.md) describe the rebuilt content
+and its checks. Course
+progress is saved locally through the existing SQLite settings API.
+
+**Languages → JLPT N2 courses** offers four practice courses:
+
+- **Kanji Word Builder:** 20 kanji and 733 vocabulary entries for N3–N1 study,
+  with typed hiragana readings and single-answer or multiple-answer English
+  meaning quizzes. Browse every bank word for a kanji, practice ten or the full
+  list, and revisit reading or meaning mistakes. Shared words share progress.
+  See the [source and authoring notes](src/data/kanjiWords/README.md).
 
 - **Kanji & Vocabulary Blanks:** 120 original questions in 24 families, with
   readings, translations, explanations, and accepted alternative answers.
 - **Sentence Assembly ★:** 125 questions, solving tips, and mistake review.
-- **読解 Reading:** 113 original passages and 128 questions across 短文, 中文,
-  AB問題文, 長文, and 情報検索. The short-passage library contains 100 texts of
-  about 200 characters. Click annotated words for kana and meanings, save them
+- **読解 Reading:** 238 original passages and 388 questions across 短文, 中文,
+  AB問題文, 長文, and 情報検索. The short and medium libraries each contain 100 texts.
+  Hover over annotated words for kana and meanings, save them
   for spaced vocabulary review, and study the evidence and explanations for
   every answer. Study and timed practice have separate results, with bookmarks,
   filters, translations, and mistake review.
 
 Course progress is saved in the local SQLite settings and works offline. The
 existing coding tracks and Japanese technical vocabulary remain available.
-See [reading content authoring](src/data/dokkai/README.md) for the passage format
-and [the 中文 expansion prompt](prompts/jlpt-chuubun.md) for the next content batch.
+See [reading content authoring](src/data/dokkai/README.md) for passage formats,
+the completed medium-passage expansion, and the rules for future additions.
 
 Prerequisites (already verified on this machine):
 

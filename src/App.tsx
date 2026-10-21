@@ -33,9 +33,11 @@ import Contest from "./pages/Contest";
 import JapaneseBridge from "./pages/JapaneseBridge";
 import JlptN2 from "./pages/JlptN2";
 import JlptN2Courses from "./pages/JlptN2Courses";
+import JlptKanjiWords from "./pages/JlptKanjiWords";
 import JlptN2SentenceOrder from "./pages/JlptN2SentenceOrder";
 import JlptReading from "./pages/JlptReading";
 import AwsMla from "./pages/AwsMla";
+import AwsSaa from "./pages/AwsSaa";
 import Paths from "./pages/Paths";
 import Insights from "./pages/Insights";
 import Popout from "./pages/Popout";
@@ -107,6 +109,12 @@ function Shell() {
           <Route path="/learn/:key" element={<Learn />} />
           <Route path="/japanese" element={<JapanesePage />} />
           <Route path="/japanese/n2" element={<JlptN2Courses />} />
+          <Route path="/japanese/n2/kanji" element={<JlptKanjiWords />} />
+          <Route path="/japanese/n2/kanji/mixed" element={<JlptKanjiWords mode="mixed" />} />
+          <Route path="/japanese/n2/kanji/review" element={<JlptKanjiWords mode="review" />} />
+          <Route path="/japanese/n2/kanji/word/:wordId" element={<JlptKanjiWords mode="word" />} />
+          <Route path="/japanese/n2/kanji/:groupId" element={<JlptKanjiWords />} />
+          <Route path="/japanese/n2/kanji/:groupId/practice" element={<JlptKanjiWords mode="practice" />} />
           <Route path="/japanese/n2/patterns" element={<JlptN2 />} />
           <Route path="/japanese/n2/patterns/:lessonId" element={<JlptN2 />} />
           <Route path="/japanese/n2/sentence-order" element={<JlptN2SentenceOrder />} />
@@ -124,6 +132,11 @@ function Shell() {
           <Route path="/aws-mla" element={<AwsMla />} />
           <Route path="/aws-mla/daily" element={<AwsMla daily />} />
           <Route path="/aws-mla/:lessonId" element={<AwsMla />} />
+          <Route path="/aws-saa" element={<AwsSaa />} />
+          <Route path="/aws-saa/daily" element={<AwsSaa mode="daily" />} />
+          <Route path="/aws-saa/topic/:topicId" element={<AwsSaa mode="topic" />} />
+          <Route path="/aws-saa/practice" element={<AwsSaa mode="mixed" />} />
+          <Route path="/aws-saa/review" element={<AwsSaa mode="review" />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/projects/:project" element={<Projects />} />
           {/* Static segment, so it out-ranks the `:module` route below it and

@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { AWS_LESSONS } from "../data/awsMla/lessons";
 import { AWS_DOMAINS, AWS_SKILLS, AWS_TASKS } from "../data/awsMla/syllabus";
-import { AWS_DAY, awsStatus, awsStudyStreak, emptyAwsProgress, gradeAwsQuestion, parseAwsProgress, planAwsSession, recordAwsAttempt, setAwsNote } from "./awsMla";
+import { AWS_DAY, awsStatus, awsStudyMinutes, awsStudyStreak, emptyAwsProgress, gradeAwsQuestion, parseAwsProgress, planAwsSession, recordAwsAttempt, setAwsNote } from "./awsMla";
 import { todayISO } from "./srs";
 
 const NOW = new Date(2026, 9, 21, 12).getTime();
@@ -29,12 +29,15 @@ describe("MLA-C02 blueprint integrity", () => {
     expect(AWS_LESSONS).toHaveLength(24);
     expect(new Set(AWS_LESSONS.map((item) => item.id)).size).toBe(AWS_LESSONS.length);
     const questions = AWS_LESSONS.flatMap((item) => item.questions);
-    expect(questions).toHaveLength(48);
+    expect(questions).toHaveLength(72);
     expect(new Set(questions.map((question) => question.id)).size).toBe(questions.length);
     expect(questions.some((question) => question.answers.length > 1)).toBe(true);
     for (const item of AWS_LESSONS) {
       expect(item.skills.every((id) => id.startsWith(item.task + "."))).toBe(true);
-      expect(item.references.every((reference) => reference.url.startsWith("https://docs.aws.amazon.com/"))).toBe(true);
+      expect(item.references.every((reference) => {
+        const url = new URL(reference.url);
+        return url.protocol === "https:" && ["docs.aws.amazon.com", "aws.amazon.com", "www.youtube.com", "scikit-learn.org"].includes(url.hostname);
+      })).toBe(true);
       for (const question of item.questions) {
         expect(question.options.length).toBeGreaterThanOrEqual(4);
         expect(new Set(question.options.map((option) => option.text)).size).toBe(question.options.length);
@@ -42,6 +45,28 @@ describe("MLA-C02 blueprint integrity", () => {
         expect(question.answers.length).toBeLessThan(question.options.length);
         expect(question.answers.every((answer) => Number.isInteger(answer) && answer >= 0 && answer < question.options.length)).toBe(true);
         expect(gradeAwsQuestion(question, question.answers)).toBe(true);
+      }
+    }
+  });
+
+  it("provides full module-one lessons with taught sections, curated sources and assessed skill coverage", () => {
+    const full = AWS_LESSONS.filter((item) => item.teaching);
+    expect(full.map((item) => item.id)).toEqual(AWS_LESSONS.filter((item) => item.task.startsWith("1.")).map((item) => item.id));
+    expect(full).toHaveLength(6);
+    const assessed = new Set(full.flatMap((item) => item.questions.flatMap((question) => question.skills ?? [])));
+    expect([...assessed].sort()).toEqual(AWS_SKILLS.filter((skill) => skill.domain === 1).map((skill) => skill.id).sort());
+    for (const item of full) {
+      expect(item.teaching!.sections.length).toBeGreaterThanOrEqual(4);
+      expect(item.teaching!.sections.every((section) => section.title && section.body.length > 500)).toBe(true);
+      expect(new Set(item.teaching!.sections.map((section) => section.id)).size).toBe(item.teaching!.sections.length);
+      expect(item.questions).toHaveLength(6);
+      expect(item.references.every((reference) => reference.kind && reference.focus)).toBe(true);
+      expect(item.references.some((reference) => reference.kind === "Video" || reference.kind === "Article")).toBe(true);
+      for (const question of item.questions) {
+        expect(item.teaching!.sections.some((section) => section.id === question.section)).toBe(true);
+        expect(question.skills?.length).toBeGreaterThan(0);
+        expect(question.skills!.every((skill) => item.skills.includes(skill))).toBe(true);
+        expect(question.options.every((option) => option.why.trim().length > 0)).toBe(true);
       }
     }
   });
@@ -102,11 +127,13 @@ describe("MLA-C02 review scheduling", () => {
 });
 
 describe("MLA-C02 daily planning and persistence", () => {
-  it("starts in prerequisite order and respects the daily time budget", () => {
+  it("offers a full first lesson even for a short target without skipping prerequisites", () => {
     const progress = emptyAwsProgress();
-    expect(planAwsSession(progress, NOW)).toEqual(AWS_LESSONS.slice(0, 2).map((item) => item.id));
+    expect(planAwsSession(progress, NOW)).toEqual([lesson.id]);
+    progress.target = 10;
+    expect(planAwsSession(progress, NOW)).toEqual([lesson.id]);
     progress.target = 25;
-    expect(planAwsSession(progress, NOW)).toHaveLength(4);
+    expect(planAwsSession(progress, NOW)).toEqual([lesson.id]);
     const studied = recordAwsAttempt({ ...progress, target: 10 }, lesson.id, correct, NOW);
     expect(planAwsSession(studied, NOW)).toEqual([]);
     expect(planAwsSession(studied, NOW + AWS_DAY)[0]).toBe(lesson.id);
@@ -120,7 +147,17 @@ describe("MLA-C02 daily planning and persistence", () => {
     expect(queue[0]).toBe(second.id);
     expect(queue[1]).toBe(lesson.id);
     expect(new Set(queue).size).toBe(queue.length);
-    expect(queue).toContain(AWS_LESSONS[2].id);
+    expect(queue).toHaveLength(2);
+    expect(queue).not.toContain(AWS_LESSONS[6].id);
+  });
+
+  it("records the full lesson estimate and uses a shorter review estimate", () => {
+    const first = recordAwsAttempt(emptyAwsProgress(), lesson.id, correct, NOW);
+    expect(first.days[todayISO(new Date(NOW))].minutes).toBe(awsStudyMinutes(lesson));
+    const review = recordAwsAttempt(first, lesson.id, correct, NOW + AWS_DAY);
+    expect(review.days[todayISO(new Date(NOW + AWS_DAY))].minutes).toBe(awsStudyMinutes(lesson, true));
+    expect(awsStudyMinutes(AWS_LESSONS[6])).toBe(6);
+    expect(awsStudyMinutes(AWS_LESSONS[6], true)).toBe(3);
   });
 
   it("roundtrips saved progress and recovers valid rows from malformed state", () => {

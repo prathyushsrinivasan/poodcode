@@ -32,6 +32,23 @@ export interface AwsQuestion {
   prompt: string;
   options: { text: string; why: string }[];
   answers: number[];
+  /** Skills actually assessed by this item, independent of lesson coverage. */
+  skills?: string[];
+  section?: string;
+}
+
+export interface AwsResource {
+  title: string;
+  url: string;
+  kind?: "Documentation" | "Article" | "Video";
+  focus?: string;
+  note?: string;
+}
+
+export interface AwsTeaching {
+  minutes: number;
+  objectives: string[];
+  sections: { id: string; title: string; body: string }[];
 }
 
 export interface AwsLesson {
@@ -45,6 +62,7 @@ export interface AwsLesson {
   recall: string;
   exercise: string;
   exerciseAnswer: string;
-  references: { title: string; url: string }[];
+  references: AwsResource[];
   questions: AwsQuestion[];
+  teaching?: AwsTeaching;
 }

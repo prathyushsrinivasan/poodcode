@@ -1,0 +1,47 @@
+.kw-kanji-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); }
+.kw-kanji-card { display: flex; align-items: center; gap: var(--space-4); text-decoration: none; color: var(--text); }
+.kw-kanji-card:hover { border-color: var(--accent); text-decoration: none; }
+.kw-glyph { font-size: 3rem; line-height: 1.4; flex: 0 0 auto; color: var(--accent-text); }
+.kw-page .kw-kanji-card h2 { font-size: var(--text-lg); }
+.kw-page .kw-kanji-card p { margin-bottom: var(--space-2); color: var(--text-dim); font-size: var(--text-sm); }
+.kw-kanji-card > div { min-width: 0; flex: 1; }
+.kw-stat-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-4); }
+.kw-stat-row > div { display: grid; gap: var(--space-2); }
+.kw-stat-row strong { font-size: var(--text-2xl); }
+.kw-stat-row span { font-size: var(--text-sm); color: var(--text-dim); }
+.kw-filters { display: grid; grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
+.kw-filters label { display: grid; gap: var(--space-2); min-width: 0; }
+.kw-filters input, .kw-filters select { width: 100%; min-width: 0; }
+.kw-word-library { display: grid; gap: var(--space-4); }
+.kw-word-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
+.kw-word-card { display: flex; flex-direction: column; gap: var(--space-3); min-width: 0; }
+.kw-word-card .btn { align-self: flex-start; margin-top: auto; }
+.kw-page .kw-word-card h3 { margin: 0; font-size: var(--text-2xl); }
+.kw-page .kw-word-card p { margin: 0; }
+.kw-word-heading, .kw-list-heading, .kw-round-status { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.kw-check { display: inline-flex; align-items: center; gap: var(--space-2); }
+.kw-cue { color: var(--text-dim); line-height: 1.9; }
+.kw-library-answer ul { margin-block: var(--space-2); padding-left: var(--space-5); line-height: var(--leading-loose); }
+.kw-page .kw-exercise { max-width: 900px; width: 100%; margin-inline: auto; min-width: 0; overflow-wrap: anywhere; }
+.kw-page .kw-exercise .kw-prompt { font-size: clamp(2.2rem, 6vw, 3.5rem); line-height: 1.9; margin-block: var(--space-4); }
+.kw-prompt rt { font-size: var(--text-lg); color: var(--text-dim); }
+.kw-reading-result { font-size: var(--text-xl); }
+.kw-meaning-options { display: grid; gap: var(--space-3); }
+.kw-meaning-options .n2-choice { display: flex; flex-direction: column; align-items: stretch; }
+.kw-choice-line { display: flex; align-items: center; gap: var(--space-3); }
+.kw-option-reason { font-size: var(--text-sm); color: var(--text-dim); line-height: var(--leading-loose); }
+.kw-meaning-options .kw-correct { border-color: var(--good); }
+.kw-meaning-options .kw-incorrect { border-color: var(--bad); }
+.kw-exercise input:disabled { opacity: 1; }
+.kw-note { border-left: 3px solid var(--accent); padding-left: var(--space-4); }
+.kw-recap { width: 100%; padding-left: var(--space-5); }
+.kw-recap li { padding-block: var(--space-2); }
+.kw-recap span { display: block; color: var(--text-dim); font-size: var(--text-sm); }
+.kw-sources { border-top: 1px solid var(--border); padding-top: var(--space-3); color: var(--text-dim); font-size: var(--text-sm); overflow-wrap: anywhere; }
+.kw-license-text { max-height: 18rem; white-space: pre-wrap; overflow: auto; overflow-wrap: anywhere; }
+.kw-disabled-link { opacity: .6; }
+@media (max-width: 1100px) { .kw-kanji-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) {
+  .kw-kanji-grid, .kw-word-grid, .kw-filters { grid-template-columns: minmax(0, 1fr); }
+  .kw-stat-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

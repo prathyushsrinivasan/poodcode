@@ -73,6 +73,13 @@ const TREE: Record<string, RouteNode> = {
     label: "AWS MLA-C02",
     children: { daily: { label: "Daily session" }, ":": { label: "", dynamicLabel: "Lesson" } },
   },
+  "aws-saa": {
+    label: "AWS SAA-C03",
+    children: {
+      daily: { label: "Daily five" }, practice: { label: "Mixed practice" }, review: { label: "Mistake review" },
+      topic: { label: "", children: { ":": { label: "", dynamicLabel: "Topic" } } },
+    },
+  },
   projects: {
     label: "Projects",
     children: {
@@ -100,6 +107,11 @@ const TREE: Record<string, RouteNode> = {
   japanese: {
     label: "日本語 vocabulary",
     children: { n2: { label: "JLPT N2 courses", children: {
+      kanji: { label: "Kanji Word Builder", children: {
+        mixed: { label: "Mixed practice" }, review: { label: "Mistake review" },
+        word: { label: "", children: { ":": { label: "", dynamicLabel: "Word" } } },
+        ":": { label: "", dynamicLabel: "Kanji", children: { practice: { label: "Practice" } } },
+      } },
       patterns: { label: "Kanji & Vocabulary Blanks", children: {
         review: { label: "Mistake review" }, ":": { label: "", dynamicLabel: "Pattern lesson" },
       } },

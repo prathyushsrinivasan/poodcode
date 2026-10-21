@@ -1,0 +1,58 @@
+{
+  "reviewed": "2026-10-21",
+  "sourceRevision": "1ad66734417aca9dbcca6b2d5ee440cb13ab3ba0",
+  "dictionaryDate": "2026-10-19",
+  "words": 733,
+  "sourceSha256": {
+    "n1.csv": "120911636c019899552aa6d7bd64b036ecef4bedfe272a744f75735c46aae5cd",
+    "n2.csv": "2d0f1ddd6222881cd9fc2ca701db74300af99b3f1f84d5ac3c18411c20f0c055",
+    "n3.csv": "ba071571d344e60b0e1fd11cd2e98a6aaa04515361653ca45147129460531297"
+  },
+  "excluded": [
+    [
+      "～化",
+      "~か",
+      "not a whole hiragana-reading word"
+    ],
+    [
+      "～行",
+      "~ぎょう",
+      "not a whole hiragana-reading word"
+    ],
+    [
+      "～年生",
+      "~ねんせい",
+      "not a whole hiragana-reading word"
+    ],
+    [
+      "～力",
+      "~りょく",
+      "not a whole hiragana-reading word"
+    ],
+    [
+      "行っていらっしゃい",
+      "いっていらっしゃい",
+      "no matching JMdict spelling/reading; needs editorial review"
+    ],
+    [
+      "生意気な",
+      "なまいきな",
+      "no matching JMdict spelling/reading; needs editorial review"
+    ],
+    [
+      "～合せ",
+      "~あわせ",
+      "not a whole hiragana-reading word"
+    ],
+    [
+      "(花を〜) 生ける, 活ける",
+      "(はなを~) いける",
+      "not a whole hiragana-reading word"
+    ],
+    [
+      "～心",
+      "~しん",
+      "not a whole hiragana-reading word"
+    ]
+  ]
+}

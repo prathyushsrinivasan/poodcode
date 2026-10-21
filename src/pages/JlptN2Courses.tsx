@@ -3,12 +3,20 @@ import { Badge, PageHeader } from "../components/ui";
 import { N2_QUESTIONS } from "../data/jlptN2";
 import { N2_ASSEMBLY_QUESTIONS } from "../data/jlptN2SentenceOrder";
 import { READING_PASSAGES, READING_QUESTIONS } from "../data/dokkai";
+import { KANJI_GROUPS, KANJI_WORDS } from "../data/kanjiWords";
 
 export default function JlptN2Courses() {
   return <div className="page n2-page">
     <PageHeader eyebrow="日本語 · JLPT N2" title="JLPT N2 courses"
       subtitle="Choose the question format you want to practice. Each course has its own lessons, explanations and saved progress." />
     <div className="n2-grid">
+      <Link className="card n2-lesson" to="/japanese/n2/kanji">
+        <Badge>Kanji · Readings &amp; meanings</Badge>
+        <h2>Kanji Word Builder</h2>
+        <p>Explore words built from each kanji. Type the hiragana, then choose every matching English meaning. Includes single-answer and multiple-answer quizzes.</p>
+        <span className="n2-meta">{KANJI_GROUPS.length} kanji · {KANJI_WORDS.length} vocabulary entries · N3–N1 study estimates</span>
+        <strong>Explore kanji &amp; words →</strong>
+      </Link>
       <Link className="card n2-lesson" to="/japanese/n2/reading">
         <Badge>Reading · 読解</Badge>
         <h2>読解（どっかい）</h2>

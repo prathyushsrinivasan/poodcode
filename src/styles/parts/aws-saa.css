@@ -1,0 +1,20 @@
+/* SAA quiz views share the existing AWS course's theme and component styles. */
+.saa-progress { width: 100%; height: var(--space-2); accent-color: var(--accent); }
+.saa-practice-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+.saa-topics { display: flex; flex-direction: column; gap: var(--space-4); }
+.saa-topics-heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-4); align-items: center; }
+.saa-topics-heading label { display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; }
+.saa-topics-heading input { max-width: 100%; }
+.saa-page .aws-card-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+.saa-page .aws-lesson-card { display: flex; flex-direction: column; gap: var(--space-3); }
+.saa-page .aws-lesson-card h3, .saa-page .aws-lesson-card p { margin: 0; }
+.saa-page .aws-lesson-card .saa-progress { margin-top: auto; }
+.saa-prompt { font-size: var(--text-lg); }
+.saa-instruction { font-weight: var(--weight-medium); color: var(--text-dim); }
+.saa-question .aws-option-reason { display: block; margin: var(--space-2) 0 0 var(--space-6); }
+.saa-question input:disabled { opacity: 1; }
+.saa-result-list { display: flex; flex-direction: column; gap: var(--space-3); padding-left: var(--space-5); }
+.saa-result-list button { text-align: left; white-space: normal; height: auto; line-height: var(--leading-loose); }
+.saa-save-error { padding: var(--space-4); }
+.saa-session { min-width: 0; }
+.saa-question, .saa-results { overflow-wrap: anywhere; }
