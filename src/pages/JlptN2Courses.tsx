@@ -12,7 +12,7 @@ export default function JlptN2Courses() {
       <Link className="card n2-lesson" to="/japanese/n2/reading">
         <Badge>Reading · 読解</Badge>
         <h2>読解（どっかい）</h2>
-        <p>短文・中文・AB問題文・長文・情報検索. Read with clickable vocabulary, practice under a time limit, and review the evidence behind every answer.</p>
+        <p>短文・中文・AB問題文・長文・情報検索. Read with vocabulary on hover, practice under a time limit, and review the evidence behind every answer.</p>
         <span className="n2-meta">{READING_PASSAGES.length} passages · {READING_QUESTIONS.length} questions · 100 short passages</span>
         <strong>Open reading sections →</strong>
       </Link>

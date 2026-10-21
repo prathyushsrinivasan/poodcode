@@ -11,8 +11,8 @@ describe("authored reading library", () => {
     const medium = READING_PASSAGES.filter((p) => p.kind === "medium");
     expect(medium.map((p) => p.id)).toEqual(Array.from({ length: 100 }, (_, i) => `medium-${String(i + 1).padStart(3, "0")}`));
     expect(medium.flatMap((p) => p.questions)).toHaveLength(200);
-    expect(READING_PASSAGES).toHaveLength(208);
-    expect(READING_QUESTIONS).toHaveLength(318);
+    expect(READING_PASSAGES).toHaveLength(238);
+    expect(READING_QUESTIONS).toHaveLength(388);
     for (const p of medium) expect(p.questions.map((q) => q.id)).toEqual([`${p.id}-q1`, `${p.id}-q2`]);
     expect(new Set(READING_PASSAGES.map((p) => p.id)).size).toBe(READING_PASSAGES.length);
     expect(new Set(READING_PASSAGES.flatMap((p) => p.texts.map((t) => plainReading(t.text)))).size)
@@ -49,6 +49,30 @@ describe("authored reading library", () => {
     expect(new Set(added.map((p) => p.topic)).size).toBeGreaterThanOrEqual(8);
     expect(new Set(added.map((p) => p.skill)).size).toBeGreaterThanOrEqual(6);
     expect(new Set(added.map((p) => p.level))).toEqual(new Set([1, 2, 3]));
+  });
+  it("adds ten stable, fully explained passages to each remaining section", () => {
+    for (const [kind, legacy, questions] of [["ab", 3, 2], ["long", 2, 3], ["information", 3, 2]] as const) {
+      const passages = READING_PASSAGES.filter((p) => p.kind === kind);
+      expect(passages.map((p) => p.id)).toEqual(Array.from({ length: legacy + 10 }, (_, i) => `${kind}-${String(i + 1).padStart(3, "0")}`));
+      for (const p of passages.slice(legacy)) {
+        expect(p.questions.map((q) => q.id)).toEqual(Array.from({ length: questions }, (_, i) => `${p.id}-q${i + 1}`));
+        expect(p.texts, p.id).toHaveLength(kind === "ab" ? 2 : 1);
+        for (const text of p.texts) {
+          expect(readingSegments(text.text, COMMON_READING_WORDS).filter((s) => s.word).length, p.id).toBeGreaterThanOrEqual(15);
+          expect(text.translation.match(/\b[A-Za-z]+\b/g)?.length, p.id).toBeGreaterThan(kind === "ab" ? 60 : 150);
+        }
+        for (const q of p.questions) for (const quote of q.evidence) {
+          const text = p.texts.find((t) => plainReading(t.text).includes(quote))!;
+          expect(text, q.id).toBeDefined();
+          expect(readingSegments(text.text, COMMON_READING_WORDS, [quote]).filter((s) => s.evidence).map((s) => s.text).join(""), q.id).toBe(quote);
+        }
+      }
+    }
+    // Identical spellings must not inherit the fabric meaning in the bread passage.
+    const bread = READING_PASSAGES.find((p) => p.id === "long-010")!;
+    const dough = readingSegments(bread.texts[0].text, COMMON_READING_WORDS).filter((s) => s.word?.text === "生地");
+    expect(dough.length).toBeGreaterThan(0);
+    for (const segment of dough) expect(segment.word).toMatchObject({ reading: "きじ", meaning: "dough" });
   });
   it("rejects reused passage templates by comparing normalized four-character sequences", () => {
     const passages = READING_PASSAGES.filter((p) => p.kind === "medium");

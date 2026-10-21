@@ -1,0 +1,61 @@
+/* AWS learning reuses the app's theme, focus, spacing, and contrast tokens. */
+.aws-page { display: flex; flex-direction: column; gap: var(--space-5); }
+.aws-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-4); }
+.aws-summary > div { display: flex; flex-direction: column; gap: var(--space-1); padding: var(--space-4); border: 1px solid var(--border); border-radius: var(--radius); }
+.aws-summary strong { font-size: var(--text-2xl); }
+.aws-summary small { font-size: var(--text-lg); color: var(--text-dim); font-weight: var(--weight-normal); }
+.aws-summary span, .aws-card-meta, .aws-up-next div > span { color: var(--text-dim); font-size: var(--text-sm); }
+.aws-switcher, .aws-session-bar, .aws-card-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+.aws-switcher button[aria-pressed="true"] { background: var(--accent-dim); color: var(--accent-text); border-color: var(--accent); }
+.aws-daily { display: grid; grid-template-columns: minmax(0, 1fr) minmax(200px, 260px); gap: var(--space-6); padding: var(--space-5); }
+.aws-daily p, .aws-explainer p { line-height: var(--leading-loose); }
+.aws-daily-action { display: flex; flex-direction: column; justify-content: center; align-items: stretch; gap: var(--space-3); }
+.aws-daily-action .btn { text-align: center; white-space: normal; }
+.aws-page a.btn.primary { background: var(--accent); border: 1px solid var(--accent); color: var(--on-accent); padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); font-size: var(--text-sm); }
+.aws-page a.btn.primary:hover { text-decoration: none; }
+.aws-page button.primary:hover:not(:disabled) { background: var(--accent); color: var(--on-accent); filter: none; }
+.aws-stack { display: flex; flex-direction: column; gap: var(--space-3); }
+.aws-stack > h2 { margin: 0; }
+.aws-domains, .aws-lesson-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
+.aws-domains .card, .aws-explainer { padding: var(--space-5); }
+.aws-domains progress { width: 100%; accent-color: var(--accent); height: var(--space-2); }
+.aws-up-next { display: flex; align-items: center; gap: var(--space-4); padding: var(--space-4); color: var(--text); text-decoration: none; }
+.aws-up-next div { flex: 1; display: flex; flex-direction: column; gap: var(--space-1); }
+.aws-lesson-card { color: var(--text); text-decoration: none; padding: var(--space-5); }
+.aws-lesson-card p { line-height: var(--leading-loose); color: var(--text-dim); }
+.aws-up-next:hover, .aws-lesson-card:hover { border-color: var(--accent); }
+.aws-card-meta { justify-content: space-between; }
+.aws-filters { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-3); }
+.aws-filters label, .aws-study label { display: flex; flex-direction: column; gap: var(--space-2); }
+.aws-filters input, .aws-filters select, .aws-study textarea { width: 100%; min-width: 0; }
+.aws-task { padding: var(--space-4); }
+.aws-task summary { cursor: pointer; line-height: var(--leading-loose); font-weight: var(--weight-medium); }
+.aws-task li { margin-block: var(--space-3); line-height: var(--leading-loose); }
+.aws-footer { display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-5); color: var(--text-dim); font-size: var(--text-sm); border-top: 1px solid var(--border); padding-top: var(--space-4); }
+.aws-study { display: flex; flex-direction: column; gap: var(--space-5); max-width: 900px; width: 100%; margin-inline: auto; }
+.aws-study > .card { padding: var(--space-5); }
+.aws-study .page-sub { overflow-wrap: anywhere; }
+.aws-study h2 { font-size: var(--text-xl); }
+.aws-study p, .aws-study li { line-height: var(--leading-loose); }
+.aws-study textarea { resize: vertical; margin-bottom: var(--space-3); }
+.aws-notes li + li { margin-top: var(--space-3); }
+.aws-model { font-size: var(--text-lg); }
+.aws-trap { border-left: 3px solid var(--warn); padding: var(--space-3) var(--space-4); background: var(--bg-elev-2); border-radius: var(--radius-sm); }
+.aws-trap p { margin-bottom: 0; }
+.aws-session-bar { justify-content: space-between; }
+.aws-quiz fieldset { min-width: 0; border: 0; padding: 0; margin: var(--space-5) 0; }
+.aws-quiz legend { font-weight: var(--weight-medium); line-height: var(--leading-loose); margin-bottom: var(--space-3); }
+.aws-quiz label.aws-option { display: flex; flex-direction: column; border: 1px solid var(--border-strong); padding: var(--space-3); margin-block: var(--space-2); border-radius: var(--radius-sm); cursor: pointer; }
+.aws-option-choice { display: flex; align-items: flex-start; gap: var(--space-3); line-height: var(--leading-normal); }
+.aws-option-choice input { margin-top: var(--space-1); flex: 0 0 auto; }
+.aws-option-reason { font-size: var(--text-sm); color: var(--text-dim); line-height: var(--leading-loose); }
+.aws-quiz label.aws-correct { border-color: var(--good); }
+.aws-quiz label.aws-incorrect { border-color: var(--bad); }
+.aws-result, .aws-exercise-answer { padding: var(--space-4); background: var(--bg-elev-2); border-radius: var(--radius); margin-top: var(--space-4); }
+@media (max-width: 900px) {
+  .aws-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .aws-daily, .aws-filters { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 600px) {
+  .aws-domains, .aws-lesson-grid { grid-template-columns: minmax(0, 1fr); }
+}

@@ -43,7 +43,7 @@ export default function ReadingVocabulary({ state }: { state: ReadingState }) {
     </> : <><h2>Vocabulary round complete</h2><p>Your next review times have been saved.</p></>}
       <Button variant="ghost" onClick={() => setReviewing(false)}>Close review</Button></Card>}
     <label className="n2-search">Find a saved word<input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Japanese, kana or meaning" /></label>
-    {!filtered.length && <Card><p>{words.length ? "No words match your search." : "Click an underlined word in a reading passage, then choose Save for vocabulary review."}</p><Link to="/japanese/n2/reading/short">Open short passages →</Link></Card>}
+    {!filtered.length && <Card><p>{words.length ? "No words match your search." : "Hover over an underlined word in a reading passage, then choose Save for vocabulary review."}</p><Link to="/japanese/n2/reading/short">Open short passages →</Link></Card>}
     <div className="n2-grid">{filtered.map(([key, w]) => {
       const source = READING_PASSAGES.find((p) => p.id === w.source);
       return <Card key={key}><h2 lang="ja">{w.text} <span className="n2-meta">{w.reading}</span></h2><p>{w.meaning}</p>

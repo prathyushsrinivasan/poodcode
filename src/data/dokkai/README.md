@@ -1,9 +1,25 @@
 # N2 reading content
 
-All 208 passages are original practice material: 100 short, 100 medium, 3 paired
-AB passages, 2 long arguments, and 3 information-search documents. Together they
-provide 318 questions, including 200 medium questions. They ship with the app
+All 238 passages are original practice material: 100 short, 100 medium, 13 paired
+AB passages, 12 long arguments, and 13 information-search documents. Together they
+provide 388 questions, including 200 medium questions. They ship with the app
 and work offline.
+
+`additions/paired.ts`, `additions/long.ts`, and `additions/information.ts` each
+append ten passages with explicit IDs: `ab-004`–`ab-013`, `long-003`–`long-012`,
+and `information-004`–`information-013`. Paired texts are 270–350 characters each,
+long arguments are 900–1,200, and information documents are 600–800. Each new
+pair/document has two questions; each long argument has three. Every addition
+has a full English translation, exact supporting quotes, and explanations for
+all four choices. Legacy passages and question IDs remain unchanged.
+
+Vocabulary opens on hover in passages, questions and choices, without blocking
+the reader. Focus or tap also opens it; Arrow Down moves keyboard focus into the
+popup, and Escape closes it. Readers can move into the popup to save a word.
+Leaving both the word and popup dismisses it. Actual lookups mark unanswered
+study results as assisted; timed practice still hides lookups until review.
+`additions/vocabulary.ts` supplies additional curated terms; ambiguous 生地 is
+explicitly glossed as dough in the bread passage while retaining fabric elsewhere.
 
 The medium library has ten ordered ten-passage practice sets in the existing
 中文 reader. The five original entries in `extended.ts` are unchanged, including

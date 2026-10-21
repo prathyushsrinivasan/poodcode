@@ -16,6 +16,9 @@ import { MEDIUM_SET_10 } from "./medium/set10";
 import { PAIRED_PASSAGES } from "./paired";
 import { LONG_PASSAGES } from "./long";
 import { INFORMATION_PASSAGES } from "./information";
+import { ADDITIONAL_PAIRED_PASSAGES } from "./additions/paired";
+import { ADDITIONAL_LONG_PASSAGES } from "./additions/long";
+import { ADDITIONAL_INFORMATION_PASSAGES } from "./additions/information";
 import { shortPassage, type ReadingKind, type ReadingPassage, type ReadingSkill } from "./types";
 export const READING_SECTIONS: { id: ReadingKind; name: string; english: string; length: string; description: string }[] = [
   { id: "short", name: "短文", english: "Short passages", length: "About 200 characters", description: "One focused question. Build accuracy with reasons, references, intentions and main points." },
@@ -29,7 +32,9 @@ export const READING_PASSAGES: ReadingPassage[] = [
   ...EXTENDED_PASSAGES,
   ...MEDIUM_SET_01, ...MEDIUM_SET_02, ...MEDIUM_SET_03, ...MEDIUM_SET_04, ...MEDIUM_SET_05,
   ...MEDIUM_SET_06, ...MEDIUM_SET_07, ...MEDIUM_SET_08, ...MEDIUM_SET_09, ...MEDIUM_SET_10,
-  ...PAIRED_PASSAGES, ...LONG_PASSAGES, ...INFORMATION_PASSAGES,
+  ...PAIRED_PASSAGES, ...ADDITIONAL_PAIRED_PASSAGES,
+  ...LONG_PASSAGES, ...ADDITIONAL_LONG_PASSAGES,
+  ...INFORMATION_PASSAGES, ...ADDITIONAL_INFORMATION_PASSAGES,
 ];
 export const READING_QUESTIONS = READING_PASSAGES.flatMap((p) => p.questions);
 export const READING_TIPS: Record<ReadingSkill, string> = {

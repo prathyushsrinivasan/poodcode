@@ -32,7 +32,7 @@ export default function JlptReading() {
       {passageId && <Link className="ghost-link" to={`${READING_BASE}/${section}`}>← Passage library</Link>}</div>
     <PageHeader eyebrow="JLPT N2 · 読解（どっかい）" title={section === "vocabulary" ? "Reading vocabulary" : passage?.title ?? (passageId === "practice" ? `${current?.name} · Practice` : current ? `${current.name} · ${current.english}` : "読解 · Reading")}
       subtitle={passageId ? "Read the passage, choose the best answer, then review the evidence."
-        : "Original practice material. Study with clickable vocabulary or test yourself under a time limit."} />
+        : "Original practice material. Study with vocabulary on hover or test yourself under a time limit."} />
     {state.saveError && <Card tone="warn"><p role="alert">Your latest changes have not been saved. Keep this page open and retry.</p><Button onClick={state.retrySave}>Retry saving</Button></Card>}
     {section === "vocabulary" ? <ReadingVocabulary state={state} /> : passageId ? <ReadingSession key={`${section}-${passageId}-${params.toString()}-${run}`}
       passages={passage ? [passage] : practicePool} state={state} timed={params.get("mode") === "timed"}
@@ -49,7 +49,7 @@ function ReadingOverview({ state }: { state: ReadingState }) {
       <ProgressBar value={stats.correct} max={stats.total} label="Reading questions correct on the latest attempt" />
       <div className="n2-actions"><Link className="btn primary" to={`${READING_BASE}/short`}>Practice 短文</Link>
         <Link className="btn" to={`${READING_BASE}/vocabulary`}>Reading vocabulary · {Object.keys(state.progress.words).length} saved</Link></div>
-      <p className="n2-meta">Click underlined words for kana and meaning. Study results distinguish independent attempts from attempts using help. Timed answers and explanations are revealed at the end.</p>
+      <p className="n2-meta">Hover over underlined words for kana and meaning. Study results distinguish independent attempts from attempts using help. Timed answers and explanations are revealed at the end.</p>
     </Card>
     <div className="n2-grid">{READING_SECTIONS.map((s) => {
       const passages = READING_PASSAGES.filter((p) => p.kind === s.id);

@@ -71,8 +71,7 @@
 .dokkai-evidence { background: var(--accent-dim); box-shadow: inset 0 -2px var(--accent); }
 .dokkai-choices { display: grid; gap: var(--space-3); }
 .dokkai-correct { border-color: var(--good); }
-.dokkai-dialog { width: min(30rem, calc(100vw - 2rem)); max-height: calc(100dvh - 4rem); overflow: auto; padding: var(--space-5); border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-elev); color: var(--text); box-shadow: var(--shadow-3); }
-.dokkai-dialog::backdrop { background: rgb(0 0 0 / 55%); }
+.dokkai-dialog { position: fixed; z-index: 1000; width: min(24rem, calc(100vw - 1rem)); max-height: calc(100dvh - 1rem); overflow: auto; padding: var(--space-5); border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-elev); color: var(--text); box-shadow: var(--shadow-3); }
 .dokkai-dialog h2 { margin: 0; }
 .dokkai-kana { font-size: var(--text-xl); }
 .dokkai-page blockquote { margin: var(--space-3) 0; padding-left: var(--space-4); border-left: 3px solid var(--accent); line-height: var(--leading-loose); }

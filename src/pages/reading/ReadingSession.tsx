@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Badge, Button, Card, ProgressBar } from "../../components/ui";
-import { passageVocabulary, ReadingText, ReadingWordDialog, useWordPopup } from "../../components/ReadingText";
+import { passageVocabulary, ReadingText, ReadingWordPopup, useWordPopup } from "../../components/ReadingText";
 import { READING_PASSAGES, READING_TIPS } from "../../data/dokkai";
 import type { ReadingPassage, ReadingWord } from "../../data/dokkai/types";
 import { nextReading, readingTimeBudget, type ReadingMode } from "../../lib/dokkai";
@@ -76,7 +76,7 @@ export default function ReadingSession({ passages, state, timed, mixed, minutes,
       <Button onClick={onRestart}>Practice again</Button><Link to={`/japanese/n2/reading/${round[0].kind}`}>Return to passage library →</Link></div></Card>;
 
   function assist() { if (!timed && !review) setAids((before) => ({ ...before, [p.id]: true })); }
-  function openWord(word: ReadingWord) { assist(); popup.open(word); }
+  function openWord(word: ReadingWord, anchor: HTMLElement) { assist(); popup.open(word, anchor); }
   function check(reveal = false) {
     if (checkedRef.current.has(p.id) || timed) return;
     if (!reveal && p.questions.some((q) => answers[q.id] === undefined)) return;
@@ -106,7 +106,7 @@ export default function ReadingSession({ passages, state, timed, mixed, minutes,
       <Button aria-pressed={bookmark} onClick={() => state.bookmark(p.id)}>{bookmark ? "Bookmarked" : "Bookmark passage"}</Button></div>
       <h2 ref={headingRef} tabIndex={-1} lang="ja">{p.title}</h2>
       {enabled && <div className="n2-actions"><label className="dokkai-check"><input type="checkbox" checked={ruby} onChange={(e) => { assist(); setRuby(e.target.checked); }} /> Show kana above annotated words</label>
-        <span className="n2-meta">Click underlined words for meaning and kana.</span></div>}
+        <span className="n2-meta">Hover over underlined words for meaning and kana. You can also focus or tap a word.</span></div>}
       <div className={p.kind === "ab" ? "dokkai-texts dokkai-paired" : "dokkai-texts"}>{p.texts.map((text, i) => <section key={i} className={p.kind === "information" ? "dokkai-notice" : "dokkai-text-block"}>
         {text.label && <h3>Text {text.label}</h3>}
         <div className="dokkai-passage" lang="ja"><ReadingText text={text.text} vocabulary={vocabulary} enabled={enabled} ruby={ruby && enabled}
@@ -143,6 +143,6 @@ export default function ReadingSession({ passages, state, timed, mixed, minutes,
       <details key={p.id}><summary>English translation</summary>{p.texts.map((text, i) => <div key={i}>{text.label && <h3>Text {text.label}</h3>}<p>{text.translation}</p></div>)}</details>
       {!timed && <p className="n2-meta">Recorded as {recordedModes[p.id] === "assisted" ? "study with help" : "independent study"}.</p>}
     </Card>}
-    <ReadingWordDialog word={popup.word} source={p.id} state={state} onClose={popup.close} />
+    <ReadingWordPopup word={popup.word} anchor={popup.anchor} source={p.id} state={state} onClose={popup.close} />
   </>;
 }

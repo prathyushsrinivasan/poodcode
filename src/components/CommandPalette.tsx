@@ -18,6 +18,7 @@ import { ignore } from "../lib/failures";
 import { N2_LESSONS } from "../data/jlptN2";
 import { N2_ASSEMBLY_LESSONS } from "../data/jlptN2SentenceOrder";
 import { READING_SECTIONS, READING_PASSAGES } from "../data/dokkai";
+import { AWS_LESSONS } from "../data/awsMla/lessons";
 
 interface Cmd {
   id: string;
@@ -309,6 +310,7 @@ export function CommandPalette() {
       { id: "course", label: "TypeScript Course", run: () => navigate("/course") },
       { id: "java-course", label: "Java Course", run: () => navigate("/java-course") },
       { id: "backend", label: "Backend Lab", run: () => navigate("/backend") },
+      { id: "aws-mla", label: "AWS MLA-C02 — daily exam practice", run: () => navigate("/aws-mla") },
       { id: "projects", label: "Projects", run: () => navigate("/projects") },
       { id: "mastery", label: "6-Month Mastery", run: () => navigate("/mastery") },
       { id: "flashcards", label: "Flashcards", run: () => navigate("/flashcards") },
@@ -336,6 +338,9 @@ export function CommandPalette() {
       ...dsaCmds(tracks.dsa, navigate),
       ...masteryCmds(tracks.mastery, navigate),
       ...japaneseCmds(concepts, navigate),
+      ...AWS_LESSONS.map((lesson) => ({ id: `aws-${lesson.id}`, label: `AWS MLA-C02 · ${lesson.title}`,
+        hint: `Task ${lesson.task} · ${lesson.skills.join(" ")} · ${lesson.model}`,
+        run: () => navigate(`/aws-mla/${lesson.id}`) })),
       ...courseCmds(tracks.ts, "/course", navigate),
       ...courseCmds(tracks.java, "/java-course", navigate),
       ...(tracks.backend?.projects ?? [])

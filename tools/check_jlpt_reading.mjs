@@ -18,6 +18,7 @@ const errors = [];
 page.on("pageerror", (error) => errors.push(error.message));
 const root = "/japanese/n2/reading";
 const go = async (route) => {
+  await page.mouse.move(0, 0);
   const url = `${base}/#${route}`;
   if (page.url() === url) await page.reload();
   else await page.goto(url);
@@ -41,8 +42,11 @@ try {
   const medium = corpus.passages.filter((p) => p.kind === "medium");
   assert.equal(medium.length, 100);
   assert.equal(medium.flatMap((p) => p.questions).length, 200);
-  assert.equal(corpus.passages.length, 208);
-  assert.equal(corpus.passages.flatMap((p) => p.questions).length, 318);
+  assert.equal(corpus.passages.length, 238);
+  assert.equal(corpus.passages.flatMap((p) => p.questions).length, 388);
+  for (const [kind, count] of [["ab", 13], ["long", 12], ["information", 13]]) {
+    assert.equal(corpus.passages.filter((p) => p.kind === kind).length, count);
+  }
   for (const size of corpus.sizes.filter((p) => p.kind === "medium" && Number(p.id.slice(7)) > 5)) {
     assert.ok(size.lengths.every((n) => n >= 450 && n <= 550), `${size.id}: new medium length`);
   }
@@ -58,6 +62,58 @@ try {
     assert.equal(await page.locator(".dokkai-passage").count(), section === "ab" ? 2 : 1);
     assert.ok(await page.locator(".dokkai-word").count());
   }
+  console.log("Checking ten additions per remaining section and hover interactions.");
+  for (const kind of ["ab", "long", "information"]) {
+    const passages = corpus.passages.filter((p) => p.kind === kind);
+    const last = passages.at(-1);
+    await go(`${root}/${kind}`);
+    await page.getByText(`${passages.length} passages match · Set 1 of 2`, { exact: true }).waitFor();
+    await page.getByRole("button", { name: "Next set", exact: true }).click();
+    assert.equal(await page.locator(".dokkai-library-card").count(), passages.length - 10);
+    await page.getByRole("link", { name: `${passages.length}. ${last.title}`, exact: true }).click();
+    assert.equal(await page.locator(".n2-choice-group").count(), kind === "long" ? 3 : 2);
+    for (const q of last.questions) await page.locator(`input[name="${q.id}"]`).nth(q.answer).check();
+    await page.getByRole("button", { name: "Check answers", exact: true }).click();
+    await page.getByText("English translation", { exact: true }).click();
+    for (const text of last.texts) assert.ok(await page.getByText(text.translation, { exact: true }).isVisible());
+    await waitSaved((s) => last.questions.every((q) => s.results?.[q.id]?.independent?.lastCorrect));
+  }
+  await go(`${root}/long/long-010`);
+  const dough = page.getByRole("button", { name: "Look up 生地", exact: true }).first();
+  await dough.hover();
+  const popup = page.getByRole("dialog");
+  await popup.waitFor();
+  assert.equal(await popup.getAttribute("aria-modal"), "false");
+  assert.ok(await popup.getByText("dough", { exact: true }).isVisible());
+  await popup.hover();
+  await page.waitForTimeout(250);
+  assert.ok(await popup.isVisible(), "Moving from the word into the popup must keep it open");
+  await page.mouse.move(0, 0);
+  await popup.waitFor({ state: "hidden" });
+  await dough.focus();
+  await popup.waitFor();
+  await page.keyboard.press("ArrowDown");
+  assert.ok(await popup.getByRole("button", { name: "Close vocabulary", exact: true }).evaluate((el) => el === document.activeElement));
+  await page.keyboard.press("Escape");
+  await popup.waitFor({ state: "hidden" });
+  assert.ok(await dough.evaluate((el) => el === document.activeElement));
+  await go(`${root}/ab/ab-013`);
+  const choiceWord = page.locator(".n2-choice .dokkai-word").first();
+  await choiceWord.hover();
+  await popup.waitFor();
+  assert.equal(await page.locator("input[type=radio]:checked").count(), 0, "Hovering a choice word must not select the answer");
+  await page.keyboard.press("Escape");
+
+  const touchContext = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+  const touch = await touchContext.newPage();
+  await touch.goto(`${base}/#${root}/information/information-013`);
+  await touch.locator(".dokkai-reader .dokkai-word").first().tap();
+  await touch.getByRole("dialog").waitFor();
+  const bounds = await touch.getByRole("dialog").boundingBox();
+  assert.ok(bounds.x >= 0 && bounds.x + bounds.width <= 390 && bounds.y >= 0 && bounds.y + bounds.height <= 844);
+  await touch.getByRole("button", { name: "Save for vocabulary review", exact: true }).tap();
+  await touch.getByRole("button", { name: "Saved to vocabulary review", exact: true }).waitFor();
+  await touchContext.close();
   const first = corpus.passages[0];
   console.log("Five reading formats render; checking study results.");
   const q = first.questions[0];
@@ -72,7 +128,7 @@ try {
   await go(`${root}/short/${first.id}`);
   await page.getByRole("button", { name: "Bookmark passage", exact: true }).click();
   const lookup = page.locator(".dokkai-reader .dokkai-word").first();
-  await lookup.click();
+  await lookup.hover();
   await page.getByRole("dialog").waitFor();
   assert.ok((await page.locator(".dokkai-kana").innerText()).length);
   await page.getByRole("button", { name: "Save for vocabulary review", exact: true }).click();
@@ -150,19 +206,19 @@ try {
 
   // Identical spellings keep the reading for their own occurrence.
   await go(`${root}/medium/medium-068`);
-  await page.getByRole("button", { name: "Look up 生物", exact: true }).first().click();
+  await page.getByRole("button", { name: "Look up 生物", exact: true }).first().hover();
   await page.getByRole("dialog").waitFor();
   assert.equal(await page.locator(".dokkai-kana").innerText(), "せいぶつ");
   await page.keyboard.press("Escape");
   await go(`${root}/medium/medium-096`);
-  await page.getByRole("button", { name: "Look up 生物", exact: true }).first().click();
+  await page.getByRole("button", { name: "Look up 生物", exact: true }).first().hover();
   await page.getByRole("dialog").waitFor();
   assert.equal(await page.locator(".dokkai-kana").innerText(), "なまもの");
   await page.keyboard.press("Escape");
   await go(`${root}/medium/${last.id}`);
 
   // A grammar lookup in a question must mark both answers as assisted too.
-  await page.locator(".n2-choice-group legend .dokkai-word").first().click();
+  await page.locator(".n2-choice-group legend .dokkai-word").first().hover();
   await page.getByRole("dialog").waitFor();
   await page.getByRole("button", { name: "Save for vocabulary review", exact: true }).click();
   await page.keyboard.press("Escape");
@@ -215,7 +271,7 @@ try {
 
   for (const width of [390, 960, 1440]) {
     await page.setViewportSize({ width, height: 900 });
-    for (const route of [root, `${root}/short`, `${root}/medium`, `${root}/medium/medium-096`, `${root}/medium/medium-100`, `${root}/ab/ab-001`, `${root}/information/information-003`]) {
+    for (const route of [root, `${root}/short`, `${root}/medium`, `${root}/medium/medium-096`, `${root}/medium/medium-100`, `${root}/ab/ab-013`, `${root}/long/long-012`, `${root}/information/information-013`]) {
       await go(route);
       // Resizing crosses the shell's animated sidebar breakpoint. Wait for
       // settled geometry; an immediate read can inspect the outgoing layout.
@@ -242,5 +298,5 @@ try {
     console.log("Reading accessibility checks passed in light and dark themes.");
   }
   assert.deepEqual(errors, []);
-  console.log("Reading browser checks passed: five formats, 100 中文 passages / ten sets, independent/assisted/timed results, translations, vocabulary save and recall, reload persistence, bookmarks, filtering, stable rounds, multi-question timeout and responsive layouts.");
+  console.log("Reading browser checks passed: 238 passages / 388 questions, ten additions per remaining section, hover/focus/touch lookup, independent/assisted/timed results, translations, vocabulary save and recall, reload persistence, bookmarks, filtering, stable rounds, multi-question timeout and responsive layouts.");
 } finally { await browser.close(); }

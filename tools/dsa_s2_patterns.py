@@ -137,6 +137,34 @@ given a constraint, you have roughly 10⁸ simple operations to spend, and the
 constraint tells you which shapes of solution fit.
 """,
     model="""
+### Start here: what does “cost” mean?
+
+An algorithm is a set of steps for solving a problem. Its **input size** is how
+much data it receives; for an array, we usually call that size `n`. **Time
+complexity** describes how the number of steps grows as `n` grows. **Space
+complexity** describes how much extra memory the algorithm needs. Big-O names
+that growth; it is not a stopwatch reading, and it does not tell you the exact
+number of seconds.
+
+Try counting one simple job. To find `8` in `[4, 8, 2, 9]`, check values from
+left to right and stop when you find it. In the worst case you inspect every
+value, so the work grows with `n`: **O(n)**. To check every pair, the first
+value is paired with almost `n` others, the next with almost `n`, and so on.
+That is about `n × n` checks: **O(n²)**. If you double the input, a linear job
+roughly doubles; a quadratic job roughly quadruples.
+
+Use this order whenever you meet a new problem:
+
+1. Find the largest input size in the constraints.
+2. Describe the work your straightforward solution repeats.
+3. Estimate how that work grows, including the cost of library calls.
+4. Check whether that growth fits the input size; only then choose an approach.
+
+For example, `contains` on an `ArrayList` scans the list. Calling it once for
+each of `n` values repeats an `n`-step search `n` times, so the whole solution
+is O(n²), even though the code has only one visible loop. The hashing unit
+shows how to replace that repeated scan.
+
 ### Read the constraint, pick the shape
 
 A rough but reliable table. Take the largest `n` in the constraints and read
@@ -741,6 +769,32 @@ whole tier of O(n²) solutions into O(n) with a few lines, and the cost is memor
 — which is nearly always the right trade.
 """,
     model="""
+### Start here: a lookup table you build as you go
+
+A **set** remembers which distinct values have appeared. A **map** remembers
+an answer for each key, such as a count or an index. Think of either one as a
+labelled lookup table: you add a key once, then ask whether it is present or
+what value is attached to it. This trades memory for fewer repeated searches.
+
+Suppose the array is `[4, 7, 1, 9]` and the target is `10`. For each number,
+ask which partner would complete the target, then look for that partner among
+the numbers already passed:
+
+| Current value | Partner needed | Earlier values remembered | Result |
+| --- | --- | --- | --- |
+| 4 | 6 | none | remember 4 |
+| 7 | 3 | 4 | remember 7 |
+| 1 | 9 | 4, 7 | remember 1 |
+| 9 | 1 | 4, 7, 1 | found the pair 1 + 9 |
+
+The order matters: **look first, then remember the current value**. Otherwise
+the value could be paired with itself. In Java, use a `HashSet` when you only
+need membership, and a `HashMap` when you also need a count or an index. The
+expected lookup time is O(1); storing up to `n` values uses O(n) extra space.
+
+As you read the examples below, keep asking: *what question is my key answering?*
+“Seen?”, “how many?”, and “where?” lead to slightly different map or set values.
+
 ### Three structures, three questions
 
 | You need to know | Use | Cost |
@@ -1213,6 +1267,37 @@ It is also the answer to the interviewer's favourite follow-up, *"can you do it
 without the hash map?"*.
 """,
     model="""
+### Start here: why sorted order lets pointers move
+
+Two pointers are two index variables that move through data. The useful case
+here is a **sorted** array: small values are on the left and large values are
+on the right. Because of that order, a comparison can tell you which side can
+no longer contain an answer. Discarding that side is safe, so neither pointer
+needs to move backwards.
+
+Find two values that sum to `12` in `[1, 3, 4, 7, 10]`:
+
+| Left value | Right value | Sum | Safe next move |
+| --- | --- | --- | --- |
+| 1 | 10 | 11 | too small: move left |
+| 3 | 10 | 13 | too large: move right |
+| 3 | 7 | 10 | too small: move left |
+| 4 | 7 | 11 | too small: move left; pointers meet |
+
+Why are those moves safe? When `1 + 10` is too small, `1` cannot make `12`
+with any value: `10` is the largest partner. When `3 + 10` is too large,
+`10` cannot work with any remaining left value: `3` is now the smallest.
+Each comparison rules out one whole end of the remaining search space. This
+reasoning is the proof behind the pattern.
+
+There is a second common arrangement: a `read` index visits every element,
+while a `write` index marks where the next kept element belongs. It is used to
+filter or compact an array in place. The read index never falls behind; the
+write index advances only when an element should stay.
+
+Before using either form, check what the prompt requires: sorting changes the
+original order, while the in-place form promises O(1) extra space.
+
 ### Two arrangements
 
 **Converging** — one pointer at each end, walking inward:
@@ -1594,6 +1679,34 @@ That reuse is the whole technique, and it turns a cubic brute force into a
 single pass.
 """,
     model="""
+### Start here: keep one interval instead of checking them all
+
+A **subarray** or **substring** is a contiguous piece: its elements sit next to
+each other in the original input. A window is simply the current contiguous
+piece, described by its left and right indices. Many possible pieces overlap,
+so when the right edge moves one step, most of the previous work is still
+useful.
+
+For `[2, 1, 3, 2]`, find the longest window whose sum is at most `5`:
+
+1. Start with an empty window. Add `2`: `[2]`, sum `2`, best length `1`.
+2. Add `1`: `[2, 1]`, sum `3`, best length `2`.
+3. Add `3`: `[2, 1, 3]`, sum `6`, so it is too large.
+4. Remove `2`: `[1, 3]`, sum `4`, best length stays `2`.
+5. Add `2`: `[1, 3, 2]`, sum `6`; remove `1`, leaving `[3, 2]`, sum `5`.
+   The valid window has length `2`, so the final answer is `2`.
+
+The left edge only moves forward. Each value enters once and leaves at most
+once, so the total updates are O(n), even though a `while` loop appears inside
+the main loop. This example uses nonnegative values: with negative values,
+adding a value can make the sum smaller, so the “shrink until valid” rule may
+not work. The signals and pitfalls below help you check that condition.
+
+To design a window, decide four things before coding: what state to maintain,
+what makes the window invalid, when to record an answer, and whether moving
+the left edge forward can always restore validity. Fixed-size windows use the
+same idea but always remove exactly the element that falls off the left.
+
 ### The one template
 
 ```java
@@ -2043,6 +2156,30 @@ run over a timeline is how every *"how many are active at once?"* problem is
 solved.
 """,
     model="""
+### Start here: store the answers to all starting ranges
+
+A **prefix sum** is a running total from the beginning of an array. Store one
+extra value at the front: `pre[0] = 0`. Then `pre[i]` is the sum of the first
+`i` elements. This exclusive-end convention makes every range use the same
+formula, including one that starts at index zero.
+
+For `a = [3, -2, 5, 4]`, the prefix array is `[0, 3, 1, 6, 10]`:
+
+| Range in `a` | Calculation | Sum |
+| --- | --- | --- |
+| `a[0..1]` = `[3, -2]` | `pre[2] - pre[0]` = `1 - 0` | 1 |
+| `a[1..3]` = `[-2, 5, 4]` | `pre[4] - pre[1]` = `10 - 3` | 7 |
+
+The prefix before the range contains everything to exclude; subtract it from
+the prefix after the range. Build the array once in O(n), then answer each
+range-sum query in O(1). The array uses O(n) extra space.
+
+If the question asks for the **number** of subarrays with a target sum, a
+prefix array alone is not enough; pair it with a map that counts earlier
+prefixes. That works with negative values too, where a sliding window cannot
+reliably decide which edge to move. The later sections build that extension
+one step at a time.
+
 ### The identity
 
 With `pre[i]` = sum of the first `i` elements (`pre[0] = 0`):
@@ -2470,6 +2607,29 @@ turns letters into array indices — the trick behind every counting solution in
 this unit.
 """,
     model="""
+### Start here: text is indexed data, with a few extra rules
+
+A Java `String` is a sequence of characters. You can read a character at index
+`i` with `s.charAt(i)`, just as you read `a[i]` from an array. Indices start at
+zero, so the last character is at `s.length() - 1`. A **substring** is a
+contiguous part of that sequence; a **subsequence** may skip characters while
+keeping their order. For example, `"ace"` is a subsequence of `"abcde"`, but
+not a substring.
+
+Characters also have numeric codes. For lowercase English letters,
+`c - 'a'` maps `'a'` to 0, `'b'` to 1, through `'z'` to 25. That is why a
+26-slot integer array can count letters without a map.
+
+One Java-specific rule changes how you build text: strings cannot be changed
+in place. Each `result += piece` creates a new string and copies the old
+contents. Repeating that in a loop can copy about `1 + 2 + ... + n` characters,
+which grows like O(n²). A `StringBuilder` keeps one growable buffer instead.
+
+When reading a string problem, first decide whether it is about individual
+characters, a contiguous substring, or a subsequence. Then check whether you
+need to compare text, count characters, or construct output. Those choices
+point to different tools in the sections below.
+
 ### The costs that matter
 
 | Operation | Cost | Note |

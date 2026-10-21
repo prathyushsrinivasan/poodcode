@@ -11,6 +11,13 @@ Built with **Tauri 2 · React + TypeScript · Rust · SQLite · Monaco · EChart
 
 ## Quick start
 
+**Courses → AWS MLA-C02** adds 24 short lessons covering all 107 published
+exam skill IDs, with 48 original scenario questions, recall prompts, design
+exercises, local notes, daily targets, and spaced reviews. Read the
+[complete exam roadmap](AWS_MLA_C02_ROADMAP.md) for the topic checklist,
+official sources, service list, and hands-on milestones. Course progress is
+saved locally through the existing SQLite settings API.
+
 **Languages → JLPT N2 courses** offers three practice courses:
 
 - **Kanji & Vocabulary Blanks:** 120 original questions in 24 families, with

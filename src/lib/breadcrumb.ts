@@ -69,6 +69,10 @@ const TREE: Record<string, RouteNode> = {
     label: "Backend Lab",
     children: { ":": { label: "", dynamicLabel: "Project" } },
   },
+  "aws-mla": {
+    label: "AWS MLA-C02",
+    children: { daily: { label: "Daily session" }, ":": { label: "", dynamicLabel: "Lesson" } },
+  },
   projects: {
     label: "Projects",
     children: {

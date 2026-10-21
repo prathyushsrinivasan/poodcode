@@ -35,6 +35,7 @@ import JlptN2 from "./pages/JlptN2";
 import JlptN2Courses from "./pages/JlptN2Courses";
 import JlptN2SentenceOrder from "./pages/JlptN2SentenceOrder";
 import JlptReading from "./pages/JlptReading";
+import AwsMla from "./pages/AwsMla";
 import Paths from "./pages/Paths";
 import Insights from "./pages/Insights";
 import Popout from "./pages/Popout";
@@ -120,6 +121,9 @@ function Shell() {
           <Route path="/java-course/:week" element={<JavaCourse />} />
           <Route path="/backend" element={<Backend />} />
           <Route path="/backend/:project" element={<Backend />} />
+          <Route path="/aws-mla" element={<AwsMla />} />
+          <Route path="/aws-mla/daily" element={<AwsMla daily />} />
+          <Route path="/aws-mla/:lessonId" element={<AwsMla />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/projects/:project" element={<Projects />} />
           {/* Static segment, so it out-ranks the `:module` route below it and

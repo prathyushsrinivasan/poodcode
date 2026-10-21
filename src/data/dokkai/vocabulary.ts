@@ -1,5 +1,6 @@
 import type { ReadingWord } from "./types";
 import { MEDIUM_READING_WORDS } from "./medium/vocabulary";
+import { EXTENDED_READING_WORDS } from "./additions/vocabulary";
 
 // Shared surfaces whose readings and core meaning are stable in these passages.
 // Polysemous words and inflections are glossed explicitly at their occurrence.
@@ -167,6 +168,7 @@ const entries: [string, string, string, string?][] = [
   ["補足", "ほそく", "supplementary explanation"], ["境界", "きょうかい", "boundary"], ["完結", "かんけつ", "completion; closure"],
 ];
 export const COMMON_READING_WORDS: ReadingWord[] = [...new Map([
+  ...EXTENDED_READING_WORDS.map((word) => [word.text, word] as const),
   ...MEDIUM_READING_WORDS.map((word) => [word.text, word] as const),
   ...entries.map(([text, reading, meaning, lemma]) => [text, { text, reading, meaning, ...(lemma ? { lemma } : {}) }] as const),
 ]).values()];

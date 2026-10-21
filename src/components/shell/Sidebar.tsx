@@ -63,6 +63,7 @@ const GROUPS: { section: string; items: NavItem[] }[] = [
       { to: "/course", label: "TypeScript Course", icon: "typescript", progressKey: "ts" },
       { to: "/java-course", label: "Java Course", icon: "java", progressKey: "java" },
       { to: "/backend", label: "Backend Lab", icon: "backend" },
+      { to: "/aws-mla", label: "AWS MLA-C02", icon: "backend" },
       { to: "/projects", label: "Projects", icon: "projects" },
       { to: "/mastery", label: "6-Month Mastery", icon: "mastery" },
     ],
