@@ -115,12 +115,14 @@ export function HintPanel({ ladder, title = "Hint" }: { ladder: ReturnType<typeo
  */
 export function ReferenceReveal({
   reference,
+  format = "code",
   language = "ts",
   revealLabel = "Reveal a reference solution",
   hideLabel = "Hide the reference solution",
   note = "One way to write it — not the only way. Compare it with yours rather than replacing yours with it.",
 }: {
   reference: string;
+  format?: "code" | "markdown";
   language?: string;
   revealLabel?: string;
   hideLabel?: string;
@@ -132,7 +134,14 @@ export function ReferenceReveal({
       <Button variant="ghost" icon={show ? "hide" : "show"} onClick={() => setShow((s) => !s)} aria-expanded={show}>
         {show ? hideLabel : revealLabel}
       </Button>
-      {show && <ReferenceCode code={reference} language={language} note={note} />}
+      {show && (format === "markdown" ? (
+        <div className="exercise-reference-body">
+          {note && <p className="exercise-note">{note}</p>}
+          <Markdown>{reference}</Markdown>
+        </div>
+      ) : (
+        <ReferenceCode code={reference} language={language} note={note} />
+      ))}
     </div>
   );
 }

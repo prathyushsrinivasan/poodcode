@@ -1,0 +1,56 @@
+name: FastAPI reference
+
+on:
+  push:
+    paths:
+      - "examples/fastapi-taskboard/**"
+      - ".github/workflows/fastapi-course.yml"
+      - "src/data/fastapi/**"
+      - "tools/verify_fastapi_course.py"
+  pull_request:
+    paths:
+      - "examples/fastapi-taskboard/**"
+      - ".github/workflows/fastapi-course.yml"
+      - "src/data/fastapi/**"
+      - "tools/verify_fastapi_course.py"
+  workflow_dispatch:
+
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.12", "3.14"]
+    defaults:
+      run:
+        working-directory: examples/fastapi-taskboard
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: taskboard
+          POSTGRES_PASSWORD: ci-only-password
+          POSTGRES_DB: taskboard
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U taskboard -d taskboard"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      JWT_SECRET: ci-only-secret-never-use-for-a-real-deployment-00000000
+      DATABASE_URL: postgresql+psycopg://taskboard:ci-only-password@localhost:5432/taskboard
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: examples/fastapi-taskboard/requirements*.txt
+      - run: python -m pip install -r requirements-dev.txt
+      - run: python ../../tools/verify_fastapi_course.py --run-checkpoints
+      - run: python -m pytest -q
+      - run: python -m alembic upgrade head
+      - run: python -m alembic check
+      - run: python scripts/smoke.py

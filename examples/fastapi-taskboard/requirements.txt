@@ -1,0 +1,11 @@
+# Direct dependencies pinned to the versions used to verify this reference.
+# requirements.in records the intended version ranges for future updates.
+fastapi==0.159.1
+uvicorn[standard]==0.54.0
+python-multipart==0.0.32
+sqlalchemy==2.0.55
+alembic==1.20.0
+pydantic-settings==2.16.1
+pwdlib[argon2]==0.3.1
+PyJWT==2.15.1
+psycopg[binary]==3.3.6

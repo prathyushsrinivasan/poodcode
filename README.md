@@ -11,6 +11,16 @@ Built with **Tauri 2 · React + TypeScript · Rust · SQLite · Monaco · EChart
 
 ## Quick start
 
+**Courses → FastAPI Course** is a beginner-friendly, code-focused course with
+12 modules, 24 lessons, 36 explained review questions and 12 project milestones.
+Build a task API through app design, SQLAlchemy/PostgreSQL, authentication and
+authorization, testing, Docker and cloud deployment. Practical milestones are
+manually marked after verification and saved locally. Start at `/fastapi-course`;
+the [runnable reference and setup](examples/fastapi-taskboard/README.md) include
+tests, migrations, smoke scripts and a PostgreSQL CI template. Plan 40–50 hours
+for the beginner-to-intermediate core. The [full course audit](FASTAPI_COURSE_AUDIT.md)
+records beginner sequencing fixes and the advanced topics still to implement.
+
 **Courses → AWS SAA quizzes** offers 100 original SAA-C03 scenario questions
 across ten topics, with single-answer and multiple-answer formats. Practice a
 topic, try a mixed set of ten, revisit mistakes, or complete five daily questions.

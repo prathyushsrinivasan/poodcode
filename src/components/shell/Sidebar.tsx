@@ -36,7 +36,7 @@ interface NavItem {
   /** Key into the badge map below. */
   badge?: "curriculum" | "vocab";
   /** Shows a dot when the track has been started but not finished. */
-  progressKey?: "ts" | "java";
+  progressKey?: "ts" | "java" | "fastapi";
 }
 
 const GROUPS: { section: string; items: NavItem[] }[] = [
@@ -62,6 +62,7 @@ const GROUPS: { section: string; items: NavItem[] }[] = [
     items: [
       { to: "/course", label: "TypeScript Course", icon: "typescript", progressKey: "ts" },
       { to: "/java-course", label: "Java Course", icon: "java", progressKey: "java" },
+      { to: "/fastapi-course", label: "FastAPI Course", icon: "backend", progressKey: "fastapi" },
       { to: "/backend", label: "Backend Lab", icon: "backend" },
       { to: "/aws-mla", label: "AWS MLA-C02", icon: "backend" },
       { to: "/aws-saa", label: "AWS SAA quizzes", icon: "backend" },
@@ -113,6 +114,7 @@ function useBadges() {
     inProgress: {
       ts: [...started].some((k) => k.startsWith("ts-course:")),
       java: [...started].some((k) => k.startsWith("java-course:")),
+      fastapi: [...started].some((k) => k.startsWith("fastapi-course:")),
     },
   };
 }

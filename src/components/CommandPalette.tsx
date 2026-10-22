@@ -36,13 +36,14 @@ interface Cmd {
 type Tracks = {
   ts: WeeklyCourse | null;
   java: WeeklyCourse | null;
+  fastapi: WeeklyCourse | null;
   backend: BackendTrack | null;
   projects: ProjectTrack | null;
   dsa: DsaCurriculum | null;
   mastery: MasteryTrack[] | null;
 };
 
-const NO_TRACKS: Tracks = { ts: null, java: null, backend: null, projects: null, dsa: null, mastery: null };
+const NO_TRACKS: Tracks = { ts: null, java: null, fastapi: null, backend: null, projects: null, dsa: null, mastery: null };
 
 /** One command per Mastery week — searchable by title, goal and phase — and
  * one per TypeScript error in the glossary (TS_MASTERY_ROADMAP X-73). */
@@ -227,6 +228,7 @@ export function CommandPalette() {
       setTracks((t) => ({ ...t, [k]: v }));
     api.tsCourse().then(put("ts")).catch(ignore("palette index: TypeScript course"));
     api.javaCourse().then(put("java")).catch(ignore("palette index: Java course"));
+    import("../data/fastapi").then((m) => put("fastapi")(m.FASTAPI_COURSE)).catch(ignore("palette index: FastAPI course"));
     api.backendTrack().then(put("backend")).catch(ignore("palette index: Backend Lab"));
     api.projectsTrack().then(put("projects")).catch(ignore("palette index: Projects"));
     loadCurriculumSeed().then(put("dsa")).catch(ignore("palette index: DSA curriculum"));
@@ -311,6 +313,7 @@ export function CommandPalette() {
       { id: "japanese", label: "日本語 vocabulary", run: () => navigate("/japanese") },
       { id: "course", label: "TypeScript Course", run: () => navigate("/course") },
       { id: "java-course", label: "Java Course", run: () => navigate("/java-course") },
+      { id: "fastapi-course", label: "FastAPI Course", run: () => navigate("/fastapi-course") },
       { id: "backend", label: "Backend Lab", run: () => navigate("/backend") },
       { id: "aws-mla", label: "AWS MLA-C02 — daily exam practice", run: () => navigate("/aws-mla") },
       { id: "aws-saa", label: "AWS SAA-C03 — quizzes by topic", run: () => navigate("/aws-saa") },
@@ -347,6 +350,7 @@ export function CommandPalette() {
         run: () => navigate(`/aws-mla/${lesson.id}`) })),
       ...courseCmds(tracks.ts, "/course", navigate),
       ...courseCmds(tracks.java, "/java-course", navigate),
+      ...courseCmds(tracks.fastapi, "/fastapi-course", navigate),
       ...(tracks.backend?.projects ?? [])
         .filter((p) => p.authored)
         .map((p) => ({

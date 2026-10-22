@@ -58,6 +58,7 @@ export default function Insights() {
   const [concepts, setConcepts] = useState<Concept[]>([]);
   const [ts, setTs] = useState<WeeklyCourse | null>(null);
   const [java, setJava] = useState<WeeklyCourse | null>(null);
+  const [fastapi, setFastapi] = useState<WeeklyCourse | null>(null);
   const [backend, setBackend] = useState<BackendTrack | null>(null);
   const [projects, setProjects] = useState<ProjectTrack | null>(null);
   const [mastery, setMastery] = useState<MasteryTrack[]>([]);
@@ -76,6 +77,7 @@ export default function Insights() {
     loadConcepts().then(setConcepts).catch(loadFailed("the concept library"));
     api.tsCourse().then(setTs).catch(loadFailed("the TypeScript course"));
     api.javaCourse().then(setJava).catch(loadFailed("the Java course"));
+    import("../data/fastapi").then((m) => setFastapi(m.FASTAPI_COURSE)).catch(loadFailed("the FastAPI course"));
     api.backendTrack().then(setBackend).catch(loadFailed("the Backend Lab"));
     api.projectsTrack().then(setProjects).catch(loadFailed("the Projects track"));
     api.mastery().then(setMastery).catch(loadFailed("the Mastery programmes"));
@@ -91,6 +93,7 @@ export default function Insights() {
     if (curriculum) out.push(curriculumInsight(curriculum));
     if (ts) out.push(courseInsight(ts, "ts-course", done, { key: "ts", label: ts.title, icon: "typescript", href: "/course" }));
     if (java) out.push(courseInsight(java, "java-course", done, { key: "java", label: java.title, icon: "java", href: "/java-course" }));
+    if (fastapi) out.push(courseInsight(fastapi, "fastapi-course", done, { key: "fastapi", label: fastapi.title, icon: "backend", href: "/fastapi-course" }));
     if (backend) out.push(backendInsight(backend, done));
     if (projects) out.push(...projectInsights(projects, done));
     for (const t of mastery) out.push(masteryInsight(t, rows));
@@ -105,7 +108,7 @@ export default function Insights() {
       })
     );
     return orderTracks(out.filter((t) => t.total > 0));
-  }, [done, curriculum, ts, java, backend, projects, mastery, rows, concepts]);
+  }, [done, curriculum, ts, java, fastapi, backend, projects, mastery, rows, concepts]);
 
   const today = todayISO();
   const health = useMemo(() => reviewHealth(cards, today), [cards, today]);

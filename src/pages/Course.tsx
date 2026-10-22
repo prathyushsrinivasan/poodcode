@@ -29,10 +29,9 @@ import { useCrumb } from "../store";
 import { inlineCode } from "../components/common";
 import { loadFailed } from "../lib/failures";
 
-// This page renders both structured courses. They share a data model, a judge
-// and every interaction; they differ only in where the content comes from, how
-// the two levels are named (Week/Month vs Module/Part — the course carries its
-// own labels), and the namespace their progress is stored under.
+// Structured courses share the same reader and progress model. Coding tracks
+// can use the judge; terminal-based practical builds use manual completion.
+// Each track supplies its content, unit/group labels and progress namespace.
 type Track = {
   /** Progress-key namespace. Never change it, or existing progress is orphaned. */
   key: string;
@@ -41,6 +40,8 @@ type Track = {
   base: string;
   icon: IconName;
   emptyText: string;
+  manualCompletion?: boolean;
+  referenceFormat?: "code" | "markdown";
 };
 
 const TS_TRACK: Track = {
@@ -57,6 +58,16 @@ const JAVA_TRACK: Track = {
   base: "/java-course",
   icon: "java",
   emptyText: "The Java course isn't built yet.",
+};
+
+const FASTAPI_TRACK: Track = {
+  key: "fastapi",
+  load: () => import("../data/fastapi").then((m) => m.FASTAPI_COURSE),
+  base: "/fastapi-course",
+  icon: "backend",
+  emptyText: "The FastAPI course isn't available.",
+  manualCompletion: true,
+  referenceFormat: "markdown",
 };
 
 // A unit's completion is tracked in the same SQLite-backed chapter-done set as
@@ -91,6 +102,10 @@ export function JavaCourse() {
   return <CourseView track={JAVA_TRACK} />;
 }
 
+export function FastApiCourse() {
+  return <CourseView track={FASTAPI_TRACK} />;
+}
+
 function CourseView({ track }: { track: Track }) {
   const { week } = useParams();
   const [course, setCourse] = useState<WeeklyCourse | null>(null);
@@ -112,7 +127,7 @@ function CourseView({ track }: { track: Track }) {
   if (course.weeks.length === 0) {
     return (
       <div className="page">
-        <EmptyState icon={track.key === "java" ? "java" : "typescript"} title={track.emptyText} />
+        <EmptyState icon={track.icon} title={track.emptyText} />
       </div>
     );
   }
@@ -126,7 +141,7 @@ function CourseView({ track }: { track: Track }) {
       return (
         <div className="page">
           <EmptyState
-            icon={track.key === "java" ? "java" : "typescript"}
+            icon={track.icon}
             title={`${labels.unit} not found.`}
             action={{ label: "Back to the course", icon: "back", onClick: () => nav(track.base) }}
           />
@@ -291,15 +306,16 @@ function UnitDetail({
   }, []);
 
   useEffect(() => {
-    if (!isDone && seenBottom && allSolved && !celebrated.current) {
+    if (!track.manualCompletion && !isDone && seenBottom && allSolved && !celebrated.current) {
       celebrated.current = true;
       onSetDone(true);
       const head = `${labels.unit} ${week.number} complete!`;
       toast.success(week.milestone ? `${head} ${week.milestone}` : head);
     }
-  }, [isDone, seenBottom, allSolved, onSetDone, toast, week.milestone, week.number, labels.unit]);
+  }, [track.manualCompletion, isDone, seenBottom, allSolved, onSetDone, toast, week.milestone, week.number, labels.unit]);
 
   const steps = [
+    ...(track.manualCompletion ? [{ label: "Build the project and verify its checklist, then mark complete", met: isDone }] : []),
     { label: "Read to the end", met: seenBottom || isDone },
     ...(gradableIds.length > 0
       ? [{ label: `Solve the exercises (${solvedCount}/${gradableIds.length})`, met: allSolved }]
@@ -428,7 +444,7 @@ function UnitDetail({
             {cap.exercise && <ExerciseCard index={1} exercise={cap.exercise} challenge onSolved={handleSolved} />}
             {/* note="" keeps this reveal as it was before the component was
                 shared — the course capstone never carried the caveat. */}
-            {cap.reference && <ReferenceReveal reference={cap.reference} note="" />}
+            {cap.reference && <ReferenceReveal reference={cap.reference} format={track.referenceFormat} note="" />}
             {cap.stretch && (
               <>
                 <SubHeading icon="sparkles">Stretch goal (optional)</SubHeading>
