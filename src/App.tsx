@@ -33,6 +33,8 @@ import Contest from "./pages/Contest";
 import JapaneseBridge from "./pages/JapaneseBridge";
 import JlptN2 from "./pages/JlptN2";
 import JlptN2Courses from "./pages/JlptN2Courses";
+import N2StudyHub, { StudyLessonPage } from "./pages/n2/StudyHub";
+import N2StudySession from "./pages/n2/StudySession";
 import JlptKanjiWords from "./pages/JlptKanjiWords";
 import JlptN2SentenceOrder from "./pages/JlptN2SentenceOrder";
 import JlptReading from "./pages/JlptReading";
@@ -108,7 +110,10 @@ function Shell() {
           <Route path="/learn" element={<Learn />} />
           <Route path="/learn/:key" element={<Learn />} />
           <Route path="/japanese" element={<JapanesePage />} />
-          <Route path="/japanese/n2" element={<JlptN2Courses />} />
+          <Route path="/japanese/n2" element={<N2StudyHub />} />
+          <Route path="/japanese/n2/library" element={<JlptN2Courses />} />
+          <Route path="/japanese/n2/study" element={<N2StudySession />} />
+          <Route path="/japanese/n2/lesson/:lessonId" element={<StudyLessonPage />} />
           <Route path="/japanese/n2/kanji" element={<JlptKanjiWords />} />
           <Route path="/japanese/n2/kanji/mixed" element={<JlptKanjiWords mode="mixed" />} />
           <Route path="/japanese/n2/kanji/review" element={<JlptKanjiWords mode="review" />} />

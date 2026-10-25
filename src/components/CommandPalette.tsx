@@ -148,7 +148,7 @@ function japaneseCmds(concepts: Concept[], navigate: (to: string) => void): Cmd[
     {
       id: "jlpt-n2",
       label: "JLPT N2 courses",
-      hint: "読解 Reading · Kanji & Vocabulary Blanks · Sentence Assembly ★",
+        hint: "Daily learning · quick quizzes · spaced review · study plan",
       run: () => navigate("/japanese/n2"),
     },
     { id: "jlpt-n2-patterns", label: "Kanji & Vocabulary Blanks — JLPT N2",

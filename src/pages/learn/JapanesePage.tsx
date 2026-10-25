@@ -117,8 +117,8 @@ export default function JapanesePage() {
           <Link to="/japanese/n2" className="card learn-promo">
             <Icon name="learn" size={20} />
             <span className="learn-promo-text">
-              <strong>JLPT N2 — choose a practice course</strong>
-              <span>読解 Reading, Kanji &amp; Vocabulary Blanks and Sentence Assembly ★: practice, explanations and mistake review.</span>
+              <strong>JLPT N2 — your daily study space</strong>
+              <span>Mini lessons, section quizzes, spaced review and a final-month study plan. Kanji, vocabulary, grammar and reading.</span>
             </span>
             <Icon name="chevronRight" size={16} />
           </Link>

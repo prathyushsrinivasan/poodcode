@@ -7,6 +7,7 @@ import { KANJI_GROUPS, KANJI_WORDS } from "../data/kanjiWords";
 
 export default function JlptN2Courses() {
   return <div className="page n2-page">
+    <Link className="ghost-link" to="/japanese/n2">← Your N2 study space</Link>
     <PageHeader eyebrow="日本語 · JLPT N2" title="JLPT N2 courses"
       subtitle="Choose the question format you want to practice. Each course has its own lessons, explanations and saved progress." />
     <div className="n2-grid">

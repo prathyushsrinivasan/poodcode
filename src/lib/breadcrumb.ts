@@ -111,6 +111,9 @@ const TREE: Record<string, RouteNode> = {
   japanese: {
     label: "日本語 vocabulary",
     children: { n2: { label: "JLPT N2 courses", children: {
+      library: { label: "Full course library" },
+      study: { label: "Study round" },
+      lesson: { label: "", children: { ":": { label: "", dynamicLabel: "Mini lesson" } } },
       kanji: { label: "Kanji Word Builder", children: {
         mixed: { label: "Mixed practice" }, review: { label: "Mistake review" },
         word: { label: "", children: { ":": { label: "", dynamicLabel: "Word" } } },
