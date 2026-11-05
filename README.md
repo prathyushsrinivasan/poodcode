@@ -42,7 +42,13 @@ the earlier audit and remaining improvement ideas. The
 and its checks. Course
 progress is saved locally through the existing SQLite settings API.
 
-**Languages → JLPT N2 courses** offers four practice courses:
+**Languages → JLPT N2 courses** offers five practice courses:
+
+- **Prefixes & Suffixes:** 300 original four-choice word-formation questions in
+  30 families, with 100 questions each for N3, N2 and N1 study estimates. Filter
+  by level, prefix/suffix, target affix or text; practice a family, try mixed
+  rounds of 10, 20 or 50, and revisit mistakes. Each answer includes a hiragana
+  reading, translation and explanation, with progress saved locally.
 
 - **Kanji Word Builder:** 20 kanji and 733 vocabulary entries for N3–N1 study,
   with typed hiragana readings and single-answer or multiple-answer English

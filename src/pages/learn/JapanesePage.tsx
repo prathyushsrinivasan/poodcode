@@ -118,7 +118,7 @@ export default function JapanesePage() {
             <Icon name="learn" size={20} />
             <span className="learn-promo-text">
               <strong>JLPT N2 — your daily study space</strong>
-              <span>Mini lessons, section quizzes, spaced review and a final-month study plan. Kanji, vocabulary, grammar and reading.</span>
+              <span>Mini lessons, section quizzes, spaced review and a study plan. Includes Prefixes &amp; Suffixes N3–N1, kanji, vocabulary, grammar and reading.</span>
             </span>
             <Icon name="chevronRight" size={16} />
           </Link>

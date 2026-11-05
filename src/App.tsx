@@ -35,6 +35,7 @@ import JlptN2 from "./pages/JlptN2";
 import JlptN2Courses from "./pages/JlptN2Courses";
 import N2StudyHub, { StudyLessonPage } from "./pages/n2/StudyHub";
 import N2StudySession from "./pages/n2/StudySession";
+import JlptAffixes from "./pages/JlptAffixes";
 import JlptKanjiWords from "./pages/JlptKanjiWords";
 import JlptN2SentenceOrder from "./pages/JlptN2SentenceOrder";
 import JlptReading from "./pages/JlptReading";
@@ -114,6 +115,8 @@ function Shell() {
           <Route path="/japanese/n2/library" element={<JlptN2Courses />} />
           <Route path="/japanese/n2/study" element={<N2StudySession />} />
           <Route path="/japanese/n2/lesson/:lessonId" element={<StudyLessonPage />} />
+          <Route path="/japanese/n2/affixes" element={<JlptAffixes />} />
+          <Route path="/japanese/n2/affixes/:lessonId" element={<JlptAffixes />} />
           <Route path="/japanese/n2/kanji" element={<JlptKanjiWords />} />
           <Route path="/japanese/n2/kanji/mixed" element={<JlptKanjiWords mode="mixed" />} />
           <Route path="/japanese/n2/kanji/review" element={<JlptKanjiWords mode="review" />} />

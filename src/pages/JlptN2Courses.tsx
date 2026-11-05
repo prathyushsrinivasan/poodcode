@@ -4,13 +4,21 @@ import { N2_QUESTIONS } from "../data/jlptN2";
 import { N2_ASSEMBLY_QUESTIONS } from "../data/jlptN2SentenceOrder";
 import { READING_PASSAGES, READING_QUESTIONS } from "../data/dokkai";
 import { KANJI_GROUPS, KANJI_WORDS } from "../data/kanjiWords";
+import { AFFIX_LESSONS, AFFIX_QUESTIONS } from "../data/jlptAffixes";
 
 export default function JlptN2Courses() {
   return <div className="page n2-page">
     <Link className="ghost-link" to="/japanese/n2">← Your N2 study space</Link>
     <PageHeader eyebrow="日本語 · JLPT N2" title="JLPT N2 courses"
-      subtitle="Choose the question format you want to practice. Each course has its own lessons, explanations and saved progress." />
+      subtitle="Choose a practice course, including N3–N1 word building. Each course has its own lessons, explanations and saved progress." />
     <div className="n2-grid">
+      <Link className="card n2-lesson" to="/japanese/n2/affixes">
+        <Badge>N3 · N2 · N1 · 語形成</Badge>
+        <h2>Prefixes &amp; Suffixes</h2>
+        <p>Complete words such as 名選手, 不規則 and 国際化. Choose from four options, learn the reading and meaning, and revisit mistakes.</p>
+        <span className="n2-meta">{AFFIX_QUESTIONS.length} questions · {AFFIX_LESSONS.length} families · 100 per level · prefixes &amp; suffixes</span>
+        <strong>Practice word formation →</strong>
+      </Link>
       <Link className="card n2-lesson" to="/japanese/n2/kanji">
         <Badge>Kanji · Readings &amp; meanings</Badge>
         <h2>Kanji Word Builder</h2>

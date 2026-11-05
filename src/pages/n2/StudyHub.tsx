@@ -12,7 +12,7 @@ export default function StudyHub() {
   const [params, setParams] = useSearchParams();
   const tab = TABS.some((t) => t.key === params.get("tab")) ? params.get("tab")! : "today";
   return <div className="page n2-page study-page">
-    <PageHeader eyebrow="日本語 · A little every day" title="JLPT N2 study space" subtitle="Understand the idea. Try it yourself. Bring back what needs another look." actions={<LibraryLink />} />
+    <PageHeader eyebrow="日本語 · A little every day" title="JLPT N2 study space" subtitle="Understand the idea. Try it yourself. Bring back what needs another look." actions={<div className="n2-actions"><Link className="ghost-link" to={`${STUDY_ROOT}/affixes`}>Prefixes &amp; Suffixes N3–N1 →</Link><LibraryLink /></div>} />
     <StudyStatus state={state} />
     {state.data && <>
       <Tabs idBase="n2-study" tabs={TABS} active={tab} onChange={(value) => setParams({ tab: value })} />

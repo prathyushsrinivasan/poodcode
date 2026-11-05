@@ -42,6 +42,10 @@
 .n2-page summary { cursor: pointer; padding-block: var(--space-2); font-weight: var(--weight-medium); }
 .n2-scratch-preview { font-size: var(--text-xl); overflow-wrap: anywhere; }
 .n2-hint { padding: var(--space-3); border-left: 3px solid var(--accent); }
+.affix-filters { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-4); }
+.affix-filters select { width: 100%; min-width: 0; }
+@media (max-width: 1180px) { .affix-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) { .affix-filters { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 700px) { .n2-choices { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 1180px) { .n2-grid { grid-template-columns: minmax(0, 1fr); } }
 

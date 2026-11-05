@@ -17,6 +17,7 @@ import { clearRecents, readRecents } from "../lib/recents";
 import { ignore } from "../lib/failures";
 import { N2_LESSONS } from "../data/jlptN2";
 import { N2_ASSEMBLY_LESSONS } from "../data/jlptN2SentenceOrder";
+import { AFFIX_LESSONS } from "../data/jlptAffixes";
 import { READING_SECTIONS, READING_PASSAGES } from "../data/dokkai";
 import { AWS_LESSONS } from "../data/awsMla/lessons";
 
@@ -148,11 +149,15 @@ function japaneseCmds(concepts: Concept[], navigate: (to: string) => void): Cmd[
     {
       id: "jlpt-n2",
       label: "JLPT N2 courses",
-        hint: "Daily learning · quick quizzes · spaced review · study plan",
+      hint: "Daily learning · quick quizzes · spaced review · study plan · Prefixes & Suffixes N3–N1",
       run: () => navigate("/japanese/n2"),
     },
     { id: "jlpt-n2-patterns", label: "Kanji & Vocabulary Blanks — JLPT N2",
       hint: "120 questions · one kanji · vocabulary", run: () => navigate("/japanese/n2/patterns") },
+    { id: "jlpt-affixes", label: "Prefixes & Suffixes — JLPT N3–N1 · 語形成",
+      hint: "300 four-choice questions · 接頭辞 接尾辞 · 名選手 · mixed practice · mistake review", run: () => navigate("/japanese/n2/affixes") },
+    ...AFFIX_LESSONS.map((l) => ({ id: `jlpt-affixes-${l.id}`, label: `Prefixes & Suffixes · ${l.level} · ${l.title}`,
+      hint: `${l.kind} · ${l.rule}`, run: () => navigate(`/japanese/n2/affixes/${l.id}`) })),
     { id: "jlpt-kanji-words", label: "Kanji Word Builder — Hiragana & English meanings",
       hint: "20 kanji · N3 N2 N1 vocabulary · typed readings · multiple meanings", run: () => navigate("/japanese/n2/kanji") },
     { id: "jlpt-n2-assembly", label: "Sentence Assembly ★ — JLPT N2",
