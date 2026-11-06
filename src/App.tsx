@@ -22,6 +22,7 @@ import Settings from "./pages/Settings";
 import ProblemForm from "./pages/ProblemForm";
 import Learn, { JapanesePage } from "./pages/Learn";
 import Course, { FastApiCourse, JavaCourse } from "./pages/Course";
+import PythonCourse from "./pages/PythonCourse";
 import Backend from "./pages/Backend";
 import Projects from "./pages/Projects";
 import Mastery from "./pages/Mastery";
@@ -141,6 +142,8 @@ function Shell() {
           <Route path="/course/:week" element={<Course />} />
           <Route path="/java-course" element={<JavaCourse />} />
           <Route path="/java-course/:week" element={<JavaCourse />} />
+          <Route path="/python-course" element={<PythonCourse />} />
+          <Route path="/python-course/:moduleId" element={<PythonCourse />} />
           <Route path="/fastapi-course" element={<FastApiCourse />} />
           <Route path="/fastapi-course/:week" element={<FastApiCourse />} />
           <Route path="/backend" element={<Backend />} />

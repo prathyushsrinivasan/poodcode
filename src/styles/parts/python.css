@@ -1,0 +1,22 @@
+.python-course { max-width: var(--page-max); }
+.python-intro p:first-child { margin-top: 0; }
+.python-intro progress { width: 100%; accent-color: var(--accent); }
+.python-stage { margin-block: var(--space-6); }
+.python-roadmap { display: grid; gap: var(--space-3); padding-left: var(--space-5); }
+.python-roadmap .card { padding: var(--space-4); margin: 0; }
+.python-roadmap p { margin-block: var(--space-2); }
+.python-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); margin-block: var(--space-4); }
+.python-lesson, .python-exercise, .python-exit { margin-block: var(--space-5); }
+.python-course details { margin-block: var(--space-3); }
+.python-course summary { cursor: pointer; font-weight: var(--weight-medium); }
+.python-course section[id] { scroll-margin-top: calc(var(--topbar-h) + var(--space-5)); }
+.python-editor { height: 340px; min-width: 0; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+.python-editor-label { display: block; margin-block: var(--space-3); }
+.python-example-code { display: block; width: 100%; min-height: 260px; font-family: var(--font-mono); font-size: var(--text-md); line-height: var(--leading-normal); tab-size: 4; white-space: pre; overflow: auto; margin-bottom: var(--space-3); }
+.python-case { margin-block: var(--space-4); }
+.python-syntax { border-left: 3px solid var(--accent); padding-left: var(--space-3); }
+.python-exit label { display: flex; align-items: baseline; gap: var(--space-2); }
+@media (max-width: 600px) {
+  .python-editor { height: 300px; }
+  .python-roadmap { padding-left: var(--space-4); }
+}

@@ -65,6 +65,10 @@ const TREE: Record<string, RouteNode> = {
     label: "Java Course",
     children: { ":": { label: "", dynamicLabel: "Module" } },
   },
+  "python-course": {
+    label: "Python Course",
+    children: { ":": { label: "", dynamicLabel: "Module" } },
+  },
   "fastapi-course": {
     label: "FastAPI Course",
     children: { ":": { label: "", dynamicLabel: "Module" } },

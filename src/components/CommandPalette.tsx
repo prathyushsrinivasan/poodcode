@@ -322,6 +322,7 @@ export function CommandPalette() {
       { id: "japanese", label: "日本語 vocabulary", run: () => navigate("/japanese") },
       { id: "course", label: "TypeScript Course", run: () => navigate("/course") },
       { id: "java-course", label: "Java Course", run: () => navigate("/java-course") },
+      { id: "python-course", label: "Python Course — zero syntax to interview problems", run: () => navigate("/python-course") },
       { id: "fastapi-course", label: "FastAPI Course", run: () => navigate("/fastapi-course") },
       { id: "backend", label: "Backend Lab", run: () => navigate("/backend") },
       { id: "aws-mla", label: "AWS MLA-C02 — daily exam practice", run: () => navigate("/aws-mla") },

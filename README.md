@@ -11,6 +11,16 @@ Built with **Tauri 2 · React + TypeScript · Rust · SQLite · Monaco · EChart
 
 ## Quick start
 
+**Courses → Python Course** (`/python-course`) is a coding-first roadmap from
+zero Python syntax to interview problems: 25 modules, 50 original exercises,
+and 196 published cases. Every starter and worked solution is checked against
+syntax already demonstrated, with links back to the required lessons. Run and
+modify examples, solve problems in the Python editor, and save accepted progress
+locally. Real execution requires the desktop app and Python 3.9+ on PATH; no
+extra Python packages are needed. See the [standalone roadmap](PYTHON_ROADMAP.md).
+Rebuild with `python tools/python_course.py`; verify all examples, answers,
+starters and syntax prerequisites with `python tools/verify_python_course.py`.
+
 **Courses → FastAPI Course** is a beginner-friendly, code-focused course with
 12 modules, 24 lessons, 36 explained review questions and 12 project milestones.
 Build a task API through app design, SQLAlchemy/PostgreSQL, authentication and

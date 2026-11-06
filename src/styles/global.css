@@ -33,6 +33,7 @@
 @import "./parts/aws.css"; /* AWS MLA-C02 daily learning */
 @import "./parts/aws-saa.css"; /* AWS SAA-C03 quizzes */
 @import "./parts/projects.css"; /* Projects track (G7) */
+@import "./parts/python.css";
 @import "./parts/mastery.css"; /* 6-Month Mastery */
 @import "./parts/forms.css"; /* Problem form (H3) */
 @import "./parts/utilities.css"; /* Token utilities — last, like the inline styles they replace (C1) */

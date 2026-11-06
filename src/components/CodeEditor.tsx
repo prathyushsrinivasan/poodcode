@@ -20,6 +20,8 @@ interface Props {
    * give each file its own path, so the TypeScript service sees them as
    * sibling modules and `import … from "./parse"` resolves. */
   path?: string;
+  /** A course may fix indentation to the convention it teaches. */
+  tabSize?: number;
   /** False when the page sets the TypeScript compiler options itself (the
    * playground), so focusing this editor does not reset them to a judge preset. */
   tsOptionsManaged?: boolean;
@@ -46,6 +48,7 @@ export const CodeEditor = forwardRef<CodeEditorHandle, Props>(function CodeEdito
     onSubmit,
     tsStrictness,
     path,
+    tabSize,
     tsOptionsManaged = true,
   },
   ref
@@ -97,7 +100,8 @@ export const CodeEditor = forwardRef<CodeEditorHandle, Props>(function CodeEdito
       onMount={onMount}
       options={{
         fontSize: prefs.fontSize,
-        tabSize: prefs.tabSize,
+        tabSize: tabSize ?? prefs.tabSize,
+        detectIndentation: tabSize === undefined,
         minimap: { enabled: prefs.minimap },
         wordWrap: prefs.wordWrap ? "on" : "off",
         lineNumbers: prefs.lineNumbers ? "on" : "off",

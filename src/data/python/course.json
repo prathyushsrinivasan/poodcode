@@ -1,0 +1,2561 @@
+[
+  {
+    "id": "p01",
+    "number": 1,
+    "title": "Your first Python functions",
+    "stage": "1. Learn Python by coding",
+    "goal": "Read a tiny program, change it, and return an integer.",
+    "explanation": "Python executes statements from top to bottom. A name stores a value: `score = 3`.\n`=` assigns; it is not a mathematical equality test. Integers can be negative.\n`+`, `-`, `*` and `**` mean add, subtract, multiply and exponentiate.\nParentheses control evaluation order. `//` gives floor division (so `-3 // 2`\nis `-2`); `%` gives the remainder (`7 % 3` is `1`). `/` produces a floating\npoint result; use `//` for integer counts. Names are case sensitive.\n\n`def solve(a, b):` defines a function named `solve` with two parameters.\nParameters are names supplied by whoever calls the function. The colon starts\nits body. Indent the body with four spaces. `return` sends a value back and\nimmediately exits the function. Blank lines separate ideas; `#` starts a\ncomment. `print(...)` displays a value; it does not replace `return`.\nA call such as `solve(2, 3)` supplies arguments in parameter order.\nYou do not need input parsing: the course runner supplies the arguments.\n\nType the example, predict 5, then change the arguments. In each exercise,\nkeep the function name and parameters and replace the placeholder return.\nRun all visible cases. Expected and actual values appear in the results.\nA red case is feedback: repair the code and run again. A completed exercise\nmeans the published cases passed, not a proof of optimal complexity.\n",
+    "example": "def solve(a, b):\n    total = a + b\n    return total\n\nprint(solve(2, 3))  # 5\nquotient = 7 // 3\nremainder = 7 % 3\nprint(quotient, remainder, 2 ** 3, 8 / 2, -3 * 2 - 1)\n",
+    "pattern": "Trace parameters -> calculation -> return. Never add print statements to\nthe submitted function: the runner displays the returned value for you.\nThere are no secret input formats, imports, annotations, or class wrappers.\nTo run locally, save your function in practice.py, add a print(solve(...))\ncall below it, and run `python practice.py` in a terminal with Python 3 installed.\n",
+    "gate": "Explain each character in def solve(a, b): and return a result without printing it.",
+    "exercises": [
+      {
+        "id": "python:add",
+        "title": "Add two integers",
+        "prompt": "Return a + b. Both inputs are integers between -10000 and 10000.",
+        "hint": "Use the + operator on the two parameters.",
+        "starter": "def solve(a, b):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(a, b):\n    return a + b\n",
+        "explanation": "The function returns the arithmetic sum to its caller.",
+        "complexity": "O(1) time and space for these bounded integers.",
+        "tests": [
+          {
+            "name": "positive",
+            "setup": "",
+            "call": "solve(2, 3)",
+            "expected": "5"
+          },
+          {
+            "name": "negative",
+            "setup": "",
+            "call": "solve(-4, 1)",
+            "expected": "-3"
+          },
+          {
+            "name": "zero",
+            "setup": "",
+            "call": "solve(0, 0)",
+            "expected": "0"
+          }
+        ],
+        "requires": [
+          "p01"
+        ]
+      },
+      {
+        "id": "python:minutes",
+        "title": "Split minutes",
+        "prompt": "Return the number of complete hours in minutes (an integer from 0 to 10000). Ignore leftover minutes.",
+        "hint": "An hour has 60 minutes. Integer floor division discards the remainder here.",
+        "starter": "def solve(minutes):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(minutes):\n    return minutes // 60\n",
+        "explanation": "For nonnegative minutes, floor division counts complete groups of 60.",
+        "complexity": "O(1) time and space.",
+        "tests": [
+          {
+            "name": "partial",
+            "setup": "",
+            "call": "solve(59)",
+            "expected": "0"
+          },
+          {
+            "name": "exact",
+            "setup": "",
+            "call": "solve(120)",
+            "expected": "2"
+          },
+          {
+            "name": "leftover",
+            "setup": "",
+            "call": "solve(125)",
+            "expected": "2"
+          },
+          {
+            "name": "zero",
+            "setup": "",
+            "call": "solve(0)",
+            "expected": "0"
+          }
+        ],
+        "requires": [
+          "p01"
+        ]
+      }
+    ],
+    "syntax": [
+      "Add",
+      "Assign",
+      "BinOp",
+      "Call",
+      "Constant",
+      "Div",
+      "Expr",
+      "FloorDiv",
+      "FunctionDef",
+      "Mod",
+      "Mult",
+      "Name",
+      "Pow",
+      "Return",
+      "Sub",
+      "USub",
+      "UnaryOp",
+      "print()"
+    ]
+  },
+  {
+    "id": "p02",
+    "number": 2,
+    "title": "Decisions and booleans",
+    "stage": "1. Learn Python by coding",
+    "goal": "Choose behavior with explicit conditions.",
+    "explanation": "`True` and `False` are boolean values. `==` compares values; `!=` means\nunequal; `<`, `<=`, `>` and `>=` compare order. `if condition:` executes its\nindented body only when the condition is true. `elif` tests another condition;\n`else` handles what remains. Only the first matching branch runs.\n`and` requires both conditions, `or` requires either, and `not` negates a\ncondition. Parenthesize combined conditions while learning.\n\nA `return` inside an if ends the whole function, not just the branch.\nKeep later branches aligned with if. Try changing the example to -2 and 0.\nPython treats 0, empty containers and None as false, but use explicit\ncomparisons until those containers have been introduced.\n",
+    "example": "def label(n):\n    if n < 0:\n        return -1\n    elif n == 0:\n        return 0\n    else:\n        return 1\n\nprint(label(4))\nprint(True, False, 2 != 3, 2 <= 3, 4 >= 4, 4 > 2)\nprint((2 > 0 and 2 < 5) or not (2 == 2))\n",
+    "pattern": "Test the boundary itself and the values immediately on either side. Draw the branches before coding.\n",
+    "gate": "Distinguish assignment from comparison and trace which branch runs.",
+    "exercises": [
+      {
+        "id": "python:sign",
+        "title": "Sign of an integer",
+        "prompt": "Return -1 for negative n, 0 for zero, and 1 for positive n. n is an integer from -10000 to 10000.",
+        "hint": "Handle negative and zero with early returns; the remaining case is positive.",
+        "starter": "def solve(n):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(n):\n    if n < 0:\n        return -1\n    if n == 0:\n        return 0\n    return 1\n",
+        "explanation": "Each early return eliminates one possibility.",
+        "complexity": "O(1) time and space.",
+        "tests": [
+          {
+            "name": "negative",
+            "setup": "",
+            "call": "solve(-8)",
+            "expected": "-1"
+          },
+          {
+            "name": "zero",
+            "setup": "",
+            "call": "solve(0)",
+            "expected": "0"
+          },
+          {
+            "name": "positive",
+            "setup": "",
+            "call": "solve(7)",
+            "expected": "1"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02"
+        ]
+      },
+      {
+        "id": "python:even",
+        "title": "Nonnegative and even",
+        "prompt": "Return True exactly when integer n is nonnegative and even; otherwise return False.",
+        "hint": "An even integer has remainder zero after division by two.",
+        "starter": "def solve(n):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(n):\n    return n >= 0 and n % 2 == 0\n",
+        "explanation": "Both predicates must hold. Zero is nonnegative and even.",
+        "complexity": "O(1) time and space.",
+        "tests": [
+          {
+            "name": "even",
+            "setup": "",
+            "call": "solve(8)",
+            "expected": "True"
+          },
+          {
+            "name": "odd",
+            "setup": "",
+            "call": "solve(3)",
+            "expected": "False"
+          },
+          {
+            "name": "negative even",
+            "setup": "",
+            "call": "solve(-2)",
+            "expected": "False"
+          },
+          {
+            "name": "zero",
+            "setup": "",
+            "call": "solve(0)",
+            "expected": "True"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02"
+        ]
+      }
+    ],
+    "syntax": [
+      "And",
+      "BoolOp",
+      "Compare",
+      "Eq",
+      "Gt",
+      "GtE",
+      "If",
+      "Lt",
+      "LtE",
+      "Not",
+      "NotEq",
+      "Or"
+    ]
+  },
+  {
+    "id": "p03",
+    "number": 3,
+    "title": "Loops and running state",
+    "stage": "1. Learn Python by coding",
+    "goal": "Repeat work and maintain a running answer.",
+    "explanation": "`for i in range(n):` visits 0 through n-1. The stop is excluded.\n`range(start, stop, step)` allows a starting value and positive or negative\nstep. `while condition:` repeats until its condition is false; update state\nso that it terminates. `total += value` is shorthand for\n`total = total + value`; `i -= 1` subtracts one.\n`break` exits the nearest loop; `continue` starts its next iteration.\nInitialize the running answer before the loop, update it inside, and return\nafter the loop. An empty range runs zero iterations.\n\nTrace i and total on paper for n=3. Returning inside the loop is a common\nbug: it stops after the first item. Write the invariant: total is the sum\nof all values processed so far. If the loop has no iterations, the initial\nvalue must already be the right answer.\n",
+    "example": "def sum_to(n):\n    total = 0\n    for i in range(1, n + 1):\n        total += i\n    return total\n\nprint(sum_to(3))\ni = 3\nwhile i > 0:\n    i -= 1\n    if i == 2:\n        continue\n    if i == 0:\n        break\n    print(i)\nfor i in range(3, 0, -1):\n    print(i)\n",
+    "pattern": "A loop with n iterations and constant work per iteration takes O(n) time. This is how we count growth, not seconds.\n",
+    "gate": "Trace a loop, including zero iterations, and explain why a while loop terminates.",
+    "exercises": [
+      {
+        "id": "python:sum-to",
+        "title": "Sum from one to n",
+        "prompt": "Return 1 + 2 + ... + n using a loop. n is an integer from 0 to 1000; return 0 for n=0.",
+        "hint": "The exclusive stop must be n + 1.",
+        "starter": "def solve(n):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(n):\n    total = 0\n    for i in range(1, n + 1):\n        total += i\n    return total\n",
+        "explanation": "After processing i, total contains the sum from 1 through i.",
+        "complexity": "O(n) time; O(1) auxiliary space.",
+        "tests": [
+          {
+            "name": "three",
+            "setup": "",
+            "call": "solve(3)",
+            "expected": "6"
+          },
+          {
+            "name": "zero",
+            "setup": "",
+            "call": "solve(0)",
+            "expected": "0"
+          },
+          {
+            "name": "one",
+            "setup": "",
+            "call": "solve(1)",
+            "expected": "1"
+          },
+          {
+            "name": "ten",
+            "setup": "",
+            "call": "solve(10)",
+            "expected": "55"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p03"
+        ]
+      },
+      {
+        "id": "python:digits",
+        "title": "Count decimal digits",
+        "prompt": "Return the number of decimal digits of integer n, where 0 <= n <= 1000000000. Zero has one digit. Use integer division and a loop.",
+        "hint": "Each division by ten removes one decimal digit; handle zero before the loop.",
+        "starter": "def solve(n):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(n):\n    if n == 0:\n        return 1\n    count = 0\n    while n > 0:\n        n = n // 10\n        count += 1\n    return count\n",
+        "explanation": "Repeated floor division reduces a positive integer to zero.",
+        "complexity": "O(d) time for d digits; O(1) space.",
+        "tests": [
+          {
+            "name": "zero",
+            "setup": "",
+            "call": "solve(0)",
+            "expected": "1"
+          },
+          {
+            "name": "single",
+            "setup": "",
+            "call": "solve(7)",
+            "expected": "1"
+          },
+          {
+            "name": "multiple",
+            "setup": "",
+            "call": "solve(1020)",
+            "expected": "4"
+          },
+          {
+            "name": "power of ten",
+            "setup": "",
+            "call": "solve(100)",
+            "expected": "3"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03"
+        ]
+      }
+    ],
+    "syntax": [
+      "AugAssign",
+      "Break",
+      "Continue",
+      "For",
+      "While",
+      "range()"
+    ]
+  },
+  {
+    "id": "p04",
+    "number": 4,
+    "title": "Lists and indexes",
+    "stage": "1. Learn Python by coding",
+    "goal": "Scan and build arrays safely.",
+    "explanation": "A list such as `[4, -2, 4]` stores ordered values, including duplicates.\n`[]` is empty. `len(nums)` counts items. `nums[0]` is the first item;\n`nums[len(nums)-1]` and `nums[-1]` are the last. These indexes are invalid\non an empty list. `for value in nums:` visits values; `for i in range(len(nums)):`\nvisits indexes. `nums[i] = value` replaces an item. `out.append(value)` adds\none item to the end. A method is a function attached with a dot to a value.\n\nLists are mutable: modifying them changes the original object. An index\nmust be in bounds; do not assume the input has a first element unless the\ncontract says so. Initialize a maximum from the first actual input value,\nnot zero, when all inputs might be negative. First trace on one element,\nthen two, then an empty list when allowed.\n",
+    "example": "def doubled(nums):\n    out = []\n    for value in nums:\n        out.append(value * 2)\n    return out\n\nnums = [3, -2]\nnums[0] = 5\nprint(len(nums), nums[-1], doubled(nums))\n",
+    "pattern": "A scan visits each item once: O(n) time. A new list of n answers uses O(n) auxiliary space. append is amortized O(1).\n",
+    "gate": "Choose a value loop or an index loop and handle an empty input deliberately.",
+    "exercises": [
+      {
+        "id": "python:count-positive",
+        "title": "Count positive entries",
+        "prompt": "Return how many entries are strictly greater than zero. nums contains 0 to 1000 integers; zero does not count.",
+        "hint": "Keep a counter and add one only in the positive branch.",
+        "starter": "def solve(nums):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(nums):\n    count = 0\n    for value in nums:\n        if value > 0:\n            count += 1\n    return count\n",
+        "explanation": "The counter describes exactly the entries already visited.",
+        "complexity": "O(n) time; O(1) auxiliary space.",
+        "tests": [
+          {
+            "name": "mixed",
+            "setup": "",
+            "call": "solve([-2, 0, 3, 3])",
+            "expected": "2"
+          },
+          {
+            "name": "empty",
+            "setup": "",
+            "call": "solve([])",
+            "expected": "0"
+          },
+          {
+            "name": "none",
+            "setup": "",
+            "call": "solve([-4, 0])",
+            "expected": "0"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03"
+        ]
+      },
+      {
+        "id": "python:maximum",
+        "title": "Maximum without max",
+        "prompt": "Return the greatest value in a nonempty list of 1 to 1000 integers. Use comparisons and a loop rather than a built-in maximum.",
+        "hint": "Use nums[0] as the initial best so negative-only inputs work.",
+        "starter": "def solve(nums):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(nums):\n    best = nums[0]\n    for value in nums:\n        if value > best:\n            best = value\n    return best\n",
+        "explanation": "best is the maximum of the processed prefix.",
+        "complexity": "O(n) time; O(1) auxiliary space.",
+        "tests": [
+          {
+            "name": "mixed",
+            "setup": "",
+            "call": "solve([3, 9, 2])",
+            "expected": "9"
+          },
+          {
+            "name": "all negative",
+            "setup": "",
+            "call": "solve([-8, -2, -4])",
+            "expected": "-2"
+          },
+          {
+            "name": "one",
+            "setup": "",
+            "call": "solve([-5])",
+            "expected": "-5"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03",
+          "p04"
+        ]
+      }
+    ],
+    "syntax": [
+      ".append",
+      "Attribute",
+      "List",
+      "Subscript",
+      "len()"
+    ]
+  },
+  {
+    "id": "p05",
+    "number": 5,
+    "title": "Strings and slices",
+    "stage": "1. Learn Python by coding",
+    "goal": "Treat text as a sequence and build new text.",
+    "explanation": "Strings are text in single or double quotes. `''` is empty. Indexing,\nlen and for loops work as on lists, but strings are immutable: you cannot\nassign to `text[i]`. `text[start:stop]` copies a slice, excluding stop.\nOmitting a bound uses that end; `text[::-1]` makes a reversed copy using\na step of -1. Slices clamp to valid bounds rather than raising IndexError.\n\n`ch in 'aeiou'` tests membership; `not in` negates it. `text.lower()`\nreturns lowercased text. `text.split()` returns whitespace-separated words.\n`' '.join(words)` joins strings with spaces. `out = out + ch` concatenates\nstrings; repeated growth can be quadratic because it creates new strings.\nFor many characters, append to a list and join once. Equality compares\nfull string contents. Our exercises specify lowercase ASCII to avoid\nsurprising Unicode normalization or case rules.\n",
+    "example": "text = 'Cat dog'\nprint(text[0], text[1:3], text[::-1], text.lower())\nwords = text.split()\nchars = []\nfor ch in text:\n    if ch not in 'aeiouAEIOU':\n        chars.append(ch)\nprint(''.join(chars), ' '.join(words), 'a' in 'cat', 'c' + 'at')\n",
+    "pattern": "Scan characters when counting; use slices only when the copied data is needed. A length-k slice costs O(k) time and space.\n",
+    "gate": "Explain the difference between an index and a slice, and why strings cannot be updated in place.",
+    "exercises": [
+      {
+        "id": "python:vowels",
+        "title": "Count vowels",
+        "prompt": "Return the number of lowercase vowels a, e, i, o, u in text. text contains 0 to 1000 lowercase ASCII letters.",
+        "hint": "Use a character loop and membership in the fixed vowel string.",
+        "starter": "def solve(text):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(text):\n    count = 0\n    for ch in text:\n        if ch in 'aeiou':\n            count += 1\n    return count\n",
+        "explanation": "The membership string has a fixed length of five, so each check is constant work.",
+        "complexity": "O(n) time; O(1) space.",
+        "tests": [
+          {
+            "name": "word",
+            "setup": "",
+            "call": "solve('leetcode')",
+            "expected": "4"
+          },
+          {
+            "name": "empty",
+            "setup": "",
+            "call": "solve('')",
+            "expected": "0"
+          },
+          {
+            "name": "none",
+            "setup": "",
+            "call": "solve('rhythm')",
+            "expected": "0"
+          },
+          {
+            "name": "all",
+            "setup": "",
+            "call": "solve('aeiou')",
+            "expected": "5"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03",
+          "p05"
+        ]
+      },
+      {
+        "id": "python:reverse-words",
+        "title": "Reverse word order",
+        "prompt": "Return the whitespace-separated words in reverse order, joined with single spaces. Leading, trailing and repeated spaces are allowed; text has at most 1000 ASCII characters. Empty input returns ''.",
+        "hint": "split removes whitespace runs; reverse the resulting list with a slice, then join.",
+        "starter": "def solve(text):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(text):\n    words = text.split()\n    return ' '.join(words[::-1])\n",
+        "explanation": "A slice reverses a copy of the word list; join controls the output spacing.",
+        "complexity": "O(n) time and space for n characters.",
+        "tests": [
+          {
+            "name": "normal",
+            "setup": "",
+            "call": "solve('code every day')",
+            "expected": "'day every code'"
+          },
+          {
+            "name": "spacing",
+            "setup": "",
+            "call": "solve('  a   b  ')",
+            "expected": "'b a'"
+          },
+          {
+            "name": "empty",
+            "setup": "",
+            "call": "solve('')",
+            "expected": "''"
+          },
+          {
+            "name": "one",
+            "setup": "",
+            "call": "solve('hi')",
+            "expected": "'hi'"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p04",
+          "p05"
+        ]
+      }
+    ],
+    "syntax": [
+      ".join",
+      ".lower",
+      ".split",
+      "In",
+      "NotIn",
+      "Slice"
+    ]
+  },
+  {
+    "id": "p06",
+    "number": 6,
+    "title": "Dictionaries and frequency maps",
+    "stage": "1. Learn Python by coding",
+    "goal": "Associate keys with counts or positions.",
+    "explanation": "`{}` creates an empty dictionary. `{'a': 2}` maps key 'a' to value 2.\n`counts[key] = value` inserts or updates a mapping. Reading `counts[key]`\nfor a missing key raises KeyError. `counts.get(key, 0)` returns zero when\nabsent without inserting it. `key in counts` tests keys, not values.\n`for key in counts:` visits keys; `counts.items()` visits key-value pairs\n(pair unpacking comes next module, so use key loops for now).\n\nInteger and string keys are supported; lists cannot be keys. Count one\noccurrence at a time with counts[ch] = counts.get(ch, 0) + 1. Never change\nthe dictionary's size while looping over it. Dictionaries preserve\ninsertion order, but solve frequency problems using counts, not accidental\nordering. Hash table operations take expected O(1), not a guaranteed\nworst-case O(1). A frequency table can use up to O(k) space for k keys.\n",
+    "example": "counts = {}\nfor ch in 'aba':\n    counts[ch] = counts.get(ch, 0) + 1\nfor key in counts:\n    print(key, counts[key])\nprint('a' in counts, counts.get('z', 0), counts.items())\n",
+    "pattern": "Replace repeated full scans with one table-building pass. Separate 'build counts' from 'read counts' when order matters.\n",
+    "gate": "Read and update a missing key safely, and explain why a list is not a dictionary key.",
+    "exercises": [
+      {
+        "id": "python:frequencies",
+        "title": "Build a frequency map",
+        "prompt": "Return a dictionary mapping each integer to its occurrence count. nums has 0 to 1000 integers. Insert keys in the order first seen; the course displays dictionaries in insertion order.",
+        "hint": "Start with an empty dictionary and update once per number.",
+        "starter": "def solve(nums):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(nums):\n    counts = {}\n    for value in nums:\n        counts[value] = counts.get(value, 0) + 1\n    return counts\n",
+        "explanation": "get supplies the initial count; assignment stores the incremented count.",
+        "complexity": "Expected O(n) time; O(k) space for k distinct values.",
+        "tests": [
+          {
+            "name": "repeats",
+            "setup": "",
+            "call": "solve([2, 1, 2])",
+            "expected": "{2: 2, 1: 1}"
+          },
+          {
+            "name": "empty",
+            "setup": "",
+            "call": "solve([])",
+            "expected": "{}"
+          },
+          {
+            "name": "negative",
+            "setup": "",
+            "call": "solve([-1, -1, 0])",
+            "expected": "{-1: 2, 0: 1}"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p03",
+          "p04",
+          "p06"
+        ]
+      },
+      {
+        "id": "python:first-unique",
+        "title": "First unique character index",
+        "prompt": "Return the index of the first character occurring exactly once, or -1 if none. text has 0 to 1000 lowercase ASCII letters.",
+        "hint": "Count first; scan indexes in original order second.",
+        "starter": "def solve(text):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(text):\n    counts = {}\n    for ch in text:\n        counts[ch] = counts.get(ch, 0) + 1\n    for i in range(len(text)):\n        if counts[text[i]] == 1:\n            return i\n    return -1\n",
+        "explanation": "The second pass guarantees the first qualifying index rather than an arbitrary unique character.",
+        "complexity": "O(n) time; O(1) space for a fixed alphabet.",
+        "tests": [
+          {
+            "name": "early",
+            "setup": "",
+            "call": "solve('leetcode')",
+            "expected": "0"
+          },
+          {
+            "name": "later",
+            "setup": "",
+            "call": "solve('aabbc')",
+            "expected": "4"
+          },
+          {
+            "name": "none",
+            "setup": "",
+            "call": "solve('aabb')",
+            "expected": "-1"
+          },
+          {
+            "name": "empty",
+            "setup": "",
+            "call": "solve('')",
+            "expected": "-1"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03",
+          "p04",
+          "p06"
+        ]
+      }
+    ],
+    "syntax": [
+      ".get",
+      ".items",
+      "Dict"
+    ]
+  },
+  {
+    "id": "p07",
+    "number": 7,
+    "title": "Sets, tuples and unpacking",
+    "stage": "1. Learn Python by coding",
+    "goal": "Track membership and carry small records.",
+    "explanation": "`set()` is an empty set; `{2, 3}` is a nonempty set (not a dictionary).\n`seen.add(x)` inserts; `seen.discard(x)` removes if present.\n`x in seen` and `x not in seen` test membership in expected O(1).\nSets remove duplicates and have no promised iteration order.\n\n`(2, 3)` is a tuple: an immutable sequence. `(2,)` needs the comma for\none item. A tuple of integers can be a dictionary key or set element.\n`a, b = pair` unpacks exactly two entries from a list or tuple.\n`a, b = b, a` swaps values\nusing the original right-hand values. `for i, value in enumerate(nums):`\nvisits index-value pairs. `for key, value in counts.items():` unpacks\ndictionary entries. `None` means no value; `is None` and `is not None`\ntest that singleton by identity. Use `==` for numeric and text equality.\n",
+    "example": "seen = set()\nseen.add(2)\nseen.discard(9)\nprint(2 in seen, 3 not in seen, {2, 3})\na, b = (2, 3)\na, b = b, a\nfor i, value in enumerate([7, 8]):\n    print(i, value)\nfor key, value in {'x': 2}.items():\n    print(key, value)\nmissing = None\nprint(missing is None, missing is not None, (2,))\n",
+    "pattern": "For Two Sum, look for the complement before inserting the current index. This prevents using one element twice.\n",
+    "gate": "Choose a set for membership and a dictionary when the associated index is needed.",
+    "exercises": [
+      {
+        "id": "python:duplicates",
+        "title": "Contains a duplicate",
+        "prompt": "Return True if any integer occurs at least twice, otherwise False. nums has 0 to 1000 integers.",
+        "hint": "Check whether a value is already in the set before adding it.",
+        "starter": "def solve(nums):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(nums):\n    seen = set()\n    for value in nums:\n        if value in seen:\n            return True\n        seen.add(value)\n    return False\n",
+        "explanation": "The set contains precisely the earlier values.",
+        "complexity": "Expected O(n) time; O(n) space.",
+        "tests": [
+          {
+            "name": "duplicate",
+            "setup": "",
+            "call": "solve([1, 2, 1])",
+            "expected": "True"
+          },
+          {
+            "name": "distinct",
+            "setup": "",
+            "call": "solve([1, 2])",
+            "expected": "False"
+          },
+          {
+            "name": "empty",
+            "setup": "",
+            "call": "solve([])",
+            "expected": "False"
+          },
+          {
+            "name": "zero pair",
+            "setup": "",
+            "call": "solve([0, 0])",
+            "expected": "True"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03",
+          "p04",
+          "p05",
+          "p07"
+        ]
+      },
+      {
+        "id": "python:two-sum",
+        "title": "Two Sum",
+        "prompt": "Return [i, j], i < j, for the two entries summing to target, or [] if absent. nums has 0 to 1000 integers. At most one index pair qualifies. Never reuse an index.",
+        "hint": "Map previously seen values to indexes; look up target - value first.",
+        "starter": "def solve(nums, target):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(nums, target):\n    seen = {}\n    for i, value in enumerate(nums):\n        need = target - value\n        if need in seen:\n            return [seen[need], i]\n        seen[value] = i\n    return []\n",
+        "explanation": "A hit is always an earlier, distinct index. The single-pair contract removes tie ambiguity.",
+        "complexity": "Expected O(n) time; O(n) space.",
+        "tests": [
+          {
+            "name": "pair",
+            "setup": "",
+            "call": "solve([2, 7, 11, 15], 9)",
+            "expected": "[0, 1]"
+          },
+          {
+            "name": "equal values",
+            "setup": "",
+            "call": "solve([3, 3], 6)",
+            "expected": "[0, 1]"
+          },
+          {
+            "name": "single cannot reuse",
+            "setup": "",
+            "call": "solve([3], 6)",
+            "expected": "[]"
+          },
+          {
+            "name": "empty",
+            "setup": "",
+            "call": "solve([], 5)",
+            "expected": "[]"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03",
+          "p04",
+          "p05",
+          "p06",
+          "p07"
+        ]
+      }
+    ],
+    "syntax": [
+      ".add",
+      ".discard",
+      "Is",
+      "IsNot",
+      "Set",
+      "Tuple",
+      "enumerate()",
+      "set()"
+    ]
+  },
+  {
+    "id": "p08",
+    "number": 8,
+    "title": "Sorting, helpers and copying",
+    "stage": "2. Solve array and string patterns",
+    "goal": "Use only explained conveniences and reason about their costs.",
+    "explanation": "`sorted(nums)` returns a new sorted list; `nums.sort()` mutates a list and\nreturns None. `reverse=True` sorts descending. A keyword argument names\nan option. `key=first` uses the function first to compute a comparison key;\ndo not write first() there because you are passing the function itself.\n`min(a, b)`, `max(a, b)`, `abs(x)` and `sum(nums)` return smaller, larger,\nabsolute value and sum. These helpers do not replace understanding a scan.\n\n`copy = nums[:]` copies a list shallowly. `alias = nums` shares it.\n`[0] * n` creates a flat list of zeros. For rows, use\n`[[0] * cols for _ in range(rows)]`: a list comprehension evaluates the\nexpression before for once per item. `_` is an ordinary unused variable.\nNever use `[[0] * cols] * rows`: all rows then share one list.\nComprehensions are optional; the earlier append loop always works.\n\nBig O measures growth as n increases. One scan is O(n); nested full scans\nare O(n squared); halving repeatedly is O(log n). Sorting is O(n log n).\nA built-in may hide a loop: sum and list copying are O(n). Python sorting\nmay use O(n) auxiliary memory. Count output storage separately from working\nstorage. No timed tests here prove an asymptotic claim: explain it yourself.\n",
+    "example": "def first(pair):\n    return pair[0]\n\nnums = [3, 1, 2]\ncopy = nums[:]\nalias = nums\ncopy.sort(reverse=True)\nprint(nums, copy, sorted(nums), min(3, 1), max(3, 1), abs(-4), sum(nums))\nprint(sorted([[2, 9], [1, 8]], key=first))\ngrid = [[0] * 2 for _ in range(2)]\ngrid[0][0] = 7\nprint(grid, alias)\n",
+    "pattern": "Sorting can simplify comparisons, but ask whether it destroys original indexes or order. State the cost of every helper.\n",
+    "gate": "Explain mutation versus copying, sort versus sorted, and why repeated rows can alias.",
+    "exercises": [
+      {
+        "id": "python:squares",
+        "title": "Sorted squares: first solution",
+        "prompt": "Return the squares of all integers in ascending order. nums has 0 to 1000 integers. Do not mutate the input. This first version may sort.",
+        "hint": "Square each value, then sort the new list.",
+        "starter": "def solve(nums):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(nums):\n    out = []\n    for value in nums:\n        out.append(value * value)\n    return sorted(out)\n",
+        "explanation": "Squaring does not preserve signed order, so sorting is necessary for this approach.",
+        "complexity": "O(n log n) time; O(n) space including output and sorting.",
+        "tests": [
+          {
+            "name": "mixed",
+            "setup": "",
+            "call": "solve([-4, -1, 0, 3])",
+            "expected": "[0, 1, 9, 16]"
+          },
+          {
+            "name": "empty",
+            "setup": "",
+            "call": "solve([])",
+            "expected": "[]"
+          },
+          {
+            "name": "negative",
+            "setup": "",
+            "call": "solve([-3, -2])",
+            "expected": "[4, 9]"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p03",
+          "p04",
+          "p08"
+        ]
+      },
+      {
+        "id": "python:closest-zero",
+        "title": "Closest value to zero",
+        "prompt": "Return the integer closest to zero in a nonempty list of at most 1000 integers. If both -x and x are equally close, prefer x.",
+        "hint": "Compare absolute values first, then apply the positive tie rule.",
+        "starter": "def solve(nums):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(nums):\n    best = nums[0]\n    for value in nums:\n        if abs(value) < abs(best) or (abs(value) == abs(best) and value > best):\n            best = value\n    return best\n",
+        "explanation": "The tie rule is explicit; input order cannot change the answer.",
+        "complexity": "O(n) time; O(1) space.",
+        "tests": [
+          {
+            "name": "tie",
+            "setup": "",
+            "call": "solve([-2, 2, 5])",
+            "expected": "2"
+          },
+          {
+            "name": "negative",
+            "setup": "",
+            "call": "solve([-7, -1])",
+            "expected": "-1"
+          },
+          {
+            "name": "zero",
+            "setup": "",
+            "call": "solve([3, 0, -1])",
+            "expected": "0"
+          },
+          {
+            "name": "one",
+            "setup": "",
+            "call": "solve([6])",
+            "expected": "6"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03",
+          "p04",
+          "p08"
+        ]
+      }
+    ],
+    "syntax": [
+      ".sort",
+      "ListComp",
+      "abs()",
+      "comprehension",
+      "keyword",
+      "keyword key",
+      "keyword reverse",
+      "max()",
+      "min()",
+      "sorted()",
+      "sum()"
+    ]
+  },
+  {
+    "id": "p09",
+    "number": 9,
+    "title": "Two pointers",
+    "stage": "2. Solve array and string patterns",
+    "goal": "Move boundaries using a stated invariant.",
+    "explanation": "No new syntax. Use two integer indexes and a while loop. On a sorted list,\nthe smallest and largest remaining values bound a candidate pair. If their\nsum is too small, advancing left is safe: pairing the same left with an\neven smaller right could not help. If too large, decrease right.\nStop when left >= right so one element is never used twice.\n\nFor a palindrome, compare the two end characters and move inward. Return\nFalse on a mismatch, True after all pairs match. Empty and single-character\nstrings are palindromes under this definition. Trace the indexes explicitly;\nneither slicing nor copying is required. In both patterns each pointer\nmoves in one direction at most n times, so the loop is linear.\n",
+    "example": "def palindrome(text):\n    left = 0\n    right = len(text) - 1\n    while left < right:\n        if text[left] != text[right]:\n            return False\n        left += 1\n        right -= 1\n    return True\n\nprint(palindrome('abba'))\n",
+    "pattern": "Before moving a pointer, say which candidates are eliminated and why. A sorted-input contract is essential for the pair-sum rule.\n",
+    "gate": "Justify pointer movement rather than memorizing it.",
+    "exercises": [
+      {
+        "id": "python:palindrome",
+        "title": "Exact palindrome",
+        "prompt": "Return whether text reads identically forward and backward. text has 0 to 1000 lowercase ASCII letters. Use two pointers without a reversed copy.",
+        "hint": "Compare the endpoints; move both inward after a match.",
+        "starter": "def solve(text):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(text):\n    left = 0\n    right = len(text) - 1\n    while left < right:\n        if text[left] != text[right]:\n            return False\n        left += 1\n        right -= 1\n    return True\n",
+        "explanation": "Every pair outside the active range has already matched.",
+        "complexity": "O(n) time; O(1) space.",
+        "tests": [
+          {
+            "name": "even",
+            "setup": "",
+            "call": "solve('abba')",
+            "expected": "True"
+          },
+          {
+            "name": "mismatch",
+            "setup": "",
+            "call": "solve('abca')",
+            "expected": "False"
+          },
+          {
+            "name": "empty",
+            "setup": "",
+            "call": "solve('')",
+            "expected": "True"
+          },
+          {
+            "name": "single",
+            "setup": "",
+            "call": "solve('a')",
+            "expected": "True"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03",
+          "p04"
+        ]
+      },
+      {
+        "id": "python:sorted-pair",
+        "title": "Pair in a sorted array",
+        "prompt": "Return [i, j] with i < j for two entries summing to target, or []. nums is sorted ascending, has at most 1000 integers, and at most one index pair qualifies. Use constant auxiliary space.",
+        "hint": "Compare the endpoint sum to target; eliminate one endpoint each time.",
+        "starter": "def solve(nums, target):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(nums, target):\n    left = 0\n    right = len(nums) - 1\n    while left < right:\n        total = nums[left] + nums[right]\n        if total == target:\n            return [left, right]\n        if total < target:\n            left += 1\n        else:\n            right -= 1\n    return []\n",
+        "explanation": "Sorted order makes each elimination safe.",
+        "complexity": "O(n) time; O(1) auxiliary space.",
+        "tests": [
+          {
+            "name": "pair",
+            "setup": "",
+            "call": "solve([1, 3, 4, 8], 7)",
+            "expected": "[1, 2]"
+          },
+          {
+            "name": "equal",
+            "setup": "",
+            "call": "solve([2, 2], 4)",
+            "expected": "[0, 1]"
+          },
+          {
+            "name": "absent",
+            "setup": "",
+            "call": "solve([1, 3], 8)",
+            "expected": "[]"
+          },
+          {
+            "name": "empty",
+            "setup": "",
+            "call": "solve([], 3)",
+            "expected": "[]"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03",
+          "p04"
+        ]
+      }
+    ],
+    "syntax": []
+  },
+  {
+    "id": "p10",
+    "number": 10,
+    "title": "Sliding windows",
+    "stage": "2. Solve array and string patterns",
+    "goal": "Update a contiguous range instead of recomputing it.",
+    "explanation": "No new syntax. A window represents contiguous indexes left through right.\nFor fixed width k, add the incoming value and subtract the outgoing value\nonce the window grows too large. Record answers only for complete windows.\nInitializing best to zero is incorrect for all-negative windows; initialize\nit from the first complete window or use None and an explicit test.\n\nFor a variable window with nonnegative inputs, extend right and shrink left\nwhile the window violates its limit. Nonnegative values make shrinking\nreduce the sum; this proof fails with negative numbers. For unique text,\na last-seen index table lets left jump past a repeated character. Use\nmax(left, previous + 1) so left never moves backward. Every item enters and\nleaves at most once: nested loops can still total O(n) work.\n",
+    "example": "def longest_distinct(text):\n    last = {}\n    left = 0\n    best = 0\n    for right, ch in enumerate(text):\n        if ch in last:\n            left = max(left, last[ch] + 1)\n        last[ch] = right\n        best = max(best, right - left + 1)\n    return best\n\nprint(longest_distinct('abba'))\n",
+    "pattern": "Write what makes the current window valid, when you shrink it, and when you record its length or sum.\n",
+    "gate": "Explain why a left boundary never retreats, and why input signs can matter.",
+    "exercises": [
+      {
+        "id": "python:fixed-window",
+        "title": "Maximum sum of k consecutive values",
+        "prompt": "Return the maximum sum of a contiguous length-k window. nums has 1 to 1000 integers; 1 <= k <= len(nums). Negative values are allowed.",
+        "hint": "Start with the first k entries, then replace one outgoing value each step.",
+        "starter": "def solve(nums, k):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(nums, k):\n    current = sum(nums[:k])\n    best = current\n    for right in range(k, len(nums)):\n        current += nums[right] - nums[right - k]\n        best = max(best, current)\n    return best\n",
+        "explanation": "The running sum always describes exactly k consecutive values.",
+        "complexity": "O(n) time; O(k) temporary space for the initial slice (can be reduced to O(1) with a loop).",
+        "tests": [
+          {
+            "name": "mixed",
+            "setup": "",
+            "call": "solve([1, 4, -2, 5], 2)",
+            "expected": "5"
+          },
+          {
+            "name": "negative",
+            "setup": "",
+            "call": "solve([-5, -2, -3], 2)",
+            "expected": "-5"
+          },
+          {
+            "name": "whole",
+            "setup": "",
+            "call": "solve([1, 2], 2)",
+            "expected": "3"
+          },
+          {
+            "name": "one",
+            "setup": "",
+            "call": "solve([-4], 1)",
+            "expected": "-4"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p03",
+          "p04",
+          "p05",
+          "p08"
+        ]
+      },
+      {
+        "id": "python:unique-window",
+        "title": "Longest substring without repeats",
+        "prompt": "Return the length of the longest contiguous substring with no repeated character. text has at most 1000 lowercase ASCII letters; empty returns 0.",
+        "hint": "Keep last-seen indexes and move left past a repeated character only when needed.",
+        "starter": "def solve(text):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(text):\n    last = {}\n    left = 0\n    best = 0\n    for right, ch in enumerate(text):\n        if ch in last:\n            left = max(left, last[ch] + 1)\n        last[ch] = right\n        best = max(best, right - left + 1)\n    return best\n",
+        "explanation": "The active range contains no duplicate characters; max prevents an old occurrence from moving left backward.",
+        "complexity": "O(n) time; O(1) space for the fixed alphabet.",
+        "tests": [
+          {
+            "name": "typical",
+            "setup": "",
+            "call": "solve('abcabcbb')",
+            "expected": "3"
+          },
+          {
+            "name": "do not retreat",
+            "setup": "",
+            "call": "solve('abba')",
+            "expected": "2"
+          },
+          {
+            "name": "empty",
+            "setup": "",
+            "call": "solve('')",
+            "expected": "0"
+          },
+          {
+            "name": "all same",
+            "setup": "",
+            "call": "solve('aaaa')",
+            "expected": "1"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03",
+          "p04",
+          "p05",
+          "p06",
+          "p07",
+          "p08"
+        ]
+      }
+    ],
+    "syntax": []
+  },
+  {
+    "id": "p11",
+    "number": 11,
+    "title": "Prefix sums",
+    "stage": "2. Solve array and string patterns",
+    "goal": "Summarize everything before an index.",
+    "explanation": "No new syntax. Define prefix[0] = 0 and append one cumulative sum per\ninput value. prefix[i] is the sum of the first i values. Therefore an\ninclusive range [left, right] sums to prefix[right+1] - prefix[left].\nThe extra leading zero handles ranges starting at index zero uniformly.\n\nFor subarray sums equal to k, a current prefix total s needs an earlier\nprefix s-k. Count earlier prefix sums in a dictionary. Seed {0: 1} for the\nempty prefix; otherwise subarrays starting at zero disappear. Look up the\nneeded count before inserting the current prefix so an empty subarray\nis not counted. Unlike the nonnegative sliding-sum rule, this method works\nwith negative numbers and zeroes. Trace [1, -1, 0] with k=0.\n",
+    "example": "nums = [2, -1, 4]\nprefix = [0]\nfor value in nums:\n    prefix.append(prefix[-1] + value)\nleft, right = 1, 2\nprint(prefix[right + 1] - prefix[left])  # 3\n",
+    "pattern": "Choose prefixes for repeated static range queries or count-of-earlier-total problems. Name exactly what the dictionary counts.\n",
+    "gate": "Explain both the leading zero and why a frequency map starts at {0: 1}.",
+    "exercises": [
+      {
+        "id": "python:range-sums",
+        "title": "Static range sums",
+        "prompt": "Return one sum per inclusive query [left, right], in order. nums has 1 to 1000 integers; queries has 0 to 1000 valid ranges with 0 <= left <= right < len(nums).",
+        "hint": "Build n+1 prefixes, then subtract the prefix before the query from the one after it.",
+        "starter": "def solve(nums, queries):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(nums, queries):\n    prefix = [0]\n    for value in nums:\n        prefix.append(prefix[-1] + value)\n    out = []\n    for left, right in queries:\n        out.append(prefix[right + 1] - prefix[left])\n    return out\n",
+        "explanation": "Each query cancels values outside its range.",
+        "complexity": "O(n+q) time; O(n) working space plus O(q) output.",
+        "tests": [
+          {
+            "name": "ranges",
+            "setup": "",
+            "call": "solve([2, -1, 4], [[0, 2], [1, 1], [1, 2]])",
+            "expected": "[5, -1, 3]"
+          },
+          {
+            "name": "no queries",
+            "setup": "",
+            "call": "solve([8], [])",
+            "expected": "[]"
+          },
+          {
+            "name": "single",
+            "setup": "",
+            "call": "solve([-3], [[0, 0]])",
+            "expected": "[-3]"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p03",
+          "p04",
+          "p07"
+        ]
+      },
+      {
+        "id": "python:subarray-k",
+        "title": "Count subarrays with sum k",
+        "prompt": "Return the count of nonempty contiguous subarrays summing to integer k. nums has 0 to 1000 integers, including negatives.",
+        "hint": "Count how many previous prefix totals equal current total minus k.",
+        "starter": "def solve(nums, k):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(nums, k):\n    counts = {0: 1}\n    total = 0\n    answer = 0\n    for value in nums:\n        total += value\n        answer += counts.get(total - k, 0)\n        counts[total] = counts.get(total, 0) + 1\n    return answer\n",
+        "explanation": "Multiple identical prefixes correspond to different starting positions, so store frequencies rather than a set.",
+        "complexity": "Expected O(n) time; O(n) space.",
+        "tests": [
+          {
+            "name": "positive",
+            "setup": "",
+            "call": "solve([1, 1, 1], 2)",
+            "expected": "2"
+          },
+          {
+            "name": "zeroes",
+            "setup": "",
+            "call": "solve([0, 0], 0)",
+            "expected": "3"
+          },
+          {
+            "name": "negative",
+            "setup": "",
+            "call": "solve([1, -1, 0], 0)",
+            "expected": "3"
+          },
+          {
+            "name": "empty",
+            "setup": "",
+            "call": "solve([], 0)",
+            "expected": "0"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p03",
+          "p04",
+          "p06"
+        ]
+      }
+    ],
+    "syntax": []
+  },
+  {
+    "id": "p12",
+    "number": 12,
+    "title": "Binary search and boundaries",
+    "stage": "2. Solve array and string patterns",
+    "goal": "Halve a search interval without losing an answer.",
+    "explanation": "No new syntax. Use a half-open interval [left, right): left is included,\nright is excluded. Start with left=0 and right=len(nums).\nWhile left < right, mid=(left+right)//2. If nums[mid] < target, all indexes\nthrough mid can be eliminated: left=mid+1. Otherwise right=mid. At exit,\nleft is the first position whose value is at least target, possibly n.\nCheck left < len(nums) before reading nums[left]. Short-circuit `and`\nonly evaluates the second operand if the first is true, making that guard safe.\n\nA lower bound handles duplicates predictably. Never mix this interval\nconvention with an inclusive right=n-1 template. Every iteration shrinks\nthe interval. The same idea searches a monotone yes/no feasibility test\nover answer values, once you have justified monotonicity.\n",
+    "example": "def lower_bound(nums, target):\n    left = 0\n    right = len(nums)\n    while left < right:\n        mid = (left + right) // 2\n        if nums[mid] < target:\n            left = mid + 1\n        else:\n            right = mid\n    return left\n\nprint(lower_bound([1, 3, 3, 8], 3))\n",
+    "pattern": "Write the interval convention and the meaning of the answer before coding. Test absent-before, absent-after, duplicates and empty input.\n",
+    "gate": "Derive an update from the interval invariant and prove the interval shrinks.",
+    "exercises": [
+      {
+        "id": "python:insert-position",
+        "title": "Search insert position",
+        "prompt": "Return the first index with value >= target, or len(nums) if none. nums is sorted ascending and has 0 to 1000 integers. Duplicates are allowed.",
+        "hint": "Use [left, right) and move right to mid when the midpoint could be the first answer.",
+        "starter": "def solve(nums, target):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(nums, target):\n    left = 0\n    right = len(nums)\n    while left < right:\n        mid = (left + right) // 2\n        if nums[mid] < target:\n            left = mid + 1\n        else:\n            right = mid\n    return left\n",
+        "explanation": "Equality stays in the search range, so the leftmost equal value survives.",
+        "complexity": "O(log n) time; O(1) space.",
+        "tests": [
+          {
+            "name": "duplicates",
+            "setup": "",
+            "call": "solve([1, 3, 3, 8], 3)",
+            "expected": "1"
+          },
+          {
+            "name": "gap",
+            "setup": "",
+            "call": "solve([1, 3], 2)",
+            "expected": "1"
+          },
+          {
+            "name": "after",
+            "setup": "",
+            "call": "solve([1, 3], 9)",
+            "expected": "2"
+          },
+          {
+            "name": "before",
+            "setup": "",
+            "call": "solve([1, 3], 0)",
+            "expected": "0"
+          },
+          {
+            "name": "empty",
+            "setup": "",
+            "call": "solve([], 2)",
+            "expected": "0"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03",
+          "p04"
+        ]
+      },
+      {
+        "id": "python:sqrt",
+        "title": "Integer square root",
+        "prompt": "Return the largest integer x such that x*x <= n. n is an integer from 0 to 1000000000. Use binary search rather than a square-root helper.",
+        "hint": "Find the first integer whose square is too large, then subtract one.",
+        "starter": "def solve(n):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(n):\n    left = 0\n    right = n + 1\n    while left < right:\n        mid = (left + right) // 2\n        if mid * mid <= n:\n            left = mid + 1\n        else:\n            right = mid\n    return left - 1\n",
+        "explanation": "The predicate x*x > n is monotone. The first failing value is one beyond the floor root.",
+        "complexity": "O(log(n+1)) time; O(1) space.",
+        "tests": [
+          {
+            "name": "zero",
+            "setup": "",
+            "call": "solve(0)",
+            "expected": "0"
+          },
+          {
+            "name": "one",
+            "setup": "",
+            "call": "solve(1)",
+            "expected": "1"
+          },
+          {
+            "name": "square",
+            "setup": "",
+            "call": "solve(16)",
+            "expected": "4"
+          },
+          {
+            "name": "between",
+            "setup": "",
+            "call": "solve(8)",
+            "expected": "2"
+          },
+          {
+            "name": "large",
+            "setup": "",
+            "call": "solve(1000000000)",
+            "expected": "31622"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03"
+        ]
+      }
+    ],
+    "syntax": []
+  },
+  {
+    "id": "p13",
+    "number": 13,
+    "title": "Stacks and monotonic stacks",
+    "stage": "3. Learn data structures",
+    "goal": "Store unfinished work in last-in, first-out order.",
+    "explanation": "`stack.pop()` removes and returns the last list item. It raises IndexError\non an empty list. Guard it with `len(stack) > 0`; `and` short-circuits.\nappend is push, pop is removal, stack[-1] peeks. Each is amortized O(1)\nat the list end. Removing from the front of a list costs O(n).\n\nA bracket stack stores openings whose matching closings have not arrived.\nReject a closing with no opening or the wrong opening; accept only when\nno opening remains. A monotonic stack instead maintains ordered values\nor their indexes. For next-greater problems, a larger current value resolves\nevery smaller pending value at the top. Store indexes when answers depend\non distances. Although one iteration may pop many items, each item is\npushed once and popped at most once: total O(n) work (amortized analysis).\n",
+    "example": "stack = []\nstack.append(4)\nstack.append(7)\nif len(stack) > 0:\n    print(stack[-1], stack.pop())\nprint(stack)\n",
+    "pattern": "Ask what each pending stack entry is waiting for, and what event makes it safe to pop.\n",
+    "gate": "Explain a stack invariant and the total number of pushes and pops.",
+    "exercises": [
+      {
+        "id": "python:brackets",
+        "title": "Valid brackets",
+        "prompt": "Return whether text is properly nested. text contains only ()[]{} and has at most 1000 characters. Empty is valid.",
+        "hint": "Push openings; for a closing, require the matching most recent opening.",
+        "starter": "def solve(text):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(text):\n    matching = {')': '(', ']': '[', '}': '{'}\n    stack = []\n    for ch in text:\n        if ch in '([{':\n            stack.append(ch)\n        else:\n            if len(stack) == 0 or stack.pop() != matching[ch]:\n                return False\n    return len(stack) == 0\n",
+        "explanation": "Short-circuit or avoids popping an empty stack.",
+        "complexity": "O(n) time; O(n) space.",
+        "tests": [
+          {
+            "name": "nested",
+            "setup": "",
+            "call": "solve('([]{})')",
+            "expected": "True"
+          },
+          {
+            "name": "crossed",
+            "setup": "",
+            "call": "solve('([)]')",
+            "expected": "False"
+          },
+          {
+            "name": "early close",
+            "setup": "",
+            "call": "solve(')')",
+            "expected": "False"
+          },
+          {
+            "name": "leftover",
+            "setup": "",
+            "call": "solve('(')",
+            "expected": "False"
+          },
+          {
+            "name": "empty",
+            "setup": "",
+            "call": "solve('')",
+            "expected": "True"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03",
+          "p04",
+          "p05",
+          "p06",
+          "p13"
+        ]
+      },
+      {
+        "id": "python:temperatures",
+        "title": "Days until a warmer temperature",
+        "prompt": "Return one distance per day to the next strictly warmer day, or 0 if none. temps has 0 to 1000 integer temperatures. Equal is not warmer.",
+        "hint": "Keep indexes of unresolved days with nonincreasing temperatures.",
+        "starter": "def solve(temps):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(temps):\n    out = [0] * len(temps)\n    stack = []\n    for i, value in enumerate(temps):\n        while len(stack) > 0 and temps[stack[-1]] < value:\n            previous = stack.pop()\n            out[previous] = i - previous\n        stack.append(i)\n    return out\n",
+        "explanation": "A warmer day resolves pending colder days; unresolved indexes retain zero.",
+        "complexity": "O(n) time; O(n) space including output.",
+        "tests": [
+          {
+            "name": "mixed",
+            "setup": "",
+            "call": "solve([73, 74, 75, 71, 69, 72, 76, 73])",
+            "expected": "[1, 1, 4, 2, 1, 1, 0, 0]"
+          },
+          {
+            "name": "equal",
+            "setup": "",
+            "call": "solve([70, 70])",
+            "expected": "[0, 0]"
+          },
+          {
+            "name": "falling",
+            "setup": "",
+            "call": "solve([3, 2, 1])",
+            "expected": "[0, 0, 0]"
+          },
+          {
+            "name": "empty",
+            "setup": "",
+            "call": "solve([])",
+            "expected": "[]"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03",
+          "p04",
+          "p07",
+          "p13"
+        ]
+      }
+    ],
+    "syntax": [
+      ".pop"
+    ]
+  },
+  {
+    "id": "p14",
+    "number": 14,
+    "title": "Imports, queues and BFS",
+    "stage": "3. Learn data structures",
+    "goal": "Process work in first-in, first-out order.",
+    "explanation": "`from collections import deque` loads deque from Python's standard library;\nno installation is needed. `deque([start])` constructs a queue.\n`.append(x)` adds at the right, `.popleft()` removes from the left, and\n`.appendleft(x)` adds at the left, all in O(1). Guard removal from empty.\nA library name must be imported before use. You may put imports above def.\n\nBreadth-first search (BFS) expands the closest pending state first. Store\n(state, distance) tuples and mark states visited when enqueued, so the same\nstate is not scheduled repeatedly. With unit-cost edges, the first time\na state is reached gives its shortest distance. This does not apply to\narbitrary weighted edges. A queue implementation using list.pop(0) shifts\nall remaining entries and can make an otherwise linear traversal quadratic.\n",
+    "example": "from collections import deque\n\nqueue = deque([(0, 0)])\nseen = {0}\nwhile len(queue) > 0:\n    position, distance = queue.popleft()\n    print(position, distance)\n    for nxt in [position + 1, position + 2]:\n        if nxt <= 3 and nxt not in seen:\n            seen.add(nxt)\n            queue.append((nxt, distance + 1))\nqueue.appendleft((9, 9))\nprint(queue.popleft())\n",
+    "pattern": "Separate the queue's pending work from the visited set. The set records discovery, not completion.\n",
+    "gate": "Choose stack versus queue and explain when BFS proves a shortest path.",
+    "exercises": [
+      {
+        "id": "python:queue-ops",
+        "title": "Queue operations",
+        "prompt": "ops is a list of at most 1000 two-item lists [action, value]. action is 'add' or 'take'. Add enqueues value; take ignores value and records the oldest item, or -1 if empty. Return recorded removals.",
+        "hint": "Use deque; add on the right and take from the left.",
+        "starter": "def solve(ops):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "from collections import deque\n\ndef solve(ops):\n    queue = deque()\n    out = []\n    for action, value in ops:\n        if action == 'add':\n            queue.append(value)\n        elif len(queue) > 0:\n            out.append(queue.popleft())\n        else:\n            out.append(-1)\n    return out\n",
+        "explanation": "The output records only take operations. The -1 rule makes empty behavior explicit.",
+        "complexity": "O(n) time; O(n) space.",
+        "tests": [
+          {
+            "name": "fifo",
+            "setup": "",
+            "call": "solve([['add', 2], ['add', 4], ['take', 0], ['take', 0]])",
+            "expected": "[2, 4]"
+          },
+          {
+            "name": "empty take",
+            "setup": "",
+            "call": "solve([['take', 0]])",
+            "expected": "[-1]"
+          },
+          {
+            "name": "no ops",
+            "setup": "",
+            "call": "solve([])",
+            "expected": "[]"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03",
+          "p04",
+          "p07",
+          "p14"
+        ]
+      },
+      {
+        "id": "python:number-bfs",
+        "title": "Fewest increments",
+        "prompt": "Start at 0; each move adds 1 or 2. Return the fewest moves to target, an integer from 0 to 100. Practice BFS even though an arithmetic formula exists. Do not visit positions beyond target.",
+        "hint": "Queue position-distance pairs; return when target is removed from the queue.",
+        "starter": "def solve(target):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "from collections import deque\n\ndef solve(target):\n    queue = deque([(0, 0)])\n    seen = {0}\n    while len(queue) > 0:\n        position, distance = queue.popleft()\n        if position == target:\n            return distance\n        for nxt in [position + 1, position + 2]:\n            if nxt <= target and nxt not in seen:\n                seen.add(nxt)\n                queue.append((nxt, distance + 1))\n    return -1\n",
+        "explanation": "FIFO order processes distances in increasing layers, making the first target distance minimal.",
+        "complexity": "O(target+1) time and space.",
+        "tests": [
+          {
+            "name": "zero",
+            "setup": "",
+            "call": "solve(0)",
+            "expected": "0"
+          },
+          {
+            "name": "one",
+            "setup": "",
+            "call": "solve(1)",
+            "expected": "1"
+          },
+          {
+            "name": "odd",
+            "setup": "",
+            "call": "solve(7)",
+            "expected": "4"
+          },
+          {
+            "name": "even",
+            "setup": "",
+            "call": "solve(10)",
+            "expected": "5"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03",
+          "p04",
+          "p05",
+          "p07",
+          "p14"
+        ]
+      }
+    ],
+    "syntax": [
+      ".appendleft",
+      ".popleft",
+      "ImportFrom",
+      "alias",
+      "from collections import deque"
+    ]
+  },
+  {
+    "id": "p15",
+    "number": 15,
+    "title": "Recursion and the call stack",
+    "stage": "3. Learn data structures",
+    "goal": "Define a smaller subproblem and a stopping case.",
+    "explanation": "A function may call itself: that is recursion, using the function-call\nsyntax you already know. Every call has its own parameters and local\nvariables. A base case returns without another call. Each recursive path\nmust move toward that base case. The caller waits for the smaller result\nand then combines it. Trace the descent and the return separately.\n\nReturning a recursive result is essential: merely calling the function\ndiscards its answer. Recursion uses stack space proportional to maximum\ndepth. Python has a recursion depth limit; this course bounds recursive\ninputs to safe depths. For large adversarial trees or graphs, use an\nexplicit stack or queue instead of assuming recursion is unlimited.\nDo not raise the recursion limit as a substitute for choosing an algorithm.\n",
+    "example": "def factorial(n):\n    if n <= 1:\n        return 1\n    smaller = factorial(n - 1)\n    return n * smaller\n\nprint(factorial(4))  # 24\n",
+    "pattern": "State three things: the base case, the smaller argument, and how its returned result builds this result.\n",
+    "gate": "Trace call frames and account for stack space.",
+    "exercises": [
+      {
+        "id": "python:factorial",
+        "title": "Recursive factorial",
+        "prompt": "Return n! using recursion. n is an integer from 0 to 12; 0! is 1.",
+        "hint": "Stop at 0 or 1. Multiply n by the factorial of n-1.",
+        "starter": "def solve(n):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(n):\n    if n <= 1:\n        return 1\n    return n * solve(n - 1)\n",
+        "explanation": "Each recursive call reduces n and each waiting frame stores constant information.",
+        "complexity": "O(n) time; O(n) call-stack space.",
+        "tests": [
+          {
+            "name": "zero",
+            "setup": "",
+            "call": "solve(0)",
+            "expected": "1"
+          },
+          {
+            "name": "one",
+            "setup": "",
+            "call": "solve(1)",
+            "expected": "1"
+          },
+          {
+            "name": "four",
+            "setup": "",
+            "call": "solve(4)",
+            "expected": "24"
+          },
+          {
+            "name": "six",
+            "setup": "",
+            "call": "solve(6)",
+            "expected": "720"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02"
+        ]
+      },
+      {
+        "id": "python:digit-sum",
+        "title": "Recursive digit sum",
+        "prompt": "Return the sum of decimal digits using recursion. n is an integer from 0 to 1000000000.",
+        "hint": "Separate the last digit with % and recurse on the remaining digits with //.",
+        "starter": "def solve(n):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(n):\n    if n < 10:\n        return n\n    return n % 10 + solve(n // 10)\n",
+        "explanation": "The integer loses a digit each call, so it reaches the single-digit base case.",
+        "complexity": "O(d) time and stack space for d digits.",
+        "tests": [
+          {
+            "name": "zero",
+            "setup": "",
+            "call": "solve(0)",
+            "expected": "0"
+          },
+          {
+            "name": "one digit",
+            "setup": "",
+            "call": "solve(7)",
+            "expected": "7"
+          },
+          {
+            "name": "multiple",
+            "setup": "",
+            "call": "solve(1024)",
+            "expected": "7"
+          },
+          {
+            "name": "zeroes",
+            "setup": "",
+            "call": "solve(1000)",
+            "expected": "1"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02"
+        ]
+      }
+    ],
+    "syntax": []
+  },
+  {
+    "id": "p16",
+    "number": 16,
+    "title": "Nested helpers and backtracking",
+    "stage": "4. Traverse and search",
+    "goal": "Explore choices, copy answers, and undo mutations.",
+    "explanation": "`def visit(index):` may be defined inside solve. It can read names from\nsolve's enclosing scope, such as path and out. Calling path.append(...)\nmutates that shared list; it does not rebind the name. We avoid assigning\nto enclosing scalar names, which would require additional syntax.\nNo nonlocal or global declaration is needed in these exercises.\nA bare `return` exits the function with the value None; here it stops\nvisiting a finished branch after its answer has been recorded.\n\nBacktracking is choose -> explore -> undo. Keep one mutable path and\nremove its last item with pop after returning. When recording an answer,\nappend path[:] rather than path itself, so later mutations cannot change\nrecorded answers. A branching recursion tree can have exponentially many\noutputs. For subsets, each of n values is either excluded or included:\nthere are 2**n answers and copying them costs O(n * 2**n) time and space.\nExplore branches in the documented order because our checker compares lists.\n",
+    "example": "def choices(n):\n    path = []\n    out = []\n    def visit(index):\n        if index == n:\n            out.append(path[:])\n            return\n        visit(index + 1)\n        path.append(index)\n        visit(index + 1)\n        path.pop()\n    visit(0)\n    return out\n\nprint(choices(2))  # [[], [1], [0], [0, 1]]\n",
+    "pattern": "Record a path snapshot at a complete answer. After every recursive call, restore exactly the state that existed before the choice.\n",
+    "gate": "Explain why appending the path without copying would corrupt earlier answers.",
+    "exercises": [
+      {
+        "id": "python:subsets",
+        "title": "All subsets",
+        "prompt": "Return every subset of a list of 0 to 10 distinct integers. Process indexes left to right; explore exclusion before inclusion. Preserve original order within subsets. The empty list produces [[]].",
+        "hint": "At each index, recurse without the value, then append it, recurse, and pop it.",
+        "starter": "def solve(nums):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(nums):\n    out = []\n    path = []\n    def visit(index):\n        if index == len(nums):\n            out.append(path[:])\n            return\n        visit(index + 1)\n        path.append(nums[index])\n        visit(index + 1)\n        path.pop()\n    visit(0)\n    return out\n",
+        "explanation": "Every sequence of inclusion decisions produces one distinct subset; copying freezes its current path.",
+        "complexity": "O(n * 2**n) time and output space; O(n) additional stack/path.",
+        "tests": [
+          {
+            "name": "two",
+            "setup": "",
+            "call": "solve([1, 2])",
+            "expected": "[[], [2], [1], [1, 2]]"
+          },
+          {
+            "name": "empty",
+            "setup": "",
+            "call": "solve([])",
+            "expected": "[[]]"
+          },
+          {
+            "name": "one",
+            "setup": "",
+            "call": "solve([9])",
+            "expected": "[[], [9]]"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p04",
+          "p05",
+          "p13"
+        ]
+      },
+      {
+        "id": "python:binary-strings",
+        "title": "Binary strings without adjacent ones",
+        "prompt": "Return all length-n strings of '0' and '1' without '11', in lexicographic order (try '0' first). n is from 0 to 10. For n=0 return [''].",
+        "hint": "Always allow 0; allow 1 only at the start or after 0.",
+        "starter": "def solve(n):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(n):\n    out = []\n    def visit(text):\n        if len(text) == n:\n            out.append(text)\n            return\n        visit(text + '0')\n        if len(text) == 0 or text[-1] != '1':\n            visit(text + '1')\n    visit('')\n    return out\n",
+        "explanation": "Pruning rejects invalid prefixes before exploring their descendants. Immutable strings require no undo step.",
+        "complexity": "O(n * 2**n) upper bound on time and output space; O(n squared) upper bound for live copied prefixes.",
+        "tests": [
+          {
+            "name": "zero",
+            "setup": "",
+            "call": "solve(0)",
+            "expected": "['']"
+          },
+          {
+            "name": "one",
+            "setup": "",
+            "call": "solve(1)",
+            "expected": "['0', '1']"
+          },
+          {
+            "name": "two",
+            "setup": "",
+            "call": "solve(2)",
+            "expected": "['00', '01', '10']"
+          },
+          {
+            "name": "three",
+            "setup": "",
+            "call": "solve(3)",
+            "expected": "['000', '001', '010', '100', '101']"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p04"
+        ]
+      }
+    ],
+    "syntax": []
+  },
+  {
+    "id": "p17",
+    "number": 17,
+    "title": "Classes, objects and linked lists",
+    "stage": "4. Traverse and search",
+    "goal": "Follow references rather than array indexes.",
+    "explanation": "`class ListNode:` defines an object shape. `def __init__(self, val, next=None):`\ninitializes each new object. self is that object; `self.val = val` stores\na field. A default parameter is used when the caller omits it.\n`ListNode(3)` constructs an object; Python supplies self automatically.\n`.next` holds another node or None. Variable names hold references;\nassigning a reference does not copy a node. `is` compares object identity.\n\nWalk with node = node.next until node is None. A linked list has no constant\ntime indexed access. For a middle node, move slow once and fast twice;\nguard fast and fast.next before following two links. In a cycle, traversal\nmay never reach None; fast and slow eventually meet by object identity.\nNode equality for cycle detection is about the same node, not equal values.\nThe provided class is part of the starter and has now been fully taught.\n",
+    "example": "class ListNode:\n    def __init__(self, val, next=None):\n        self.val = val\n        self.next = next\n\nhead = ListNode(4, ListNode(7))\nnode = head\nwhile node is not None:\n    print(node.val)\n    node = node.next\nprint(head is head, head is head.next)\n",
+    "pattern": "Draw boxes for objects and arrows for references. Trace empty, one-node, two-node and cyclic structures before coding.\n",
+    "gate": "Explain self, constructor calls, default arguments, field access and identity.",
+    "exercises": [
+      {
+        "id": "python:middle",
+        "title": "Middle node value",
+        "prompt": "head is None or the head of an acyclic list with at most 100 nodes. Return the middle node's val, choosing the second middle for even length. Return None for empty. Keep the supplied ListNode definition.",
+        "hint": "Start both references at head; move fast two links and slow one.",
+        "starter": "class ListNode:\n    def __init__(self, val, next=None):\n        self.val = val\n        self.next = next\n\ndef solve(head):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "class ListNode:\n    def __init__(self, val, next=None):\n        self.val = val\n        self.next = next\n\ndef solve(head):\n    slow = head\n    fast = head\n    while fast is not None and fast.next is not None:\n        slow = slow.next\n        fast = fast.next.next\n    if slow is None:\n        return None\n    return slow.val\n",
+        "explanation": "When fast reaches the end, slow has taken half as many steps, choosing the second middle.",
+        "complexity": "O(n) time; O(1) space.",
+        "tests": [
+          {
+            "name": "odd",
+            "setup": "",
+            "call": "solve(ListNode(1, ListNode(2, ListNode(3))))",
+            "expected": "2"
+          },
+          {
+            "name": "even",
+            "setup": "",
+            "call": "solve(ListNode(1, ListNode(2)))",
+            "expected": "2"
+          },
+          {
+            "name": "one",
+            "setup": "",
+            "call": "solve(ListNode(8))",
+            "expected": "8"
+          },
+          {
+            "name": "empty",
+            "setup": "",
+            "call": "solve(None)",
+            "expected": "None"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03",
+          "p04",
+          "p07",
+          "p17"
+        ]
+      },
+      {
+        "id": "python:cycle",
+        "title": "Detect a linked-list cycle",
+        "prompt": "Return True if following next references repeats a node, otherwise False. There are at most 100 distinct ListNode objects. Equal values alone are not a cycle. Tests show how cyclic fixtures are constructed.",
+        "hint": "Move first, then compare node identity; both references initially equal head even in an acyclic list.",
+        "starter": "class ListNode:\n    def __init__(self, val, next=None):\n        self.val = val\n        self.next = next\n\ndef solve(head):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "class ListNode:\n    def __init__(self, val, next=None):\n        self.val = val\n        self.next = next\n\ndef solve(head):\n    slow = head\n    fast = head\n    while fast is not None and fast.next is not None:\n        slow = slow.next\n        fast = fast.next.next\n        if slow is fast:\n            return True\n    return False\n",
+        "explanation": "Within a finite cycle, the relative gap changes by one per step until the references meet.",
+        "complexity": "O(n) time; O(1) space.",
+        "tests": [
+          {
+            "name": "cycle",
+            "setup": "cycle = ListNode(1, ListNode(2))\ncycle.next.next = cycle\nself_cycle = ListNode(9)\nself_cycle.next = self_cycle\n",
+            "call": "solve(cycle)",
+            "expected": "True"
+          },
+          {
+            "name": "equal values no cycle",
+            "setup": "cycle = ListNode(1, ListNode(2))\ncycle.next.next = cycle\nself_cycle = ListNode(9)\nself_cycle.next = self_cycle\n",
+            "call": "solve(ListNode(1, ListNode(1)))",
+            "expected": "False"
+          },
+          {
+            "name": "self cycle",
+            "setup": "cycle = ListNode(1, ListNode(2))\ncycle.next.next = cycle\nself_cycle = ListNode(9)\nself_cycle.next = self_cycle\n",
+            "call": "solve(self_cycle)",
+            "expected": "True"
+          },
+          {
+            "name": "empty",
+            "setup": "cycle = ListNode(1, ListNode(2))\ncycle.next.next = cycle\nself_cycle = ListNode(9)\nself_cycle.next = self_cycle\n",
+            "call": "solve(None)",
+            "expected": "False"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03",
+          "p04",
+          "p07",
+          "p17"
+        ]
+      }
+    ],
+    "syntax": [
+      ".next",
+      ".val",
+      "ClassDef"
+    ]
+  },
+  {
+    "id": "p18",
+    "number": 18,
+    "title": "Binary trees: DFS and BFS",
+    "stage": "4. Traverse and search",
+    "goal": "Combine child results and traverse levels.",
+    "explanation": "TreeNode uses the same class syntax as ListNode, with .left and .right\ninstead of .next. A missing child is None. The root is the entry reference.\nA tree here is acyclic and each node has at most one parent.\nDepth is measured in nodes: an empty tree has depth 0, a leaf depth 1.\nRecursive depth is 1 + max(left depth, right depth).\n\nDepth-first traversal follows a child fully before another. Inorder means\nleft subtree -> node -> right subtree. A binary search tree additionally\norders keys, but these exercises accept any binary tree. For breadth-first\ntraversal, enqueue children of each removed node. To collect separate\nlevels, read the queue length before processing that layer.\nBoth DFS and BFS visit n nodes in O(n) time. DFS uses O(h) stack depth;\nBFS uses O(w) queued nodes at the widest level. Recursion exercises cap\ntrees at 100 nodes; an arbitrarily skewed large tree needs an explicit stack.\n",
+    "example": "class TreeNode:\n    def __init__(self, val, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef depth(root):\n    if root is None:\n        return 0\n    return 1 + max(depth(root.left), depth(root.right))\n\nroot = TreeNode(2, TreeNode(1), TreeNode(3))\nprint(depth(root), root.left.val, root.right.val)\n",
+    "pattern": "Define what each recursive call returns. Keep 'visit order' separate from 'what result this call computes'.\n",
+    "gate": "Trace a tree by object references and explain depth versus breadth memory use.",
+    "exercises": [
+      {
+        "id": "python:tree-depth",
+        "title": "Maximum tree depth",
+        "prompt": "Return maximum depth measured in nodes. root is None or a TreeNode in an acyclic binary tree with at most 100 nodes. Empty depth is 0.",
+        "hint": "The base case is None; take the larger child depth and add one.",
+        "starter": "class TreeNode:\n    def __init__(self, val, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef solve(root):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "class TreeNode:\n    def __init__(self, val, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef solve(root):\n    if root is None:\n        return 0\n    return 1 + max(solve(root.left), solve(root.right))\n",
+        "explanation": "Every node returns the height of its own subtree.",
+        "complexity": "O(n) time; O(h) recursion space.",
+        "tests": [
+          {
+            "name": "balanced",
+            "setup": "",
+            "call": "solve(TreeNode(2, TreeNode(1), TreeNode(3)))",
+            "expected": "2"
+          },
+          {
+            "name": "skewed",
+            "setup": "",
+            "call": "solve(TreeNode(1, None, TreeNode(2, None, TreeNode(3))))",
+            "expected": "3"
+          },
+          {
+            "name": "leaf",
+            "setup": "",
+            "call": "solve(TreeNode(5))",
+            "expected": "1"
+          },
+          {
+            "name": "empty",
+            "setup": "",
+            "call": "solve(None)",
+            "expected": "0"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p04",
+          "p07",
+          "p08",
+          "p17",
+          "p18"
+        ]
+      },
+      {
+        "id": "python:tree-inorder",
+        "title": "Inorder traversal",
+        "prompt": "Return values in left-node-right order. root is None or the root of an acyclic TreeNode tree with at most 100 nodes; it need not be a BST.",
+        "hint": "Reuse the nested helper pattern and append between the two recursive calls.",
+        "starter": "class TreeNode:\n    def __init__(self, val, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef solve(root):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "class TreeNode:\n    def __init__(self, val, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef solve(root):\n    out = []\n    def visit(node):\n        if node is None:\n            return\n        visit(node.left)\n        out.append(node.val)\n        visit(node.right)\n    visit(root)\n    return out\n",
+        "explanation": "Appending between left and right produces inorder regardless of numeric ordering.",
+        "complexity": "O(n) time; O(h) working stack plus O(n) output.",
+        "tests": [
+          {
+            "name": "balanced",
+            "setup": "",
+            "call": "solve(TreeNode(2, TreeNode(1), TreeNode(3)))",
+            "expected": "[1, 2, 3]"
+          },
+          {
+            "name": "not bst",
+            "setup": "",
+            "call": "solve(TreeNode(9, TreeNode(7), TreeNode(1)))",
+            "expected": "[7, 9, 1]"
+          },
+          {
+            "name": "empty",
+            "setup": "",
+            "call": "solve(None)",
+            "expected": "[]"
+          },
+          {
+            "name": "right only",
+            "setup": "",
+            "call": "solve(TreeNode(1, None, TreeNode(2)))",
+            "expected": "[1, 2]"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p04",
+          "p07",
+          "p17",
+          "p18"
+        ]
+      }
+    ],
+    "syntax": [
+      ".left",
+      ".right"
+    ]
+  },
+  {
+    "id": "p19",
+    "number": 19,
+    "title": "Graphs and grids",
+    "stage": "4. Traverse and search",
+    "goal": "Represent neighbors and avoid repeated work.",
+    "explanation": "No new syntax. An adjacency list graph[u] contains the outgoing neighbors\nof vertex u. Vertices are integers from 0 to len(graph)-1. In a directed\ngraph, u -> v does not imply v -> u; an undirected representation includes\nboth. A visited set prevents cycles and duplicate scheduling. Mark visited\nwhen pushing or enqueuing, not after repeated discoveries.\n\nA grid is a list of row lists. grid[row][col] uses two indexes. Check\n0 <= row < rows and 0 <= col < cols with the explicit and conditions shown\nbelow before indexing. A tuple (row, col) is a hashable visited key.\nFour-direction movement adds (-1,0), (1,0), (0,-1), (0,1).\nAn explicit stack does DFS; deque does BFS. Flood fill processes each\nreachable cell once; restart from every unvisited land cell to count\nislands. Do not mutate input when a separate visited set suffices.\n",
+    "example": "grid = [[1, 0], [1, 1]]\nrow, col = 0, 0\nfor dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:\n    nr, nc = row + dr, col + dc\n    if nr >= 0 and nr < len(grid) and nc >= 0 and nc < len(grid[0]):\n        print(nr, nc, grid[nr][nc])\nseen = {(0, 0)}\nprint((row, col) in seen)\n",
+    "pattern": "State vertices, edges, direction, and movement rules before choosing a traversal. O(V+E) counts vertices plus adjacency entries.\n",
+    "gate": "Explain visited timing, bounds checks, and why BFS rather than DFS finds a shortest unweighted path.",
+    "exercises": [
+      {
+        "id": "python:graph-distance",
+        "title": "Shortest unweighted directed path",
+        "prompt": "graph is an adjacency list with 1 to 100 vertices and valid integer neighbors. Return the fewest directed edges from start to target, or -1 if unreachable. Both vertices are valid. Cycles and self-edges are allowed.",
+        "hint": "Adapt the number BFS: neighbors now come from graph[node].",
+        "starter": "def solve(graph, start, target):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "from collections import deque\n\ndef solve(graph, start, target):\n    queue = deque([(start, 0)])\n    seen = {start}\n    while len(queue) > 0:\n        node, distance = queue.popleft()\n        if node == target:\n            return distance\n        for neighbor in graph[node]:\n            if neighbor not in seen:\n                seen.add(neighbor)\n                queue.append((neighbor, distance + 1))\n    return -1\n",
+        "explanation": "FIFO order guarantees minimum edges; visited prevents infinite cycling.",
+        "complexity": "O(V+E) time; O(V) space.",
+        "tests": [
+          {
+            "name": "shortest",
+            "setup": "",
+            "call": "solve([[1, 2], [3], [3], []], 0, 3)",
+            "expected": "2"
+          },
+          {
+            "name": "cycle unreachable",
+            "setup": "",
+            "call": "solve([[1], [0], []], 0, 2)",
+            "expected": "-1"
+          },
+          {
+            "name": "same",
+            "setup": "",
+            "call": "solve([[]], 0, 0)",
+            "expected": "0"
+          },
+          {
+            "name": "directed",
+            "setup": "",
+            "call": "solve([[1], []], 1, 0)",
+            "expected": "-1"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03",
+          "p04",
+          "p05",
+          "p07",
+          "p14"
+        ]
+      },
+      {
+        "id": "python:islands",
+        "title": "Count islands",
+        "prompt": "Return the number of four-directionally connected groups of 1 cells. grid is [] or a rectangular grid with at most 30 rows and 30 columns; cells are integer 0 or 1. An empty row is allowed. Do not mutate grid.",
+        "hint": "Each unseen land cell begins one flood fill. Mark neighbors when pushing them.",
+        "starter": "def solve(grid):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(grid):\n    if len(grid) == 0:\n        return 0\n    rows = len(grid)\n    cols = len(grid[0])\n    seen = set()\n    count = 0\n    for row in range(rows):\n        for col in range(cols):\n            if grid[row][col] == 1 and (row, col) not in seen:\n                count += 1\n                seen.add((row, col))\n                stack = [(row, col)]\n                while len(stack) > 0:\n                    r, c = stack.pop()\n                    for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:\n                        nr, nc = r + dr, c + dc\n                        if nr >= 0 and nr < rows and nc >= 0 and nc < cols:\n                            if grid[nr][nc] == 1 and (nr, nc) not in seen:\n                                seen.add((nr, nc))\n                                stack.append((nr, nc))\n    return count\n",
+        "explanation": "Each flood fill claims exactly one connected component; restarting counts all components.",
+        "complexity": "O(rows * cols) time and space.",
+        "tests": [
+          {
+            "name": "two",
+            "setup": "",
+            "call": "solve([[1, 1, 0], [0, 0, 1]])",
+            "expected": "2"
+          },
+          {
+            "name": "diagonal separate",
+            "setup": "",
+            "call": "solve([[1, 0], [0, 1]])",
+            "expected": "2"
+          },
+          {
+            "name": "water",
+            "setup": "",
+            "call": "solve([[0, 0]])",
+            "expected": "0"
+          },
+          {
+            "name": "empty",
+            "setup": "",
+            "call": "solve([])",
+            "expected": "0"
+          },
+          {
+            "name": "empty row",
+            "setup": "",
+            "call": "solve([[]])",
+            "expected": "0"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03",
+          "p04",
+          "p05",
+          "p07",
+          "p13"
+        ]
+      }
+    ],
+    "syntax": []
+  },
+  {
+    "id": "p20",
+    "number": 20,
+    "title": "Heaps and priority queues",
+    "stage": "5. Build interview solutions",
+    "goal": "Keep the best pending candidate available.",
+    "explanation": "`import heapq` loads a standard module. `heapq.heapify(values)` mutates a\nlist into a min-heap in O(n). `heapq.heappush(heap, x)` inserts in O(log n);\n`heapq.heappop(heap)` removes the smallest in O(log n). heap[0] peeks\nin O(1); it needs a nonempty heap. A heap is not a fully sorted list.\nCopy the input before heapify when mutation is forbidden.\n\nTo keep the k largest values, use a min-heap capped at k: after insertion,\nremove the smallest when size exceeds k. Its root is then the kth largest.\nTo simulate a max-heap with the basic portable API, push negative values\nand negate the removed values. A tuple priority is compared\nlexicographically, including tie fields; avoid putting noncomparable custom\nobjects into ties without an integer sequence number.\n",
+    "example": "import heapq\n\nheap = [4, 1, 7]\nheapq.heapify(heap)\nheapq.heappush(heap, 2)\nprint(heap[0], heapq.heappop(heap))\n",
+    "pattern": "Use a heap when the best current item changes after each operation; sorting once is often simpler when all results are needed.\n",
+    "gate": "Explain what the heap root means and why a size-k heap can discard its minimum.",
+    "exercises": [
+      {
+        "id": "python:kth-largest",
+        "title": "Kth largest element",
+        "prompt": "Return the kth largest entry, counting duplicates separately. nums has 1 to 1000 integers and 1 <= k <= len(nums). Keep a heap of at most k entries and do not mutate nums.",
+        "hint": "Push each value and remove the minimum whenever the heap grows beyond k.",
+        "starter": "def solve(nums, k):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "import heapq\n\ndef solve(nums, k):\n    heap = []\n    for value in nums:\n        heapq.heappush(heap, value)\n        if len(heap) > k:\n            heapq.heappop(heap)\n    return heap[0]\n",
+        "explanation": "The heap contains the k largest entries processed so far; its minimum is kth largest.",
+        "complexity": "O(n log(k+1)) time; O(k) space.",
+        "tests": [
+          {
+            "name": "typical",
+            "setup": "",
+            "call": "solve([3, 2, 1, 5, 6, 4], 2)",
+            "expected": "5"
+          },
+          {
+            "name": "duplicates",
+            "setup": "",
+            "call": "solve([2, 2, 1], 2)",
+            "expected": "2"
+          },
+          {
+            "name": "negative",
+            "setup": "",
+            "call": "solve([-3, -1, -2], 3)",
+            "expected": "-3"
+          },
+          {
+            "name": "one",
+            "setup": "",
+            "call": "solve([8], 1)",
+            "expected": "8"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03",
+          "p04",
+          "p14",
+          "p20"
+        ]
+      },
+      {
+        "id": "python:last-stone",
+        "title": "Last stone weight",
+        "prompt": "Repeatedly take the two heaviest positive integer stones. Equal weights disappear; otherwise insert their positive difference. Return the final weight or 0 if none. stones has 0 to 100 values, each at most 1000. Do not mutate input.",
+        "hint": "Negative weights make the smallest stored value represent the heaviest stone.",
+        "starter": "def solve(stones):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "import heapq\n\ndef solve(stones):\n    heap = []\n    for value in stones:\n        heap.append(-value)\n    heapq.heapify(heap)\n    while len(heap) > 1:\n        first = -heapq.heappop(heap)\n        second = -heapq.heappop(heap)\n        if first != second:\n            heapq.heappush(heap, -(first - second))\n    if len(heap) == 0:\n        return 0\n    return -heap[0]\n",
+        "explanation": "Each iteration reduces the number of stones, and the heap exposes the two greatest weights.",
+        "complexity": "O(n log n) time; O(n) space.",
+        "tests": [
+          {
+            "name": "typical",
+            "setup": "",
+            "call": "solve([2, 7, 4, 1, 8, 1])",
+            "expected": "1"
+          },
+          {
+            "name": "equal",
+            "setup": "",
+            "call": "solve([4, 4])",
+            "expected": "0"
+          },
+          {
+            "name": "one",
+            "setup": "",
+            "call": "solve([9])",
+            "expected": "9"
+          },
+          {
+            "name": "empty",
+            "setup": "",
+            "call": "solve([])",
+            "expected": "0"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03",
+          "p04",
+          "p14",
+          "p20"
+        ]
+      }
+    ],
+    "syntax": [
+      ".heapify",
+      ".heappop",
+      ".heappush",
+      "Import",
+      "import heapq"
+    ]
+  },
+  {
+    "id": "p21",
+    "number": 21,
+    "title": "Greedy choices and intervals",
+    "stage": "5. Build interview solutions",
+    "goal": "Justify a local decision and define endpoint rules.",
+    "explanation": "No new syntax. Greedy algorithms commit to a local choice; they require\na proof that some optimal solution can include that choice. For a single\nstock transaction, keep the lowest earlier price and the best profit.\nThis is a scan invariant, not a rule to buy every local dip.\n\nAn interval is [start, end]. For merging closed intervals, [1,3] and [3,5]\noverlap because their endpoints touch. Sort by start using a named key\nfunction, then compare each interval with the last output interval. If it\noverlaps, extend the last end with max; otherwise append a new interval.\nCopy pairs into output so updating their endpoints does not mutate input.\nFor scheduling nonoverlapping half-open meetings, earliest finish is a\ndifferent greedy rule with different endpoint behavior. Always read the\nproblem's overlap definition before reusing a template.\n",
+    "example": "def start_key(interval):\n    return interval[0]\n\nintervals = [[5, 8], [1, 3], [3, 6]]\nordered = sorted(intervals, key=start_key)\nout = []\nfor start, end in ordered:\n    if len(out) == 0 or start > out[-1][1]:\n        out.append([start, end])\n    else:\n        out[-1][1] = max(out[-1][1], end)\nprint(out)\n",
+    "pattern": "Try to construct a counterexample to the greedy choice. If you cannot explain why it is safe, return to state or exhaustive search.\n",
+    "gate": "Explain a greedy invariant, interval endpoints and nested-list aliasing.",
+    "exercises": [
+      {
+        "id": "python:stock",
+        "title": "Best one-transaction stock profit",
+        "prompt": "Return the largest profit from buying once and selling on a later day. You may skip trading and return 0. prices has 0 to 1000 nonnegative integer prices.",
+        "hint": "Track the minimum earlier price and compare its profit with each possible sale.",
+        "starter": "def solve(prices):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(prices):\n    if len(prices) == 0:\n        return 0\n    lowest = prices[0]\n    best = 0\n    for price in prices:\n        best = max(best, price - lowest)\n        lowest = min(lowest, price)\n    return best\n",
+        "explanation": "The best purchase for any sale is the lowest price before it; skipped trades keep profit nonnegative.",
+        "complexity": "O(n) time; O(1) space.",
+        "tests": [
+          {
+            "name": "rise after dip",
+            "setup": "",
+            "call": "solve([7, 1, 5, 3, 6, 4])",
+            "expected": "5"
+          },
+          {
+            "name": "falling",
+            "setup": "",
+            "call": "solve([7, 5, 2])",
+            "expected": "0"
+          },
+          {
+            "name": "one",
+            "setup": "",
+            "call": "solve([4])",
+            "expected": "0"
+          },
+          {
+            "name": "empty",
+            "setup": "",
+            "call": "solve([])",
+            "expected": "0"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03",
+          "p04",
+          "p08"
+        ]
+      },
+      {
+        "id": "python:merge",
+        "title": "Merge closed intervals",
+        "prompt": "Return merged intervals sorted by start. Each closed interval [start,end] has integer start <= end. Touching endpoints overlap. There are 0 to 1000 intervals. Do not mutate the original pairs.",
+        "hint": "Sort by start; merge into the last output pair when start <= its end.",
+        "starter": "def solve(intervals):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def start_key(interval):\n    return interval[0]\n\ndef solve(intervals):\n    out = []\n    for start, end in sorted(intervals, key=start_key):\n        if len(out) == 0 or start > out[-1][1]:\n            out.append([start, end])\n        else:\n            out[-1][1] = max(out[-1][1], end)\n    return out\n",
+        "explanation": "Earlier sorted intervals cannot overlap a later interval without also overlapping the last merged interval.",
+        "complexity": "O(n log n) time; O(n) space including sort and output.",
+        "tests": [
+          {
+            "name": "touch and overlap",
+            "setup": "",
+            "call": "solve([[1, 3], [2, 6], [8, 10], [10, 12]])",
+            "expected": "[[1, 6], [8, 12]]"
+          },
+          {
+            "name": "nested",
+            "setup": "",
+            "call": "solve([[1, 9], [2, 3]])",
+            "expected": "[[1, 9]]"
+          },
+          {
+            "name": "unsorted",
+            "setup": "",
+            "call": "solve([[5, 5], [1, 2]])",
+            "expected": "[[1, 2], [5, 5]]"
+          },
+          {
+            "name": "empty",
+            "setup": "",
+            "call": "solve([])",
+            "expected": "[]"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03",
+          "p04",
+          "p07",
+          "p08"
+        ]
+      }
+    ],
+    "syntax": []
+  },
+  {
+    "id": "p22",
+    "number": 22,
+    "title": "One-dimensional dynamic programming",
+    "stage": "5. Build interview solutions",
+    "goal": "Define a reusable state before writing a recurrence.",
+    "explanation": "No new syntax. Dynamic programming (DP) stores answers to overlapping\nsubproblems. Write the state meaning, base values, transition and evaluation\norder in words first. For stairs, dp[i] counts ways to reach step i with\nmoves of 1 or 2: dp[i] = dp[i-1] + dp[i-2]. dp[0]=1 counts doing nothing.\nTwo rolling values replace the full table when only the last two states\nare needed. Tuple assignment updates them simultaneously from old values.\n\nFor nonadjacent rewards, a prefix optimum either skips the current value\nor takes it plus the optimum two positions earlier. These are choices,\nso use max; counting choices would instead use addition. Greedy selection\nof the largest current reward can fail. Draw a tiny exhaustive decision\ntree and compare it with the recurrence to verify what is being stored.\nMemoization is top-down DP: storing a recursive result avoids recomputing\nit. You can implement the cache with the already taught dictionary syntax.\n",
+    "example": "def ways(n):\n    dp = [0] * (n + 2)\n    dp[0] = 1\n    dp[1] = 1\n    for i in range(2, n + 1):\n        dp[i] = dp[i - 1] + dp[i - 2]\n    return dp[n]\n\nprint(ways(4))  # 5\n",
+    "pattern": "Distinguish counting, minimizing and maximizing states. An unexplained recurrence is harder to debug than a clear state definition.\n",
+    "gate": "Derive a transition, supply base cases and explain why the iteration order makes dependencies available.",
+    "exercises": [
+      {
+        "id": "python:stairs",
+        "title": "Climbing stairs",
+        "prompt": "Return the number of ordered sequences of 1-step and 2-step moves reaching step n. n is from 0 to 30. For n=0 there is one empty sequence.",
+        "hint": "Classify a route by its last move; the earlier route ends at n-1 or n-2.",
+        "starter": "def solve(n):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(n):\n    dp = [0] * (n + 2)\n    dp[0] = 1\n    dp[1] = 1\n    for i in range(2, n + 1):\n        dp[i] = dp[i - 1] + dp[i - 2]\n    return dp[n]\n",
+        "explanation": "The two last-move classes are disjoint, so their counts add.",
+        "complexity": "O(n) time and space; a rolling version uses O(1) space.",
+        "tests": [
+          {
+            "name": "zero",
+            "setup": "",
+            "call": "solve(0)",
+            "expected": "1"
+          },
+          {
+            "name": "one",
+            "setup": "",
+            "call": "solve(1)",
+            "expected": "1"
+          },
+          {
+            "name": "two",
+            "setup": "",
+            "call": "solve(2)",
+            "expected": "2"
+          },
+          {
+            "name": "five",
+            "setup": "",
+            "call": "solve(5)",
+            "expected": "8"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p03",
+          "p04"
+        ]
+      },
+      {
+        "id": "python:robber",
+        "title": "Maximum nonadjacent sum",
+        "prompt": "Return the greatest sum obtainable by selecting no adjacent entries. You may select none. nums has 0 to 1000 nonnegative integers.",
+        "hint": "For each prefix, compare skipping the new value with taking it after the prefix two positions earlier.",
+        "starter": "def solve(nums):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(nums):\n    two_back = 0\n    one_back = 0\n    for value in nums:\n        current = max(one_back, two_back + value)\n        two_back = one_back\n        one_back = current\n    return one_back\n",
+        "explanation": "The rolling variables preserve exactly the two dependent prefix optima.",
+        "complexity": "O(n) time; O(1) space.",
+        "tests": [
+          {
+            "name": "typical",
+            "setup": "",
+            "call": "solve([2, 7, 9, 3, 1])",
+            "expected": "12"
+          },
+          {
+            "name": "greedy trap",
+            "setup": "",
+            "call": "solve([2, 1, 1, 2])",
+            "expected": "4"
+          },
+          {
+            "name": "one",
+            "setup": "",
+            "call": "solve([8])",
+            "expected": "8"
+          },
+          {
+            "name": "empty",
+            "setup": "",
+            "call": "solve([])",
+            "expected": "0"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p03",
+          "p08"
+        ]
+      }
+    ],
+    "syntax": []
+  },
+  {
+    "id": "p23",
+    "number": 23,
+    "title": "DP tables and unbounded choices",
+    "stage": "5. Build interview solutions",
+    "goal": "Translate dependencies into a table and handle impossible states.",
+    "explanation": "No new syntax. A two-dimensional table dp[r][c] can describe states\ndepending on two indexes. For grid paths moving only right and down,\nways[r][c] = ways[r-1][c] + ways[r][c-1]; seed the start cell and treat\nabsent predecessors as zero. Build independent rows using the previously\ntaught list comprehension, never repeated row references.\n\nCoin change uses dp[amount] = fewest coins for that amount. dp[0]=0.\nUse amount+1 as an impossible sentinel for positive integer denominations:\nany feasible minimum uses at most amount coins. For each target subtotal,\ntry every coin not exceeding it; a smaller subtotal has already been\nsolved. Unlimited reuse comes from reading earlier subtotal states, not\nconsuming each coin once. Return -1 when the final sentinel remains.\nA greedy largest-coin-first rule fails for [1,3,4] and amount 6.\n",
+    "example": "rows, cols = 2, 3\ndp = [[0] * cols for _ in range(rows)]\ndp[0][0] = 1\nfor r in range(rows):\n    for c in range(cols):\n        if r > 0:\n            dp[r][c] += dp[r - 1][c]\n        if c > 0:\n            dp[r][c] += dp[r][c - 1]\nprint(dp[-1][-1])  # 3\n",
+    "pattern": "For each table cell, identify its dependencies and prove they were evaluated earlier. Explain the impossible-state sentinel.\n",
+    "gate": "Build nonaliased rows and distinguish unlimited coin reuse from choosing each item once.",
+    "exercises": [
+      {
+        "id": "python:grid-paths",
+        "title": "Unique right-down grid paths",
+        "prompt": "Return the number of paths from top-left to bottom-right using only right and down. rows and cols are integers from 1 to 15. A 1 by 1 grid has one empty-move path.",
+        "hint": "Add paths from above and left; seed only the starting cell.",
+        "starter": "def solve(rows, cols):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(rows, cols):\n    dp = [[0] * cols for _ in range(rows)]\n    dp[0][0] = 1\n    for r in range(rows):\n        for c in range(cols):\n            if r > 0:\n                dp[r][c] += dp[r - 1][c]\n            if c > 0:\n                dp[r][c] += dp[r][c - 1]\n    return dp[-1][-1]\n",
+        "explanation": "Each path has a unique final direction, so predecessor counts add without overlap.",
+        "complexity": "O(rows * cols) time and space.",
+        "tests": [
+          {
+            "name": "rectangle",
+            "setup": "",
+            "call": "solve(3, 7)",
+            "expected": "28"
+          },
+          {
+            "name": "single",
+            "setup": "",
+            "call": "solve(1, 1)",
+            "expected": "1"
+          },
+          {
+            "name": "one row",
+            "setup": "",
+            "call": "solve(1, 5)",
+            "expected": "1"
+          },
+          {
+            "name": "one col",
+            "setup": "",
+            "call": "solve(4, 1)",
+            "expected": "1"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03",
+          "p04",
+          "p08"
+        ]
+      },
+      {
+        "id": "python:coin-change",
+        "title": "Fewest coins",
+        "prompt": "Return the fewest coins summing to amount, or -1 if impossible. coins has 1 to 20 distinct positive integer denominations; each may be used unlimited times. amount is from 0 to 1000.",
+        "hint": "Solve smaller amounts first, taking the minimum over all possible final coins.",
+        "starter": "def solve(coins, amount):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(coins, amount):\n    dp = [amount + 1] * (amount + 1)\n    dp[0] = 0\n    for total in range(1, amount + 1):\n        for coin in coins:\n            if coin <= total:\n                dp[total] = min(dp[total], dp[total - coin] + 1)\n    if dp[amount] == amount + 1:\n        return -1\n    return dp[amount]\n",
+        "explanation": "Every feasible solution has a final coin; considering all denominations covers it. The sentinel never wins over a feasible count.",
+        "complexity": "O(amount * len(coins)) time; O(amount) space.",
+        "tests": [
+          {
+            "name": "typical",
+            "setup": "",
+            "call": "solve([1, 2, 5], 11)",
+            "expected": "3"
+          },
+          {
+            "name": "impossible",
+            "setup": "",
+            "call": "solve([2], 3)",
+            "expected": "-1"
+          },
+          {
+            "name": "zero",
+            "setup": "",
+            "call": "solve([2], 0)",
+            "expected": "0"
+          },
+          {
+            "name": "greedy trap",
+            "setup": "",
+            "call": "solve([1, 3, 4], 6)",
+            "expected": "2"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03",
+          "p04",
+          "p08"
+        ]
+      }
+    ],
+    "syntax": []
+  },
+  {
+    "id": "p24",
+    "number": 24,
+    "title": "Bits and integer behavior",
+    "stage": "5. Build interview solutions",
+    "goal": "Use binary operations only after learning their meaning.",
+    "explanation": "Binary represents integers with powers of two. `a & b` keeps bits set in\nboth; `a | b` keeps bits set in either; `a ^ b` is XOR (set when different).\n`a << k` shifts left k places; `a >> k` shifts right. Parenthesize bit tests:\n`(n & 1) == 1` tests the least significant bit. These are integer operations;\n`and` and `or` are boolean control operations with different semantics.\n`~n` is bitwise complement and equals -n-1 in Python. Use nonnegative\ninputs for shift loops: repeatedly right-shifting a negative integer need\nnot reach zero. Python integers do not overflow at a fixed 32-bit boundary.\n\nXOR satisfies x ^ x = 0 and x ^ 0 = x and can be regrouped. If every value\noccurs twice except one, XOR cancels pairs. For bit count, repeatedly add\nn & 1 and shift. Cost depends on bit length; Python arbitrary-size integer\noperations are not constant time for unbounded integers. Our arithmetic\nexamples use bounded inputs; name that assumption in interviews.\n",
+    "example": "print(6 & 3, 6 | 3, 6 ^ 3, 1 << 3, 8 >> 1, ~0)\nn = 13\ncount = 0\nwhile n > 0:\n    count += n & 1\n    n = n >> 1\nprint(count)  # 3\n",
+    "pattern": "Use bit tricks only when the input contract supplies the necessary pairing or nonnegative assumptions.\n",
+    "gate": "Explain XOR cancellation, boolean versus bitwise operators, and bounded-integer assumptions.",
+    "exercises": [
+      {
+        "id": "python:single",
+        "title": "Single number",
+        "prompt": "Return the one value occurring once; every other value occurs exactly twice. nums has 1 to 1001 integers, each between 0 and 1000000. Use XOR and constant auxiliary space.",
+        "hint": "XOR every entry into a running value starting at zero.",
+        "starter": "def solve(nums):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(nums):\n    answer = 0\n    for value in nums:\n        answer = answer ^ value\n    return answer\n",
+        "explanation": "Paired occurrences cancel, leaving only the unpaired value.",
+        "complexity": "O(n) time and O(1) auxiliary space for bounded integers.",
+        "tests": [
+          {
+            "name": "pair",
+            "setup": "",
+            "call": "solve([2, 2, 1])",
+            "expected": "1"
+          },
+          {
+            "name": "mixed",
+            "setup": "",
+            "call": "solve([4, 1, 2, 1, 2])",
+            "expected": "4"
+          },
+          {
+            "name": "zero",
+            "setup": "",
+            "call": "solve([0])",
+            "expected": "0"
+          },
+          {
+            "name": "one",
+            "setup": "",
+            "call": "solve([9])",
+            "expected": "9"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p03",
+          "p24"
+        ]
+      },
+      {
+        "id": "python:bit-count",
+        "title": "Count set bits",
+        "prompt": "Return the number of 1 bits in nonnegative integer n, with 0 <= n < 2**31. Use bitwise operations and a loop.",
+        "hint": "Read the lowest bit, then shift right by one.",
+        "starter": "def solve(n):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(n):\n    count = 0\n    while n > 0:\n        count += n & 1\n        n = n >> 1\n    return count\n",
+        "explanation": "Each iteration consumes one binary digit. Zero has no set bits.",
+        "complexity": "O(b) time for b bits; O(1) auxiliary space under the 31-bit bound.",
+        "tests": [
+          {
+            "name": "zero",
+            "setup": "",
+            "call": "solve(0)",
+            "expected": "0"
+          },
+          {
+            "name": "mixed",
+            "setup": "",
+            "call": "solve(13)",
+            "expected": "3"
+          },
+          {
+            "name": "power of two",
+            "setup": "",
+            "call": "solve(1024)",
+            "expected": "1"
+          },
+          {
+            "name": "all ones",
+            "setup": "",
+            "call": "solve(31)",
+            "expected": "5"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03",
+          "p24"
+        ]
+      }
+    ],
+    "syntax": [
+      "BitAnd",
+      "BitOr",
+      "BitXor",
+      "Invert",
+      "LShift",
+      "RShift"
+    ]
+  },
+  {
+    "id": "p25",
+    "number": 25,
+    "title": "Interview rehearsal and platform syntax",
+    "stage": "6. Interview rehearsal",
+    "goal": "Solve independently and translate your function to an interview platform.",
+    "explanation": "The final two exercises introduce no new algorithm syntax: solve them\nwithout opening hints or answers. Use 30 to 40 minutes per problem.\nClarify constraints, write a brute-force idea, choose a pattern, state its\ninvariant, code, and trace edge cases before running. Afterwards explain\ncomplexity and reimplement the missed problem from blank the next day.\n\nInterview platforms may provide `class Solution:` with a method such as\n`def twoSum(self, nums: list[int], target: int) -> list[int]:`.\nself is the instance parameter taught with nodes. `: int` and `: list[int]`\nare type annotations for readers and tools; `-> list[int]` annotates the\nreturn. They do not convert or validate values at runtime. Built-in\ngeneric annotations such as list[int] need Python 3.9 or newer.\n`from typing import Optional, List` supports older platform templates:\n`Optional[ListNode]` means a node or None, and `List[int]` is a list of ints.\nYou may keep a provided platform annotation; the course exercises do not\nrequire you to write annotations. Do not paste the course's print driver\ninto the platform. Move only your function body into the supplied method.\n\nAfter this foundation, continue with topological sorting, union-find,\ntries, weighted shortest paths and more DP variants in the DSA Curriculum.\nThey require new algorithm lessons, not unexplained Python shortcuts.\nOptional future conveniences include Counter, defaultdict, bisect, cache,\nlambdas, generators and itertools. None is required anywhere in this course.\nRead a syntax lesson before adopting one from an external editorial.\n",
+    "example": "from typing import List, Optional\n\nclass Solution:\n    def total(self, nums: list[int]) -> int:\n        return sum(nums)\n\ndef identity(value: Optional[int]) -> Optional[int]:\n    return value\n\nvalues: List[int] = [1, 2, 3]\nprint(Solution().total(values), identity(None))\n",
+    "pattern": "Ready to continue when you can solve both rehearsal tasks from blank, explain their invariants and costs, and reproduce them after a delay. Passing samples alone is insufficient.\n",
+    "gate": "Solve a mixed interview task without hints, translate its signature, and explain an edge-case trace and complexity.",
+    "exercises": [
+      {
+        "id": "python:product",
+        "title": "Rehearsal: product except self",
+        "prompt": "Return a list where out[i] is the product of every input except nums[i]. nums has 2 to 100 bounded integers; zero and negatives are allowed. Use O(n) time, no division, and O(1) working space beyond the output. Products fit within signed 32-bit integers. Start by explaining a brute-force solution.",
+        "hint": "Store products strictly before each index, then multiply by products strictly after it.",
+        "starter": "def solve(nums):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(nums):\n    out = [1] * len(nums)\n    prefix = 1\n    for i in range(len(nums)):\n        out[i] = prefix\n        prefix = prefix * nums[i]\n    suffix = 1\n    for i in range(len(nums) - 1, -1, -1):\n        out[i] = out[i] * suffix\n        suffix = suffix * nums[i]\n    return out\n",
+        "explanation": "The two passes exclude the current value by updating the running product after storing it. No division means zero needs no special branch.",
+        "complexity": "O(n) time; O(1) auxiliary space beyond O(n) output.",
+        "tests": [
+          {
+            "name": "positive",
+            "setup": "",
+            "call": "solve([1, 2, 3, 4])",
+            "expected": "[24, 12, 8, 6]"
+          },
+          {
+            "name": "one zero",
+            "setup": "",
+            "call": "solve([-1, 1, 0, -3, 3])",
+            "expected": "[0, 0, 9, 0, 0]"
+          },
+          {
+            "name": "two zeroes",
+            "setup": "",
+            "call": "solve([0, 0, 2])",
+            "expected": "[0, 0, 0]"
+          },
+          {
+            "name": "pair",
+            "setup": "",
+            "call": "solve([2, 3])",
+            "expected": "[3, 2]"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p03",
+          "p04"
+        ]
+      },
+      {
+        "id": "python:jump",
+        "title": "Rehearsal: Jump Game",
+        "prompt": "Return whether the last index is reachable from index 0. Each entry is the maximum forward jump from that index (any distance from 1 through that value is allowed). nums has 1 to 1000 nonnegative integers. A one-element input is already reached. Explain why your greedy choice is safe.",
+        "hint": "Keep the farthest reachable index from all reachable entries processed so far.",
+        "starter": "def solve(nums):\n    # Replace this return with your solution.\n    return 0\n",
+        "solution": "def solve(nums):\n    farthest = 0\n    for i, value in enumerate(nums):\n        if i > farthest:\n            return False\n        farthest = max(farthest, i + value)\n    return True\n",
+        "explanation": "Every position up to farthest is reachable because shorter jumps are allowed. An index beyond farthest cannot be rescued by any later, unreachable index.",
+        "complexity": "O(n) time; O(1) space.",
+        "tests": [
+          {
+            "name": "reachable",
+            "setup": "",
+            "call": "solve([2, 3, 1, 1, 4])",
+            "expected": "True"
+          },
+          {
+            "name": "blocked",
+            "setup": "",
+            "call": "solve([3, 2, 1, 0, 4])",
+            "expected": "False"
+          },
+          {
+            "name": "one",
+            "setup": "",
+            "call": "solve([0])",
+            "expected": "True"
+          },
+          {
+            "name": "stuck",
+            "setup": "",
+            "call": "solve([0, 1])",
+            "expected": "False"
+          },
+          {
+            "name": "skip zero",
+            "setup": "",
+            "call": "solve([2, 0, 0])",
+            "expected": "True"
+          }
+        ],
+        "requires": [
+          "p01",
+          "p02",
+          "p03",
+          "p07",
+          "p08"
+        ]
+      }
+    ],
+    "syntax": [
+      ".total",
+      "AnnAssign",
+      "from typing import List",
+      "from typing import Optional"
+    ]
+  }
+]
