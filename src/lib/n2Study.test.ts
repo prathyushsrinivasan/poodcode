@@ -28,7 +28,7 @@ describe("N2 sample bank integrity", () => {
       expect(q.explanation.length).toBeGreaterThan(25); expect(q.hint.length).toBeGreaterThan(10);
       expect(q.targetSeconds).toBeGreaterThan(0);
       expect(answerCorrect(q, correct(q.id))).toBe(true);
-      for (const quote of q.evidence ?? []) expect(q.texts?.some((t) => t.text.includes(quote))).toBe(true);
+      for (const quote of q.evidence ?? []) expect(q.texts?.some((t) => [t.text, ...(t.table?.rows.flat() ?? [])].some((text) => text.includes(quote)))).toBe(true);
       if (q.kind === "choice") {
         expect(q.choices).toHaveLength(4); expect(new Set(q.choices.map((c) => c.text)).size).toBe(4);
         expect(q.answer).toBeGreaterThanOrEqual(0); expect(q.answer).toBeLessThan(4);

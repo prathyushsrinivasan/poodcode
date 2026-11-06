@@ -1,8 +1,11 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Badge, Button, Card } from "../../components/ui";
 import { READING_PASSAGES } from "../../data/dokkai";
 import type { ReadingState } from "../../lib/useReadingProgress";
+import ReadingTransfer from "../../components/ReadingTransfer";
+import JlptListPicker from "../../components/JlptListPicker";
+import { useJlptPreference, useJlptSessionState } from "../../lib/useJlptPractice";
 
 function dueLabel(due: number, now: number): string {
   const minutes = Math.ceil((due - now) / 60_000);
@@ -16,12 +19,14 @@ function dueLabel(due: number, now: number): string {
 
 export default function ReadingVocabulary({ state }: { state: ReadingState }) {
   const [now, setNow] = useState(Date.now);
-  const [reviewing, setReviewing] = useState(false);
-  const [round, setRound] = useState<string[]>([]);
-  const [index, setIndex] = useState(0);
-  const [flipped, setFlipped] = useState(false);
-  const [query, setQuery] = useState("");
-  const words = Object.entries(state.progress.words);
+  const [params] = useSearchParams();
+  const [reviewing, setReviewing] = useJlptSessionState("reviewing", false);
+  const [round, setRound] = useJlptSessionState<string[]>("wordRound", []);
+  const [index, setIndex] = useJlptSessionState("index", 0);
+  const [flipped, setFlipped] = useJlptSessionState("flipped", false);
+  const [query, setQuery] = useJlptPreference("reading-vocabulary", "query", "");
+  const selected = params.has("word") ? params.getAll("word") : params.get("words")?.split(",");
+  const words = Object.entries(state.progress.words).filter(([key]) => !selected || selected.includes(key));
   const due = words.filter(([, word]) => word.due <= now);
   const word = state.progress.words[round[index]];
   const filtered = words.filter(([, w]) => `${w.text} ${w.reading} ${w.meaning}`.toLowerCase().includes(query.toLowerCase()));
@@ -36,6 +41,7 @@ export default function ReadingVocabulary({ state }: { state: ReadingState }) {
         <Button onClick={() => setNow(Date.now())}>Refresh due list</Button></div></Card>
     {reviewing && <Card className="n2-overview">{word ? <>
       <Badge>Word {index + 1} of {round.length}</Badge><h2 lang="ja">{word.text}</h2>
+      <ReadingTransfer key={round[index]} word={word} source={word.source} />
       {flipped ? <><p className="dokkai-kana" lang="ja">{word.reading}</p><p>{word.meaning}</p>
         {word.lemma && word.lemma !== word.text && <p>Dictionary form: <span lang="ja">{word.lemma}</span></p>}
         <div className="n2-actions"><Button onClick={() => grade(false)}>Again · 10 minutes</Button><Button variant="primary" onClick={() => grade(true)}>Remembered</Button></div></>
@@ -48,6 +54,8 @@ export default function ReadingVocabulary({ state }: { state: ReadingState }) {
       const source = READING_PASSAGES.find((p) => p.id === w.source);
       return <Card key={key}><h2 lang="ja">{w.text} <span className="n2-meta">{w.reading}</span></h2><p>{w.meaning}</p>
         <p className="n2-meta">{dueLabel(w.due, now)} · {w.reviews} reviews</p>
+        <JlptListPicker id={`word:${key}`} />
+        <ReadingTransfer word={w} source={w.source} />
         <div className="n2-actions">{source && <Link to={`/japanese/n2/reading/${source.kind}/${source.id}`}>Source: {source.title}</Link>}
           <Button variant="ghost" disabled={reviewing} onClick={() => state.removeWord(key)}>Remove saved word</Button></div></Card>;
     })}</div>

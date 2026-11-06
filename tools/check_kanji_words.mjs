@@ -28,14 +28,16 @@ const waitSaved = async (id, skill, attempts) => page.waitForFunction(({ id, ski
   const progress = JSON.parse(mock?.settings?.["jlpt-kanji-word-practice-v1"] ?? "null");
   return (progress?.words[id]?.[skill]?.attempts ?? 0) >= attempts;
 }, { id, skill, attempts });
-const finish = async (word, { reading = word.readings[0], wrongMeaning = false } = {}) => {
+const finish = async (word, { reading = word.readings[0], wrongMeaning = false, meaningOnly = false } = {}) => {
   const before = (await stored()).words[word.id];
+  if (!meaningOnly) {
   await page.getByLabel("Type the full word in hiragana", { exact: true }).fill(reading);
   await page.getByRole("button", { name: "Check reading", exact: true }).click();
   await page.getByRole("heading", { name: "Reading correct", exact: true }).waitFor();
   assert.equal(await page.locator(".kw-option-reason").count(), 0);
   assert.equal(await page.locator(".kw-note").count(), 0);
   await page.getByRole("button", { name: "Continue to meaning", exact: true }).click();
+  }
   const picks = word.options.flatMap((option, index) => option.correct ? [index] : []);
   if (wrongMeaning) picks[picks.length - 1] = word.options.length - 1;
   if (picks.length > 1) {
@@ -47,7 +49,8 @@ const finish = async (word, { reading = word.readings[0], wrongMeaning = false }
   await page.getByRole("heading", { name: wrongMeaning ? "Review the meanings" : "Meaning correct", exact: true }).waitFor();
   assert.equal(await page.locator(".kw-option-reason").count(), word.options.length);
   await waitSaved(word.id, "meaning", (before?.meaning?.attempts ?? 0) + 1);
-  await waitSaved(word.id, "reading", (before?.reading?.attempts ?? 0) + 1);
+  if (!meaningOnly) await waitSaved(word.id, "reading", (before?.reading?.attempts ?? 0) + 1);
+  else assert.deepEqual((await stored()).words[word.id].reading, before.reading);
   await page.getByRole("button", { name: "Next word / results", exact: true }).click();
 };
 try {
@@ -56,8 +59,8 @@ try {
     const data = await import("/src/data/kanjiWords/index.ts");
     return { words: data.KANJI_WORDS, groups: data.KANJI_GROUPS };
   });
-  assert.equal(groups.length, 20);
-  assert.equal(await page.locator(".kw-kanji-card").count(), 20);
+  assert.equal(groups.length, 22);
+  assert.equal(await page.locator(".kw-kanji-card").count(), groups.length);
   // Every family exposes every applicable bank entry without leaking its answers.
   for (const group of groups) {
     await go(`/${group.id}`);
@@ -84,7 +87,7 @@ try {
     await finish(word);
     await page.getByRole("heading", { name: "1 / 1 words correct in both steps", exact: true }).waitFor();
   }
-  console.log(`All 20 family libraries and ${samples.size} two-step representative quizzes passed.`);
+  console.log(`All ${groups.length} family libraries and ${samples.size} two-step representative quizzes passed.`);
   const shared = words.find((word) => word.written === "生産性");
   await go(`/word/${shared.id}`);
   const input = page.getByLabel("Type the full word in hiragana", { exact: true });
@@ -117,11 +120,25 @@ try {
   assert.equal(failed.reading.lastCorrect, true);
   assert.equal(failed.meaning.lastCorrect, false);
   await go("/review");
-  await page.getByRole("heading", { name: multi.written, exact: true }).waitFor();
-  await finish(multi);
+  await page.locator(".kw-exercise").waitFor();
+  assert.ok((await page.locator(".kw-prompt").innerText()).includes(multi.written));
+  assert.equal(await page.getByLabel("Type the full word in hiragana", { exact: true }).count(), 0);
+  await finish(multi, { meaningOnly: true });
   await go();
   await go("/review");
   await page.getByRole("heading", { name: "No matching words to practice", exact: true }).waitFor();
+  // Single-skill rounds must never overwrite the other skill's result.
+  const beforeReadingOnly = (await stored()).words[shared.id];
+  await go(`/word/${shared.id}?skill=reading`);
+  await page.getByLabel("Type the full word in hiragana", { exact: true }).fill(shared.readings[0]);
+  await page.getByRole("button", { name: "Check reading", exact: true }).click();
+  await waitSaved(shared.id, "reading", beforeReadingOnly.reading.attempts + 1);
+  assert.equal(await page.getByRole("button", { name: "Continue to meaning", exact: true }).count(), 0);
+  await page.getByRole("button", { name: "Next word / results", exact: true }).click();
+  await page.getByRole("heading", { name: "1 / 1 words correct in practised skills", exact: true }).waitFor();
+  assert.deepEqual((await stored()).words[shared.id].meaning, beforeReadingOnly.meaning);
+  await go(`/word/${shared.id}?skill=meaning`);
+  await finish(shared, { meaningOnly: true });
   // Filters must constrain the practice pool as well as the visible library.
   await go("/learning");
   await page.getByLabel("Estimated level", { exact: true }).selectOption("N1");

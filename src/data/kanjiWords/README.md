@@ -1,11 +1,13 @@
 # Kanji Word Builder
 
-Open **Languages → JLPT N2 courses → Kanji Word Builder**. The initial bank
-contains **20 kanji and 733 vocabulary entries**, with **73 multiple-meaning
+Open **Languages → JLPT → Kanji Reading → Study tips & examples → Explore Kanji Word Builder**. The initial bank
+contains **22 kanji and 820 vocabulary entries**, with **73 multiple-meaning
 items**. Different readings of a homograph can be separate entries. A shared
 compound appears under every applicable kanji, with one shared progress ID.
 
-The families are 生 学 会 人 心 意 力 行 動 事 物 合 定 成 化 性 表 取 交 分.
+The families are 生 学 会 人 心 意 力 行 動 事 物 合 定 成 化 性 表 取 交 分 見 出.
+The 見 and 出 expansion adds 87 words; all 733 previously released entries and
+their answer options are unchanged.
 Each family currently has 25–63 entries. These productive characters were chosen
 for their useful intermediate and advanced compounds, not because the characters
 themselves all first appear at N2.
@@ -31,6 +33,11 @@ the separate `jlpt-kanji-word-practice-v1` key. Both latest results must be
 correct for a word to count as complete. Mistake review includes either failed
 skill. A correct reading with an unattempted meaning remains unfinished.
 
+Collapsed practice options support reading only, meaning only, both skills,
+or unfinished/failed skills only. Mistake review defaults to the latter. A
+skipped skill never records an attempt. Incorrect typed readings show an aligned
+kana correction after submission.
+
 The library offers search by written form, aliases, hiragana and English,
 estimated-level and progress filters, and an explicit reveal toggle. Practice
 up to ten matching words or every matching word in a family. A five-word mixed
@@ -45,7 +52,7 @@ The bank and all grading work offline; external documentation links need interne
 
 ## Content and sources
 
-The reference selection is every whole-word match for the 20 characters from
+The reference selection is every whole-word match for the 22 characters from
 the N1, N2 and N3 CSV files in
 [Open Anki JLPT](https://github.com/jamsinclair/open-anki-jlpt-decks), revision
 `1ad66734417aca9dbcca6b2d5ee440cb13ab3ba0`, plus editorial supplements.
@@ -95,7 +102,7 @@ editorial source and rebuild rather than editing generated rows directly.
 3. Run:
 
    ```text
-   python tools/build_kanji_words.py --source-dir PATH_TO_CSVS --dictionary PATH_TO_JMDICT_JSON
+   python tools/build_kanji_words.py --source-dir PATH_TO_CSVS --dictionary PATH_TO_JMDICT_JSON --preserve-existing
    ```
 
 The build validates the main and reviewed alternative readings, creates stable
@@ -113,6 +120,6 @@ Checks:
 - `npm run build`: TypeScript and production bundling.
 - `npm run dev:mock -- --host 127.0.0.1 --port 5183`, then
   `node tools/check_kanji_words.mjs --playwright PATH_TO_INDEX_MJS --chromium PATH_TO_CHROME`
-  exercises the 20 libraries, representative reading/meaning sessions,
+  exercises the 22 libraries, representative reading/meaning sessions,
   homographs, multiple-answer failures, IME behavior, persistence, shared-word
   progress, review, filtering, save retry and responsive layout.

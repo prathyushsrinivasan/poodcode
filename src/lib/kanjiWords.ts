@@ -2,6 +2,7 @@ import { KANJI_WORD_BY_ID, type KanjiWord } from "../data/kanjiWords";
 import { optionOrder } from "./quizShuffle";
 
 export type KanjiSkill = "reading" | "meaning";
+export type KanjiPracticeMode = "both" | "reading" | "meaning" | "weak";
 export interface KanjiResult { attempts: number; correct: number; lastCorrect: boolean }
 export type KanjiWordProgress = Partial<Record<KanjiSkill, KanjiResult>>;
 export interface KanjiProgress { version: 1; words: Record<string, KanjiWordProgress> }
@@ -49,6 +50,14 @@ export function recordKanjiResult(progress: KanjiProgress, id: string, skill: Ka
 }
 export const kanjiWordComplete = (row?: KanjiWordProgress) => !!row?.reading?.lastCorrect && !!row.meaning?.lastCorrect;
 export const kanjiWordNeedsReview = (row?: KanjiWordProgress) => row?.reading?.lastCorrect === false || row?.meaning?.lastCorrect === false;
+export function kanjiPracticeSkills(row: KanjiWordProgress | undefined, mode: KanjiPracticeMode): KanjiSkill[] {
+  if (mode === "reading" || mode === "meaning") return [mode];
+  if (mode === "weak") {
+    const needed = (["reading", "meaning"] as const).filter((skill) => !row?.[skill]?.lastCorrect);
+    if (needed.length) return needed;
+  }
+  return ["reading", "meaning"];
+}
 export function kanjiStats(words: KanjiWord[], progress: KanjiProgress) {
   return {
     total: words.length,

@@ -110,8 +110,9 @@ const TREE: Record<string, RouteNode> = {
   "jp-bridge": { label: "日本語 → Java" },
   japanese: {
     label: "日本語 vocabulary",
-    children: { n2: { label: "JLPT N2 courses", children: {
-      library: { label: "Full course library" },
+    children: { n2: { label: "JLPT", children: {
+      library: { label: "JLPT" },
+      practice: { label: "", children: { ":": { label: "", dynamicLabel: "Practice" } } },
       study: { label: "Study round" },
       lesson: { label: "", children: { ":": { label: "", dynamicLabel: "Mini lesson" } } },
       affixes: { label: "Prefixes & Suffixes", children: {
@@ -136,7 +137,7 @@ const TREE: Record<string, RouteNode> = {
           ":": { label: "", dynamicLabel: "Reading passage" },
         } },
       } },
-      review: { label: "Mistake review" },
+      review: { label: "JLPT review" },
       ":": { label: "", dynamicLabel: "Pattern lesson" },
     } } },
   },

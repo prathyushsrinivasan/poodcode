@@ -36,6 +36,8 @@ export const KANJI_GROUPS = [
   { id: "taking", kanji: "取", gloss: "Taking, obtaining & handling" },
   { id: "exchange", kanji: "交", gloss: "Exchange, crossing & interaction" },
   { id: "division", kanji: "分", gloss: "Dividing, shares & distinctions" },
+  { id: "seeing", kanji: "見", gloss: "Seeing, opinions & discovery" },
+  { id: "outward", kanji: "出", gloss: "Going out, beginnings & producing" },
 ] as const;
 export type KanjiGroup = (typeof KANJI_GROUPS)[number];
 export const wordsForKanji = (kanji: string) => KANJI_WORDS.filter((word) => word.written.includes(kanji));

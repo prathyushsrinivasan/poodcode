@@ -1,5 +1,7 @@
+import { clearJlptSession, useJlptSessionState } from "../lib/useJlptPractice";
+import JlptQuestionTools from "../components/JlptQuestionTools";
 import { useEffect, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { Badge, Button, Card, ErrorState, PageHeader, ProgressBar } from "../components/ui";
 import { useCrumb } from "../store";
 import { N2_ASSEMBLY_LESSONS, N2_ASSEMBLY_QUESTIONS, N2_ASSEMBLY_PROGRESS_KEY,
@@ -33,6 +35,7 @@ function StrategyGuide() {
 
 export default function JlptN2SentenceOrder() {
   const { lessonId } = useParams();
+  const [params] = useSearchParams();
   const lesson = N2_ASSEMBLY_LESSONS.find((l) => l.id === lessonId);
   const reviewing = lessonId === "review";
   const mixed = lessonId === "mixed";
@@ -46,11 +49,12 @@ export default function JlptN2SentenceOrder() {
     <ErrorState title="Your course progress could not be loaded." error={state.loadError} onRetry={state.retryLoad} /></div>;
   if (!state.progress) return <div className="page" role="status">Loading your sentence assembly course…</div>;
 
-  const questions = reviewing
+  const availableQuestions = reviewing
     ? N2_ASSEMBLY_QUESTIONS.filter((q) => state.progress?.[q.id] && !state.progress[q.id].lastCorrect)
     : mixed ? N2_ASSEMBLY_QUESTIONS : lesson?.questions;
+  const questions = params.get("question") ? availableQuestions?.filter((q) => q.id === params.get("question")) : availableQuestions;
   return <div className="page n2-page">
-    <Link className="ghost-link" to="/japanese/n2">← JLPT N2 courses</Link>
+    <Link className="ghost-link" to="/japanese/n2">← JLPT</Link>
     {lessonId && <Link className="ghost-link" to={BASE}>← All assembly lessons &amp; tips</Link>}
     <PageHeader eyebrow="JLPT N2 · 文の組み立て"
       title={reviewing ? "Revisit assembly mistakes" : mixed ? "Five-question mixed practice" : lesson?.title ?? "Sentence Assembly ★"}
@@ -58,8 +62,8 @@ export default function JlptN2SentenceOrder() {
         : `${N2_ASSEMBLY_QUESTIONS.length} questions: your five examples and 120 original exercises in 24 grammar families.`} />
     {state.saveError && <Card tone="warn"><p role="alert">Your latest progress has not been saved. Keep this page open and retry.</p>
       <Button onClick={state.retrySave}>Retry saving progress</Button></Card>}
-    {questions ? <AssemblySession key={`${lessonId}-${run}`} questions={questions} progress={state.progress}
-      reviewing={reviewing} mixed={mixed} onRecord={state.record} onRestart={() => setRun((n) => n + 1)} />
+    {questions ? <AssemblySession key={`${lessonId}-${params.toString()}-${run}`} questions={questions} progress={state.progress}
+      reviewing={reviewing} mixed={mixed} onRecord={state.record} onRestart={() => { clearJlptSession(); setRun((n) => n + 1); }} />
       : <AssemblyIndex progress={state.progress} />}
     {lessonId && <details><summary>General solving tips</summary><StrategyGuide /></details>}
   </div>;
@@ -106,7 +110,7 @@ function AssemblySession({ questions, progress, reviewing, mixed, onRecord, onRe
   onRecord: (id: string, correct: boolean) => void; onRestart: () => void;
 }) {
   // Snapshot the round so a corrected review answer never removes the next item.
-  const [round] = useState(() => {
+  const [round] = useJlptSessionState("round", () => {
     if (mixed) {
       const pool = [...questions];
       for (let i = pool.length - 1; i > 0; i--) {
@@ -118,13 +122,13 @@ function AssemblySession({ questions, progress, reviewing, mixed, onRecord, onRe
     const start = reviewing ? 0 : n2ResumeIndex(questions, progress);
     return [...questions.slice(start), ...questions.slice(0, start)];
   });
-  const [position, setPosition] = useState(0);
-  const [answer, setAnswer] = useState<number | null>(null);
-  const [scratch, setScratch] = useState<number[]>([]);
-  const [hint, setHint] = useState(false);
-  const [result, setResult] = useState<"correct" | "incorrect" | "revealed" | null>(null);
-  const [correctCount, setCorrectCount] = useState(0);
-  const submitted = useRef(false);
+  const [position, setPosition] = useJlptSessionState("position", 0);
+  const [answer, setAnswer] = useJlptSessionState<number | null>("answer", null);
+  const [scratch, setScratch] = useJlptSessionState<number[]>("scratch", []);
+  const [hint, setHint] = useJlptSessionState("hint", false);
+  const [result, setResult] = useJlptSessionState<"correct" | "incorrect" | "revealed" | null>("result", null);
+  const [correctCount, setCorrectCount] = useJlptSessionState("correctCount", 0);
+  const submitted = useRef(!!result);
   const nextRef = useRef<HTMLButtonElement>(null);
   const firstRef = useRef<HTMLInputElement>(null);
   useEffect(() => { firstRef.current?.focus(); }, [position]);
@@ -160,6 +164,7 @@ function AssemblySession({ questions, progress, reviewing, mixed, onRecord, onRe
   return <Card className="n2-exercise">
     <div className="n2-actions"><Badge>文の組み立て · ★ slot {q.starIndex + 1}</Badge>
       <span className="n2-meta">Question {position + 1} of {round.length}</span></div>
+    <JlptQuestionTools id={`order:${q.id}`} review={!!result} />
     <ProgressBar value={position} max={round.length} label="Assembly questions completed in this round" />
     <h2 className="sr-only">Choose the fragment at the star</h2>
     <p className="n2-sentence" lang="ja">{q.before}{[0, 1, 2, 3].map((slot) =>

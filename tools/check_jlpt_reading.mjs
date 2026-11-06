@@ -14,6 +14,7 @@ const browser = await chromium.launch({ executablePath: arg("chromium", process.
 const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
 const page = await context.newPage();
 page.setDefaultTimeout(12_000);
+page.setDefaultNavigationTimeout(60_000);
 const errors = [];
 page.on("pageerror", (error) => errors.push(error.message));
 const root = "/japanese/n2/reading";
@@ -139,6 +140,7 @@ try {
   await page.getByText("Recorded as study with help.", { exact: true }).waitFor();
   await waitSaved((s) => s.results?.[q.id]?.assisted?.lastCorrect === false && Object.keys(s.words ?? {}).length === 1 && s.bookmarks?.includes(first.id));
   await go(`${root}/short`);
+  await page.getByText("Filters & more practice options", { exact: true }).click();
   await page.getByRole("combobox", { name: /^Show/ }).selectOption("mistakes");
   assert.equal(await page.locator(".dokkai-library-card").count(), 1);
   await page.getByRole("combobox", { name: /^Show/ }).selectOption("bookmarks");
@@ -177,6 +179,7 @@ try {
   for (let i = 1; i < 10; i++) await page.getByRole("button", { name: "Next set", exact: true }).click();
   await page.getByText("100 passages match · Set 10 of 10", { exact: true }).waitFor();
   assert.equal(await page.locator(".dokkai-library-card").count(), 10);
+  await page.getByText("Filters & more practice options", { exact: true }).click();
   const setLink = page.getByRole("link", { name: "Practice this set · 10 passages", exact: true });
   assert.equal(new URL(`${base}/${await setLink.getAttribute("href")}`).hash.includes("round=set"), true);
   await setLink.click();
@@ -229,6 +232,7 @@ try {
   await waitSaved((s) => last.questions.every((q) => s.results?.[q.id]?.assisted?.lastCorrect === false) &&
     Object.values(s.words ?? {}).some((w) => w.source === last.id));
   await go(`${root}/medium`);
+  await page.getByText("Filters & more practice options", { exact: true }).click();
   await page.getByRole("combobox", { name: /^Show/ }).selectOption("bookmarks");
   assert.equal(await page.locator(".dokkai-library-card").count(), 1);
   await page.getByRole("combobox", { name: /^Show/ }).selectOption("mistakes");

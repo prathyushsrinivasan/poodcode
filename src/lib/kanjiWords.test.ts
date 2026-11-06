@@ -1,15 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { KANJI_GROUPS, KANJI_WORDS, KANJI_WORD_BY_ID, wordsForKanji } from "../data/kanjiWords";
 import { emptyKanjiProgress, gradeKanjiMeaning, gradeKanjiReading, isHiragana, kanjiStats, kanjiWordComplete,
-  kanjiWordNeedsReview, parseKanjiProgress, planKanjiRound, recordKanjiResult, validKanjiMeaningSelection } from "./kanjiWords";
+  kanjiPracticeSkills, kanjiWordNeedsReview, parseKanjiProgress, planKanjiRound, recordKanjiResult, validKanjiMeaningSelection } from "./kanjiWords";
 import { optionOrder } from "./quizShuffle";
 
 const find = (written: string, reading?: string) => KANJI_WORDS.find((word) => word.written === written && (!reading || word.readings.includes(reading)))!;
 
 describe("kanji vocabulary content", () => {
-  it("ships twenty substantial kanji families and over seven hundred unique verified entries", () => {
-    expect(KANJI_GROUPS).toHaveLength(20);
-    expect(new Set(KANJI_GROUPS.map((group) => group.kanji)).size).toBe(20);
+  it("ships twenty-two substantial kanji families and over seven hundred unique verified entries", () => {
+    expect(KANJI_GROUPS).toHaveLength(22);
+    expect(new Set(KANJI_GROUPS.map((group) => group.kanji)).size).toBe(22);
     expect(KANJI_WORDS.length).toBeGreaterThanOrEqual(700);
     expect(KANJI_WORD_BY_ID.size).toBe(KANJI_WORDS.length);
     expect(new Set(KANJI_WORDS.map((word) => `${word.written}|${word.readings[0]}`)).size).toBe(KANJI_WORDS.length);
@@ -87,6 +87,18 @@ describe("meaning selection", () => {
 });
 
 describe("kanji study progress", () => {
+  it("retries only the missing or failed skill without changing other skill results", () => {
+    const word = KANJI_WORDS[0];
+    let progress = recordKanjiResult(emptyKanjiProgress(), word.id, "reading", true);
+    progress = recordKanjiResult(progress, word.id, "meaning", false);
+    expect(kanjiPracticeSkills(progress.words[word.id], "weak")).toEqual(["meaning"]);
+    const reading = progress.words[word.id].reading;
+    progress = recordKanjiResult(progress, word.id, "meaning", true);
+    expect(progress.words[word.id].reading).toEqual(reading);
+    expect(kanjiPracticeSkills(progress.words[word.id], "reading")).toEqual(["reading"]);
+    expect(kanjiPracticeSkills(undefined, "weak")).toEqual(["reading", "meaning"]);
+    expect(kanjiPracticeSkills(progress.words[word.id], "both")).toEqual(["reading", "meaning"]);
+  });
   it("tracks reading and meaning independently, and counts shared words once", () => {
     const word = find("生産性");
     let progress = recordKanjiResult(emptyKanjiProgress(), word.id, "reading", true);

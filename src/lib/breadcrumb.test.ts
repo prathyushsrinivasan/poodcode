@@ -33,7 +33,7 @@ describe("breadcrumb", () => {
 
   it("nests both N2 course formats under the course menu", () => {
     expect(labels("/japanese/n2/patterns/a01")).toEqual([
-      "Today", "日本語 vocabulary", "JLPT N2 courses", "Kanji & Vocabulary Blanks", "Pattern lesson",
+      "Today", "日本語 vocabulary", "JLPT", "Kanji & Vocabulary Blanks", "Pattern lesson",
     ]);
     expect(hrefs("/japanese/n2/patterns/a01")).toEqual(["/", "/japanese", "/japanese/n2", "/japanese/n2/patterns", null]);
     expect(labels("/japanese/n2/sentence-order/review").slice(-2)).toEqual(["Sentence Assembly ★", "Mistake review"]);

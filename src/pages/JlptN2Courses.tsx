@@ -1,52 +1,35 @@
 import { Link } from "react-router-dom";
-import { Badge, PageHeader } from "../components/ui";
-import { N2_QUESTIONS } from "../data/jlptN2";
-import { N2_ASSEMBLY_QUESTIONS } from "../data/jlptN2SentenceOrder";
-import { READING_PASSAGES, READING_QUESTIONS } from "../data/dokkai";
-import { KANJI_GROUPS, KANJI_WORDS } from "../data/kanjiWords";
-import { AFFIX_LESSONS, AFFIX_QUESTIONS } from "../data/jlptAffixes";
+import { Card, Icon, PageHeader } from "../components/ui";
+import { JLPT_SECTIONS } from "../data/jlptSections";
+import { useN2Study } from "../lib/useN2Study";
+import { StudyStatus, STUDY_ROOT } from "./n2/StudyShared";
+import JlptReviewEntry from "../components/JlptReviewEntry";
+import { COURSE_LINKS } from "../lib/jlptWorkspace";
+import JlptRecovery from "../components/JlptRecovery";
 
 export default function JlptN2Courses() {
-  return <div className="page n2-page">
-    <Link className="ghost-link" to="/japanese/n2">← Your N2 study space</Link>
-    <PageHeader eyebrow="日本語 · JLPT N2" title="JLPT N2 courses"
-      subtitle="Choose a practice course, including N3–N1 word building. Each course has its own lessons, explanations and saved progress." />
-    <div className="n2-grid">
-      <Link className="card n2-lesson" to="/japanese/n2/affixes">
-        <Badge>N3 · N2 · N1 · 語形成</Badge>
-        <h2>Prefixes &amp; Suffixes</h2>
-        <p>Complete words such as 名選手, 不規則 and 国際化. Choose from four options, learn the reading and meaning, and revisit mistakes.</p>
-        <span className="n2-meta">{AFFIX_QUESTIONS.length} questions · {AFFIX_LESSONS.length} families · 100 per level · prefixes &amp; suffixes</span>
-        <strong>Practice word formation →</strong>
-      </Link>
-      <Link className="card n2-lesson" to="/japanese/n2/kanji">
-        <Badge>Kanji · Readings &amp; meanings</Badge>
-        <h2>Kanji Word Builder</h2>
-        <p>Explore words built from each kanji. Type the hiragana, then choose every matching English meaning. Includes single-answer and multiple-answer quizzes.</p>
-        <span className="n2-meta">{KANJI_GROUPS.length} kanji · {KANJI_WORDS.length} vocabulary entries · N3–N1 study estimates</span>
-        <strong>Explore kanji &amp; words →</strong>
-      </Link>
-      <Link className="card n2-lesson" to="/japanese/n2/reading">
-        <Badge>Reading · 読解</Badge>
-        <h2>読解（どっかい）</h2>
-        <p>短文・中文・AB問題文・長文・情報検索. Read with vocabulary on hover, practice under a time limit, and review the evidence behind every answer.</p>
-        <span className="n2-meta">{READING_PASSAGES.length} passages · {READING_QUESTIONS.length} questions · 100 short passages</span>
-        <strong>Open reading sections →</strong>
-      </Link>
-      <Link className="card n2-lesson" to="/japanese/n2/patterns">
-        <Badge>Kanji · Vocabulary</Badge>
-        <h2>Kanji &amp; Vocabulary Blanks</h2>
-        <p>Learn the pattern. Fill the blank. The original course: one-kanji word building and contextual vocabulary, with readings and translations.</p>
-        <span className="n2-meta">{N2_QUESTIONS.length} questions · 24 pattern families</span>
-        <strong>Open course →</strong>
-      </Link>
-      <Link className="card n2-lesson" to="/japanese/n2/sentence-order">
-        <Badge>Grammar · 文の組み立て</Badge>
-        <h2>Sentence Assembly ★</h2>
-        <p>Put four fragments in order and choose the one that belongs at ★. Learn grammar connections, practice your five examples and try fresh five-question sets.</p>
-        <span className="n2-meta">{N2_ASSEMBLY_QUESTIONS.length} questions · solving tips · mistake review</span>
-        <strong>Open course →</strong>
-      </Link>
+  const state = useN2Study();
+  const session = state.data?.session;
+  return <div className="page n2-page study-page jlpt-home">
+    <PageHeader eyebrow="日本語" title="JLPT" subtitle="Choose what you want to practice." />
+    <JlptReviewEntry />
+    <JlptRecovery showCourses />
+    {session && session.phase !== "summary" && <Card className="study-resume">
+      <div><strong>Pick up where you left off</strong><p>{session.title} · Question {session.position + 1} of {session.questionIds.length}</p></div>
+      <Link className="btn primary" to={`${STUDY_ROOT}/study`}>Continue round →</Link>
+    </Card>}
+    <div className="jlpt-sections">
+      {JLPT_SECTIONS.map((section) => <section className="jlpt-section" key={section.id} aria-labelledby={`jlpt-${section.id}`}>
+        <h2 id={`jlpt-${section.id}`}><span lang="ja">{section.japanese}</span><span>{section.title}</span></h2>
+        <ul className="jlpt-practice-list">
+          {section.items.map((item) => <li key={item.label}>
+            {item.to ? <Link to={item.to} className="jlpt-practice-link"><span>{item.label}</span><Icon name="chevronRight" size={16} /></Link>
+              : <span className="jlpt-practice-unavailable"><span>{item.label}</span><small>Coming soon</small></span>}
+          </li>)}
+        </ul>
+      </section>)}
     </div>
+    <details className="card jlpt-tips"><summary>Courses &amp; personal tools</summary><div className="n2-actions">{COURSE_LINKS.map((l) => <Link key={l.href} to={l.href}>{l.label} →</Link>)}<Link to={`${STUDY_ROOT}/review?tab=vocabulary`}>Personal vocabulary lists →</Link><Link to={`${STUDY_ROOT}/review?tab=backup`}>Progress export / import →</Link></div></details>
+    <StudyStatus state={state} />
   </div>;
 }

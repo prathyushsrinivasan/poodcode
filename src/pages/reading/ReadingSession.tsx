@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useJlptSessionState } from "../../lib/useJlptPractice";
+import JlptQuestionTools from "../../components/JlptQuestionTools";
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Badge, Button, Card, ProgressBar } from "../../components/ui";
 import { passageVocabulary, ReadingText, ReadingWordPopup, useWordPopup } from "../../components/ReadingText";
@@ -8,30 +10,35 @@ import { nextReading, readingTimeBudget, type ReadingMode } from "../../lib/dokk
 import { plainReading } from "../../lib/dokkaiText";
 import { shuffleWith } from "../../lib/jpVocab";
 import type { ReadingState } from "../../lib/useReadingProgress";
+import ReadingEvidence from "../../components/ReadingEvidence";
+import JlptReadingSupport from "../../components/JlptReadingSupport";
+import { useN2Study } from "../../lib/useN2Study";
 
 export default function ReadingSession({ passages, state, timed, mixed, minutes, onRestart }: {
   passages: ReadingPassage[]; state: ReadingState; timed: boolean; mixed: boolean; minutes: string | null; onRestart: () => void;
 }) {
+  const shared = useN2Study();
+  const support = shared.data?.workspace.support ?? { readings: false, translations: false };
   // A round is immutable: answering correctly in mistake review cannot remove
   // a passage or move the next question while the learner is reading.
-  const [round] = useState(() => mixed ? shuffleWith(passages).slice(0, 5) : [...passages]);
-  const [duration] = useState(() => minutes && Number.isFinite(Number(minutes)) && Number(minutes) >= 1 && Number(minutes) <= 120
+  const [round] = useJlptSessionState("round", () => mixed ? shuffleWith(passages).slice(0, 5) : [...passages]);
+  const [duration] = useJlptSessionState("duration", () => minutes && Number.isFinite(Number(minutes)) && Number(minutes) >= 1 && Number(minutes) <= 120
     ? Math.round(Number(minutes) * 60) : readingTimeBudget(round));
-  const [phase, setPhase] = useState<"ready" | "answer" | "review" | "finish">(timed ? "ready" : "answer");
-  const [index, setIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [phase, setPhase] = useJlptSessionState<"ready" | "answer" | "review" | "finish">("phase", timed ? "ready" : "answer");
+  const [index, setIndex] = useJlptSessionState("index", 0);
+  const [answers, setAnswers] = useJlptSessionState<Record<string, number>>("answers", {});
   const answerRef = useRef(answers);
-  const [checked, setChecked] = useState<Record<string, boolean>>({});
-  const checkedRef = useRef(new Set<string>());
-  const [aids, setAids] = useState<Record<string, boolean>>({});
-  const [revealed, setRevealed] = useState<Record<string, boolean>>({});
-  const [recordedModes, setRecordedModes] = useState<Record<string, ReadingMode>>({});
-  const [ruby, setRuby] = useState(false);
-  const [hint, setHint] = useState(false);
-  const [deadline, setDeadline] = useState<number | null>(null);
-  const [remaining, setRemaining] = useState(duration);
-  const [expired, setExpired] = useState(false);
-  const timedRecorded = useRef(false);
+  const [checked, setChecked] = useJlptSessionState<Record<string, boolean>>("checked", {});
+  const checkedRef = useRef(new Set(Object.keys(checked)));
+  const [aids, setAids] = useJlptSessionState<Record<string, boolean>>("aids", {});
+  const [revealed, setRevealed] = useJlptSessionState<Record<string, boolean>>("revealed", {});
+  const [recordedModes, setRecordedModes] = useJlptSessionState<Record<string, ReadingMode>>("recordedModes", {});
+  const [ruby, setRuby] = useJlptSessionState("ruby", false);
+  const [hint, setHint] = useJlptSessionState("hint", false);
+  const [deadline, setDeadline] = useJlptSessionState<number | null>("deadline", null);
+  const [remaining, setRemaining] = useJlptSessionState("remaining", duration);
+  const [expired, setExpired] = useJlptSessionState("expired", false);
+  const timedRecorded = useRef(phase === "review" || phase === "finish");
   const nextRef = useRef<HTMLButtonElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const popup = useWordPopup();
@@ -65,7 +72,7 @@ export default function ReadingSession({ passages, state, timed, mixed, minutes,
   if (phase === "ready") return <Card className="n2-overview"><h2>Ready for timed practice?</h2>
     <p>{round.length} passages · {round.reduce((n, item) => n + item.questions.length, 0)} questions · {Math.ceil(duration / 60)} minutes</p>
     <p>You can move back and change answers until you finish. Lookups, furigana, translations and explanations open after the round. When time runs out, unanswered questions count as missed.</p>
-    <p className="n2-meta">The timer continues while this tab is in the background. Your chosen answers are saved as results when the round ends; finish before leaving this page.</p>
+    <p className="n2-meta">The timer continues while this tab is in the background. Draft answers and the deadline are recovered when you return. The timer continues when you leave.</p>
     <Button variant="primary" onClick={() => { setDeadline(Date.now() + duration * 1000); setPhase("answer"); }}>Begin timed practice</Button></Card>;
   const total = round.reduce((n, item) => n + item.questions.length, 0);
   const score = round.reduce((n, item) => n + item.questions.filter((q) => !revealed[item.id] && answers[q.id] === q.answer).length, 0);
@@ -81,7 +88,7 @@ export default function ReadingSession({ passages, state, timed, mixed, minutes,
     if (checkedRef.current.has(p.id) || timed) return;
     if (!reveal && p.questions.some((q) => answers[q.id] === undefined)) return;
     checkedRef.current.add(p.id);
-    const mode: ReadingMode = reveal || aids[p.id] || ruby ? "assisted" : "independent";
+    const mode: ReadingMode = reveal || aids[p.id] || ruby || support.readings || support.translations ? "assisted" : "independent";
     setRecordedModes((before) => ({ ...before, [p.id]: mode }));
     state.record(p.questions.map((q) => ({ id: q.id, correct: !reveal && answers[q.id] === q.answer, mode })));
     if (reveal) setRevealed((before) => ({ ...before, [p.id]: true }));
@@ -97,6 +104,7 @@ export default function ReadingSession({ passages, state, timed, mixed, minutes,
   const answered = Object.keys(answers).length;
   const bookmark = state.progress.bookmarks.includes(p.id);
   return <>
+    {p.questions.map((q) => <JlptQuestionTools key={q.id} id={`reading:${q.id}`} review={review} />)}
     <Card className="dokkai-session-bar"><div className="n2-actions dokkai-spread"><strong>Passage {index + 1} of {round.length} · {timed ? phase === "review" ? "Timed review" : "Timed practice" : "Study"}</strong>
       {timed && phase === "answer" && <span className={remaining <= 30 ? "dokkai-countdown is-low" : "dokkai-countdown"} role="timer" aria-label="Time remaining">{Math.floor(remaining / 60)}:{String(remaining % 60).padStart(2, "0")}</span>}</div>
       <ProgressBar value={timed && phase === "answer" ? answered : index} max={timed && phase === "answer" ? total : round.length} label={timed && phase === "answer" ? "Questions answered in this round" : "Passages reviewed in this round"} />
@@ -105,12 +113,14 @@ export default function ReadingSession({ passages, state, timed, mixed, minutes,
     <Card className="dokkai-reader"><div className="n2-actions dokkai-spread"><Badge>{p.skill} · {p.topic}</Badge>
       <Button aria-pressed={bookmark} onClick={() => state.bookmark(p.id)}>{bookmark ? "Bookmarked" : "Bookmark passage"}</Button></div>
       <h2 ref={headingRef} tabIndex={-1} lang="ja">{p.title}</h2>
-      {enabled && <div className="n2-actions"><label className="dokkai-check"><input type="checkbox" checked={ruby} onChange={(e) => { assist(); setRuby(e.target.checked); }} /> Show kana above annotated words</label>
+      <JlptReadingSupport disabled={!enabled} onAssist={assist} />
+      {enabled && <div className="n2-actions"><label className="dokkai-check"><input type="checkbox" checked={ruby || support.readings} onChange={(e) => { assist(); setRuby(e.target.checked); shared.update((old) => ({ ...old, workspace: { ...old.workspace, support: { ...old.workspace.support, readings: e.target.checked } } })); }} /> Show kana above annotated words</label>
         <span className="n2-meta">Hover over underlined words for meaning and kana. You can also focus or tap a word.</span></div>}
       <div className={p.kind === "ab" ? "dokkai-texts dokkai-paired" : "dokkai-texts"}>{p.texts.map((text, i) => <section key={i} className={p.kind === "information" ? "dokkai-notice" : "dokkai-text-block"}>
         {text.label && <h3>Text {text.label}</h3>}
-        <div className="dokkai-passage" lang="ja"><ReadingText text={text.text} vocabulary={vocabulary} enabled={enabled} ruby={ruby && enabled}
+        <div className="dokkai-passage" lang="ja"><ReadingText text={text.text} vocabulary={vocabulary} enabled={enabled} ruby={(ruby || support.readings) && enabled}
           evidence={review ? p.questions.flatMap((q) => q.evidence) : []} onWord={openWord} /></div>
+        {enabled && support.translations && <p>{text.translation}</p>}
       </section>)}</div>
       {review && <p className="n2-meta">Highlighted text supports the answers below.</p>}
     </Card>
@@ -122,6 +132,7 @@ export default function ReadingSession({ passages, state, timed, mixed, minutes,
             const value = { ...answerRef.current, [q.id]: ci }; answerRef.current = value; setAnswers(value);
           }} /><strong>{ci + 1}.</strong><span lang="ja"><ReadingText text={choice.text} vocabulary={vocabulary} enabled={enabled} onWord={openWord} /></span>
         </label>)}</div>
+        {!timed && <ReadingEvidence texts={p.texts} evidence={q.evidence} review={review} />}
         {review && <div className="n2-feedback"><p role="status"><Badge tone={!revealed[p.id] && answers[q.id] === q.answer ? "good" : "warn"}>
           {revealed[p.id] ? "Answer revealed · revisit later" : answers[q.id] === q.answer ? "Correct" : answers[q.id] === undefined ? "Unanswered · revisit later" : "Incorrect · revisit later"}</Badge></p>
           <p>Your choice: {answers[q.id] === undefined ? "None" : answers[q.id] + 1}. <strong>Correct answer: {q.answer + 1}</strong></p>

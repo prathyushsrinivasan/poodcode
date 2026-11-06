@@ -1,3 +1,5 @@
+import { clearJlptSession, useJlptSessionState, useJlptPreference } from "../lib/useJlptPractice";
+import JlptQuestionTools from "../components/JlptQuestionTools";
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { Badge, Button, Card, ErrorState, PageHeader, ProgressBar } from "../components/ui";
@@ -14,6 +16,9 @@ const AFFIXES = [...new Set(AFFIX_QUESTIONS.map((q) => q.answer))].sort((a, b) =
 export default function JlptAffixes() {
   const { lessonId } = useParams();
   const [params, setParams] = useSearchParams();
+  const [savedFilters, setSavedFilters] = useJlptPreference("affixes", "filters", "");
+  const restored = useRef(false);
+  useEffect(() => { if (!restored.current && savedFilters && !params.size) { restored.current = true; setParams(new URLSearchParams(savedFilters), { replace: true }); } }, [savedFilters, params, setParams]);
   const lesson = AFFIX_LESSONS.find((l) => l.id === lessonId);
   const mode = lessonId === "mixed" ? "mixed" : lessonId === "review" ? "review" : "lesson";
   const level = params.get("level"), kind = params.get("kind");
@@ -23,7 +28,7 @@ export default function JlptAffixes() {
     affix: AFFIXES.includes(params.get("affix") ?? "") ? params.get("affix")! : "",
     query: params.get("q") ?? "",
   };
-  const size = [10, 20, 50].includes(Number(params.get("size"))) ? Number(params.get("size")) : 10;
+  const size = [3, 5, 10, 15, 20, 50].includes(Number(params.get("size"))) ? Number(params.get("size")) : 10;
   const search = params.size ? `?${params}` : "";
   const state = useN2Progress(AFFIX_PROGRESS_KEY, AFFIX_QUESTIONS);
   const [run, setRun] = useState(0);
@@ -35,14 +40,17 @@ export default function JlptAffixes() {
     <ErrorState title="Your affix progress could not be loaded." error={state.loadError} onRetry={state.retryLoad} /></div>;
   if (!state.progress) return <div className="page" role="status">Loading your prefix and suffix practice…</div>;
 
-  const pool = filterAffixQuestions(filters, lesson?.questions ?? AFFIX_QUESTIONS);
+  const selectedIds = params.get("ids")?.split(",");
+  const pool = filterAffixQuestions(filters, lesson?.questions ?? AFFIX_QUESTIONS).filter((q) => !selectedIds || selectedIds.includes(q.id));
   function updateFilter(key: string, value: string) {
     const next = new URLSearchParams(params);
     if (value && value !== "all") next.set(key, value); else next.delete(key);
+    restored.current = true;
+    setSavedFilters(next.toString());
     setParams(next, { replace: true });
   }
   return <div className="page n2-page">
-    <div className="n2-actions"><Link className="ghost-link" to="/japanese/n2/library">← JLPT course library</Link>
+    <div className="n2-actions"><Link className="ghost-link" to="/japanese/n2">← JLPT</Link>
       {lessonId && <Link className="ghost-link" to={`${BASE}${search}`}>← Prefix &amp; suffix library</Link>}</div>
     <PageHeader eyebrow="JLPT N3–N1 practice · 語形成 · 接頭辞・接尾辞"
       title={mode === "review" ? "Review affix mistakes" : mode === "mixed" ? "Mixed affix practice" : lesson?.title ?? "Prefixes & Suffixes"}
@@ -51,7 +59,7 @@ export default function JlptAffixes() {
     {state.saveError && <Card tone="warn"><p role="alert">Your latest progress has not been saved. Keep this page open and retry.</p>
       <Button onClick={state.retrySave}>Retry saving progress</Button></Card>}
     {lessonId ? <AffixSession key={`${lessonId}-${search}-${run}`} questions={pool} progress={state.progress} mode={mode}
-      size={size} onRecord={state.record} onRestart={() => setRun((n) => n + 1)} back={`${BASE}${search}`} />
+      size={size} onRecord={state.record} onRestart={() => { clearJlptSession(); setRun((n) => n + 1); }} back={`${BASE}${search}`} />
       : <AffixIndex questions={pool} progress={state.progress} filters={filters} size={size} search={search} onFilter={updateFilter} />}
   </div>;
 }
@@ -99,7 +107,7 @@ function AffixIndex({ questions, progress, filters, size, search, onFilter }: {
         <option value="">All affixes</option>{AFFIXES.map((a) => <option key={a} value={a}>{a}</option>)}
       </select></label>
       <label className="n2-search">Mixed round size<select value={size} onChange={(e) => onFilter("size", e.target.value)}>
-        {[10, 20, 50].map((n) => <option key={n} value={n}>{n} questions</option>)}
+        {[3, 5, 10, 15, 20, 50].map((n) => <option key={n} value={n}>{n} questions</option>)}
       </select></label>
     </div>
     <label className="n2-search">Find an affix, word, reading or meaning
@@ -125,14 +133,14 @@ function AffixSession({ questions, progress, mode, size, onRecord, onRestart, ba
   questions: AffixQuestion[]; progress: N2Progress; mode: "lesson" | "mixed" | "review"; size: number;
   onRecord: (id: string, correct: boolean) => void; onRestart: () => void; back: string;
 }) {
-  const [seed] = useState(() => Math.floor(Math.random() * 0x100000000));
-  const [round] = useState(() => drawAffixRound(questions, progress, mode, size, seed));
-  const [position, setPosition] = useState(0);
-  const [answer, setAnswer] = useState<string | null>(null);
-  const [result, setResult] = useState<"correct" | "incorrect" | "revealed" | null>(null);
-  const [correctCount, setCorrectCount] = useState(0);
-  const [hint, setHint] = useState(false);
-  const submitted = useRef(false);
+  const [seed] = useJlptSessionState("seed", () => Math.floor(Math.random() * 0x100000000));
+  const [round] = useJlptSessionState("round", () => drawAffixRound(questions, progress, mode, size, seed));
+  const [position, setPosition] = useJlptSessionState("position", 0);
+  const [answer, setAnswer] = useJlptSessionState<string | null>("answer", null);
+  const [result, setResult] = useJlptSessionState<"correct" | "incorrect" | "revealed" | null>("result", null);
+  const [correctCount, setCorrectCount] = useJlptSessionState("correctCount", 0);
+  const [hint, setHint] = useJlptSessionState("hint", false);
+  const submitted = useRef(!!result);
   const firstRef = useRef<HTMLInputElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
   useEffect(() => { firstRef.current?.focus(); }, [position]);
@@ -164,6 +172,7 @@ function AffixSession({ questions, progress, mode, size, onRecord, onRestart, ba
   return <Card className="n2-exercise">
     <div className="n2-actions"><Badge>{q.level} · {q.kind === "prefix" ? "接頭辞 · Prefix" : "接尾辞 · Suffix / ending"}</Badge>
       <span className="n2-meta">Question {position + 1} of {round.length}</span></div>
+    <JlptQuestionTools id={`affix:${q.id}`} review={!!result} />
     <ProgressBar value={position} max={round.length} label="Affix questions completed this round" />
     <h2 className="sr-only">Choose the missing prefix or suffix</h2>
     <p className="n2-sentence" lang="ja">{before}<span className="n2-blank">（　　）</span>{after}</p>

@@ -74,7 +74,7 @@ const GROUPS: { section: string; items: NavItem[] }[] = [
     section: "Languages",
     items: [
       { to: "/japanese", label: "日本語 vocabulary", icon: "japanese", badge: "vocab", end: true },
-      { to: "/japanese/n2", label: "JLPT N2 courses", icon: "learn" },
+      { to: "/japanese/n2", label: "JLPT", icon: "learn" },
       { to: "/jp-bridge", label: "日本語 → Java", icon: "code" },
     ],
   },

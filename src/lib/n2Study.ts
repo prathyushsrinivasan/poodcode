@@ -1,4 +1,5 @@
 import { STUDY_LESSONS, STUDY_QUESTION_MAP, STUDY_QUESTIONS, STUDY_SECTIONS, type StudyQuestion, type StudySection } from "../data/n2Study";
+import { emptyWorkspace, parseWorkspace, type WorkspaceState } from "./jlptWorkspaceState";
 
 export const STUDY_KEY = "jlpt-n2-study-v1";
 export const DAY = 86_400_000;
@@ -20,6 +21,8 @@ export interface StudySession {
   phase: "lesson" | "question" | "summary";
   drafts: Record<string, StudyDraft>; results: Record<string, StudyAttempt>;
   finishedAt?: number; expired?: boolean;
+  flags?: string[];
+  mock?: { kind: "mini" | "written"; minutes: number };
 }
 export interface StudyState {
   version: 1; revision: number;
@@ -30,9 +33,10 @@ export interface StudyState {
   notes: Record<string, { text: string; reason: string }>;
   learned: string[];
   session: StudySession | null;
+  workspace: WorkspaceState;
 }
 export function emptyStudy(): StudyState {
-  return { version: 1, revision: 0, preferences: { examDate: "2026-12-06", dailyMinutes: 60, roundSize: 5 }, reviews: {}, attempts: [], bookmarks: [], notes: {}, learned: [], session: null };
+  return { version: 1, revision: 0, preferences: { examDate: "2026-12-06", dailyMinutes: 60, roundSize: 5 }, reviews: {}, attempts: [], bookmarks: [], notes: {}, learned: [], session: null, workspace: emptyWorkspace() };
 }
 function isObject(value: unknown): value is Record<string, unknown> { return !!value && typeof value === "object" && !Array.isArray(value); }
 function integer(value: unknown, min = 0): value is number { return typeof value === "number" && Number.isSafeInteger(value) && value >= min; }
@@ -59,6 +63,7 @@ export function parseStudy(raw?: string | null): StudyState {
   const pref = p.preferences;
   if (typeof pref.examDate !== "string" || (pref.examDate !== "" && !validExamDate(pref.examDate)) || !integer(pref.dailyMinutes, 10) || pref.dailyMinutes > 240 || !integer(pref.roundSize, 1) || pref.roundSize > 20) return fail();
   const out = emptyStudy();
+  out.workspace = parseWorkspace(p.workspace);
   out.revision = p.revision;
   out.preferences = { examDate: pref.examDate, dailyMinutes: pref.dailyMinutes, roundSize: pref.roundSize };
   for (const [id, r] of Object.entries(p.reviews)) {
@@ -76,6 +81,8 @@ export function parseStudy(raw?: string | null): StudyState {
     const s = p.session;
     if (!isObject(s) || typeof s.id !== "string" || typeof s.title !== "string" || !["learn", "timed"].includes(String(s.mode)) || !Array.isArray(s.questionIds) || !s.questionIds.length || !s.questionIds.every((id) => typeof id === "string") || new Set(s.questionIds).size !== s.questionIds.length || !integer(s.position) || s.position >= s.questionIds.length || !timestamp(s.startedAt) || !timestamp(s.questionStartedAt) || !(s.deadline === null || timestamp(s.deadline)) || typeof s.paused !== "boolean" || !["lesson", "question", "summary"].includes(String(s.phase)) || !isObject(s.drafts) || !Object.values(s.drafts).every(draft) || !isObject(s.results) || !Object.values(s.results).every(attempt) || (s.finishedAt !== undefined && !timestamp(s.finishedAt)) || (s.expired !== undefined && typeof s.expired !== "boolean")) return fail();
     const ids = s.questionIds as string[];
+    if (s.flags !== undefined && (!Array.isArray(s.flags) || !s.flags.every((id) => typeof id === "string" && ids.includes(id)))) return fail();
+    if (s.mock !== undefined && (!isObject(s.mock) || !["mini", "written"].includes(String(s.mock.kind)) || !integer(s.mock.minutes, 1) || s.mock.minutes > 240 || s.mode !== "timed")) return fail();
     for (const [id, r] of Object.entries(s.results as Record<string, StudyAttempt>)) if (!ids.includes(id) || r.questionId !== id || r.id !== `${s.id}:${id}`) return fail();
     if (s.mode === "timed" && (s.deadline === null || s.paused || s.phase === "lesson")) return fail();
     if (s.phase === "summary" && (Object.keys(s.results).length !== ids.length || s.finishedAt === undefined)) return fail();
@@ -100,6 +107,13 @@ export function answerCorrect(q: StudyQuestion, answer: string): boolean {
   if (q.kind === "assembly") return [q.order, ...(q.acceptedOrders ?? [])].some((order) => answer === order.join(","));
   const normalized = answer.normalize("NFKC").replace(/\s/gu, "");
   return !!normalized && q.answers.includes(normalized);
+}
+export function answerComplete(q: StudyQuestion, answer?: string): boolean {
+  if (!answer) return false;
+  if (q.kind === "choice") return /^\d$/.test(answer) && Number(answer) < q.choices.length;
+  if (q.kind === "typed") return !!answer.trim();
+  const order = answer.split(",");
+  return order.length === q.fragments.length && new Set(order).size === order.length && order.every((n) => /^\d$/.test(n) && Number(n) < q.fragments.length);
 }
 export function displayAnswer(q: StudyQuestion, answer?: string): string {
   if (answer === undefined || answer === "") return "Unanswered";
@@ -147,7 +161,7 @@ export function selectRound(state: StudyState, pool: StudyQuestion[], count: num
   return result.map((q) => q.id);
 }
 export function startSession(state: StudyState, questionIds: string[], mode: StudyMode, title: string, now = Date.now(), id: string = crypto.randomUUID()): StudyState {
-  const ids = [...new Set(questionIds)].filter((q) => STUDY_QUESTION_MAP.has(q)).slice(0, 30);
+  const ids = [...new Set(questionIds)].filter((q) => STUDY_QUESTION_MAP.has(q)).slice(0, 150);
   if (!ids.length || (state.session && state.session.phase !== "summary")) return state;
   const budget = ids.reduce((sum, q) => sum + STUDY_QUESTION_MAP.get(q)!.targetSeconds, 0);
   return { ...state, session: { id, title, mode, questionIds: ids, position: 0, startedAt: now, questionStartedAt: now,

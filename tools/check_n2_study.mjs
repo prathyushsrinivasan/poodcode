@@ -16,7 +16,11 @@ const base = arg("base", "http://localhost:5180");
 const root = "/japanese/n2";
 const errors = [];
 page.on("pageerror", (e) => errors.push(e.message));
-const go = async (path) => { await page.goto(`${base}/#${path}`); await page.locator(".study-page, .n2-page").waitFor(); await page.getByText("Saved on this device", { exact: true }).waitFor().catch(() => undefined); };
+const go = async (path) => {
+  await page.goto(`${base}/#${path}`);
+  await page.locator(".n2-page").waitFor();
+  if (await page.locator(".study-page").count()) await page.getByText("Saved on this device", { exact: true }).waitFor();
+};
 const data = () => page.evaluate(async () => (await import("/src/lib/useN2Study.ts")).n2StudyStore.getSnapshot().data);
 const waitSave = async () => {
   await page.getByText("Saved on this device", { exact: true }).waitFor();
@@ -32,21 +36,41 @@ const waitSave = async () => {
 const accessibility = async (label) => {
   if (!arg("axe")) return;
   await page.addScriptTag({ content: await readFile(arg("axe"), "utf8") });
-  const violations = await page.evaluate(async () => (await window.axe.run(document.querySelector(".study-page"), { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21aa"] } })).violations.map((v) => ({ id: v.id, impact: v.impact, nodes: v.nodes.map((n) => n.target) })));
+  const violations = await page.evaluate(async () => (await window.axe.run(document.querySelector(".n2-page"), { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21aa"] } })).violations.map((v) => ({ id: v.id, impact: v.impact, nodes: v.nodes.map((n) => n.target) })));
   assert.deepEqual(violations, [], `${label}: accessibility violations ${JSON.stringify(violations)}`);
 };
 try {
   await go(root);
-  await page.getByRole("heading", { name: "JLPT N2 study space" }).waitFor();
-  await accessibility("Today");
-  await page.getByRole("tab", { name: "Learn & practice" }).click();
-  assert.ok(await page.locator(".study-lesson-link").count() >= 15);
-  await page.getByLabel("Find a lesson").fill("nonsense-no-match");
-  await page.getByRole("heading", { name: "No matching lessons" }).waitFor();
-  await page.getByRole("button", { name: "Clear filters" }).click();
-  if (arg("screenshot")) await page.screenshot({ path: arg("screenshot").replace(/\.png$/, "-practice.png"), fullPage: true });
-  await go(`${root}/lesson/compound-readings`);
-  await page.getByRole("button", { name: /Practice 4 questions/ }).click();
+  await page.getByRole("heading", { name: "JLPT", exact: true }).waitFor();
+  assert.equal(await page.getByRole("tab").count(), 0);
+  assert.equal(await page.locator(".jlpt-section").count(), 4);
+  assert.equal(await page.locator(".jlpt-practice-link").count(), 14);
+  assert.equal(await page.locator(".jlpt-practice-unavailable").count(), 5);
+  await accessibility("JLPT home");
+  if (arg("screenshot")) await page.screenshot({ path: arg("screenshot").replace(/\.png$/, "-home.png"), fullPage: true });
+  // Every available home entry resolves to its intended practice page.
+  const destinations = await page.locator(".jlpt-practice-link").evaluateAll((links) => links.map((link) => ({ label: link.textContent.trim(), href: link.getAttribute("href").replace(/^#/, "") })));
+  for (const destination of destinations) {
+    await go(destination.href);
+    assert.equal(await page.getByRole("heading", { name: /not found/i }).count(), 0, destination.label);
+    if (destination.href.includes("/reading/")) {
+      await page.getByRole("link", { name: "Continue practice", exact: true }).waitFor();
+      assert.equal(await page.getByLabel("Search passages").isVisible(), false);
+      await page.getByText("Filters & more practice options", { exact: true }).click();
+      await page.getByLabel("Search passages").fill("no-matching-passage-xyz");
+      await page.getByRole("heading", { name: "No matching passages" }).waitFor();
+    } else if (destination.href.includes("/practice/")) {
+      await page.getByRole("button", { name: "Start practice →", exact: true }).waitFor();
+      for (const detail of await page.locator(".jlpt-tips").all()) assert.equal(await detail.getAttribute("open"), null);
+    } else {
+      await page.locator(".n2-exercise").waitFor();
+    }
+    await accessibility(destination.label);
+  }
+  await go(`${root}/library`);
+  await page.waitForURL(`**/#${root}`);
+  await page.getByRole("link", { name: "Kanji Reading", exact: true }).click();
+  await page.getByRole("button", { name: "Start practice →", exact: true }).click();
   await page.getByLabel("Reading in hiragana", { exact: true }).waitFor();
   await accessibility("Typed question");
   const s = await data(); const first = s.session.questionIds[0];
@@ -61,6 +85,7 @@ try {
   await waitSave();
   assert.equal((await data()).attempts.length, 1);
   await page.getByRole("button", { name: "Next question →", exact: true }).click();
+  if (await page.getByRole("button", { name: "Try the questions →", exact: true }).isVisible()) await page.getByRole("button", { name: "Try the questions →", exact: true }).click();
   await page.getByLabel("Reading in hiragana", { exact: true }).fill("とちゅう");
   await page.getByRole("button", { name: "← Save & return", exact: true }).click();
   await page.getByRole("link", { name: "Continue round →", exact: true }).click();
@@ -76,15 +101,13 @@ try {
   await page.getByRole("heading", { name: "A little clearer than before" }).waitFor();
   assert.equal((await data()).attempts.length, 2);
   await accessibility("Round recap");
-  await go(`${root}?tab=review`);
-  await page.getByRole("button", { name: /^Mistakes & help/ }).click();
   assert.ok(await page.locator(".study-recap-item").count() >= 1);
-  await accessibility("Review queue");
+  await accessibility("Review recap");
   // A timed round hides explanations and hints, preserves editable answers,
   // and keeps the original deadline across an app reload.
   await go(`${root}/lesson/wake`);
-  await page.getByLabel("Practice mode").selectOption("timed");
-  await page.getByRole("button", { name: /Practice 2 questions/ }).click();
+  await page.getByLabel("Timed practice", { exact: true }).check();
+  await page.getByRole("button", { name: "Start practice →", exact: true }).click();
   await page.locator(".study-answer-options").waitFor();
   assert.equal(await page.getByRole("button", { name: "Show a hint", exact: true }).count(), 0);
   const before = await data(); const deadline = before.session.deadline;
@@ -103,7 +126,7 @@ try {
   assert.equal((await data()).attempts.length, 4);
   // Verify all assembly controls through an actual full-order submission.
   await go(`${root}/lesson/assembly-links`);
-  await page.getByRole("button", { name: /Practice 4 questions/ }).click();
+  await page.getByRole("button", { name: "Start practice →", exact: true }).click();
   await page.locator(".study-fragments").waitFor();
   const order = await page.evaluate(async () => { const p = (await import("/src/lib/useN2Study.ts")).n2StudyStore.getSnapshot().data; const q = (await import("/src/data/n2Study/index.ts")).STUDY_QUESTION_MAP.get(p.session.questionIds[0]); return q.acceptedOrders?.[0] ?? q.order; });
   for (const n of order) await page.locator(".study-fragments button").nth(n).click();
@@ -115,7 +138,7 @@ try {
   await page.getByRole("button", { name: "Finish early", exact: true }).click();
   await page.getByRole("button", { name: "Finish & review", exact: true }).click();
   await go(`${root}/lesson/paragraph-links`);
-  await page.getByRole("button", { name: /Practice 3 questions/ }).click();
+  await page.getByRole("button", { name: "Start practice →", exact: true }).click();
   await page.locator(".study-passage").waitFor();
   assert.equal(await page.getByText("English translation", { exact: true }).count(), 0);
   const paragraphAnswer = await page.evaluate(async () => { const p = (await import("/src/lib/useN2Study.ts")).n2StudyStore.getSnapshot().data; return (await import("/src/data/n2Study/index.ts")).STUDY_QUESTION_MAP.get(p.session.questionIds[0]).answer; });
@@ -126,7 +149,7 @@ try {
   await page.getByRole("button", { name: "Finish early", exact: true }).click();
   await page.getByRole("button", { name: "Finish & review", exact: true }).click();
   await go(`${root}/lesson/reading-ab`);
-  await page.getByRole("button", { name: /Practice \d+ questions/ }).click();
+  await page.getByRole("button", { name: "Start practice →", exact: true }).click();
   await page.locator(".study-passage").first().waitFor();
   assert.equal(await page.locator(".study-passage").count(), 2);
   await accessibility("Paired reading");
@@ -135,27 +158,21 @@ try {
   if (arg("screenshot")) await page.screenshot({ path: arg("screenshot").replace(/\.png$/, "-reading.png"), fullPage: true });
   await page.getByRole("button", { name: "Finish early", exact: true }).click();
   await page.getByRole("button", { name: "Finish & review", exact: true }).click();
-  await page.getByRole("button", { name: "Back to study space", exact: true }).click();
-  await go(`${root}?tab=plan`);
-  await page.getByLabel("Daily study minutes").fill("75");
-  await page.getByRole("button", { name: "Save study plan", exact: true }).click();
-  await waitSave(); await page.reload(); await page.getByLabel("Daily study minutes").waitFor();
-  assert.equal(await page.getByLabel("Daily study minutes").inputValue(), "75");
-  await accessibility("Study plan");
-  await go(`${root}?tab=progress`); await accessibility("Section progress");
+  await page.getByRole("button", { name: "Back to JLPT", exact: true }).click();
   for (const theme of ["dark", "light"]) {
     await page.evaluate((value) => document.documentElement.dataset.theme = value, theme);
     for (const width of [390, 960, 1440]) {
       await page.setViewportSize({ width, height: 1000 }); await go(root);
+      await page.evaluate(async () => { await document.fonts.ready; await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))); });
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${theme} ${width}px: horizontal page overflow`);
-      await accessibility(`${theme} ${width}px Today`);
+      await accessibility(`${theme} ${width}px JLPT`);
     }
   }
   if (arg("screenshot")) { await page.evaluate(() => document.documentElement.dataset.theme = "dark"); await page.screenshot({ path: arg("screenshot"), fullPage: true }); }
   assert.deepEqual(errors, []);
-  process.stdout.write("N2 study UI passed: guided learning, hints, confidence, notes, bookmarks, pause/reload recovery, timed expiry, no duplicate grading, assembly, review queues, plan persistence, accessibility and responsive themes.\n");
+  process.stdout.write("JLPT UI passed: four groups, direct practice links, collapsed reading filters, library redirect, guided learning, notes, pause/reload recovery, timed expiry, assembly, recaps, accessibility and responsive themes.\n");
 } catch (error) {
   if (arg("screenshot")) await page.screenshot({ path: arg("screenshot"), fullPage: true });
-  process.stderr.write(`At ${page.url()}\n${(await page.locator(".study-page").innerText().catch(() => "No study page")).slice(0, 2000)}\n`);
+  process.stderr.write(`At ${page.url()}\n${(await page.locator(".n2-page").innerText().catch(() => "No JLPT page")).slice(0, 2000)}\n`);
   throw error;
 } finally { await browser.close(); }

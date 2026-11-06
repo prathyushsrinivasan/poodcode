@@ -2,9 +2,24 @@ import { N2_ASSEMBLY_LESSONS } from "../jlptN2SentenceOrder";
 import { READING_PASSAGES, READING_TIPS } from "../dokkai";
 import { plainReading } from "../../lib/dokkaiText";
 import type { ChoiceQuestion, StudyLesson, StudyQuestion } from "./schema";
+import { SPELLING_LESSONS, SPELLING_QUESTIONS } from "./spelling";
+import { READING_DRILL_LESSONS, READING_DRILL_QUESTIONS } from "./readings";
+import { VOCABULARY_LESSONS, VOCABULARY_QUESTIONS } from "./vocabulary";
+import { VOCABULARY_USAGE_QUESTIONS } from "./vocabularyUsage";
+import { GRAMMAR_LESSONS, GRAMMAR_QUESTIONS } from "./grammar";
+import { GRAMMAR_EXTRA_QUESTIONS } from "./grammarPractice";
+import { TEXT_GRAMMAR_QUESTIONS } from "./textGrammar";
+import { READING_SKILL_LESSONS, READING_SKILL_QUESTIONS } from "./readingSkills";
+import { INFORMATION_TABLE_LESSON, INFORMATION_TABLE_QUESTIONS } from "./informationTables";
 export * from "./schema";
 
 export const STUDY_LESSONS: StudyLesson[] = [
+  ...SPELLING_LESSONS,
+  ...READING_DRILL_LESSONS,
+  ...VOCABULARY_LESSONS,
+  ...GRAMMAR_LESSONS,
+  ...READING_SKILL_LESSONS,
+  INFORMATION_TABLE_LESSON,
   { id: "compound-readings", section: "kanji", title: "Read the compound, not isolated kanji", format: "Typed reading",
     takeaway: "Recall the whole word in context. A familiar kanji can have a different reading in another compound.",
     steps: ["Read the surrounding sentence to identify the word.", "Recall its full hiragana reading before checking.", "Say the word silently with its meaning; save troublesome compounds for review."],
@@ -70,6 +85,15 @@ function choice(id: string, lessonId: string, prompt: string, options: [string, 
 }
 
 export const STUDY_QUESTIONS: StudyQuestion[] = [
+  ...SPELLING_QUESTIONS,
+  ...READING_DRILL_QUESTIONS,
+  ...VOCABULARY_QUESTIONS,
+  ...VOCABULARY_USAGE_QUESTIONS,
+  ...GRAMMAR_QUESTIONS,
+  ...GRAMMAR_EXTRA_QUESTIONS,
+  ...TEXT_GRAMMAR_QUESTIONS,
+  ...READING_SKILL_QUESTIONS,
+  ...INFORMATION_TABLE_QUESTIONS,
   ...([
     ["production", "新しい工場で生産を始めた。", "生産", "せいさん", "production", "Production began at the new factory."],
     ["adjustment", "会議の日程を調整する。", "調整", "ちょうせい", "adjustment; coordination", "We will coordinate the meeting schedule."],
@@ -149,7 +173,7 @@ export const STUDY_QUESTIONS: StudyQuestion[] = [
     ["一方", "The text is not comparing two parallel situations.", "Wrong connection"], ["たとえば", "The action is not merely an example of running out of time.", "Wrong connection"]
   ], "そこで introduces an action taken in response to the preceding situation.", "The team responded to unfinished discussion by sharing materials in advance.",
   { targetSeconds: 75, texts: [{ text: "毎週の会議では、資料を読むだけで時間がなくなり、十分に話し合えなかった。（　）、資料を前日に配り、会議では意見の交換に集中することにした。", translation: "At the weekly meetings, simply reading the materials used up the time, leaving little room for discussion. So the team decided to distribute the materials the day before and concentrate on exchanging opinions during the meeting." }], evidence: ["資料を前日に配り"] }),
-  ...N2_ASSEMBLY_LESSONS.slice(1, 5).map((l) => l.questions[0]).map((q) => ({ id: `assembly-${q.id}`, lessonId: "assembly-links", kind: "assembly" as const,
+  ...N2_ASSEMBLY_LESSONS.flatMap((l) => l.questions).map((q) => ({ id: `assembly-${q.id}`, lessonId: "assembly-links", kind: "assembly" as const,
     prompt: "Put all four fragments in order. Which fragment lands at ★?", before: q.before, after: q.after,
     fragments: q.choices, order: q.order.map((n) => n - 1), starIndex: q.starIndex,
     // Time and place adjuncts may swap without changing these sentences.

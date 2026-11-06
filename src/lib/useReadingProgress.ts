@@ -4,8 +4,10 @@ import type { ReadingWord } from "../data/dokkai/types";
 import { emptyReadingProgress, parseReadingProgress, READING_PROGRESS_KEY, recordReadingAnswers,
   reviewReadingWord, type ReadingMode, type ReadingProgress } from "./dokkai";
 import { wordKey } from "./dokkaiText";
+import { clearJlptJournal, readJlptJournal, writeJlptJournal } from "./jlptPersistence";
 
 let pending: Promise<void> = Promise.resolve();
+export const flushReadingProgress = () => pending;
 export function useReadingProgress() {
   const [progress, setProgress] = useState<ReadingProgress | null>(null);
   const latest = useRef(emptyReadingProgress());
@@ -19,14 +21,16 @@ export function useReadingProgress() {
     setLoadError("");
     pending.catch(() => undefined).then(() => api.getSettings()).then((settings) => {
       if (canceled) return;
-      latest.current = parseReadingProgress(settings[READING_PROGRESS_KEY]);
+      latest.current = parseReadingProgress(readJlptJournal(READING_PROGRESS_KEY, settings[READING_PROGRESS_KEY]));
       setProgress(latest.current);
     }).catch((error) => { if (!canceled) setLoadError(String(error)); });
     return () => { canceled = true; mounted.current = false; };
   }, [attempt]);
   function save(next: ReadingProgress) {
+    const raw = JSON.stringify(next);
+    try { writeJlptJournal(READING_PROGRESS_KEY, raw); } catch { setSaveError("Recovery storage is unavailable. Keep this page open until saving succeeds."); }
     pending = pending.catch(() => undefined).then(() => api.setSetting(READING_PROGRESS_KEY, JSON.stringify(next)))
-      .then(() => { if (mounted.current) setSaveError(""); })
+      .then(() => { clearJlptJournal(READING_PROGRESS_KEY, raw); if (mounted.current) setSaveError(""); })
       .catch((error) => { if (mounted.current) setSaveError(String(error)); throw error; });
     void pending.catch(() => undefined);
   }

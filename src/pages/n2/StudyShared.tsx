@@ -1,8 +1,9 @@
-import { Link } from "react-router-dom";
 import { Badge, Button, Card, ErrorState } from "../../components/ui";
 import { STUDY_LESSON_MAP, STUDY_QUESTION_MAP, type StudyLesson, type StudyQuestion } from "../../data/n2Study";
 import { displayAnswer, targetAnswer, MISTAKE_REASONS, type StudyAttempt } from "../../lib/n2Study";
 import { useN2Study, type N2StudyController } from "../../lib/useN2Study";
+import ReadingCorrection from "../../components/ReadingCorrection";
+import { SupportedJapanese } from "../../components/JlptReadingSupport";
 
 export const STUDY_ROOT = "/japanese/n2";
 export function formatTime(seconds: number): string {
@@ -39,14 +40,26 @@ export function EvidenceText({ text, evidence = [] }: { text: string; evidence?:
   parts.push(text.slice(cursor));
   return <>{parts}</>;
 }
-export function QuestionTexts({ question, review = false }: { question: StudyQuestion; review?: boolean }) {
+export function QuestionTexts({ question, review = false, readings = false, translations = false }: { question: StudyQuestion; review?: boolean; readings?: boolean; translations?: boolean }) {
   if (!question.texts) return null;
   return <div className={`study-texts ${question.texts.length > 1 ? "study-texts-paired" : ""}`}>
     {question.texts.map((t, i) => <section key={i} className="study-passage">
       <h3>{t.label ?? (question.texts!.length > 1 ? `Text ${i + 1}` : "Passage")}</h3>
-      <p lang="ja"><EvidenceText text={t.text} evidence={review ? question.evidence : []} /></p>
+      <p lang="ja">{readings && !review ? <SupportedJapanese text={t.text} /> : <EvidenceText text={t.text} evidence={review ? question.evidence : []} />}</p>
+      {translations && <p>{t.translation}</p>}
+      {t.table && <div className="study-table-scroll" role="region" aria-label={t.table.caption} tabIndex={0}><table lang="ja"><caption>{t.table.caption}</caption>
+        <thead><tr>{t.table.columns.map((column) => <th key={column} scope="col">{column}</th>)}</tr></thead>
+        <tbody>{t.table.rows.map((row, ri) => <tr key={ri}>{row.map((cell, ci) => ci === 0
+          ? <th key={ci} scope="row"><EvidenceText text={cell} evidence={review ? question.evidence : []} /></th>
+          : <td key={ci}><EvidenceText text={cell} evidence={review ? question.evidence : []} /></td>)}</tr>)}</tbody>
+      </table></div>}
     </section>)}
   </div>;
+}
+export function QuestionPrompt({ question: q, readings = false }: { question: StudyQuestion; readings?: boolean }) {
+  const render = (text: string) => readings && q.kind !== "typed" ? <SupportedJapanese text={text} /> : text;
+  const at = q.focus ? q.prompt.indexOf(q.focus) : -1;
+  return at < 0 ? <>{render(q.prompt)}</> : <>{render(q.prompt.slice(0, at))}<u className="study-target">{render(q.focus!)}</u>{render(q.prompt.slice(at + q.focus!.length))}</>;
 }
 export function AnswerExplanation({ question: q, result, state }: { question: StudyQuestion; result: StudyAttempt; state: N2StudyController }) {
   const note = state.data.notes[q.id] ?? { text: "", reason: "" };
@@ -55,11 +68,16 @@ export function AnswerExplanation({ question: q, result, state }: { question: St
     <div className="n2-actions"><Badge tone={result.correct && !result.assisted ? "good" : "warn"}>{result.revealed ? "Revealed · scheduled for review" : result.correct ? result.assisted ? "Correct with help" : "Correct" : "Let's work through it"}</Badge>
       <span className="n2-meta">{formatTime(result.elapsedMs / 1000)} · {result.confidence === "sure" ? "Confident" : result.confidence === "guess" ? "Guessed" : "Unsure"}</span></div>
     <p>Your answer: <strong lang="ja">{displayAnswer(q, result.answer)}</strong></p>
+    {q.kind === "typed" && !result.correct && !result.revealed && <ReadingCorrection answer={result.answer} accepted={q.answers} />}
     <div className="study-example"><span className="n2-meta">Target answer</span><p lang="ja">{targetAnswer(q)}</p>
       {q.kind === "typed" && <p>{q.word} — {q.meaning}</p>}
       {q.kind === "assembly" && <p>★ is slot {q.starIndex + 1}: <strong lang="ja">{q.fragments[q.order[q.starIndex]]}</strong></p>}</div>
     {q.kind === "assembly" && !!q.acceptedOrders?.length && <details><summary>Other accepted sentence orders</summary>{q.acceptedOrders.map((order) => <p key={order.join(",")} lang="ja">{q.before}{order.map((i) => q.fragments[i]).join("")}{q.after}</p>)}</details>}
     <h3>Why it fits</h3><p>{q.explanation}</p>
+    {q.breakdown && <details><summary>Sentence breakdown</summary><p lang="ja">{q.breakdown.sentence}</p>
+      <p>Main clause: <strong lang="ja">{q.breakdown.mainClause}</strong></p>
+      <ul>{q.breakdown.modifiers.map((modifier) => <li key={modifier} lang="ja">{modifier}</li>)}</ul><p>{q.breakdown.explanation}</p>
+    </details>}
     {q.evidence && <div className="study-callout"><strong>Evidence from the text</strong>{q.evidence.map((quote) => <blockquote key={quote} lang="ja">{quote}</blockquote>)}</div>}
     {q.kind === "choice" && <details open={!result.correct}><summary>Understand every option</summary><div className="study-option-explanations">{q.choices.map((c, i) => <div key={i} className={i === q.answer ? "study-correct-option" : ""}>
       <div className="n2-actions"><strong lang="ja">{i + 1}. {c.text}</strong><Badge tone={i === q.answer ? "good" : "neutral"}>{i === q.answer ? "Correct" : c.trap ?? "Doesn't fit"}</Badge></div><p>{c.why}</p>
@@ -80,4 +98,3 @@ export function QuestionLabel({ id }: { id: string }) {
   if (!q) return <>Previously practiced question</>;
   return <>{STUDY_LESSON_MAP.get(q.lessonId)!.format} · <span lang="ja">{q.kind === "typed" ? q.word : q.kind === "assembly" ? q.before || "Sentence assembly ★" : q.prompt}</span></>;
 }
-export function LibraryLink() { return <Link className="ghost-link" to={`${STUDY_ROOT}/library`}>Full course library →</Link>; }

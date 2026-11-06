@@ -28,6 +28,10 @@
 .study-field { display: grid; gap: var(--space-2); min-width: 0; margin-bottom: var(--space-4); font-size: var(--text-sm); font-weight: var(--weight-medium); }
 .study-field input, .study-field select, .study-field textarea { width: 100%; min-width: 0; font-size: var(--text-md); }
 .study-field textarea { resize: vertical; }
+.study-table-scroll { max-width: 100%; overflow-x: auto; margin-block: var(--space-4); }
+.study-table-scroll table { width: 100%; min-width: 26rem; border-collapse: collapse; }
+.study-table-scroll th, .study-table-scroll td { padding: var(--space-3); border: 1px solid var(--border); text-align: left; }
+.study-table-scroll caption { text-align: left; font-weight: var(--weight-bold); padding-bottom: var(--space-3); }
 .study-round-setup .study-field, .study-review-toolbar .study-field { margin-bottom: 0; }
 .study-lesson-link { display: flex; flex-direction: column; gap: var(--space-3); text-decoration: none; color: var(--text); transition: border-color var(--dur-2); }
 .study-lesson-link:hover { border-color: var(--accent); text-decoration: none; }

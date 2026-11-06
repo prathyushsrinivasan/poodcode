@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useStore } from "./store";
 import { api } from "./api";
 import { ToastProvider } from "./components/Toast";
@@ -33,8 +33,10 @@ import Contest from "./pages/Contest";
 import JapaneseBridge from "./pages/JapaneseBridge";
 import JlptN2 from "./pages/JlptN2";
 import JlptN2Courses from "./pages/JlptN2Courses";
-import N2StudyHub, { StudyLessonPage } from "./pages/n2/StudyHub";
+import { StudyLessonPage, StudyPracticePage } from "./pages/n2/StudyPractice";
 import N2StudySession from "./pages/n2/StudySession";
+import StudyWorkspace from "./pages/n2/StudyWorkspace";
+import JlptRecovery from "./components/JlptRecovery";
 import JlptAffixes from "./pages/JlptAffixes";
 import JlptKanjiWords from "./pages/JlptKanjiWords";
 import JlptN2SentenceOrder from "./pages/JlptN2SentenceOrder";
@@ -89,6 +91,7 @@ function useAutoCollapse(layout: LayoutClass) {
 }
 
 function Shell() {
+  const { pathname } = useLocation();
   const layout = useLayoutClass();
   useAutoCollapse(layout);
   const collapsed = useStore((s) => s.sidebarAuto ?? s.prefs.sidebarCollapsed);
@@ -99,6 +102,7 @@ function Shell() {
       <TopBar />
       <ScrollRestore />
       <main className="main" id="main">
+        {pathname.startsWith("/japanese/n2/") && <JlptRecovery />}
         <Routes>
           <Route path="/" element={<Today />} />
           <Route path="/library" element={<Library />} />
@@ -111,9 +115,11 @@ function Shell() {
           <Route path="/learn" element={<Learn />} />
           <Route path="/learn/:key" element={<Learn />} />
           <Route path="/japanese" element={<JapanesePage />} />
-          <Route path="/japanese/n2" element={<N2StudyHub />} />
-          <Route path="/japanese/n2/library" element={<JlptN2Courses />} />
+          <Route path="/japanese/n2" element={<JlptN2Courses />} />
+          <Route path="/japanese/n2/library" element={<Navigate to="/japanese/n2" replace />} />
+          <Route path="/japanese/n2/practice/:practiceId" element={<StudyPracticePage />} />
           <Route path="/japanese/n2/study" element={<N2StudySession />} />
+          <Route path="/japanese/n2/review" element={<StudyWorkspace />} />
           <Route path="/japanese/n2/lesson/:lessonId" element={<StudyLessonPage />} />
           <Route path="/japanese/n2/affixes" element={<JlptAffixes />} />
           <Route path="/japanese/n2/affixes/:lessonId" element={<JlptAffixes />} />

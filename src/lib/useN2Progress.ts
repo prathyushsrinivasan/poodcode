@@ -2,10 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import { api } from "../api";
 import { N2_QUESTIONS } from "../data/jlptN2";
 import { N2_PROGRESS_KEY, parseN2Progress, recordN2Answer, type N2Progress } from "./jlptN2";
+import { clearJlptJournal, readJlptJournal, writeJlptJournal } from "./jlptPersistence";
 
 // Serialize snapshots so rapid answers cannot let an older write win. Await
 // this queue on remount too, before reading the persisted progress again.
 let pendingSave: Promise<void> = Promise.resolve();
+export const flushN2Progress = () => pendingSave;
 
 export function useN2Progress(key = N2_PROGRESS_KEY, questions: { id: string }[] = N2_QUESTIONS) {
   const [progress, setProgress] = useState<N2Progress | null>(null);
@@ -22,7 +24,7 @@ export function useN2Progress(key = N2_PROGRESS_KEY, questions: { id: string }[]
       .then(() => api.getSettings())
       .then((settings) => {
         if (canceled) return;
-        latest.current = parseN2Progress(settings[key], questions);
+        latest.current = parseN2Progress(readJlptJournal(key, settings[key]), questions);
         setProgress(latest.current);
       })
       .catch((e) => { if (!canceled) setLoadError(String(e)); });
@@ -30,9 +32,11 @@ export function useN2Progress(key = N2_PROGRESS_KEY, questions: { id: string }[]
   }, [attempt, key, questions]);
 
   function persist(next: N2Progress) {
+    const raw = JSON.stringify(next);
+    try { writeJlptJournal(key, raw); } catch { setSaveError("Recovery storage is unavailable. Keep this page open until saving succeeds."); }
     pendingSave = pendingSave.catch(() => undefined)
       .then(() => api.setSetting(key, JSON.stringify(next)))
-      .then(() => { if (mounted.current) setSaveError(""); })
+      .then(() => { clearJlptJournal(key, raw); if (mounted.current) setSaveError(""); })
       .catch((e) => {
         if (mounted.current) setSaveError(String(e));
         // Retain the rejected queue for the next mount/retry to recover from.

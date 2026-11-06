@@ -2,9 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Badge, Button, Card, ConfirmDialog, PageHeader, ProgressBar } from "../../components/ui";
 import { STUDY_LESSON_MAP, STUDY_QUESTION_MAP, type StudyQuestion } from "../../data/n2Study";
-import { beginQuestions, blankDraft, checkAnswer, finishSession, moveQuestion, pauseSession, startSession, updateDraft, type Confidence, type StudySession as Session } from "../../lib/n2Study";
+import { answerComplete, beginQuestions, blankDraft, checkAnswer, finishSession, moveQuestion, pauseSession, startSession, updateDraft, type Confidence, type StudySession as Session } from "../../lib/n2Study";
 import { useN2Study, type N2StudyController } from "../../lib/useN2Study";
-import { AnswerExplanation, formatTime, LessonBody, QuestionLabel, QuestionTexts, StudyStatus, STUDY_ROOT } from "./StudyShared";
+import { AnswerExplanation, formatTime, LessonBody, QuestionLabel, QuestionPrompt, QuestionTexts, StudyStatus, STUDY_ROOT } from "./StudyShared";
+import { conceptProgress, newExamples, resultsBreakdown, toggleFlag } from "../../lib/jlptWorkspace";
+import JlptReadingSupport from "../../components/JlptReadingSupport";
 
 export default function StudySession() {
   const state = useN2Study();
@@ -14,7 +16,7 @@ export default function StudySession() {
 }
 function SessionRouter({ state }: { state: N2StudyController }) {
   const session = state.data.session;
-  if (!session) return <><PageHeader title="Ready for a short round?" subtitle="Choose a section or today's mixed practice to begin." /><Link className="btn primary" to={STUDY_ROOT}>Open your study space</Link></>;
+  if (!session) return <><PageHeader title="Ready for a short round?" subtitle="Choose a practice type to begin." /><Link className="btn primary" to={STUDY_ROOT}>Open JLPT</Link></>;
   return <SessionView key={session.id} state={state} session={session} />;
 }
 function SessionView({ state, session: s }: { state: N2StudyController; session: Session }) {
@@ -29,6 +31,10 @@ function SessionView({ state, session: s }: { state: N2StudyController; session:
   const lesson = STUDY_LESSON_MAP.get(q.lessonId)!;
   const result = s.results[q.id];
   const d = s.drafts[q.id] ?? blankDraft();
+  const support = state.data.workspace.support;
+  const answered = (id: string) => answerComplete(STUDY_QUESTION_MAP.get(id)!, s.drafts[id]?.answer);
+  const answeredCount = s.questionIds.filter(answered).length;
+  useEffect(() => { if (s.mode === "learn" && (support.readings || support.translations) && !d.assisted) update((p) => updateDraft(p, { assisted: true })); }, [s.mode, s.phase, s.paused, q.id, support.readings, support.translations, d.assisted, update]);
   useEffect(() => {
     const tick = () => {
       const at = Date.now(); setNow(at);
@@ -60,13 +66,23 @@ function SessionView({ state, session: s }: { state: N2StudyController; session:
     const assisted = results.filter((r) => r.assisted).length;
     const retry = results.filter((r) => !r.correct || r.assisted || r.confidence === "guess").map((r) => r.questionId);
     const seconds = results.reduce((n, r) => n + r.elapsedMs, 0) / 1000;
+    const breakdown = resultsBreakdown(s);
+    const examples = newExamples(state.data, retry, state.data.preferences.roundSize);
+    const weak = conceptProgress(state.data).filter((c) => c.attempts && c.correct / c.attempts < 0.8).sort((a, b) => a.correct / a.attempts - b.correct / b.attempts).slice(0, 3);
     return <>
       <PageHeader eyebrow={s.mode === "timed" ? "Timed practice complete" : "Learn & practice complete"} title="A little clearer than before"
         subtitle={s.expired ? "Time expired. Submitted answers were graded; unanswered questions are included as missed." : "Your results and next reviews are saved. Take one useful clue into your next round."} />
       <Card className="study-summary"><div className="study-score">{independent}<span> / {results.length}</span></div><p>correct without help · {assisted} assisted · {formatTime(seconds)} answering time</p>
         <p className="n2-meta">Practice results are not an official JLPT scaled score. A correct guess stays on a short review interval.</p>
         <div className="n2-actions">{retry.length > 0 && <Button variant="primary" onClick={() => update((p) => startSession({ ...p, session: null }, retry, "learn", "Revisit this round"))}>Retry {retry.length} to revisit</Button>}
-          <Button onClick={back}>Back to study space</Button></div>
+          <Button onClick={back}>Back to JLPT</Button></div>
+        {examples.length > 0 && <Button onClick={() => update((p) => beginQuestions(startSession({ ...p, session: null }, examples, "learn", "New examples for missed concepts")))}>Try {examples.length} new examples for missed concepts</Button>}
+      </Card>
+      <Card><h2>Results &amp; pacing</h2><div className="study-table-scroll" tabIndex={0} role="region" aria-label="Results by section"><table><caption>Written practice breakdown</caption><thead><tr><th scope="col">Section</th><th scope="col">Independent correct</th><th scope="col">Unanswered</th><th scope="col">Slow</th><th scope="col">Confident misses</th><th scope="col">Time / suggested</th></tr></thead><tbody>{breakdown.map((r) => <tr key={r.section}><th scope="row">{r.section}</th><td>{r.correct}/{r.total}</td><td>{r.total - r.answered}</td><td>{r.slow}</td><td>{r.confidentWrong}</td><td>{formatTime(r.seconds)} / {formatTime(r.target)}</td></tr>)}</tbody></table></div>
+        <p>{breakdown.some((r) => r.slow > 0) ? "Some answers exceeded their suggested time. Revisit those questions untimed, identify the missing connection, then repeat a short timed round." : "Compare accuracy across a few rounds before tightening your time budget."}</p>
+        {s.mode === "timed" && <p>Total elapsed: {formatTime(((s.finishedAt ?? now) - s.startedAt) / 1000)} · {s.flags?.length ?? 0} flagged for later.</p>}
+        {weak.length > 0 && <><h3>Suggested next concepts</h3><div className="n2-actions">{weak.map((c) => <Link key={c.id} to={`${STUDY_ROOT}/lesson/${c.id}`}>{c.title} · {Math.round(c.correct / c.attempts * 100)}% →</Link>)}</div></>}
+        <Link to={`${STUDY_ROOT}/review`}>Open mistake notebook &amp; due review →</Link>
       </Card>
       <section aria-label="Round review" className="study-stack">{s.questionIds.map((id, i) => {
         const item = STUDY_QUESTION_MAP.get(id)!; const r = s.results[id];
@@ -77,13 +93,14 @@ function SessionView({ state, session: s }: { state: N2StudyController; session:
   }
   if (s.paused) return <><PageHeader title="Your place is saved" subtitle={`${s.title} · Question ${s.position + 1} of ${s.questionIds.length}`} />
     <Card><h2>Pick up where you left off</h2><p>Your answers, hints, confidence and notes are kept. The guided timer is paused.</p>
-      <Button variant="primary" onClick={() => update((p) => pauseSession(p, false))}>Resume round</Button></Card><Link to={STUDY_ROOT}>Back to study space</Link></>;
+      <Button variant="primary" onClick={() => update((p) => pauseSession(p, false))}>Resume round</Button></Card><Link to={STUDY_ROOT}>Back to JLPT</Link></>;
   return <>
     <div className="study-session-toolbar"><Button variant="ghost" onClick={back}>← Save &amp; return</Button>
       <span className="n2-meta">{s.mode === "timed" ? "Timed · timer continues when you leave" : "Learn & practice · pause anytime"}</span>
       {remaining !== null && <span className={`study-timer ${remaining < 30 ? "study-low-time" : ""}`} role="timer" aria-label="Time remaining">{formatTime(remaining)} left</span>}</div>
     <PageHeader eyebrow={s.title} title={lesson.format} subtitle={`Question ${s.position + 1} of ${s.questionIds.length}`} />
-    <ProgressBar value={s.mode === "timed" ? Object.values(s.drafts).filter((v) => v.answer).length : Object.keys(s.results).length} max={s.questionIds.length} label="Questions answered" />
+    <ProgressBar value={s.mode === "timed" ? answeredCount : Object.keys(s.results).length} max={s.questionIds.length} label="Questions answered" />
+    {s.mode === "timed" && <details className="card"><summary>Answer sheet · {answeredCount}/{s.questionIds.length} answered · {s.flags?.length ?? 0} flagged</summary><p>Jump to any question to change your answer before submission.</p><div className="study-question-nav">{s.questionIds.map((id, i) => <Button key={id} size="sm" aria-current={i === s.position ? "step" : undefined} onClick={() => update((p) => moveQuestion(p, i))}>{i + 1} · {answered(id) ? "Answered" : "Unanswered"}{s.flags?.includes(id) ? " · Flagged" : ""}</Button>)}</div><p className="n2-meta">{remaining !== null ? `${formatTime(remaining / Math.max(1, s.questionIds.length - answeredCount))} available per unanswered question.` : ""}</p></details>}
     {s.phase === "lesson" ? <Card className="study-lesson-card"><Badge>Learn · about one minute</Badge><LessonBody lesson={lesson} />
       <Button variant="primary" onClick={() => update(beginQuestions)}>Try the questions →</Button></Card> : <>
       <div className="study-question-layout">
@@ -92,8 +109,11 @@ function SessionView({ state, session: s }: { state: N2StudyController; session:
             <span className="n2-meta">{s.mode === "timed" ? "" : `${formatTime(elapsed)} · `}suggested {formatTime(q.targetSeconds)}</span>
             <Button size="sm" variant="ghost" aria-pressed={state.data.bookmarks.includes(q.id)} onClick={() => update((p) => ({ ...p, bookmarks: p.bookmarks.includes(q.id) ? p.bookmarks.filter((id) => id !== q.id) : [...p.bookmarks, q.id] }))}>{state.data.bookmarks.includes(q.id) ? "Saved ★" : "Save for later"}</Button>
           </div>
-          <QuestionTexts question={q} review={!!result} />
-          <h2 ref={heading} tabIndex={-1} className="study-question-prompt" lang={q.kind === "choice" || q.kind === "typed" ? "ja" : "en"}>{q.prompt}</h2>
+          {s.mode === "timed" && <Button size="sm" aria-pressed={s.flags?.includes(q.id) ?? false} onClick={() => update((p) => toggleFlag(p, q.id))}>{s.flags?.includes(q.id) ? "Flagged for later" : "Flag for later"}</Button>}
+          <JlptReadingSupport disabled={s.mode === "timed"} onAssist={() => update((p) => updateDraft(p, { assisted: true }))} />
+          <QuestionTexts question={q} review={!!result} readings={s.mode === "learn" && support.readings} translations={s.mode === "learn" && support.translations} />
+          <h2 ref={heading} tabIndex={-1} className="study-question-prompt" lang={q.kind === "choice" || q.kind === "typed" ? "ja" : "en"}><QuestionPrompt question={q} readings={s.mode === "learn" && support.readings} /></h2>
+          {s.mode === "learn" && support.translations && <p>{q.translation}</p>}
           {q.kind === "typed" && <p className="study-word" lang="ja">{q.word}</p>}
           <form onSubmit={(e) => { e.preventDefault(); if (s.mode === "learn") update((p) => checkAnswer(p)); }}>
             <AnswerInput key={q.id} question={q} answer={d.answer} disabled={!!result} onChange={(answer) => update((p) => updateDraft(p, { answer }))} />
@@ -110,7 +130,7 @@ function SessionView({ state, session: s }: { state: N2StudyController; session:
           <details onToggle={(e) => { if (e.currentTarget.open) update((p) => updateDraft(p, { assisted: true })); }}><summary>Review the mini lesson</summary><LessonBody lesson={lesson} /></details></Card></aside>}
       </div>
       <div className="study-session-footer">
-        {s.mode === "timed" ? <><div className="study-question-nav" aria-label="Jump to question">{s.questionIds.map((id, i) => <Button key={id} size="sm" aria-label={`Question ${i + 1}${s.drafts[id]?.answer ? ", answered" : ", unanswered"}`} aria-current={i === s.position ? "step" : undefined} onClick={() => update((p) => moveQuestion(p, i))}>{i + 1}{s.drafts[id]?.answer ? " ✓" : ""}</Button>)}</div>
+        {s.mode === "timed" ? <><div className="study-question-nav" aria-label="Jump to question">{s.questionIds.map((id, i) => <Button key={id} size="sm" aria-label={`Question ${i + 1}${answered(id) ? ", answered" : ", unanswered"}`} aria-current={i === s.position ? "step" : undefined} onClick={() => update((p) => moveQuestion(p, i))}>{i + 1}{answered(id) ? " ✓" : ""}</Button>)}</div>
           <div className="n2-actions"><Button disabled={s.position === 0} onClick={() => update((p) => moveQuestion(p, s.position - 1))}>Previous</Button>
             {s.position < s.questionIds.length - 1 && <Button variant="primary" onClick={() => update((p) => moveQuestion(p, s.position + 1))}>Next question →</Button>}
             <Button onClick={() => setConfirmFinish(true)}>Finish timed round</Button></div></>

@@ -31307,5 +31307,3659 @@
         "explanation": "This means ワクチン (わくちん); it is not a study meaning of 労力."
       }
     ]
+  },
+  {
+    "id": "kw-18836ee2c78c",
+    "written": "思い出",
+    "readings": [
+      "おもいで"
+    ],
+    "levels": [
+      "N3"
+    ],
+    "meanings": [
+      "memories, recollections, reminiscence"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1589340"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "memories, recollections, reminiscence",
+        "correct": true,
+        "explanation": "One study meaning of 思い出 (おもいで) is memories, recollections, reminiscence."
+      },
+      {
+        "text": "a cushion",
+        "correct": false,
+        "explanation": "This means 座布団 (ざぶとん); it is not a study meaning of 思い出."
+      },
+      {
+        "text": "a passport",
+        "correct": false,
+        "explanation": "This means 旅券 (りょけん); it is not a study meaning of 思い出."
+      },
+      {
+        "text": "a thermometer",
+        "correct": false,
+        "explanation": "This means 温度計 (おんどけい); it is not a study meaning of 思い出."
+      }
+    ]
+  },
+  {
+    "id": "kw-909f8aad7562",
+    "written": "外出",
+    "readings": [
+      "がいしゅつ"
+    ],
+    "levels": [
+      "N3"
+    ],
+    "meanings": [
+      "outing, going out"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1203800"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "outing, going out",
+        "correct": true,
+        "explanation": "One study meaning of 外出 (がいしゅつ) is outing, going out."
+      },
+      {
+        "text": "a detour",
+        "correct": false,
+        "explanation": "This means 回り道 (まわりみち); it is not a study meaning of 外出."
+      },
+      {
+        "text": "steep",
+        "correct": false,
+        "explanation": "This means 険しい (けわしい); it is not a study meaning of 外出."
+      },
+      {
+        "text": "a passport",
+        "correct": false,
+        "explanation": "This means 旅券 (りょけん); it is not a study meaning of 外出."
+      }
+    ]
+  },
+  {
+    "id": "kw-f3a02d766193",
+    "written": "見解",
+    "readings": [
+      "けんかい"
+    ],
+    "levels": [
+      "N3"
+    ],
+    "meanings": [
+      "opinion, point of view"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1259390"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "opinion, point of view",
+        "correct": true,
+        "explanation": "One study meaning of 見解 (けんかい) is opinion, point of view."
+      },
+      {
+        "text": "a secret",
+        "correct": false,
+        "explanation": "This means 秘密 (ひみつ); it is not a study meaning of 見解."
+      },
+      {
+        "text": "a contract",
+        "correct": false,
+        "explanation": "This means 契約 (けいやく); it is not a study meaning of 見解."
+      },
+      {
+        "text": "a quarrel",
+        "correct": false,
+        "explanation": "This means 喧嘩 (けんか); it is not a study meaning of 見解."
+      }
+    ]
+  },
+  {
+    "id": "kw-a809cea04156",
+    "written": "見当",
+    "readings": [
+      "けんとう"
+    ],
+    "levels": [
+      "N3"
+    ],
+    "meanings": [
+      "estimate, guess"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1259930"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "estimate, guess",
+        "correct": true,
+        "explanation": "One study meaning of 見当 (けんとう) is estimate, guess."
+      },
+      {
+        "text": "an earthquake",
+        "correct": false,
+        "explanation": "This means 地震 (じしん); it is not a study meaning of 見当."
+      },
+      {
+        "text": "a microscope",
+        "correct": false,
+        "explanation": "This means 顕微鏡 (けんびきょう); it is not a study meaning of 見当."
+      },
+      {
+        "text": "a theft",
+        "correct": false,
+        "explanation": "This means 窃盗 (せっとう); it is not a study meaning of 見当."
+      }
+    ]
+  },
+  {
+    "id": "kw-5bb6769305d5",
+    "written": "支出",
+    "readings": [
+      "ししゅつ"
+    ],
+    "levels": [
+      "N3"
+    ],
+    "meanings": [
+      "expenditure, expenses"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1310180"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "expenditure, expenses",
+        "correct": true,
+        "explanation": "One study meaning of 支出 (ししゅつ) is expenditure, expenses."
+      },
+      {
+        "text": "gratitude",
+        "correct": false,
+        "explanation": "This means 感謝 (かんしゃ); it is not a study meaning of 支出."
+      },
+      {
+        "text": "a bribe",
+        "correct": false,
+        "explanation": "This means 賄賂 (わいろ); it is not a study meaning of 支出."
+      },
+      {
+        "text": "applause",
+        "correct": false,
+        "explanation": "This means 拍手 (はくしゅ); it is not a study meaning of 支出."
+      }
+    ]
+  },
+  {
+    "id": "kw-aeb03948bb34",
+    "written": "出身",
+    "readings": [
+      "しゅっしん"
+    ],
+    "levels": [
+      "N3"
+    ],
+    "meanings": [
+      "come from"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1339260"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "come from",
+        "correct": true,
+        "explanation": "One study meaning of 出身 (しゅっしん) is come from."
+      },
+      {
+        "text": "a fossil",
+        "correct": false,
+        "explanation": "This means 化石 (かせき); it is not a study meaning of 出身."
+      },
+      {
+        "text": "a contract",
+        "correct": false,
+        "explanation": "This means 契約 (けいやく); it is not a study meaning of 出身."
+      },
+      {
+        "text": "a lottery",
+        "correct": false,
+        "explanation": "This means 宝くじ (たからくじ); it is not a study meaning of 出身."
+      }
+    ]
+  },
+  {
+    "id": "kw-c6f59945efe7",
+    "written": "出版",
+    "readings": [
+      "しゅっぱん"
+    ],
+    "levels": [
+      "N3"
+    ],
+    "meanings": [
+      "publication"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1340030"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "publication",
+        "correct": true,
+        "explanation": "One study meaning of 出版 (しゅっぱん) is publication."
+      },
+      {
+        "text": "an envelope",
+        "correct": false,
+        "explanation": "This means 封筒 (ふうとう); it is not a study meaning of 出版."
+      },
+      {
+        "text": "a warning",
+        "correct": false,
+        "explanation": "This means 警告 (けいこく); it is not a study meaning of 出版."
+      },
+      {
+        "text": "a thunderstorm",
+        "correct": false,
+        "explanation": "This means 雷雨 (らいう); it is not a study meaning of 出版."
+      }
+    ]
+  },
+  {
+    "id": "kw-dd8e6fab2702",
+    "written": "出場",
+    "readings": [
+      "しゅつじょう"
+    ],
+    "levels": [
+      "N3"
+    ],
+    "meanings": [
+      "participation"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1339220"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "participation",
+        "correct": true,
+        "explanation": "One study meaning of 出場 (しゅつじょう) is participation."
+      },
+      {
+        "text": "a railway track",
+        "correct": false,
+        "explanation": "This means 線路 (せんろ); it is not a study meaning of 出場."
+      },
+      {
+        "text": "envy; jealousy",
+        "correct": false,
+        "explanation": "This means 嫉妬 (しっと); it is not a study meaning of 出場."
+      },
+      {
+        "text": "a witness",
+        "correct": false,
+        "explanation": "This means 証人 (しょうにん); it is not a study meaning of 出場."
+      }
+    ]
+  },
+  {
+    "id": "kw-6faa8cabaa91",
+    "written": "提出",
+    "readings": [
+      "ていしゅつ"
+    ],
+    "levels": [
+      "N3"
+    ],
+    "meanings": [
+      "presentation, submission, filing"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1436410"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "presentation, submission, filing",
+        "correct": true,
+        "explanation": "One study meaning of 提出 (ていしゅつ) is presentation, submission, filing."
+      },
+      {
+        "text": "a staircase",
+        "correct": false,
+        "explanation": "This means 階段 (かいだん); it is not a study meaning of 提出."
+      },
+      {
+        "text": "a glacier",
+        "correct": false,
+        "explanation": "This means 氷河 (ひょうが); it is not a study meaning of 提出."
+      },
+      {
+        "text": "a donation",
+        "correct": false,
+        "explanation": "This means 寄付 (きふ); it is not a study meaning of 提出."
+      }
+    ]
+  },
+  {
+    "id": "kw-4c81fba55f6d",
+    "written": "出",
+    "readings": [
+      "で"
+    ],
+    "levels": [
+      "N3"
+    ],
+    "meanings": [
+      "outflow, coming (going) out, graduate (of)"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1896380"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "outflow, coming (going) out, graduate (of)",
+        "correct": true,
+        "explanation": "One study meaning of 出 (で) is outflow, coming (going) out, graduate (of)."
+      },
+      {
+        "text": "a postal stamp",
+        "correct": false,
+        "explanation": "This means 切手 (きって); it is not a study meaning of 出."
+      },
+      {
+        "text": "humidity",
+        "correct": false,
+        "explanation": "This means 湿度 (しつど); it is not a study meaning of 出."
+      },
+      {
+        "text": "a border between countries",
+        "correct": false,
+        "explanation": "This means 国境 (こっきょう); it is not a study meaning of 出."
+      }
+    ]
+  },
+  {
+    "id": "kw-726c5b4e9fed",
+    "written": "飛び出す",
+    "readings": [
+      "とびだす"
+    ],
+    "levels": [
+      "N3"
+    ],
+    "meanings": [
+      "to jump out, to rush out, to fly out"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1485350"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to jump out, to rush out, to fly out",
+        "correct": true,
+        "explanation": "One study meaning of 飛び出す (とびだす) is to jump out, to rush out, to fly out."
+      },
+      {
+        "text": "to postpone",
+        "correct": false,
+        "explanation": "This means 延期する (えんきする); it is not a study meaning of 飛び出す."
+      },
+      {
+        "text": "to freeze",
+        "correct": false,
+        "explanation": "This means 凍る (こおる); it is not a study meaning of 飛び出す."
+      },
+      {
+        "text": "to forgive",
+        "correct": false,
+        "explanation": "This means 許す (ゆるす); it is not a study meaning of 飛び出す."
+      }
+    ]
+  },
+  {
+    "id": "kw-143ee640112b",
+    "written": "発見",
+    "readings": [
+      "はっけん"
+    ],
+    "levels": [
+      "N3"
+    ],
+    "meanings": [
+      "discovery, detection, finding"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1477310"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "discovery, detection, finding",
+        "correct": true,
+        "explanation": "One study meaning of 発見 (はっけん) is discovery, detection, finding."
+      },
+      {
+        "text": "a postal stamp",
+        "correct": false,
+        "explanation": "This means 切手 (きって); it is not a study meaning of 発見."
+      },
+      {
+        "text": "gratitude",
+        "correct": false,
+        "explanation": "This means 感謝 (かんしゃ); it is not a study meaning of 発見."
+      },
+      {
+        "text": "a continent",
+        "correct": false,
+        "explanation": "This means 大陸 (たいりく); it is not a study meaning of 発見."
+      }
+    ]
+  },
+  {
+    "id": "kw-b46b527162e6",
+    "written": "見送り",
+    "readings": [
+      "みおくり"
+    ],
+    "levels": [
+      "N3"
+    ],
+    "meanings": [
+      "seeing one off"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1259820"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "seeing one off",
+        "correct": true,
+        "explanation": "One study meaning of 見送り (みおくり) is seeing one off."
+      },
+      {
+        "text": "a glacier",
+        "correct": false,
+        "explanation": "This means 氷河 (ひょうが); it is not a study meaning of 見送り."
+      },
+      {
+        "text": "a bandage",
+        "correct": false,
+        "explanation": "This means 包帯 (ほうたい); it is not a study meaning of 見送り."
+      },
+      {
+        "text": "a fossil",
+        "correct": false,
+        "explanation": "This means 化石 (かせき); it is not a study meaning of 見送り."
+      }
+    ]
+  },
+  {
+    "id": "kw-20ba729a3153",
+    "written": "見掛ける",
+    "readings": [
+      "みかける"
+    ],
+    "levels": [
+      "N3"
+    ],
+    "meanings": [
+      "to (happen to see), to notice, to catch sight of"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1604430"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to (happen to see), to notice, to catch sight of",
+        "correct": true,
+        "explanation": "One study meaning of 見掛ける (みかける) is to (happen to see), to notice, to catch sight of."
+      },
+      {
+        "text": "to repair",
+        "correct": false,
+        "explanation": "This means 修理する (しゅうりする); it is not a study meaning of 見掛ける."
+      },
+      {
+        "text": "to whisper",
+        "correct": false,
+        "explanation": "This means ささやく (ささやく); it is not a study meaning of 見掛ける."
+      },
+      {
+        "text": "to kneel",
+        "correct": false,
+        "explanation": "This means ひざまずく (ひざまずく); it is not a study meaning of 見掛ける."
+      }
+    ]
+  },
+  {
+    "id": "kw-a7c90d4bc06c",
+    "written": "見舞い",
+    "readings": [
+      "みまい"
+    ],
+    "levels": [
+      "N3"
+    ],
+    "meanings": [
+      "expression of sympathy, expression of concern"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1604690"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "expression of sympathy, expression of concern",
+        "correct": true,
+        "explanation": "One study meaning of 見舞い (みまい) is expression of sympathy, expression of concern."
+      },
+      {
+        "text": "a shortage",
+        "correct": false,
+        "explanation": "This means 不足 (ふそく); it is not a study meaning of 見舞い."
+      },
+      {
+        "text": "a dentist",
+        "correct": false,
+        "explanation": "This means 歯科医 (しかい); it is not a study meaning of 見舞い."
+      },
+      {
+        "text": "fragile; brittle",
+        "correct": false,
+        "explanation": "This means もろい (もろい); it is not a study meaning of 見舞い."
+      }
+    ]
+  },
+  {
+    "id": "kw-ea136132517e",
+    "written": "言い出す",
+    "readings": [
+      "いいだす"
+    ],
+    "levels": [
+      "N2"
+    ],
+    "meanings": [
+      "to start talking, to suggest"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1264080"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to start talking, to suggest",
+        "correct": true,
+        "explanation": "One study meaning of 言い出す (いいだす) is to start talking, to suggest."
+      },
+      {
+        "text": "to hide; to conceal",
+        "correct": false,
+        "explanation": "This means 隠す (かくす); it is not a study meaning of 言い出す."
+      },
+      {
+        "text": "to melt; to dissolve",
+        "correct": false,
+        "explanation": "This means 溶ける (とける); it is not a study meaning of 言い出す."
+      },
+      {
+        "text": "to repair",
+        "correct": false,
+        "explanation": "This means 修理する (しゅうりする); it is not a study meaning of 言い出す."
+      }
+    ]
+  },
+  {
+    "id": "kw-f292ea74332a",
+    "written": "お出掛け",
+    "readings": [
+      "おでかけ"
+    ],
+    "levels": [
+      "N2"
+    ],
+    "meanings": [
+      "outing"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1338475"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "outing",
+        "correct": true,
+        "explanation": "One study meaning of お出掛け (おでかけ) is outing."
+      },
+      {
+        "text": "a landslide",
+        "correct": false,
+        "explanation": "This means 地滑り (じすべり); it is not a study meaning of お出掛け."
+      },
+      {
+        "text": "a telescope",
+        "correct": false,
+        "explanation": "This means 望遠鏡 (ぼうえんきょう); it is not a study meaning of お出掛け."
+      },
+      {
+        "text": "a fingerprint",
+        "correct": false,
+        "explanation": "This means 指紋 (しもん); it is not a study meaning of お出掛け."
+      }
+    ]
+  },
+  {
+    "id": "kw-142db2288b75",
+    "written": "貸し出し",
+    "readings": [
+      "かしだし"
+    ],
+    "levels": [
+      "N2"
+    ],
+    "meanings": [
+      "lending, loaning"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1590240"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "lending, loaning",
+        "correct": true,
+        "explanation": "One study meaning of 貸し出し (かしだし) is lending, loaning."
+      },
+      {
+        "text": "a surplus",
+        "correct": false,
+        "explanation": "This means 余剰 (よじょう); it is not a study meaning of 貸し出し."
+      },
+      {
+        "text": "a continent",
+        "correct": false,
+        "explanation": "This means 大陸 (たいりく); it is not a study meaning of 貸し出し."
+      },
+      {
+        "text": "a mortgage; a home loan",
+        "correct": false,
+        "explanation": "This means 住宅ローン (じゅうたくろーん); it is not a study meaning of 貸し出し."
+      }
+    ]
+  },
+  {
+    "id": "kw-c0070bbfdb7e",
+    "written": "出勤",
+    "readings": [
+      "しゅっきん"
+    ],
+    "levels": [
+      "N2"
+    ],
+    "meanings": [
+      "going to work, at work"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1338600"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "going to work, at work",
+        "correct": true,
+        "explanation": "One study meaning of 出勤 (しゅっきん) is going to work, at work."
+      },
+      {
+        "text": "a continent",
+        "correct": false,
+        "explanation": "This means 大陸 (たいりく); it is not a study meaning of 出勤."
+      },
+      {
+        "text": "a waterfall",
+        "correct": false,
+        "explanation": "This means 滝 (たき); it is not a study meaning of 出勤."
+      },
+      {
+        "text": "a fingerprint",
+        "correct": false,
+        "explanation": "This means 指紋 (しもん); it is not a study meaning of 出勤."
+      }
+    ]
+  },
+  {
+    "id": "kw-23dd893102bb",
+    "written": "出張",
+    "readings": [
+      "しゅっちょう"
+    ],
+    "levels": [
+      "N2"
+    ],
+    "meanings": [
+      "official tour, business trip"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1339660"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "official tour, business trip",
+        "correct": true,
+        "explanation": "One study meaning of 出張 (しゅっちょう) is official tour, business trip."
+      },
+      {
+        "text": "a grudge",
+        "correct": false,
+        "explanation": "This means 恨み (うらみ); it is not a study meaning of 出張."
+      },
+      {
+        "text": "a lighthouse",
+        "correct": false,
+        "explanation": "This means 灯台 (とうだい); it is not a study meaning of 出張."
+      },
+      {
+        "text": "a thunderstorm",
+        "correct": false,
+        "explanation": "This means 雷雨 (らいう); it is not a study meaning of 出張."
+      }
+    ]
+  },
+  {
+    "id": "kw-c4da6ab46079",
+    "written": "出入り",
+    "readings": [
+      "でいり"
+    ],
+    "levels": [
+      "N2"
+    ],
+    "meanings": [
+      "in and out, coming and going"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1339910"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "in and out, coming and going",
+        "correct": true,
+        "explanation": "One study meaning of 出入り (でいり) is in and out, coming and going."
+      },
+      {
+        "text": "a drought",
+        "correct": false,
+        "explanation": "This means 干ばつ (かんばつ); it is not a study meaning of 出入り."
+      },
+      {
+        "text": "a headache",
+        "correct": false,
+        "explanation": "This means 頭痛 (ずつう); it is not a study meaning of 出入り."
+      },
+      {
+        "text": "a donation",
+        "correct": false,
+        "explanation": "This means 寄付 (きふ); it is not a study meaning of 出入り."
+      }
+    ]
+  },
+  {
+    "id": "kw-03e011fc5046",
+    "written": "出入り口",
+    "readings": [
+      "でいりぐち"
+    ],
+    "levels": [
+      "N2"
+    ],
+    "meanings": [
+      "exit and entrance"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1598540"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "exit and entrance",
+        "correct": true,
+        "explanation": "One study meaning of 出入り口 (でいりぐち) is exit and entrance."
+      },
+      {
+        "text": "a glacier",
+        "correct": false,
+        "explanation": "This means 氷河 (ひょうが); it is not a study meaning of 出入り口."
+      },
+      {
+        "text": "a passport",
+        "correct": false,
+        "explanation": "This means 旅券 (りょけん); it is not a study meaning of 出入り口."
+      },
+      {
+        "text": "a warning",
+        "correct": false,
+        "explanation": "This means 警告 (けいこく); it is not a study meaning of 出入り口."
+      }
+    ]
+  },
+  {
+    "id": "kw-787780bbedc4",
+    "written": "出入口",
+    "readings": [
+      "でいりぐち"
+    ],
+    "levels": [
+      "N2"
+    ],
+    "meanings": [
+      "exit and entrance"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1598540"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "exit and entrance",
+        "correct": true,
+        "explanation": "One study meaning of 出入口 (でいりぐち) is exit and entrance."
+      },
+      {
+        "text": "gratitude",
+        "correct": false,
+        "explanation": "This means 感謝 (かんしゃ); it is not a study meaning of 出入口."
+      },
+      {
+        "text": "a staircase",
+        "correct": false,
+        "explanation": "This means 階段 (かいだん); it is not a study meaning of 出入口."
+      },
+      {
+        "text": "a mortgage; a home loan",
+        "correct": false,
+        "explanation": "This means 住宅ローン (じゅうたくろーん); it is not a study meaning of 出入口."
+      }
+    ]
+  },
+  {
+    "id": "kw-a09b2c071656",
+    "written": "出来上がり",
+    "readings": [
+      "できあがり"
+    ],
+    "levels": [
+      "N2"
+    ],
+    "meanings": [
+      "be finished, ready"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1340600"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "be finished, ready",
+        "correct": true,
+        "explanation": "One study meaning of 出来上がり (できあがり) is be finished, ready."
+      },
+      {
+        "text": "a bone fracture",
+        "correct": false,
+        "explanation": "This means 骨折 (こっせつ); it is not a study meaning of 出来上がり."
+      },
+      {
+        "text": "a thermometer",
+        "correct": false,
+        "explanation": "This means 温度計 (おんどけい); it is not a study meaning of 出来上がり."
+      },
+      {
+        "text": "a compass",
+        "correct": false,
+        "explanation": "This means 羅針盤 (らしんばん); it is not a study meaning of 出来上がり."
+      }
+    ]
+  },
+  {
+    "id": "kw-eadc4a724d92",
+    "written": "出来上がる",
+    "readings": [
+      "できあがる"
+    ],
+    "levels": [
+      "N2"
+    ],
+    "meanings": [
+      "to be finished, to be ready"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1340610"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to be finished, to be ready",
+        "correct": true,
+        "explanation": "One study meaning of 出来上がる (できあがる) is to be finished, to be ready."
+      },
+      {
+        "text": "to polish",
+        "correct": false,
+        "explanation": "This means 磨く (みがく); it is not a study meaning of 出来上がる."
+      },
+      {
+        "text": "to kneel",
+        "correct": false,
+        "explanation": "This means ひざまずく (ひざまずく); it is not a study meaning of 出来上がる."
+      },
+      {
+        "text": "to forgive",
+        "correct": false,
+        "explanation": "This means 許す (ゆるす); it is not a study meaning of 出来上がる."
+      }
+    ]
+  },
+  {
+    "id": "kw-d44272bd8ef3",
+    "written": "出迎え",
+    "readings": [
+      "でむかえ"
+    ],
+    "levels": [
+      "N2"
+    ],
+    "meanings": [
+      "meeting, reception"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1338710"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "meeting, reception",
+        "correct": true,
+        "explanation": "One study meaning of 出迎え (でむかえ) is meeting, reception."
+      },
+      {
+        "text": "slippery",
+        "correct": false,
+        "explanation": "This means 滑りやすい (すべりやすい); it is not a study meaning of 出迎え."
+      },
+      {
+        "text": "a resignation from a job",
+        "correct": false,
+        "explanation": "This means 辞職 (じしょく); it is not a study meaning of 出迎え."
+      },
+      {
+        "text": "a headache",
+        "correct": false,
+        "explanation": "This means 頭痛 (ずつう); it is not a study meaning of 出迎え."
+      }
+    ]
+  },
+  {
+    "id": "kw-3bb6a062e84f",
+    "written": "出迎える",
+    "readings": [
+      "でむかえる"
+    ],
+    "levels": [
+      "N2"
+    ],
+    "meanings": [
+      "to meet, to greet"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1338720"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to meet, to greet",
+        "correct": true,
+        "explanation": "One study meaning of 出迎える (でむかえる) is to meet, to greet."
+      },
+      {
+        "text": "to whisper",
+        "correct": false,
+        "explanation": "This means ささやく (ささやく); it is not a study meaning of 出迎える."
+      },
+      {
+        "text": "to kneel",
+        "correct": false,
+        "explanation": "This means ひざまずく (ひざまずく); it is not a study meaning of 出迎える."
+      },
+      {
+        "text": "to refuse; to decline",
+        "correct": false,
+        "explanation": "This means 断る (ことわる); it is not a study meaning of 出迎える."
+      }
+    ]
+  },
+  {
+    "id": "kw-c067a4692ffc",
+    "written": "引き出す",
+    "readings": [
+      "ひきだす"
+    ],
+    "levels": [
+      "N2"
+    ],
+    "meanings": [
+      "to pull out, to take out, to withdraw"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1601660"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to pull out, to take out, to withdraw",
+        "correct": true,
+        "explanation": "One study meaning of 引き出す (ひきだす) is to pull out, to take out, to withdraw."
+      },
+      {
+        "text": "to kneel",
+        "correct": false,
+        "explanation": "This means ひざまずく (ひざまずく); it is not a study meaning of 引き出す."
+      },
+      {
+        "text": "to whisper",
+        "correct": false,
+        "explanation": "This means ささやく (ささやく); it is not a study meaning of 引き出す."
+      },
+      {
+        "text": "to hide; to conceal",
+        "correct": false,
+        "explanation": "This means 隠す (かくす); it is not a study meaning of 引き出す."
+      }
+    ]
+  },
+  {
+    "id": "kw-cf393a06e539",
+    "written": "日の出",
+    "readings": [
+      "ひので"
+    ],
+    "levels": [
+      "N2"
+    ],
+    "meanings": [
+      "sunrise"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1463790"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "sunrise",
+        "correct": true,
+        "explanation": "One study meaning of 日の出 (ひので) is sunrise."
+      },
+      {
+        "text": "a prescription",
+        "correct": false,
+        "explanation": "This means 処方箋 (しょほうせん); it is not a study meaning of 日の出."
+      },
+      {
+        "text": "a passport",
+        "correct": false,
+        "explanation": "This means 旅券 (りょけん); it is not a study meaning of 日の出."
+      },
+      {
+        "text": "transparent",
+        "correct": false,
+        "explanation": "This means 透明 (とうめい); it is not a study meaning of 日の出."
+      }
+    ]
+  },
+  {
+    "id": "kw-085b063dfe0b",
+    "written": "見上げる",
+    "readings": [
+      "みあげる"
+    ],
+    "levels": [
+      "N2"
+    ],
+    "meanings": [
+      "to look up at, to admire"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1259740"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to look up at, to admire",
+        "correct": true,
+        "explanation": "One study meaning of 見上げる (みあげる) is to look up at, to admire."
+      },
+      {
+        "text": "to postpone",
+        "correct": false,
+        "explanation": "This means 延期する (えんきする); it is not a study meaning of 見上げる."
+      },
+      {
+        "text": "to betray",
+        "correct": false,
+        "explanation": "This means 裏切る (うらぎる); it is not a study meaning of 見上げる."
+      },
+      {
+        "text": "to freeze",
+        "correct": false,
+        "explanation": "This means 凍る (こおる); it is not a study meaning of 見上げる."
+      }
+    ]
+  },
+  {
+    "id": "kw-ee55fa8dfec6",
+    "written": "見送る",
+    "readings": [
+      "みおくる"
+    ],
+    "levels": [
+      "N2"
+    ],
+    "meanings": [
+      "to see off; to escort; to let pass"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1259830"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to see off; to escort; to let pass",
+        "correct": true,
+        "explanation": "One study meaning of 見送る (みおくる) is to see off; to escort; to let pass."
+      },
+      {
+        "text": "to polish",
+        "correct": false,
+        "explanation": "This means 磨く (みがく); it is not a study meaning of 見送る."
+      },
+      {
+        "text": "to kneel",
+        "correct": false,
+        "explanation": "This means ひざまずく (ひざまずく); it is not a study meaning of 見送る."
+      },
+      {
+        "text": "to hide; to conceal",
+        "correct": false,
+        "explanation": "This means 隠す (かくす); it is not a study meaning of 見送る."
+      }
+    ]
+  },
+  {
+    "id": "kw-cc8b92ee7957",
+    "written": "見下ろす",
+    "readings": [
+      "みおろす"
+    ],
+    "levels": [
+      "N2"
+    ],
+    "meanings": [
+      "to overlook, to look down on something"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1259370"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to overlook, to look down on something",
+        "correct": true,
+        "explanation": "One study meaning of 見下ろす (みおろす) is to overlook, to look down on something."
+      },
+      {
+        "text": "to refuse; to decline",
+        "correct": false,
+        "explanation": "This means 断る (ことわる); it is not a study meaning of 見下ろす."
+      },
+      {
+        "text": "to postpone",
+        "correct": false,
+        "explanation": "This means 延期する (えんきする); it is not a study meaning of 見下ろす."
+      },
+      {
+        "text": "to melt; to dissolve",
+        "correct": false,
+        "explanation": "This means 溶ける (とける); it is not a study meaning of 見下ろす."
+      }
+    ]
+  },
+  {
+    "id": "kw-3cd5ac583abc",
+    "written": "見掛け",
+    "readings": [
+      "みかけ"
+    ],
+    "levels": [
+      "N2"
+    ],
+    "meanings": [
+      "outward appearance"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1604420"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "outward appearance",
+        "correct": true,
+        "explanation": "One study meaning of 見掛け (みかけ) is outward appearance."
+      },
+      {
+        "text": "a telescope",
+        "correct": false,
+        "explanation": "This means 望遠鏡 (ぼうえんきょう); it is not a study meaning of 見掛け."
+      },
+      {
+        "text": "an alibi",
+        "correct": false,
+        "explanation": "This means アリバイ (ありばい); it is not a study meaning of 見掛け."
+      },
+      {
+        "text": "a waterfall",
+        "correct": false,
+        "explanation": "This means 滝 (たき); it is not a study meaning of 見掛け."
+      }
+    ]
+  },
+  {
+    "id": "kw-1b92f8501944",
+    "written": "見出し",
+    "readings": [
+      "みだし"
+    ],
+    "levels": [
+      "N2"
+    ],
+    "meanings": [
+      "heading, index"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1259710"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "heading, index",
+        "correct": true,
+        "explanation": "One study meaning of 見出し (みだし) is heading, index."
+      },
+      {
+        "text": "a landslide",
+        "correct": false,
+        "explanation": "This means 地滑り (じすべり); it is not a study meaning of 見出し."
+      },
+      {
+        "text": "a secret",
+        "correct": false,
+        "explanation": "This means 秘密 (ひみつ); it is not a study meaning of 見出し."
+      },
+      {
+        "text": "a visa",
+        "correct": false,
+        "explanation": "This means 査証 (さしょう); it is not a study meaning of 見出し."
+      }
+    ]
+  },
+  {
+    "id": "kw-7e39f4016489",
+    "written": "見詰める",
+    "readings": [
+      "みつめる"
+    ],
+    "levels": [
+      "N2"
+    ],
+    "meanings": [
+      "to stare at, to gaze at"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1604580"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to stare at, to gaze at",
+        "correct": true,
+        "explanation": "One study meaning of 見詰める (みつめる) is to stare at, to gaze at."
+      },
+      {
+        "text": "to refuse; to decline",
+        "correct": false,
+        "explanation": "This means 断る (ことわる); it is not a study meaning of 見詰める."
+      },
+      {
+        "text": "to polish",
+        "correct": false,
+        "explanation": "This means 磨く (みがく); it is not a study meaning of 見詰める."
+      },
+      {
+        "text": "to hide; to conceal",
+        "correct": false,
+        "explanation": "This means 隠す (かくす); it is not a study meaning of 見詰める."
+      }
+    ]
+  },
+  {
+    "id": "kw-ca747ef22d03",
+    "written": "見直す",
+    "readings": [
+      "みなおす"
+    ],
+    "levels": [
+      "N2"
+    ],
+    "meanings": [
+      "to look over again, to review"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1259900"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to look over again, to review",
+        "correct": true,
+        "explanation": "One study meaning of 見直す (みなおす) is to look over again, to review."
+      },
+      {
+        "text": "to repair",
+        "correct": false,
+        "explanation": "This means 修理する (しゅうりする); it is not a study meaning of 見直す."
+      },
+      {
+        "text": "to sew",
+        "correct": false,
+        "explanation": "This means 縫う (ぬう); it is not a study meaning of 見直す."
+      },
+      {
+        "text": "to forgive",
+        "correct": false,
+        "explanation": "This means 許す (ゆるす); it is not a study meaning of 見直す."
+      }
+    ]
+  },
+  {
+    "id": "kw-ccf837b98944",
+    "written": "見慣れる",
+    "readings": [
+      "みなれる"
+    ],
+    "levels": [
+      "N2"
+    ],
+    "meanings": [
+      "to become used to seeing, to be familiar with"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1604650"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to become used to seeing, to be familiar with",
+        "correct": true,
+        "explanation": "One study meaning of 見慣れる (みなれる) is to become used to seeing, to be familiar with."
+      },
+      {
+        "text": "to forgive",
+        "correct": false,
+        "explanation": "This means 許す (ゆるす); it is not a study meaning of 見慣れる."
+      },
+      {
+        "text": "to polish",
+        "correct": false,
+        "explanation": "This means 磨く (みがく); it is not a study meaning of 見慣れる."
+      },
+      {
+        "text": "to refuse; to decline",
+        "correct": false,
+        "explanation": "This means 断る (ことわる); it is not a study meaning of 見慣れる."
+      }
+    ]
+  },
+  {
+    "id": "kw-0d06da41e2f6",
+    "written": "見本",
+    "readings": [
+      "みほん"
+    ],
+    "levels": [
+      "N2"
+    ],
+    "meanings": [
+      "sample"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1260100"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "sample",
+        "correct": true,
+        "explanation": "One study meaning of 見本 (みほん) is sample."
+      },
+      {
+        "text": "temporary; provisional",
+        "correct": false,
+        "explanation": "This means 臨時 (りんじ); it is not a study meaning of 見本."
+      },
+      {
+        "text": "a compass",
+        "correct": false,
+        "explanation": "This means 羅針盤 (らしんばん); it is not a study meaning of 見本."
+      },
+      {
+        "text": "a bone fracture",
+        "correct": false,
+        "explanation": "This means 骨折 (こっせつ); it is not a study meaning of 見本."
+      }
+    ]
+  },
+  {
+    "id": "kw-6e650acd0e3b",
+    "written": "見舞う",
+    "readings": [
+      "みまう"
+    ],
+    "levels": [
+      "N2"
+    ],
+    "meanings": [
+      "to ask after (health), to visit"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1259990"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to ask after (health), to visit",
+        "correct": true,
+        "explanation": "One study meaning of 見舞う (みまう) is to ask after (health), to visit."
+      },
+      {
+        "text": "to polish",
+        "correct": false,
+        "explanation": "This means 磨く (みがく); it is not a study meaning of 見舞う."
+      },
+      {
+        "text": "to freeze",
+        "correct": false,
+        "explanation": "This means 凍る (こおる); it is not a study meaning of 見舞う."
+      },
+      {
+        "text": "to kneel",
+        "correct": false,
+        "explanation": "This means ひざまずく (ひざまずく); it is not a study meaning of 見舞う."
+      }
+    ]
+  },
+  {
+    "id": "kw-3ad56854af11",
+    "written": "呼び出す",
+    "readings": [
+      "よびだす"
+    ],
+    "levels": [
+      "N2"
+    ],
+    "meanings": [
+      "to summon, to call (e.g., phone)"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1266350"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to summon, to call (e.g., phone)",
+        "correct": true,
+        "explanation": "One study meaning of 呼び出す (よびだす) is to summon, to call (e.g., phone)."
+      },
+      {
+        "text": "to forgive",
+        "correct": false,
+        "explanation": "This means 許す (ゆるす); it is not a study meaning of 呼び出す."
+      },
+      {
+        "text": "to polish",
+        "correct": false,
+        "explanation": "This means 磨く (みがく); it is not a study meaning of 呼び出す."
+      },
+      {
+        "text": "to hide; to conceal",
+        "correct": false,
+        "explanation": "This means 隠す (かくす); it is not a study meaning of 呼び出す."
+      }
+    ]
+  },
+  {
+    "id": "kw-394c77172303",
+    "written": "家出",
+    "readings": [
+      "いえで"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "running away from home"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1192030"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "running away from home",
+        "correct": true,
+        "explanation": "One study meaning of 家出 (いえで) is running away from home."
+      },
+      {
+        "text": "gratitude",
+        "correct": false,
+        "explanation": "This means 感謝 (かんしゃ); it is not a study meaning of 家出."
+      },
+      {
+        "text": "a fossil",
+        "correct": false,
+        "explanation": "This means 化石 (かせき); it is not a study meaning of 家出."
+      },
+      {
+        "text": "a customs duty; a tariff",
+        "correct": false,
+        "explanation": "This means 関税 (かんぜい); it is not a study meaning of 家出."
+      }
+    ]
+  },
+  {
+    "id": "kw-595bd691b916",
+    "written": "異見",
+    "readings": [
+      "いけん"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "different opinion, objection"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1157640"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "different opinion, objection",
+        "correct": true,
+        "explanation": "One study meaning of 異見 (いけん) is different opinion, objection."
+      },
+      {
+        "text": "a fossil",
+        "correct": false,
+        "explanation": "This means 化石 (かせき); it is not a study meaning of 異見."
+      },
+      {
+        "text": "a microscope",
+        "correct": false,
+        "explanation": "This means 顕微鏡 (けんびきょう); it is not a study meaning of 異見."
+      },
+      {
+        "text": "a headache",
+        "correct": false,
+        "explanation": "This means 頭痛 (ずつう); it is not a study meaning of 異見."
+      }
+    ]
+  },
+  {
+    "id": "kw-72032f5d1a36",
+    "written": "一見",
+    "readings": [
+      "いっけん"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "a look, a glimpse, glance; first meeting"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1162170"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "a look, a glimpse, glance; first meeting",
+        "correct": true,
+        "explanation": "One study meaning of 一見 (いっけん) is a look, a glimpse, glance; first meeting."
+      },
+      {
+        "text": "envy; jealousy",
+        "correct": false,
+        "explanation": "This means 嫉妬 (しっと); it is not a study meaning of 一見."
+      },
+      {
+        "text": "a peninsula",
+        "correct": false,
+        "explanation": "This means 半島 (はんとう); it is not a study meaning of 一見."
+      },
+      {
+        "text": "a debt; borrowed money",
+        "correct": false,
+        "explanation": "This means 借金 (しゃっきん); it is not a study meaning of 一見."
+      }
+    ]
+  },
+  {
+    "id": "kw-084048267dd4",
+    "written": "売り出し",
+    "readings": [
+      "うりだし"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "(bargain) sale"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1588530"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "(bargain) sale",
+        "correct": true,
+        "explanation": "One study meaning of 売り出し (うりだし) is (bargain) sale."
+      },
+      {
+        "text": "a traffic jam",
+        "correct": false,
+        "explanation": "This means 渋滞 (じゅうたい); it is not a study meaning of 売り出し."
+      },
+      {
+        "text": "gratitude",
+        "correct": false,
+        "explanation": "This means 感謝 (かんしゃ); it is not a study meaning of 売り出し."
+      },
+      {
+        "text": "a waterfall",
+        "correct": false,
+        "explanation": "This means 滝 (たき); it is not a study meaning of 売り出し."
+      }
+    ]
+  },
+  {
+    "id": "kw-e5a49b977cfe",
+    "written": "売り出す",
+    "readings": [
+      "うりだす"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "to put on sale, to market"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1473860"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to put on sale, to market",
+        "correct": true,
+        "explanation": "One study meaning of 売り出す (うりだす) is to put on sale, to market."
+      },
+      {
+        "text": "to kneel",
+        "correct": false,
+        "explanation": "This means ひざまずく (ひざまずく); it is not a study meaning of 売り出す."
+      },
+      {
+        "text": "to hide; to conceal",
+        "correct": false,
+        "explanation": "This means 隠す (かくす); it is not a study meaning of 売り出す."
+      },
+      {
+        "text": "to sew",
+        "correct": false,
+        "explanation": "This means 縫う (ぬう); it is not a study meaning of 売り出す."
+      }
+    ]
+  },
+  {
+    "id": "kw-c48f30173134",
+    "written": "演出",
+    "readings": [
+      "えんしゅつ"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "production (erg. play, direction)"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1176950"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "production (erg. play, direction)",
+        "correct": true,
+        "explanation": "One study meaning of 演出 (えんしゅつ) is production (erg. play, direction)."
+      },
+      {
+        "text": "frost",
+        "correct": false,
+        "explanation": "This means 霜 (しも); it is not a study meaning of 演出."
+      },
+      {
+        "text": "a discount",
+        "correct": false,
+        "explanation": "This means 割引 (わりびき); it is not a study meaning of 演出."
+      },
+      {
+        "text": "humidity",
+        "correct": false,
+        "explanation": "This means 湿度 (しつど); it is not a study meaning of 演出."
+      }
+    ]
+  },
+  {
+    "id": "kw-af270f84943d",
+    "written": "追い出す",
+    "readings": [
+      "おいだす"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "to expel, to drive out"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1432350"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to expel, to drive out",
+        "correct": true,
+        "explanation": "One study meaning of 追い出す (おいだす) is to expel, to drive out."
+      },
+      {
+        "text": "to melt; to dissolve",
+        "correct": false,
+        "explanation": "This means 溶ける (とける); it is not a study meaning of 追い出す."
+      },
+      {
+        "text": "to forgive",
+        "correct": false,
+        "explanation": "This means 許す (ゆるす); it is not a study meaning of 追い出す."
+      },
+      {
+        "text": "to sew",
+        "correct": false,
+        "explanation": "This means 縫う (ぬう); it is not a study meaning of 追い出す."
+      }
+    ]
+  },
+  {
+    "id": "kw-e12d6a0223d2",
+    "written": "見地",
+    "readings": [
+      "けんち"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "point of view"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1259870"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "point of view",
+        "correct": true,
+        "explanation": "One study meaning of 見地 (けんち) is point of view."
+      },
+      {
+        "text": "a lighthouse",
+        "correct": false,
+        "explanation": "This means 灯台 (とうだい); it is not a study meaning of 見地."
+      },
+      {
+        "text": "a dentist",
+        "correct": false,
+        "explanation": "This means 歯科医 (しかい); it is not a study meaning of 見地."
+      },
+      {
+        "text": "a glacier",
+        "correct": false,
+        "explanation": "This means 氷河 (ひょうが); it is not a study meaning of 見地."
+      }
+    ]
+  },
+  {
+    "id": "kw-a9b6d5119d6b",
+    "written": "差し出す",
+    "readings": [
+      "さしだす"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "to present, to submit, to hold out"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1291230"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to present, to submit, to hold out",
+        "correct": true,
+        "explanation": "One study meaning of 差し出す (さしだす) is to present, to submit, to hold out."
+      },
+      {
+        "text": "to melt; to dissolve",
+        "correct": false,
+        "explanation": "This means 溶ける (とける); it is not a study meaning of 差し出す."
+      },
+      {
+        "text": "to freeze",
+        "correct": false,
+        "explanation": "This means 凍る (こおる); it is not a study meaning of 差し出す."
+      },
+      {
+        "text": "to hide; to conceal",
+        "correct": false,
+        "explanation": "This means 隠す (かくす); it is not a study meaning of 差し出す."
+      }
+    ]
+  },
+  {
+    "id": "kw-b59ef9a79dc5",
+    "written": "産出",
+    "readings": [
+      "さんしゅつ"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "yield, produce"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1303810"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "yield, produce",
+        "correct": true,
+        "explanation": "One study meaning of 産出 (さんしゅつ) is yield, produce."
+      },
+      {
+        "text": "a savings deposit",
+        "correct": false,
+        "explanation": "This means 預金 (よきん); it is not a study meaning of 産出."
+      },
+      {
+        "text": "a peninsula",
+        "correct": false,
+        "explanation": "This means 半島 (はんとう); it is not a study meaning of 産出."
+      },
+      {
+        "text": "a donation",
+        "correct": false,
+        "explanation": "This means 寄付 (きふ); it is not a study meaning of 産出."
+      }
+    ]
+  },
+  {
+    "id": "kw-4f73e8e5846b",
+    "written": "出血",
+    "readings": [
+      "しゅっけつ"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "bleeding"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1338750"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "bleeding",
+        "correct": true,
+        "explanation": "One study meaning of 出血 (しゅっけつ) is bleeding."
+      },
+      {
+        "text": "temporary; provisional",
+        "correct": false,
+        "explanation": "This means 臨時 (りんじ); it is not a study meaning of 出血."
+      },
+      {
+        "text": "a ceiling",
+        "correct": false,
+        "explanation": "This means 天井 (てんじょう); it is not a study meaning of 出血."
+      },
+      {
+        "text": "applause",
+        "correct": false,
+        "explanation": "This means 拍手 (はくしゅ); it is not a study meaning of 出血."
+      }
+    ]
+  },
+  {
+    "id": "kw-c56a64756c08",
+    "written": "出産",
+    "readings": [
+      "しゅっさん"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "childbirth"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1339010"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "childbirth",
+        "correct": true,
+        "explanation": "One study meaning of 出産 (しゅっさん) is childbirth."
+      },
+      {
+        "text": "a peninsula",
+        "correct": false,
+        "explanation": "This means 半島 (はんとう); it is not a study meaning of 出産."
+      },
+      {
+        "text": "a thunderstorm",
+        "correct": false,
+        "explanation": "This means 雷雨 (らいう); it is not a study meaning of 出産."
+      },
+      {
+        "text": "a bribe",
+        "correct": false,
+        "explanation": "This means 賄賂 (わいろ); it is not a study meaning of 出産."
+      }
+    ]
+  },
+  {
+    "id": "kw-a014c07de440",
+    "written": "出社",
+    "readings": [
+      "しゅっしゃ"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "come to work"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1339150"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "come to work",
+        "correct": true,
+        "explanation": "One study meaning of 出社 (しゅっしゃ) is come to work."
+      },
+      {
+        "text": "an earthquake",
+        "correct": false,
+        "explanation": "This means 地震 (じしん); it is not a study meaning of 出社."
+      },
+      {
+        "text": "a desert",
+        "correct": false,
+        "explanation": "This means 砂漠 (さばく); it is not a study meaning of 出社."
+      },
+      {
+        "text": "a toothbrush",
+        "correct": false,
+        "explanation": "This means 歯ブラシ (はぶらし); it is not a study meaning of 出社."
+      }
+    ]
+  },
+  {
+    "id": "kw-467a42a58985",
+    "written": "出世",
+    "readings": [
+      "しゅっせ"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "promotion, successful career, eminence"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1339340"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "promotion, successful career, eminence",
+        "correct": true,
+        "explanation": "One study meaning of 出世 (しゅっせ) is promotion, successful career, eminence."
+      },
+      {
+        "text": "a grudge",
+        "correct": false,
+        "explanation": "This means 恨み (うらみ); it is not a study meaning of 出世."
+      },
+      {
+        "text": "a lighthouse",
+        "correct": false,
+        "explanation": "This means 灯台 (とうだい); it is not a study meaning of 出世."
+      },
+      {
+        "text": "a witness",
+        "correct": false,
+        "explanation": "This means 証人 (しょうにん); it is not a study meaning of 出世."
+      }
+    ]
+  },
+  {
+    "id": "kw-629b16f6d5ee",
+    "written": "出費",
+    "readings": [
+      "しゅっぴ"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "expenses, disbursements"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1340180"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "expenses, disbursements",
+        "correct": true,
+        "explanation": "One study meaning of 出費 (しゅっぴ) is expenses, disbursements."
+      },
+      {
+        "text": "a runway",
+        "correct": false,
+        "explanation": "This means 滑走路 (かっそうろ); it is not a study meaning of 出費."
+      },
+      {
+        "text": "a desert",
+        "correct": false,
+        "explanation": "This means 砂漠 (さばく); it is not a study meaning of 出費."
+      },
+      {
+        "text": "a glacier",
+        "correct": false,
+        "explanation": "This means 氷河 (ひょうが); it is not a study meaning of 出費."
+      }
+    ]
+  },
+  {
+    "id": "kw-9deffc2e5d14",
+    "written": "出品",
+    "readings": [
+      "しゅっぴん"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "exhibit, display"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1340190"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "exhibit, display",
+        "correct": true,
+        "explanation": "One study meaning of 出品 (しゅっぴん) is exhibit, display."
+      },
+      {
+        "text": "a waterfall",
+        "correct": false,
+        "explanation": "This means 滝 (たき); it is not a study meaning of 出品."
+      },
+      {
+        "text": "a customs duty; a tariff",
+        "correct": false,
+        "explanation": "This means 関税 (かんぜい); it is not a study meaning of 出品."
+      },
+      {
+        "text": "envy; jealousy",
+        "correct": false,
+        "explanation": "This means 嫉妬 (しっと); it is not a study meaning of 出品."
+      }
+    ]
+  },
+  {
+    "id": "kw-390f5d69882c",
+    "written": "出演",
+    "readings": [
+      "しゅつえん"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "leading performer, stage appearance"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1338290"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "leading performer, stage appearance",
+        "correct": true,
+        "explanation": "One study meaning of 出演 (しゅつえん) is leading performer, stage appearance."
+      },
+      {
+        "text": "a witness",
+        "correct": false,
+        "explanation": "This means 証人 (しょうにん); it is not a study meaning of 出演."
+      },
+      {
+        "text": "a receipt",
+        "correct": false,
+        "explanation": "This means 領収書 (りょうしゅうしょ); it is not a study meaning of 出演."
+      },
+      {
+        "text": "a thunderstorm",
+        "correct": false,
+        "explanation": "This means 雷雨 (らいう); it is not a study meaning of 出演."
+      }
+    ]
+  },
+  {
+    "id": "kw-36d1a5f4a2ef",
+    "written": "出現",
+    "readings": [
+      "しゅつげん"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "appearance, arrival"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1338820"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "appearance, arrival",
+        "correct": true,
+        "explanation": "One study meaning of 出現 (しゅつげん) is appearance, arrival."
+      },
+      {
+        "text": "humid; muggy",
+        "correct": false,
+        "explanation": "This means 蒸し暑い (むしあつい); it is not a study meaning of 出現."
+      },
+      {
+        "text": "temporary; provisional",
+        "correct": false,
+        "explanation": "This means 臨時 (りんじ); it is not a study meaning of 出現."
+      },
+      {
+        "text": "slippery",
+        "correct": false,
+        "explanation": "This means 滑りやすい (すべりやすい); it is not a study meaning of 出現."
+      }
+    ]
+  },
+  {
+    "id": "kw-f265be3b905b",
+    "written": "出題",
+    "readings": [
+      "しゅつだい"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "proposing a question"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1339620"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "proposing a question",
+        "correct": true,
+        "explanation": "One study meaning of 出題 (しゅつだい) is proposing a question."
+      },
+      {
+        "text": "a vaccine",
+        "correct": false,
+        "explanation": "This means ワクチン (わくちん); it is not a study meaning of 出題."
+      },
+      {
+        "text": "a suitcase",
+        "correct": false,
+        "explanation": "This means 旅行鞄 (りょこうかばん); it is not a study meaning of 出題."
+      },
+      {
+        "text": "a compass",
+        "correct": false,
+        "explanation": "This means 羅針盤 (らしんばん); it is not a study meaning of 出題."
+      }
+    ]
+  },
+  {
+    "id": "kw-4b9e34745e59",
+    "written": "進出",
+    "readings": [
+      "しんしゅつ"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "advancement"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1366080"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "advancement",
+        "correct": true,
+        "explanation": "One study meaning of 進出 (しんしゅつ) is advancement."
+      },
+      {
+        "text": "a discount",
+        "correct": false,
+        "explanation": "This means 割引 (わりびき); it is not a study meaning of 進出."
+      },
+      {
+        "text": "a suitcase",
+        "correct": false,
+        "explanation": "This means 旅行鞄 (りょこうかばん); it is not a study meaning of 進出."
+      },
+      {
+        "text": "a fossil",
+        "correct": false,
+        "explanation": "This means 化石 (かせき); it is not a study meaning of 進出."
+      }
+    ]
+  },
+  {
+    "id": "kw-f924c3fd95c5",
+    "written": "脱出",
+    "readings": [
+      "だっしゅつ"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "escape"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1416520"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "escape",
+        "correct": true,
+        "explanation": "One study meaning of 脱出 (だっしゅつ) is escape."
+      },
+      {
+        "text": "a weather forecast",
+        "correct": false,
+        "explanation": "This means 天気予報 (てんきよほう); it is not a study meaning of 脱出."
+      },
+      {
+        "text": "humidity",
+        "correct": false,
+        "explanation": "This means 湿度 (しつど); it is not a study meaning of 脱出."
+      },
+      {
+        "text": "a kitchen knife",
+        "correct": false,
+        "explanation": "This means 包丁 (ほうちょう); it is not a study meaning of 脱出."
+      }
+    ]
+  },
+  {
+    "id": "kw-9c2caa40ea9b",
+    "written": "出くわす",
+    "readings": [
+      "でくわす"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "to happen to meet, to come across"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1337950"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to happen to meet, to come across",
+        "correct": true,
+        "explanation": "One study meaning of 出くわす (でくわす) is to happen to meet, to come across."
+      },
+      {
+        "text": "to melt; to dissolve",
+        "correct": false,
+        "explanation": "This means 溶ける (とける); it is not a study meaning of 出くわす."
+      },
+      {
+        "text": "to forgive",
+        "correct": false,
+        "explanation": "This means 許す (ゆるす); it is not a study meaning of 出くわす."
+      },
+      {
+        "text": "to hide; to conceal",
+        "correct": false,
+        "explanation": "This means 隠す (かくす); it is not a study meaning of 出くわす."
+      }
+    ]
+  },
+  {
+    "id": "kw-0b417a09b373",
+    "written": "出直し",
+    "readings": [
+      "でなおし"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "adjustment, touch up"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1339740"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "adjustment, touch up",
+        "correct": true,
+        "explanation": "One study meaning of 出直し (でなおし) is adjustment, touch up."
+      },
+      {
+        "text": "a flood",
+        "correct": false,
+        "explanation": "This means 洪水 (こうずい); it is not a study meaning of 出直し."
+      },
+      {
+        "text": "a theft",
+        "correct": false,
+        "explanation": "This means 窃盗 (せっとう); it is not a study meaning of 出直し."
+      },
+      {
+        "text": "a mortgage; a home loan",
+        "correct": false,
+        "explanation": "This means 住宅ローン (じゅうたくろーん); it is not a study meaning of 出直し."
+      }
+    ]
+  },
+  {
+    "id": "kw-0030e824c014",
+    "written": "投げ出す",
+    "readings": [
+      "なげだす"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "to abandon, to throw out"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1447040"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to abandon, to throw out",
+        "correct": true,
+        "explanation": "One study meaning of 投げ出す (なげだす) is to abandon, to throw out."
+      },
+      {
+        "text": "to refuse; to decline",
+        "correct": false,
+        "explanation": "This means 断る (ことわる); it is not a study meaning of 投げ出す."
+      },
+      {
+        "text": "to whisper",
+        "correct": false,
+        "explanation": "This means ささやく (ささやく); it is not a study meaning of 投げ出す."
+      },
+      {
+        "text": "to freeze",
+        "correct": false,
+        "explanation": "This means 凍る (こおる); it is not a study meaning of 投げ出す."
+      }
+    ]
+  },
+  {
+    "id": "kw-81bf39fe89f5",
+    "written": "逃げ出す",
+    "readings": [
+      "にげだす"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "to run away, to escape from"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1450390"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to run away, to escape from",
+        "correct": true,
+        "explanation": "One study meaning of 逃げ出す (にげだす) is to run away, to escape from."
+      },
+      {
+        "text": "to sew",
+        "correct": false,
+        "explanation": "This means 縫う (ぬう); it is not a study meaning of 逃げ出す."
+      },
+      {
+        "text": "to repair",
+        "correct": false,
+        "explanation": "This means 修理する (しゅうりする); it is not a study meaning of 逃げ出す."
+      },
+      {
+        "text": "to betray",
+        "correct": false,
+        "explanation": "This means 裏切る (うらぎる); it is not a study meaning of 逃げ出す."
+      }
+    ]
+  },
+  {
+    "id": "kw-a63de5761c7d",
+    "written": "抜け出す",
+    "readings": [
+      "ぬけだす"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "to slip out, to sneak away, to excel"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1478220"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to slip out, to sneak away, to excel",
+        "correct": true,
+        "explanation": "One study meaning of 抜け出す (ぬけだす) is to slip out, to sneak away, to excel."
+      },
+      {
+        "text": "to postpone",
+        "correct": false,
+        "explanation": "This means 延期する (えんきする); it is not a study meaning of 抜け出す."
+      },
+      {
+        "text": "to melt; to dissolve",
+        "correct": false,
+        "explanation": "This means 溶ける (とける); it is not a study meaning of 抜け出す."
+      },
+      {
+        "text": "to polish",
+        "correct": false,
+        "explanation": "This means 磨く (みがく); it is not a study meaning of 抜け出す."
+      }
+    ]
+  },
+  {
+    "id": "kw-14a112592755",
+    "written": "振り出し",
+    "readings": [
+      "ふりだし"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "outset, starting point, drawing or issuing (draft)"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1602990"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "outset, starting point, drawing or issuing (draft)",
+        "correct": true,
+        "explanation": "One study meaning of 振り出し (ふりだし) is outset, starting point, drawing or issuing (draft)."
+      },
+      {
+        "text": "a grudge",
+        "correct": false,
+        "explanation": "This means 恨み (うらみ); it is not a study meaning of 振り出し."
+      },
+      {
+        "text": "a rumor",
+        "correct": false,
+        "explanation": "This means 噂 (うわさ); it is not a study meaning of 振り出し."
+      },
+      {
+        "text": "a ceiling",
+        "correct": false,
+        "explanation": "This means 天井 (てんじょう); it is not a study meaning of 振り出し."
+      }
+    ]
+  },
+  {
+    "id": "kw-a14b798822f8",
+    "written": "噴出",
+    "readings": [
+      "ふんしゅつ"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "spewing, gushing, spouting"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1504600"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "spewing, gushing, spouting",
+        "correct": true,
+        "explanation": "One study meaning of 噴出 (ふんしゅつ) is spewing, gushing, spouting."
+      },
+      {
+        "text": "a fever",
+        "correct": false,
+        "explanation": "This means 発熱 (はつねつ); it is not a study meaning of 噴出."
+      },
+      {
+        "text": "a fossil",
+        "correct": false,
+        "explanation": "This means 化石 (かせき); it is not a study meaning of 噴出."
+      },
+      {
+        "text": "a headache",
+        "correct": false,
+        "explanation": "This means 頭痛 (ずつう); it is not a study meaning of 噴出."
+      }
+    ]
+  },
+  {
+    "id": "kw-c599977f64d7",
+    "written": "偏見",
+    "readings": [
+      "へんけん"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "prejudice, narrow view"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1510380"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "prejudice, narrow view",
+        "correct": true,
+        "explanation": "One study meaning of 偏見 (へんけん) is prejudice, narrow view."
+      },
+      {
+        "text": "a border between countries",
+        "correct": false,
+        "explanation": "This means 国境 (こっきょう); it is not a study meaning of 偏見."
+      },
+      {
+        "text": "slippery",
+        "correct": false,
+        "explanation": "This means 滑りやすい (すべりやすい); it is not a study meaning of 偏見."
+      },
+      {
+        "text": "a weather forecast",
+        "correct": false,
+        "explanation": "This means 天気予報 (てんきよほう); it is not a study meaning of 偏見."
+      }
+    ]
+  },
+  {
+    "id": "kw-9602788b1a29",
+    "written": "放出",
+    "readings": [
+      "ほうしゅつ"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "release, emit"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1516710"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "release, emit",
+        "correct": true,
+        "explanation": "One study meaning of 放出 (ほうしゅつ) is release, emit."
+      },
+      {
+        "text": "frost",
+        "correct": false,
+        "explanation": "This means 霜 (しも); it is not a study meaning of 放出."
+      },
+      {
+        "text": "a fine; a monetary penalty",
+        "correct": false,
+        "explanation": "This means 罰金 (ばっきん); it is not a study meaning of 放出."
+      },
+      {
+        "text": "a flood",
+        "correct": false,
+        "explanation": "This means 洪水 (こうずい); it is not a study meaning of 放出."
+      }
+    ]
+  },
+  {
+    "id": "kw-60bd6130f621",
+    "written": "放り出す",
+    "readings": [
+      "ほうりだす"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "to throw out, to give up, to abandon"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1516510"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to throw out, to give up, to abandon",
+        "correct": true,
+        "explanation": "One study meaning of 放り出す (ほうりだす) is to throw out, to give up, to abandon."
+      },
+      {
+        "text": "to whisper",
+        "correct": false,
+        "explanation": "This means ささやく (ささやく); it is not a study meaning of 放り出す."
+      },
+      {
+        "text": "to repair",
+        "correct": false,
+        "explanation": "This means 修理する (しゅうりする); it is not a study meaning of 放り出す."
+      },
+      {
+        "text": "to betray",
+        "correct": false,
+        "explanation": "This means 裏切る (うらぎる); it is not a study meaning of 放り出す."
+      }
+    ]
+  },
+  {
+    "id": "kw-1998b5e7bb21",
+    "written": "見落とす",
+    "readings": [
+      "みおとす"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "to overlook, to fail to notice"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1260140"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to overlook, to fail to notice",
+        "correct": true,
+        "explanation": "One study meaning of 見落とす (みおとす) is to overlook, to fail to notice."
+      },
+      {
+        "text": "to sew",
+        "correct": false,
+        "explanation": "This means 縫う (ぬう); it is not a study meaning of 見落とす."
+      },
+      {
+        "text": "to refuse; to decline",
+        "correct": false,
+        "explanation": "This means 断る (ことわる); it is not a study meaning of 見落とす."
+      },
+      {
+        "text": "to hide; to conceal",
+        "correct": false,
+        "explanation": "This means 隠す (かくす); it is not a study meaning of 見落とす."
+      }
+    ]
+  },
+  {
+    "id": "kw-79e0d5524f1e",
+    "written": "見苦しい",
+    "readings": [
+      "みぐるしい"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "unsightly, ugly"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1259500"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "unsightly, ugly",
+        "correct": true,
+        "explanation": "One study meaning of 見苦しい (みぐるしい) is unsightly, ugly."
+      },
+      {
+        "text": "a drought",
+        "correct": false,
+        "explanation": "This means 干ばつ (かんばつ); it is not a study meaning of 見苦しい."
+      },
+      {
+        "text": "a bribe",
+        "correct": false,
+        "explanation": "This means 賄賂 (わいろ); it is not a study meaning of 見苦しい."
+      },
+      {
+        "text": "a headache",
+        "correct": false,
+        "explanation": "This means 頭痛 (ずつう); it is not a study meaning of 見苦しい."
+      }
+    ]
+  },
+  {
+    "id": "kw-296f03932c6f",
+    "written": "見込み",
+    "readings": [
+      "みこみ"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "prospects, expectation, hope"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1604480"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "prospects, expectation, hope",
+        "correct": true,
+        "explanation": "One study meaning of 見込み (みこみ) is prospects, expectation, hope."
+      },
+      {
+        "text": "slippery",
+        "correct": false,
+        "explanation": "This means 滑りやすい (すべりやすい); it is not a study meaning of 見込み."
+      },
+      {
+        "text": "a fossil",
+        "correct": false,
+        "explanation": "This means 化石 (かせき); it is not a study meaning of 見込み."
+      },
+      {
+        "text": "an inheritance",
+        "correct": false,
+        "explanation": "This means 遺産 (いさん); it is not a study meaning of 見込み."
+      }
+    ]
+  },
+  {
+    "id": "kw-0767ed55d7fb",
+    "written": "見せびらかす",
+    "readings": [
+      "みせびらかす"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "to show off, to flaunt"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1259200"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to show off, to flaunt",
+        "correct": true,
+        "explanation": "One study meaning of 見せびらかす (みせびらかす) is to show off, to flaunt."
+      },
+      {
+        "text": "to kneel",
+        "correct": false,
+        "explanation": "This means ひざまずく (ひざまずく); it is not a study meaning of 見せびらかす."
+      },
+      {
+        "text": "to freeze",
+        "correct": false,
+        "explanation": "This means 凍る (こおる); it is not a study meaning of 見せびらかす."
+      },
+      {
+        "text": "to hide; to conceal",
+        "correct": false,
+        "explanation": "This means 隠す (かくす); it is not a study meaning of 見せびらかす."
+      }
+    ]
+  },
+  {
+    "id": "kw-353f2ee5484b",
+    "written": "見積もり",
+    "readings": [
+      "みつもり"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "estimation, quotation"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1604590"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "estimation, quotation",
+        "correct": true,
+        "explanation": "One study meaning of 見積もり (みつもり) is estimation, quotation."
+      },
+      {
+        "text": "a fence; a hedge",
+        "correct": false,
+        "explanation": "This means 垣根 (かきね); it is not a study meaning of 見積もり."
+      },
+      {
+        "text": "a harvest",
+        "correct": false,
+        "explanation": "This means 収穫 (しゅうかく); it is not a study meaning of 見積もり."
+      },
+      {
+        "text": "a vaccine",
+        "correct": false,
+        "explanation": "This means ワクチン (わくちん); it is not a study meaning of 見積もり."
+      }
+    ]
+  },
+  {
+    "id": "kw-64f392aed648",
+    "written": "見通し",
+    "readings": [
+      "みとおし"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "perspective, unobstructed view, prospect"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1604610"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "perspective, unobstructed view, prospect",
+        "correct": true,
+        "explanation": "One study meaning of 見通し (みとおし) is perspective, unobstructed view, prospect."
+      },
+      {
+        "text": "a thermometer",
+        "correct": false,
+        "explanation": "This means 温度計 (おんどけい); it is not a study meaning of 見通し."
+      },
+      {
+        "text": "a savings deposit",
+        "correct": false,
+        "explanation": "This means 預金 (よきん); it is not a study meaning of 見通し."
+      },
+      {
+        "text": "a fine; a monetary penalty",
+        "correct": false,
+        "explanation": "This means 罰金 (ばっきん); it is not a study meaning of 見通し."
+      }
+    ]
+  },
+  {
+    "id": "kw-a54d3f60296e",
+    "written": "見なす",
+    "readings": [
+      "みなす"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "to consider as, to regard"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1604630"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to consider as, to regard",
+        "correct": true,
+        "explanation": "One study meaning of 見なす (みなす) is to consider as, to regard."
+      },
+      {
+        "text": "to sew",
+        "correct": false,
+        "explanation": "This means 縫う (ぬう); it is not a study meaning of 見なす."
+      },
+      {
+        "text": "to refuse; to decline",
+        "correct": false,
+        "explanation": "This means 断る (ことわる); it is not a study meaning of 見なす."
+      },
+      {
+        "text": "to kneel",
+        "correct": false,
+        "explanation": "This means ひざまずく (ひざまずく); it is not a study meaning of 見なす."
+      }
+    ]
+  },
+  {
+    "id": "kw-07ef82bc2fb5",
+    "written": "見習う",
+    "readings": [
+      "みならう"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "to follow another's example"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1259700"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to follow another's example",
+        "correct": true,
+        "explanation": "One study meaning of 見習う (みならう) is to follow another's example."
+      },
+      {
+        "text": "to forgive",
+        "correct": false,
+        "explanation": "This means 許す (ゆるす); it is not a study meaning of 見習う."
+      },
+      {
+        "text": "to postpone",
+        "correct": false,
+        "explanation": "This means 延期する (えんきする); it is not a study meaning of 見習う."
+      },
+      {
+        "text": "to melt; to dissolve",
+        "correct": false,
+        "explanation": "This means 溶ける (とける); it is not a study meaning of 見習う."
+      }
+    ]
+  },
+  {
+    "id": "kw-1af47f6ffce6",
+    "written": "見逃す",
+    "readings": [
+      "みのがす"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "to miss, to overlook, to leave at large"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1604670"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to miss, to overlook, to leave at large",
+        "correct": true,
+        "explanation": "One study meaning of 見逃す (みのがす) is to miss, to overlook, to leave at large."
+      },
+      {
+        "text": "to betray",
+        "correct": false,
+        "explanation": "This means 裏切る (うらぎる); it is not a study meaning of 見逃す."
+      },
+      {
+        "text": "to hide; to conceal",
+        "correct": false,
+        "explanation": "This means 隠す (かくす); it is not a study meaning of 見逃す."
+      },
+      {
+        "text": "to sew",
+        "correct": false,
+        "explanation": "This means 縫う (ぬう); it is not a study meaning of 見逃す."
+      }
+    ]
+  },
+  {
+    "id": "kw-3b23e1a5e762",
+    "written": "見計らう",
+    "readings": [
+      "みはからう"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "to choose at one's own discretion"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1259510"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to choose at one's own discretion",
+        "correct": true,
+        "explanation": "One study meaning of 見計らう (みはからう) is to choose at one's own discretion."
+      },
+      {
+        "text": "to whisper",
+        "correct": false,
+        "explanation": "This means ささやく (ささやく); it is not a study meaning of 見計らう."
+      },
+      {
+        "text": "to melt; to dissolve",
+        "correct": false,
+        "explanation": "This means 溶ける (とける); it is not a study meaning of 見計らう."
+      },
+      {
+        "text": "to refuse; to decline",
+        "correct": false,
+        "explanation": "This means 断る (ことわる); it is not a study meaning of 見計らう."
+      }
+    ]
+  },
+  {
+    "id": "kw-3ce40519f5aa",
+    "written": "見晴らし",
+    "readings": [
+      "みはらし"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "view"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1259770"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "view",
+        "correct": true,
+        "explanation": "One study meaning of 見晴らし (みはらし) is view."
+      },
+      {
+        "text": "a resignation from a job",
+        "correct": false,
+        "explanation": "This means 辞職 (じしょく); it is not a study meaning of 見晴らし."
+      },
+      {
+        "text": "a suitcase",
+        "correct": false,
+        "explanation": "This means 旅行鞄 (りょこうかばん); it is not a study meaning of 見晴らし."
+      },
+      {
+        "text": "a fever",
+        "correct": false,
+        "explanation": "This means 発熱 (はつねつ); it is not a study meaning of 見晴らし."
+      }
+    ]
+  },
+  {
+    "id": "kw-b8dc1aec9ec8",
+    "written": "見渡す",
+    "readings": [
+      "みわたす"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "to look out over, to survey (scene), to take an extensive view of"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1259920"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to look out over, to survey (scene), to take an extensive view of",
+        "correct": true,
+        "explanation": "One study meaning of 見渡す (みわたす) is to look out over, to survey (scene), to take an extensive view of."
+      },
+      {
+        "text": "to postpone",
+        "correct": false,
+        "explanation": "This means 延期する (えんきする); it is not a study meaning of 見渡す."
+      },
+      {
+        "text": "to sew",
+        "correct": false,
+        "explanation": "This means 縫う (ぬう); it is not a study meaning of 見渡す."
+      },
+      {
+        "text": "to freeze",
+        "correct": false,
+        "explanation": "This means 凍る (こおる); it is not a study meaning of 見渡す."
+      }
+    ]
+  },
+  {
+    "id": "kw-1581a438b1bb",
+    "written": "申出",
+    "readings": [
+      "もうしで"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "request, claim, report"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1362920"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "request, claim, report",
+        "correct": true,
+        "explanation": "One study meaning of 申出 (もうしで) is request, claim, report."
+      },
+      {
+        "text": "a discount",
+        "correct": false,
+        "explanation": "This means 割引 (わりびき); it is not a study meaning of 申出."
+      },
+      {
+        "text": "a bandage",
+        "correct": false,
+        "explanation": "This means 包帯 (ほうたい); it is not a study meaning of 申出."
+      },
+      {
+        "text": "a kitchen knife",
+        "correct": false,
+        "explanation": "This means 包丁 (ほうちょう); it is not a study meaning of 申出."
+      }
+    ]
+  },
+  {
+    "id": "kw-2edbdd0a35f5",
+    "written": "申し出る",
+    "readings": [
+      "もうしでる"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "to report to, to tell, to suggest"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1362930"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "to report to, to tell, to suggest",
+        "correct": true,
+        "explanation": "One study meaning of 申し出る (もうしでる) is to report to, to tell, to suggest."
+      },
+      {
+        "text": "to forgive",
+        "correct": false,
+        "explanation": "This means 許す (ゆるす); it is not a study meaning of 申し出る."
+      },
+      {
+        "text": "to whisper",
+        "correct": false,
+        "explanation": "This means ささやく (ささやく); it is not a study meaning of 申し出る."
+      },
+      {
+        "text": "to postpone",
+        "correct": false,
+        "explanation": "This means 延期する (えんきする); it is not a study meaning of 申し出る."
+      }
+    ]
+  },
+  {
+    "id": "kw-7272d19c3dda",
+    "written": "目論見",
+    "readings": [
+      "もくろみ"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "a plan, a scheme, intention"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1535730"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "a plan, a scheme, intention",
+        "correct": true,
+        "explanation": "One study meaning of 目論見 (もくろみ) is a plan, a scheme, intention."
+      },
+      {
+        "text": "an eclipse",
+        "correct": false,
+        "explanation": "This means 日食 (にっしょく); it is not a study meaning of 目論見."
+      },
+      {
+        "text": "a salary increase",
+        "correct": false,
+        "explanation": "This means 昇給 (しょうきゅう); it is not a study meaning of 目論見."
+      },
+      {
+        "text": "a celebration",
+        "correct": false,
+        "explanation": "This means 祝賀 (しゅくが); it is not a study meaning of 目論見."
+      }
+    ]
+  },
+  {
+    "id": "kw-3f3e70b37f25",
+    "written": "余所見",
+    "readings": [
+      "よそみ"
+    ],
+    "levels": [
+      "N1"
+    ],
+    "meanings": [
+      "looking away, looking aside"
+    ],
+    "cue": "",
+    "note": "",
+    "source": "reference",
+    "dictionaryIds": [
+      "1544190"
+    ],
+    "aliases": [],
+    "options": [
+      {
+        "text": "looking away, looking aside",
+        "correct": true,
+        "explanation": "One study meaning of 余所見 (よそみ) is looking away, looking aside."
+      },
+      {
+        "text": "a savings deposit",
+        "correct": false,
+        "explanation": "This means 預金 (よきん); it is not a study meaning of 余所見."
+      },
+      {
+        "text": "a theft",
+        "correct": false,
+        "explanation": "This means 窃盗 (せっとう); it is not a study meaning of 余所見."
+      },
+      {
+        "text": "a rainbow",
+        "correct": false,
+        "explanation": "This means 虹 (にじ); it is not a study meaning of 余所見."
+      }
+    ]
   }
 ]

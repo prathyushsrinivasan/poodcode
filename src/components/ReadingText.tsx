@@ -5,6 +5,7 @@ import { COMMON_READING_WORDS } from "../data/dokkai/vocabulary";
 import { readingSegments, readingWords, wordKey } from "../lib/dokkaiText";
 import type { ReadingState } from "../lib/useReadingProgress";
 import { Button } from "./ui";
+import JlptListPicker from "./JlptListPicker";
 
 export function ReadingText({ text, vocabulary = [], ruby = false, enabled = true, evidence = [], onWord }: {
   text: string; vocabulary?: ReadingWord[]; ruby?: boolean; enabled?: boolean; evidence?: string[]; onWord: (word: ReadingWord, anchor: HTMLElement) => void;
@@ -84,6 +85,7 @@ export function ReadingWordPopup({ word, anchor, source, state, onClose }: { wor
       <p className="dokkai-kana" lang="ja">{word.reading}</p><p>{word.meaning}</p>
       {word.lemma && word.lemma !== word.text && <p>Dictionary form: <span lang="ja">{word.lemma}</span></p>}
       <Button variant="primary" disabled={saved} onClick={() => state.saveWord(word, source)}>{saved ? "Saved to vocabulary review" : "Save for vocabulary review"}</Button>
+      {saved && <JlptListPicker id={`word:${wordKey(word)}`} />}
       <p className="n2-meta" role="status">{saved ? "This word is available in Reading vocabulary, with its source passage." : "Meaning and reading apply to this occurrence."}</p>
   </div>, document.body);
 }

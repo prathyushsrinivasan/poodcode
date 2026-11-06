@@ -5,6 +5,26 @@ AB passages, 12 long arguments, and 13 information-search documents. Together th
 provide 388 questions, including 200 medium questions. They ship with the app
 and work offline.
 
+Study mode offers a collapsed **Choose supporting sentences** exercise for each
+question. It strips vocabulary annotation syntax and keeps quoted punctuation
+inside the surrounding sentence. Selections are compared with the authored
+evidence only after submitting the answer. Selecting evidence does not count as
+using a hint and does not alter answer grading. This exercise is hidden during
+timed practice.
+
+Saved vocabulary and word-review cards have a collapsed **Use this word in another
+sentence** option. It retrieves up to three distinct authored contexts outside
+the source passage. Matches require the same reading and contextual meaning;
+explicit occurrence annotations override shared vocabulary. Nothing is generated
+at runtime, and a word with no matching second context is identified as such.
+Examples are searched only when the option is opened. Opening a context does not
+grade or reschedule the word.
+
+Reading libraries link to focused reading-skill drills from collapsed practice
+options. Information Retrieval also offers accessible table-based documents.
+These guided exercises live in `n2Study`; the 238-passage reader and its saved
+question IDs remain unchanged.
+
 `additions/paired.ts`, `additions/long.ts`, and `additions/information.ts` each
 append ten passages with explicit IDs: `ab-004`–`ab-013`, `long-003`–`long-012`,
 and `information-004`–`information-013`. Paired texts are 270–350 characters each,

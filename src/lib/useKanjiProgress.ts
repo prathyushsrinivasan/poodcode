@@ -2,8 +2,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "../api";
 import { KANJI_PROGRESS_KEY } from "../data/kanjiWords";
 import { emptyKanjiProgress, parseKanjiProgress, recordKanjiResult, type KanjiProgress, type KanjiSkill } from "./kanjiWords";
+import { clearJlptJournal, readJlptJournal, writeJlptJournal } from "./jlptPersistence";
 
 let pending: Promise<void> = Promise.resolve();
+export const flushKanjiProgress = () => pending;
 export function useKanjiProgress() {
   const [progress, setProgress] = useState<KanjiProgress | null>(null);
   const latest = useRef(emptyKanjiProgress());
@@ -17,14 +19,16 @@ export function useKanjiProgress() {
     setLoadError("");
     pending.catch(() => undefined).then(() => api.getSettings()).then((settings) => {
       if (canceled) return;
-      latest.current = parseKanjiProgress(settings[KANJI_PROGRESS_KEY]);
+      latest.current = parseKanjiProgress(readJlptJournal(KANJI_PROGRESS_KEY, settings[KANJI_PROGRESS_KEY]));
       setProgress(latest.current);
     }).catch((error) => { if (!canceled) setLoadError(String(error)); });
     return () => { canceled = true; mounted.current = false; };
   }, [attempt]);
   const save = useCallback((next: KanjiProgress) => {
+    const raw = JSON.stringify(next);
+    try { writeJlptJournal(KANJI_PROGRESS_KEY, raw); } catch { setSaveError("Recovery storage is unavailable. Keep this page open until saving succeeds."); }
     pending = pending.catch(() => undefined).then(() => api.setSetting(KANJI_PROGRESS_KEY, JSON.stringify(next)))
-      .then(() => { if (mounted.current) setSaveError(""); })
+      .then(() => { clearJlptJournal(KANJI_PROGRESS_KEY, raw); if (mounted.current) setSaveError(""); })
       .catch((error) => { if (mounted.current) setSaveError(String(error)); throw error; });
     void pending.catch(() => undefined);
   }, []);

@@ -1,5 +1,7 @@
+import { clearJlptSession, useJlptSessionState } from "../lib/useJlptPractice";
+import JlptQuestionTools from "../components/JlptQuestionTools";
 import { useEffect, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useCrumb } from "../store";
 import { Badge, Button, Card, Chip, ErrorState, PageHeader, ProgressBar } from "../components/ui";
 import { N2_LESSONS, N2_QUESTIONS, type N2Kind, type N2Question } from "../data/jlptN2";
@@ -10,6 +12,7 @@ import { useN2Progress } from "../lib/useN2Progress";
 
 export default function JlptN2() {
   const { lessonId } = useParams();
+  const [params] = useSearchParams();
   const lesson = N2_LESSONS.find((l) => l.id === lessonId);
   const reviewing = lessonId === "review";
   useCrumb(reviewing ? "Mistake review" : lesson?.title ?? null, "Pattern lesson");
@@ -18,17 +21,18 @@ export default function JlptN2() {
 
   if (lessonId && !lesson && !reviewing) return <div className="page">
     <PageHeader title="Lesson not found" subtitle="Choose one of the course's pattern families." />
-    <Link to="/japanese/n2/patterns">Back to JLPT N2</Link>
+    <Link to="/japanese/n2">Back to JLPT</Link>
   </div>;
   if (state.loadError) return <div className="page">
     <PageHeader title="Kanji & Vocabulary Blanks" />
     <ErrorState title="Your course progress could not be loaded." error={state.loadError} onRetry={state.retryLoad} />
   </div>;
-  if (!state.progress) return <div className="page" role="status">Loading your JLPT N2 course…</div>;
+  if (!state.progress) return <div className="page" role="status">Loading your JLPT practice…</div>;
 
-  const questions = reviewing ? n2ReviewQuestions(state.progress) : lesson?.questions;
+  const availableQuestions = reviewing ? n2ReviewQuestions(state.progress) : lesson?.questions;
+  const questions = params.get("question") ? availableQuestions?.filter((q) => q.id === params.get("question")) : availableQuestions;
   return <div className="page n2-page">
-    <Link className="ghost-link" to="/japanese/n2">← JLPT N2 courses</Link>
+    <Link className="ghost-link" to="/japanese/n2">← JLPT</Link>
     {lessonId && <Link className="ghost-link" to="/japanese/n2/patterns">← All pattern families</Link>}
     <PageHeader eyebrow="日本語 · JLPT N2 preparation"
       title={reviewing ? "Revisit your mistakes" : lesson?.title ?? "Kanji & Vocabulary Blanks"}
@@ -39,9 +43,9 @@ export default function JlptN2() {
       <p role="alert">Your latest progress has not been saved. Keep this page open and retry.</p>
       <Button onClick={state.retrySave}>Retry saving progress</Button>
     </Card>}
-    {questions ? <N2Session key={`${lessonId}-${run}`} questions={questions}
+    {questions ? <N2Session key={`${lessonId}-${params.toString()}-${run}`} questions={questions}
       progress={state.progress} reviewing={reviewing} onRecord={state.record}
-      onRestart={() => setRun((n) => n + 1)} />
+      onRestart={() => { clearJlptSession(); setRun((n) => n + 1); }} />
       : <CourseIndex progress={state.progress} />}
   </div>;
 }
@@ -105,17 +109,17 @@ function N2Session({ questions, progress, reviewing, onRecord, onRestart }: {
 }) {
   // Freeze the round, especially during review: correcting an answer must not
   // remove the current item and skip the question that follows it.
-  const [round] = useState(() => {
+  const [round] = useJlptSessionState("round", () => {
     const start = reviewing ? 0 : n2ResumeIndex(questions, progress);
     return [...questions.slice(start), ...questions.slice(0, start)];
   });
-  const [position, setPosition] = useState(0);
-  const [correctCount, setCorrectCount] = useState(0);
-  const [input, setInput] = useState("");
-  const [result, setResult] = useState<"correct" | "compare" | "revealed" | null>(null);
+  const [position, setPosition] = useJlptSessionState("position", 0);
+  const [correctCount, setCorrectCount] = useJlptSessionState("correctCount", 0);
+  const [input, setInput] = useJlptSessionState("input", "");
+  const [result, setResult] = useJlptSessionState<"correct" | "compare" | "revealed" | null>("result", null);
   const inputRef = useRef<HTMLInputElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
-  const submitted = useRef(false);
+  const submitted = useRef(!!result);
   const q = round[position];
   useEffect(() => { inputRef.current?.focus(); }, [position]);
   useEffect(() => { if (result) nextRef.current?.focus(); }, [result]);
@@ -153,7 +157,8 @@ function N2Session({ questions, progress, reviewing, onRecord, onRestart }: {
     <Card className="n2-exercise">
       <div className="n2-actions"><Badge>{lesson.kind === "kanji" ? "Fill exactly one kanji" : "Fill the missing word or form"}</Badge>
         <span className="n2-meta">Question {position + 1} of {round.length}</span></div>
-      <ProgressBar value={position} max={round.length} label="Questions completed in this round" />
+      <JlptQuestionTools id={`pattern:${q.id}`} review={!!result} />
+    <ProgressBar value={position} max={round.length} label="Questions completed in this round" />
       <h2 className="sr-only">Complete the sentence</h2>
       <p className="n2-sentence" lang="ja">{before}<span className="n2-blank" aria-label="blank">（　　　）</span>{after}</p>
       {!result ? <form onSubmit={(e) => { e.preventDefault(); submit(); }}>

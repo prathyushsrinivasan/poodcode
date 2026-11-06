@@ -15,7 +15,7 @@ import unicodedata
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 DATA = ROOT / "src/data/kanjiWords"
-KANJI = "生学会人心意力行動事物合定成化性表取交分"
+KANJI = "生学会人心意力行動事物合定成化性表取交分見出"
 MODERN = {
     "知合い": "知り合い", "付合う": "付き合う", "打合せ": "打ち合わせ", "組合せ": "組み合わせ",
     "話合い": "話し合い", "待合室": "待合室", "売行き": "売れ行き", "受取": "受け取り",
@@ -58,7 +58,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-dir", required=True, type=pathlib.Path)
     parser.add_argument("--dictionary", required=True, type=pathlib.Path)
+    parser.add_argument("--preserve-existing", action="store_true", help="Keep released entries and answer options unchanged while adding new families")
     args = parser.parse_args()
+    existing = {w["id"]: w for w in json.loads((DATA / "words.json").read_text(encoding="utf-8"))} if args.preserve_existing else {}
     editorial = json.loads((DATA / "editorial.json").read_text(encoding="utf-8"))
     dictionary = json.loads(args.dictionary.read_text(encoding="utf-8"))
     lookup = {}
@@ -120,6 +122,9 @@ def main():
         add(written, reading, level, "; ".join(meanings), "editorial")
     result = []
     for key, word in words.items():
+        if word["id"] in existing:
+            result.append(existing[word["id"]])
+            continue
         override = editorial["overrides"].get(key, {})
         pool = sorted(editorial["distractors"], key=lambda entry: hashlib.sha256((word["id"] + entry[0]).encode()).digest())
         if all(meaning.startswith("to ") for meaning in word["meanings"]):
@@ -140,10 +145,13 @@ def main():
         del word["_exclusions"]
         result.append(word)
     result.sort(key=lambda word: (int(word["levels"][0][-1]) * -1, word["readings"][0], word["written"]))
+    assert set(existing).issubset({w["id"] for w in result}), "Expansion must not remove released entries"
+    if existing:
+        result = list(existing.values()) + [w for w in result if w["id"] not in existing]
     DATA.mkdir(parents=True, exist_ok=True)
     (DATA / "words.json").write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     manifest = {"reviewed": "2026-10-21", "sourceRevision": "1ad66734417aca9dbcca6b2d5ee440cb13ab3ba0",
-        "dictionaryDate": dictionary["dictDate"], "words": len(result),
+        "dictionaryDate": dictionary["dictDate"], "words": len(result), "families": KANJI,
         "sourceSha256": {f"n{n}.csv": hashlib.sha256((args.source_dir / f"n{n}.csv").read_bytes()).hexdigest() for n in [1, 2, 3]},
         "excluded": skipped}
     (DATA / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

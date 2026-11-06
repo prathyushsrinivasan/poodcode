@@ -19,16 +19,25 @@ export interface StudyLesson {
   examples: { japanese: string; english: string }[];
   next?: { label: string; href: string };
 }
+export interface StudyText {
+  label?: string;
+  text: string;
+  translation: string;
+  table?: { caption: string; columns: string[]; rows: string[][] };
+}
 interface BaseQuestion {
   id: string;
   lessonId: string;
   prompt: string;
+  /** A literal substring of the prompt to underline as the question's target. */
+  focus?: string;
+  breakdown?: { sentence: string; mainClause: string; modifiers: string[]; explanation: string };
   hint: string;
   explanation: string;
   translation: string;
   targetSeconds: number;
   tags: string[];
-  texts?: { label?: string; text: string; translation: string }[];
+  texts?: StudyText[];
   evidence?: string[];
 }
 export interface ChoiceQuestion extends BaseQuestion {
